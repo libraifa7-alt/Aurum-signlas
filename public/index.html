@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aurum Signals AI</title>
+<style>
+:root{--bg:#090d16;--panel:#111827;--line:#263247;--gold:#d8b45c;--muted:#94a3b8;--green:#20c997}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#f8fafc;font-family:Arial,sans-serif}
+header{padding:20px 5%;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:22px;font-weight:bold;color:var(--gold)}
+.status{font-size:12px;color:var(--green)}
+main{max-width:1200px;margin:auto;padding:25px 5%}
+h1{font-size:27px;margin-bottom:6px}
+.sub{color:var(--muted);font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:25px 0}
+.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.card small{color:var(--muted)}
+.card strong{display:block;font-size:22px;margin-top:12px}
+.gold{color:var(--gold)}
+.layout{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.panel h3{margin-top:0}
+.chart{height:260px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#101b2c,#0b1220);border-radius:9px;color:var(--muted);text-align:center;padding:15px}
+select,button{background:#172337;color:white;border:1px solid var(--line);padding:11px;border-radius:7px}
+button{cursor:pointer;background:#b58a35;color:#090d16;font-weight:bold;border:0}
+.signal{border-bottom:1px solid var(--line);padding:13px 0}
+.signal:last-child{border:0}
+.green{color:var(--green)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
+@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}header{padding:16px 5%}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">✦ AURUM SIGNALS AI</div>
+<div class="status">● SYSTEM ONLINE</div>
+</header>
+<main>
+<h1>Trading Dashboard</h1>
+<p class="sub">ICT Smart Money Concepts · Forex Market Analysis</p>
+
+<div class="cards">
+<div class="card"><small>MARKET</small><strong class="gold">FOREX</strong></div>
+<div class="card"><small>TIMEFRAME</small><strong>M15</strong></div>
+<div class="card"><small>ACTIVE SIGNALS</small><strong id="signals">0</strong></div>
+<div class="card"><small>ENGINE</small><strong class="gold">READY</strong></div>
+</div>
+
+<div class="layout">
+<section class="panel">
+<h3>Market Overview</h3>
+<div style="margin-bottom:15px">
+<select id="pair">
+<option>EUR/USD</option><option>GBP/USD</option>
+<option>USD/JPY</option><option>AUD/USD</option>
+<option>USD/CAD</option><option>NZD/USD</option>
+</select>
+<select id="tf">
+<option>M1</option><option>M5</option><option selected>M15</option>
+<option>M30</option><option>M45</option><option>H1</option>
+<option>H2</option><option>H4</option><option>H6</option>
+<option>H8</option><option>H12</option>
+</select>
+</div>
+<div class="chart">
+<div>
+<div style="font-size:30px;color:#d8b45c">✦</div>
+<strong>ICT Market Chart</strong>
+<p>Live market data connection pending</p>
+</div>
+</div>
+</section>
+
+<section class="panel">
+<h3>ICT AI Analysis</h3>
+<div class="signal"><small class="sub">MARKET STRUCTURE</small><p>Waiting for data</p></div>
+<div class="signal"><small class="sub">LIQUIDITY</small><p>Not analyzed</p></div>
+<div class="signal"><small class="sub">FAIR VALUE GAP</small><p>Not analyzed</p></div>
+<div class="signal"><small class="sub">ORDER BLOCK</small><p>Not analyzed</p></div>
+</section>
+</div>
+
+<section class="panel" style="margin-top:16px">
+<h3>Trading Signals</h3>
+<p class="sub">Signal status</p>
+<p class="gold">WAIT — Awaiting verified market data</p>
+<p class="sub">No live BUY or SELL recommendation is currently available.</p>
+</section>
+</main>
+<footer>
+Aurum Signals AI · Educational analysis only · Manual execution
+</footer>
+<script>
+fetch('/api/health')
+.then(r=>r.json())
+.then(data=>{document.querySelector('.status').textContent='● '+data.status.toUpperCase()})
+.catch(()=>{document.querySelector('.status').textContent='● SERVER CONNECTION PENDING'});
+</script>
+</body>
+</html>
+
