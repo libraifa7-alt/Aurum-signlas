@@ -46,7 +46,7 @@ try {
 } catch (error) {
   return res.status(500).json({
     status: "error",
-    message: "Terjadi kesalahan koneksi data"
+    message: error.message
   });
 }
 };
