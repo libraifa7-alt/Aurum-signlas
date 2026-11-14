@@ -85,7 +85,10 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
   <small class="sub">LIQUIDITY</small>
   <p id="liquidityAnalysis">Menunggu analisis liquidity...</p>
 </div>
-<div class="signal"><small class="sub">FAIR VALUE GAP</small><p>Not analyzed</p></div>
+<div class="signal">
+  <small class="sub">FAIR VALUE GAP</small>
+  <p id="fvgAnalysis">Menunggu analisis FVG...</p>
+</div>
 <div class="signal"><small class="sub">ORDER BLOCK</small><p>Not analyzed</p></div>
 </section>
 </div>
@@ -198,12 +201,32 @@ function analyzeLiquidity(data) {
   }
     return 'LIKUIDITAS — Belum ada sweep terdeteksi';
   }
+// FAIR VALUE GAP DETECTION
+function analyzeFVG(data) {
+  if (data.length < 3) return 'Data candle belum cukup';
+
+  const a = data[data.length - 3];
+  const c = data[data.length - 1];
+
+  if (a.high < c.low) {
+    return 'BULLISH FVG — Celah harga naik terdeteksi';
+  }
+
+  if (a.low > c.high) {
+    return 'BEARISH FVG — Celah harga turun terdeteksi';
+  }
+
+  return 'FVG — Belum ada gap terdeteksi';
+}
 
 const structure = analyzeMarketStructure(candles);
 document.getElementById('marketStructure').textContent = structure;
-      
+
 const liquidity = analyzeLiquidity(candles);
 document.getElementById('liquidityAnalysis').textContent = liquidity;
+    
+      const fvg = analyzeFVG(candles);
+document.getElementById('fvgAnalysis').textContent = fvg;
   
       series.setData(candles);
       chart.timeScale().fitContent();
