@@ -619,7 +619,8 @@ document.getElementById('orderBlockAnalysis').textContent = orderBlock;
 
 const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
 document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
-  
+      
+  console.log('JUMLAH CANDLE:', candles.length);
       series.setData(candles);
       chart.timeScale().fitContent();
 } catch (error) {
