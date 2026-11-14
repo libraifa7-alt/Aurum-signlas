@@ -18,35 +18,38 @@ export default async function handler(req, res) {
   };
   const selected = String(req.query.interval || "M15").toUpperCase();
   const interval = allowedIntervals[selected] || "15min";
+  
+try {
+  
+ const url  = URL("https://api.twelvedata.com/time_series");
 
-  try 
-    const url = new URL("https://api.twelvedata.com/time_series");
+  url.searchParams.set("symbol", "XAU/USD");
+  url.searchParams.set("interval", interval);
+  url.searchParams.set("outputsize", "100");
+  url.searchParams.set("apikey", apiKey);
 
-    url.searchParams.set("symbol", "XAU/USD");
-    url.searchParams.set("interval", interval);
-    url.searchParams.set("outputsize", "100");
-    url.searchParams.set("apikey", apiKey);
+  const response = await fetch(url);
+  const data = await response.json();
 
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!response.ok || data.status === "error") {
-      return res.status(502).json({
-        status: "error",
-        message: data.message || "Gagal mengambil data XAUUSD"
-      });
-    }
-
-    return res.status(200).json({
-      status: "success",
-      symbol: "XAU/USD",
-      interval,
-      candles: data.values || []
-    });
-  } catch (error) {
-    return res.status(500).json({
+  if (!response.ok || data.status === "error") {
+    return res.status(502).json({
       status: "error",
-      message: "Terjadi kesalahan koneksi data"
+      message: data.message || "Gagal mengambil data XAUUSD"
     });
   }
+
+    return res.status(200).json({
+    status: "success",
+    symbol: "XAU/USD",
+    interval,
+    candles: data.values || []
+  });
+} catch (error) {
+  });
+  } catch (error) {
+  return res.status(500).json({
+    status: "error",
+    message: "Terjadi kesalahan koneksi data"
+  });
+}
 }
