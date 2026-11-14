@@ -341,7 +341,79 @@ function analyzeLiquidity(data) {
   return 'LIKUIDITAS — Belum ada sweep terdeteksi';
 }
       
-// MULTI TIMEFRAME LIQUIDITY SWEEP
+
+function analyzeEqualHighLow(data) {
+  if (!data || data.length < 15) {
+    return 'Data candle belum cukup';
+  }
+
+  const candles = data.slice(0, -1).slice(-30);
+
+  if (candles.length < 15) {
+    return 'Data candle belum cukup';
+  }
+
+  const tolerance = candles[candles.length - 1].close * 0.00015;
+
+  const highs = [];
+  const lows = [];
+
+  for (let i = 1; i < candles.length - 1; i++) {
+    const previous = candles[i - 1];
+    const current = candles[i];
+    const next = candles[i + 1];
+
+    if (
+      current.high >= previous.high &&
+      current.high >= next.high
+    ) {
+      highs.push(current.high);
+    }
+
+    if (
+      current.low <= previous.low &&
+      current.low <= next.low
+    ) {
+      lows.push(current.low);
+    }
+  }
+
+  let equalHigh = false;
+  let equalLow = false;
+
+  for (let i = 0; i < highs.length; i++) {
+    for (let j = i + 1; j < highs.length; j++) {
+      if (Math.abs(highs[i] - highs[j]) <= tolerance) {
+        equalHigh = true;
+      }
+    }
+  }
+
+  for (let i = 0; i < lows.length; i++) {
+    for (let j = i + 1; j < lows.length; j++) {
+      if (Math.abs(lows[i] - lows[j]) <= tolerance) {
+        equalLow = true;
+      }
+    }
+  }
+
+  if (equalHigh && equalLow) {
+    return 'EQUAL HIGH + EQUAL LOW — Likuiditas atas dan bawah terdeteksi';
+  }
+
+  if (equalHigh) {
+    return 'EQUAL HIGH — Potensi likuiditas atas terdeteksi';
+  }
+
+  if (equalLow) {
+    return 'EQUAL LOW — Potensi likuiditas bawah terdeteksi';
+  }
+
+  return 'EQUAL LEVEL — Belum ada pola terdeteksi';
+  }
+  
+      // MULTI TIMEFRAME LIQUIDITY SWEEP
+
 
 
 async function analyzeLiquidityMultiTimeframe() {
@@ -350,16 +422,23 @@ async function analyzeLiquidityMultiTimeframe() {
       const candles = await getSharedCandles(interval);
 
       if (!candles.length) {
-        return 'DATA TIDAK TERSEDIA';
+        return {
+          sweep: 'DATA TIDAK TERSEDIA',
+          equal: 'DATA TIDAK TERSEDIA'
+        };
       }
 
       const liquidityCandles = candles.map(c => ({
+        open: c.open,
         high: c.high,
         low: c.low,
         close: c.close
       }));
 
-      return analyzeLiquidity(liquidityCandles);
+      return {
+        sweep: analyzeLiquidity(liquidityCandles),
+        equal: analyzeEqualHighLow(liquidityCandles)
+      };
     }
 
     const [h4, h1, m15] = await Promise.all([
@@ -368,15 +447,24 @@ async function analyzeLiquidityMultiTimeframe() {
       getLiquidityCandles('M15')
     ]);
 
-    return 'H4: ' + h4 +
-      ' | H1: ' + h1 +
-      ' | M15: ' + m15;
+    const sweepResult =
+      'H4: ' + h4.sweep +
+      ' | H1: ' + h1.sweep +
+      ' | M15: ' + m15.sweep;
+
+    const equalResult =
+      'H4: ' + h4.equal +
+      ' | H1: ' + h1.equal +
+      ' | M15: ' + m15.equal;
+
+    return sweepResult + '\nEQUAL HIGH / LOW\n' + equalResult;
 
   } catch (error) {
     console.log('Liquidity MTF error:', error);
     return 'MENUNGGU — Gagal membaca liquidity';
   }
 }
+      
 // FAIR VALUE GAP DETECTION
 function analyzeFVG(data) {
   if (data.length < 3) return 'Data candle belum cukup';
@@ -421,7 +509,7 @@ const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
 
 const liquidity = await analyzeLiquidityMultiTimeframe();
-document.getElementById('liquidityAnalysis').textContent = liquidity;
+document.getElementById('liquidityAnalysis').innerText = liquidity;
     
       const fvg = analyzeFVG(candles);
 document.getElementById('fvgAnalysis').textContent = fvg;
