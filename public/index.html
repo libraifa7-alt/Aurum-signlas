@@ -218,7 +218,10 @@ async function analyzeMarketStructure() {
       getCandles('H1'),
       getCandles('M15')
     ]);
-
+document.getElementById('marketStructure').textContent =
+  'DATA CANDLE — H4: ' + h4.length +
+  ' | H1: ' + h1.length +
+  ' | M15: ' + m15.length;
 console.log('JUMLAH CANDLE H4:', h4.length);
 console.log('JUMLAH CANDLE H1:', h1.length);
 console.log('JUMLAH CANDLE M15:', m15.length);
