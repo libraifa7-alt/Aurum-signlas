@@ -81,7 +81,10 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
   <small class="sub">MARKET STRUCTURE</small>
   <p id="marketStructure">Menunggu analisis candle...</p>
 </div>
-<div class="signal"><small class="sub">LIQUIDITY</small><p>Not analyzed</p></div>
+<div class="signal">
+  <small class="sub">LIQUIDITY</small>
+  <p id="liquidityAnalysis">Menunggu analisis liquidity...</p>
+</div>
 <div class="signal"><small class="sub">FAIR VALUE GAP</small><p>Not analyzed</p></div>
 <div class="signal"><small class="sub">ORDER BLOCK</small><p>Not analyzed</p></div>
 </section>
@@ -144,7 +147,7 @@ if (el && window.LightweightCharts) {
         close: Number(c.close)
       }));
 
-// MARKET STRUCTURE: swing high, swing low, BOS dan CHoCH
+// MARKET STRUCTURE
 function analyzeMarketStructure(data) {
   if (data.length < 10) return 'Data candle belum cukup';
 
@@ -174,10 +177,33 @@ function analyzeMarketStructure(data) {
 
   return 'RANGE — Belum ada BOS atau CHoCH terkonfirmasi';
 }
-      
+
+// LIQUIDITY DETECTION
+function analyzeLiquidity(data) {
+  if (data.length < 10) return 'Data candle belum cukup';
+
+  const recent = data.slice(-20);
+  const last = recent[recent.length - 1];
+  const previous = recent.slice(0, -1);
+
+  const buyLiquidity = Math.max(...previous.map(c => c.high));
+  const sellLiquidity = Math.min(...previous.map(c => c.low));
+
+  if (last.high > buyLiquidity && last.close < buyLiquidity) {
+    return 'BUY-SIDE LIQUIDITY SWEEP — Harga menyapu likuiditas atas';
+  }
+
+  if (last.low < sellLiquidity && last.close > sellLiquidity) {
+    return 'SELL-SIDE LIQUIDITY SWEEP — Harga menyapu likuiditas bawah';
+  }
+    return 'LIKUIDITAS — Belum ada sweep terdeteksi';
+  }
 
 const structure = analyzeMarketStructure(candles);
 document.getElementById('marketStructure').textContent = structure;
+      
+const liquidity = analyzeLiquidity(candles);
+document.getElementById('liquidityAnalysis').textContent = liquidity;
   
       series.setData(candles);
       chart.timeScale().fitContent();
