@@ -291,8 +291,9 @@ return 'WAIT — H4: ' + signalH4 +
 
 // LIQUIDITY DETECTION
 
+
 function analyzeLiquidity(data) {
-  if (!data || data.length < 12) {
+  if (!data || data.length < 20) {
     return 'Data candle belum cukup';
   }
 
@@ -300,25 +301,49 @@ function analyzeLiquidity(data) {
   const candles = data.slice(0, -1);
   const recent = candles.slice(-30);
 
-  if (recent.length < 12) {
+  if (recent.length < 20) {
     return 'Data candle belum cukup';
   }
 
-  // Periksa 3 candle terakhir yang sudah selesai
+  // Tiga candle terakhir untuk pemeriksaan sweep
   const candidates = recent.slice(-3);
+
+  // Candle sebelumnya untuk mencari swing
   const history = recent.slice(0, -3);
 
-  // Cari level swing dari 10 candle sebelumnya
-  const levels = history.slice(-10);
+  const swingHighs = [];
+  const swingLows = [];
 
-  const buyLiquidity = Math.max(
-    ...levels.map(c => c.high)
-  );
+  // Cari swing high dan swing low lokal
+  for (let i = 1; i < history.length - 1; i++) {
+    const previous = history[i - 1];
+    const current = history[i];
+    const next = history[i + 1];
 
-  const sellLiquidity = Math.min(
-    ...levels.map(c => c.low)
-  );
+    if (
+      current.high > previous.high &&
+      current.high >= next.high
+    ) {
+      swingHighs.push(current.high);
+    }
 
+    if (
+      current.low < previous.low &&
+      current.low <= next.low
+    ) {
+      swingLows.push(current.low);
+    }
+  }
+
+  if (!swingHighs.length || !swingLows.length) {
+    return 'LIKUIDITAS — Swing belum cukup';
+  }
+
+  // Level likuiditas dari swing terpenting
+  const buyLiquidity = Math.max(...swingHighs);
+  const sellLiquidity = Math.min(...swingLows);
+
+  // Periksa candle terbaru terlebih dahulu
   for (let i = candidates.length - 1; i >= 0; i--) {
     const candle = candidates[i];
 
@@ -327,22 +352,24 @@ function analyzeLiquidity(data) {
 
     if (range <= 0) continue;
 
-    // BUY-SIDE SWEEP
+    const bodyRatio = body / range;
+
+    // BUY-SIDE SWEEP: menembus swing high lalu ditolak
     if (
       candle.high > buyLiquidity &&
       candle.close < buyLiquidity &&
       candle.close < candle.open &&
-      body / range >= 0.25
+      bodyRatio >= 0.25
     ) {
       return 'BUY-SIDE SWEEP — Likuiditas atas tersapu dan harga ditolak';
     }
 
-    // SELL-SIDE SWEEP
+    // SELL-SIDE SWEEP: menembus swing low lalu ditolak
     if (
       candle.low < sellLiquidity &&
       candle.close > sellLiquidity &&
       candle.close > candle.open &&
-      body / range >= 0.25
+      bodyRatio >= 0.25
     ) {
       return 'SELL-SIDE SWEEP — Likuiditas bawah tersapu dan harga ditolak';
     }
@@ -351,61 +378,74 @@ function analyzeLiquidity(data) {
   return 'LIKUIDITAS — Belum ada sweep terdeteksi';
 }
       
+      
+
 
 function analyzeEqualHighLow(data) {
-  if (!data || data.length < 15) {
+  if (!data || data.length < 20) {
     return 'Data candle belum cukup';
   }
 
-  const candles = data.slice(0, -1).slice(-30);
+  // Abaikan candle terakhir yang belum selesai
+  const candles = data.slice(0, -1).slice(-40);
 
-  if (candles.length < 15) {
+  if (candles.length < 20) {
     return 'Data candle belum cukup';
   }
 
-  const tolerance = candles[candles.length - 1].close * 0.00015;
+  // Toleransi harga untuk XAU/USD
+  const tolerance = Math.max(
+    candles[candles.length - 1].close * 0.0002,
+    0.30
+  );
 
   const highs = [];
   const lows = [];
 
+  // Identifikasi swing high dan swing low
   for (let i = 1; i < candles.length - 1; i++) {
     const previous = candles[i - 1];
     const current = candles[i];
     const next = candles[i + 1];
 
     if (
-      current.high >= previous.high &&
+      current.high > previous.high &&
       current.high >= next.high
     ) {
       highs.push(current.high);
     }
 
     if (
-      current.low <= previous.low &&
+      current.low < previous.low &&
       current.low <= next.low
     ) {
       lows.push(current.low);
     }
   }
 
-  let equalHigh = false;
-  let equalLow = false;
+  // Hitung jumlah level yang berdekatan
+  function hasEqualLevel(levels) {
+    for (let i = 0; i < levels.length; i++) {
+      let touches = 1;
 
-  for (let i = 0; i < highs.length; i++) {
-    for (let j = i + 1; j < highs.length; j++) {
-      if (Math.abs(highs[i] - highs[j]) <= tolerance) {
-        equalHigh = true;
+      for (let j = i + 1; j < levels.length; j++) {
+        if (
+          Math.abs(levels[i] - levels[j]) <= tolerance
+        ) {
+          touches++;
+        }
+      }
+
+      if (touches >= 2) {
+        return true;
       }
     }
+
+    return false;
   }
 
-  for (let i = 0; i < lows.length; i++) {
-    for (let j = i + 1; j < lows.length; j++) {
-      if (Math.abs(lows[i] - lows[j]) <= tolerance) {
-        equalLow = true;
-      }
-    }
-  }
+  const equalHigh = hasEqualLevel(highs);
+  const equalLow = hasEqualLevel(lows);
 
   if (equalHigh && equalLow) {
     return 'EQUAL HIGH + EQUAL LOW — Likuiditas atas dan bawah terdeteksi';
@@ -420,7 +460,8 @@ function analyzeEqualHighLow(data) {
   }
 
   return 'EQUAL LEVEL — Belum ada pola terdeteksi';
-  }
+}
+  
   
       // MULTI TIMEFRAME LIQUIDITY SWEEP
 
