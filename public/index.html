@@ -89,7 +89,10 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
   <small class="sub">FAIR VALUE GAP</small>
   <p id="fvgAnalysis">Menunggu analisis FVG...</p>
 </div>
-<div class="signal"><small class="sub">ORDER BLOCK</small><p>Not analyzed</p></div>
+<div class="signal">
+  <small class="sub">ORDER BLOCK</small>
+  <p id="orderBlockAnalysis">Menunggu analisis Order Block...</p>
+</div>
 </section>
 </div>
 
@@ -218,7 +221,29 @@ function analyzeFVG(data) {
 
   return 'FVG — Belum ada gap terdeteksi';
 }
+// ORDER BLOCK DETECTION
+function analyzeOrderBlock(data) {
+  if (data.length < 3) return 'Data candle belum cukup';
 
+  const previous = data[data.length - 2];
+  const last = data[data.length - 1];
+
+  if (
+    previous.close < previous.open &&
+    last.close > previous.high
+  ) {
+    return 'BULLISH ORDER BLOCK — Candle bearish ditembus naik';
+  }
+
+  if (
+    previous.close > previous.open &&
+    last.close < previous.low
+  ) {
+    return 'BEARISH ORDER BLOCK — Candle bullish ditembus turun';
+  }
+
+  return 'ORDER BLOCK — Belum ada pola terdeteksi';
+}
 const structure = analyzeMarketStructure(candles);
 document.getElementById('marketStructure').textContent = structure;
 
@@ -227,6 +252,9 @@ document.getElementById('liquidityAnalysis').textContent = liquidity;
     
       const fvg = analyzeFVG(candles);
 document.getElementById('fvgAnalysis').textContent = fvg;
+      
+      const orderBlock = analyzeOrderBlock(candles);
+document.getElementById('orderBlockAnalysis').textContent = orderBlock;
   
       series.setData(candles);
       chart.timeScale().fitContent();
