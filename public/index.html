@@ -93,6 +93,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
 <div class="signal">
   <small class="sub">ORDER BLOCK</small>
   <p id="orderBlockAnalysis">Menunggu analisis Order Block...</p>
+  <p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p>
 </div>
 </section>
 </div>
@@ -528,27 +529,72 @@ function analyzeFVG(data) {
 }
 // ORDER BLOCK DETECTION
 function analyzeOrderBlock(data) {
-  if (data.length < 3) return 'Data candle belum cukup';
-
-  const previous = data[data.length - 2];
-  const last = data[data.length - 1];
-
-  if (
-    previous.close < previous.open &&
-    last.close > previous.high
-  ) {
-    return 'BULLISH ORDER BLOCK — Candle bearish ditembus naik';
+  if (!data || data.length < 10) {
+    return 'Data candle belum cukup';
   }
 
-  if (
-    previous.close > previous.open &&
-    last.close < previous.low
-  ) {
-    return 'BEARISH ORDER BLOCK — Candle bullish ditembus turun';
+  const candles = data.slice(0, -1);
+  const recent = candles.slice(-10);
+
+  for (let i = recent.length - 1; i >= 1; i--) {
+    const previous = recent[i - 1];
+    const current = recent[i];
+
+    // BULLISH ORDER BLOCK
+    if (
+      previous.close < previous.open &&
+      current.close > previous.high
+    ) {
+      return 'BULLISH ORDER BLOCK — Candle bearish ditembus naik';
+    }
+
+    // BEARISH ORDER BLOCK
+    if (
+      previous.close > previous.open &&
+      current.close < previous.low
+    ) {
+      return 'BEARISH ORDER BLOCK — Candle bullish ditembus turun';
+    }
   }
 
   return 'ORDER BLOCK — Belum ada pola terdeteksi';
 }
+  async function analyzeOrderBlockMultiTimeframe() {
+  try {
+    const [h1, m15] = await Promise.all([
+      getSharedCandles('H1'),
+      getSharedCandles('M15')
+    ]);
+
+    if (!h1.length || !m15.length) {
+      return 'WAIT — Data Order Block belum tersedia';
+    }
+
+    const orderH1 = analyzeOrderBlock(h1);
+    const orderM15 = analyzeOrderBlock(m15);
+
+    if (
+      orderH1.includes('BULLISH ORDER BLOCK') &&
+      orderM15.includes('BULLISH ORDER BLOCK')
+    ) {
+      return 'BULLISH ORDER BLOCK CONFIRMED — H1 dan M15 searah';
+    }
+
+    if (
+      orderH1.includes('BEARISH ORDER BLOCK') &&
+      orderM15.includes('BEARISH ORDER BLOCK')
+    ) {
+      return 'BEARISH ORDER BLOCK CONFIRMED — H1 dan M15 searah';
+    }
+
+    return 'WAIT — H1: ' + orderH1 +
+      ' | M15: ' + orderM15;
+
+  } catch (error) {
+    console.log('Order Block MTF error:', error);
+    return 'WAIT — Gagal membaca Order Block';
+  }
+  }
 const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
 
@@ -561,8 +607,11 @@ document.getElementById('liquidityConfirmation').innerText = confirmation;
       const fvg = analyzeFVG(candles);
 document.getElementById('fvgAnalysis').textContent = fvg;
       
-      const orderBlock = analyzeOrderBlock(candles);
+const orderBlock = analyzeOrderBlock(candles);
 document.getElementById('orderBlockAnalysis').textContent = orderBlock;
+
+const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
+document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
   
       series.setData(candles);
       chart.timeScale().fitContent();
