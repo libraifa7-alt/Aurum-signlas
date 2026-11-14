@@ -9,17 +9,17 @@ export default async function handler(req, res) {
   }
 
   const allowedIntervals = {
-    M1: "1min",
-    M5: "5min",
-    M15: "15min",
-    M30: "30min",
-    H1: "1h"
+  M1: "1min",
+  M5: "5min",
+  M15: "15min",
+  M30: "30min",
+  H1: "1h",
+  H4: "4h"
   };
-
   const selected = String(req.query.interval || "M15").toUpperCase();
   const interval = allowedIntervals[selected] || "15min";
 
-  try {
+  try 
     const url = new URL("https://api.twelvedata.com/time_series");
 
     url.searchParams.set("symbol", "XAU/USD");
