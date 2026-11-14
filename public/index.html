@@ -219,7 +219,9 @@ async function analyzeMarketStructure() {
       getCandles('M15')
     ]);
 
-
+console.log('JUMLAH CANDLE H4:', h4.length);
+console.log('JUMLAH CANDLE H1:', h1.length);
+console.log('JUMLAH CANDLE M15:', m15.length);
 const signalH4 = getStructureSignal(h4);
 const signalH1 = getStructureSignal(h1);
 const signalM15 = getStructureSignal(m15);
