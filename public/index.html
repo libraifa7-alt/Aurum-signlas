@@ -105,7 +105,7 @@ fetch('/api/xauusd')
   .then(response => response.json())
   .then(data => {
     if (data.status === 'success' && data.candles?.length) {
-      const candle = data.candles[data.candles.length - 1];
+      const candle = data.candles[0];
       document.getElementById('goldPrice').textContent =
         Number(candle.close).toFixed(2);
       document.getElementById('goldTime').textContent =
