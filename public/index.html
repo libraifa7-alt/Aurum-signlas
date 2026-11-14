@@ -158,32 +158,29 @@ if (el && window.LightweightCharts) {
 // MULTI TIMEFRAME MARKET STRUCTURE
 
 
-function getStructureSignal(data) {
-  if (!data || data.length < 10) return 'UNKNOWN';
 
-  const recent = data.slice(-32);
-  const previous = recent.slice(0, -2);
-  const confirm = recent.slice(-2);
+function getStructureSignal(data) {
+  if (!data || data.length < 20) return 'UNKNOWN';
+
+  const candles = data.slice(-20);
+  const last = candles[candles.length - 1];
+  const previous = candles.slice(0, -1);
 
   const swingHigh = Math.max(...previous.map(c => c.high));
   const swingLow = Math.min(...previous.map(c => c.low));
 
-  const previousCloses = previous.slice(-5);
-  const previousTrend =
-    previousCloses[previousCloses.length - 1].close >
-    previousCloses[0].close ? 'BULLISH' : 'BEARISH';
+  const recentCloses = previous.slice(-5);
+  const firstClose = recentCloses[0].close;
+  const lastClose = recentCloses[recentCloses.length - 1].close;
 
-  const bullishConfirmed = confirm.every(c => c.close > swingHigh);
-  const bearishConfirmed = confirm.every(c => c.close < swingLow);
-
-  if (bullishConfirmed) {
-    return previousTrend === 'BEARISH'
+  if (last.close > swingHigh) {
+    return lastClose < firstClose
       ? 'CHOCH_BULLISH'
       : 'BOS_BULLISH';
   }
 
-  if (bearishConfirmed) {
-    return previousTrend === 'BULLISH'
+  if (last.close < swingLow) {
+    return lastClose > firstClose
       ? 'CHOCH_BEARISH'
       : 'BOS_BEARISH';
   }
