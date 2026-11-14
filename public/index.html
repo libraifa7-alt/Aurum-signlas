@@ -87,8 +87,10 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
   <p id="liquidityAnalysis">Menunggu analisis liquidity...</p>
 </div>
 <div class="signal">
-  <small class="sub">FAIR VALUE GAP</small>
-  <p id="fvgAnalysis">Menunggu analisis FVG...</p>
+  <small class="sub">LIQUIDITY</small>
+  <p id="liquidityAnalysis">Menunggu analisis liquidity...</p>
+  <small class="sub">LIQUIDITY CONFIRMATION</small>
+  <p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p>
 </div>
 <div class="signal">
   <small class="sub">ORDER BLOCK</small>
@@ -464,6 +466,50 @@ async function analyzeLiquidityMultiTimeframe() {
     return 'MENUNGGU — Gagal membaca liquidity';
   }
 }
+ async function analyzeLiquidityConfirmation() {
+  try {
+    const [h4, h1, m15] = await Promise.all([
+      getSharedCandles('H4'),
+      getSharedCandles('H1'),
+      getSharedCandles('M15')
+    ]);
+
+    if (!h4.length || !h1.length || !m15.length) {
+      return 'WAIT — Data liquidity belum tersedia';
+    }
+
+    const trendH4 = getStructureSignal(h4);
+    const trendH1 = getStructureSignal(h1);
+
+    const sweepH1 = analyzeLiquidity(h1);
+    const sweepM15 = analyzeLiquidity(m15);
+
+    if (
+      trendH4.includes('BULLISH') &&
+      trendH1.includes('BULLISH') &&
+      sweepM15.includes('SELL-SIDE SWEEP')
+    ) {
+      return 'BUY CONFIRMATION — H4 dan H1 bullish, M15 sell-side sweep';
+    }
+
+    if (
+      trendH4.includes('BEARISH') &&
+      trendH1.includes('BEARISH') &&
+      sweepM15.includes('BUY-SIDE SWEEP')
+    ) {
+      return 'SELL CONFIRMATION — H4 dan H1 bearish, M15 buy-side sweep';
+    }
+
+    return 'WAIT — H4: ' + trendH4 +
+      ' | H1: ' + trendH1 +
+      ' | H1 Sweep: ' + sweepH1 +
+      ' | M15 Sweep: ' + sweepM15;
+
+  } catch (error) {
+    console.log('Liquidity confirmation error:', error);
+    return 'WAIT — Gagal membaca liquidity confirmation';
+  }
+ } 
       
 // FAIR VALUE GAP DETECTION
 function analyzeFVG(data) {
@@ -510,6 +556,9 @@ document.getElementById('marketStructure').textContent = structure;
 
 const liquidity = await analyzeLiquidityMultiTimeframe();
 document.getElementById('liquidityAnalysis').innerText = liquidity;
+      
+const confirmation = await analyzeLiquidityConfirmation();
+document.getElementById('liquidityConfirmation').innerText = confirmation;      
     
       const fvg = analyzeFVG(candles);
 document.getElementById('fvgAnalysis').textContent = fvg;
