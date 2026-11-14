@@ -77,7 +77,10 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
 
 <section class="panel">
 <h3>ICT AI Analysis</h3>
-<div class="signal"><small class="sub">MARKET STRUCTURE</small><p>Waiting for data</p></div>
+<div class="signal">
+  <small class="sub">MARKET STRUCTURE</small>
+  <p id="marketStructure">Menunggu analisis candle...</p>
+</div>
 <div class="signal"><small class="sub">LIQUIDITY</small><p>Not analyzed</p></div>
 <div class="signal"><small class="sub">FAIR VALUE GAP</small><p>Not analyzed</p></div>
 <div class="signal"><small class="sub">ORDER BLOCK</small><p>Not analyzed</p></div>
@@ -141,6 +144,32 @@ if (el && window.LightweightCharts) {
         close: Number(c.close)
       }));
 
+// MARKET STRUCTURE: swing high, swing low, BOS dan CHoCH
+function analyzeMarketStructure(data) {
+  if (data.length < 5) return 'Data candle belum cukup';
+
+  const recent = data.slice(-30);
+  const highs = recent.map(c => c.high);
+  const lows = recent.map(c => c.low);
+
+  const swingHigh = Math.max(...highs.slice(0, -1));
+  const swingLow = Math.min(...lows.slice(0, -1));
+  const last = recent[recent.length - 1];
+
+  if (last.close > swingHigh) {
+    return 'BULLISH — BOS terdeteksi (harga menembus swing high)';
+  }
+
+  if (last.close < swingLow) {
+    return 'BEARISH — BOS terdeteksi (harga menembus swing low)';
+  }
+
+  return 'RANGE — Belum ada BOS terkonfirmasi';
+}
+
+const structure = analyzeMarketStructure(candles);
+document.getElementById('marketStructure').textContent = structure;
+  
       series.setData(candles);
       chart.timeScale().fitContent();
     } catch (error) {
