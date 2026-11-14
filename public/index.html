@@ -154,9 +154,11 @@ if (el && window.LightweightCharts) {
         close: Number(c.close)
       }));
 
-// MARKET STRUCTURE
-function analyzeMarketStructure(data) {
-  if (data.length < 10) return 'Data candle belum cukup';
+
+// MULTI TIMEFRAME MARKET STRUCTURE
+
+function getStructureSignal(data) {
+  if (!data || data.length < 10) return 'UNKNOWN';
 
   const recent = data.slice(-30);
   const previous = recent.slice(0, -1);
@@ -165,25 +167,70 @@ function analyzeMarketStructure(data) {
   const swingHigh = Math.max(...previous.map(c => c.high));
   const swingLow = Math.min(...previous.map(c => c.low));
 
-  const previousCloses = previous.slice(-5);
-  const previousTrend =
-    previousCloses[previousCloses.length - 1].close >
-    previousCloses[0].close ? 'BULLISH' : 'BEARISH';
+  if (last.close > swingHigh) return 'BULLISH';
+  if (last.close < swingLow) return 'BEARISH';
 
-  if (last.close > swingHigh) {
-    return previousTrend === 'BEARISH'
-      ? 'CHoCH BULLISH — Indikasi perubahan arah'
-      : 'BOS BULLISH — Struktur naik ditembus';
-  }
-
-  if (last.close < swingLow) {
-    return previousTrend === 'BULLISH'
-      ? 'CHoCH BEARISH — Indikasi perubahan arah'
-      : 'BOS BEARISH — Struktur turun ditembus';
-  }
-
-  return 'RANGE — Belum ada BOS atau CHoCH terkonfirmasi';
+  return 'RANGE';
 }
+
+async function analyzeMarketStructure() {
+  try {
+    async function getCandles(interval) {
+      const response = await fetch('/api?interval=' + interval);
+      const result = await response.json();
+
+      if (result.status !== 'success' || !result.candles?.length) {
+        return [];
+      }
+
+      return result.candles.slice().reverse().map(c => ({
+        open: Number(c.open),
+        high: Number(c.high),
+        low: Number(c.low),
+        close: Number(c.close)
+      }));
+    }
+
+    const [h4, h1, m15] = await Promise.all([
+      getCandles('H4'),
+      getCandles('H1'),
+      getCandles('M15')
+    ]);
+
+    const trendH4 = getStructureSignal(h4);
+    const trendH1 = getStructureSignal(h1);
+    const trendM15 = getStructureSignal(m15);
+
+    if ([trendH4, trendH1, trendM15].includes('UNKNOWN')) {
+      return 'MENUNGGU — Data timeframe belum cukup';
+    }
+
+    if (
+      trendH4 === 'BULLISH' &&
+      trendH1 === 'BULLISH' &&
+      trendM15 === 'BULLISH'
+    ) {
+      return 'BUY BIAS — H4, H1, M15 searah bullish';
+    }
+
+    if (
+      trendH4 === 'BEARISH' &&
+      trendH1 === 'BEARISH' &&
+      trendM15 === 'BEARISH'
+    ) {
+      return 'SELL BIAS — H4, H1, M15 searah bearish';
+    }
+
+    return 'WAIT — H4: ' + trendH4 +
+      ' | H1: ' + trendH1 +
+      ' | M15: ' + trendM15;
+
+  } catch (error) {
+    console.log('Multi timeframe error:', error);
+    return 'MENUNGGU — Gagal membaca timeframe';
+  }
+  }
+      
 
 // LIQUIDITY DETECTION
 function analyzeLiquidity(data) {
@@ -245,7 +292,7 @@ function analyzeOrderBlock(data) {
 
   return 'ORDER BLOCK — Belum ada pola terdeteksi';
 }
-const structure = analyzeMarketStructure(candles);
+const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
 
 const liquidity = analyzeLiquidity(candles);
