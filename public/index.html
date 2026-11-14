@@ -101,7 +101,22 @@ fetch('/api/health')
 .then(r=>r.json())
 .then(data=>{document.querySelector('.status').textContent='● '+data.status.toUpperCase()})
 .catch(()=>{document.querySelector('.status').textContent='● SERVER CONNECTION PENDING'});
-</script>
+fetch('/api/xauusd')
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success' && data.candles?.length) {
+      const candle = data.candles[data.candles.length - 1];
+      document.getElementById('goldPrice').textContent =
+        Number(candle.close).toFixed(2);
+      document.getElementById('goldTime').textContent =
+        'XAU/USD · Data dari Alpha Vantage';
+    } else {
+      document.getElementById('goldPrice').textContent = 'Data belum tersedia';
+    }
+  })
+  .catch(() => {
+    document.getElementById('goldPrice').textContent = 'Koneksi gagal';
+  });
 </body>
 </html>
 
