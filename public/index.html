@@ -649,13 +649,13 @@ fetch('/api?interval=M15')
   .then(response => response.json())
   .then(data => {
     document.querySelector('.status').textContent =
-      '● CONNECTED';
+      'SERVER: CONNECTED | CHART: ' + !!window.LightweightCharts +
+      ' | ELEMENT: ' + !!document.getElementById('candleChart');
   })
   .catch(() => {
     document.querySelector('.status').textContent =
       '● SERVER CONNECTION PENDING';
   });
-
 fetch('/api/xauusd')
   .then(response => response.json())
   .then(data => {
