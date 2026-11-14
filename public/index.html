@@ -119,6 +119,8 @@ Aurum Signals AI · Educational analysis only · Manual execution
   
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
+  document.querySelector('.status').textContent =
+  'CEK GRAFIK: ' + !!el + ' | LIBRARY: ' + !!window.LightweightCharts;
 
 if (el && window.LightweightCharts) {
 console.log('LIGHTWEIGHT CHARTS AKTIF');  
