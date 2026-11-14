@@ -112,10 +112,12 @@ fetch('/api/xauusd')
         'XAU/USD · Data dari Alpha Vantage';
     } else {
       document.getElementById('goldPrice').textContent = 'Data belum tersedia';
-    }
-  })
   .catch(() => {
     document.getElementById('goldPrice').textContent = 'Koneksi gagal';
+  });
+</script>
+</body>
+</html>
   });
 </body>
 </html>
