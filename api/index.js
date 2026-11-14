@@ -19,10 +19,27 @@ module.exports = async function handler(req, res) {
   H1: "1h",
   H4: "4h"
   };
-  const selected = String(req.query.interval || "M15").toUpperCase();
-  const interval = allowedIntervals[selected] || "15min";
-    const cacheKey = interval;
-  const cached = globalThis.aurumCache.get(cacheKey);
+const allowedSymbols = {
+  "XAU/USD": "XAU/USD",
+  "BTC/USD": "BTC/USD",
+  "WTI": "WTI/USD"
+};
+
+const selectedSymbol = String(req.query.symbol || "XAU/USD").toUpperCase();
+const symbol = allowedSymbols[selectedSymbol];
+
+if (!symbol) {
+  return res.status(400).json({
+    status: "error",
+    message: "Instrumen tidak didukung"
+  });
+}
+
+const selected = String(req.query.interval || "M15").toUpperCase();
+const interval = allowedIntervals[selected] || "15min";
+
+const cacheKey = symbol + ":" + interval;
+const cached = globalThis.aurumCache.get(cacheKey);
 
   if (cached && Date.now() - cached.time < 60000) {
     return res.status(200).json(cached.data);
@@ -31,7 +48,7 @@ module.exports = async function handler(req, res) {
 try {
  const url = new URL("https://api.twelvedata.com/time_series");
 
-  url.searchParams.set("symbol", "XAU/USD");
+url.searchParams.set("symbol", symbol);
   url.searchParams.set("interval", interval);
   url.searchParams.set("outputsize", "100");
   url.searchParams.set("apikey", apiKey);
@@ -43,7 +60,7 @@ try {
         time: Date.now(),
         data: {
           status: "success",
-          symbol: "XAU/USD",
+          symbol: symbol,
           interval,
           candles: data.values
         }
@@ -59,7 +76,7 @@ try {
 
 return res.status(200).json({
   status: "success",
-  symbol: "XAU/USD",
+  symbol: symbol,
   interval,
   candles: data.values || []
 });
