@@ -280,6 +280,44 @@ function analyzeLiquidity(data) {
   }
     return 'LIKUIDITAS — Belum ada sweep terdeteksi';
   }
+   
+// MULTI TIMEFRAME LIQUIDITY SWEEP
+
+async function analyzeLiquidityMultiTimeframe() {
+  try {
+    async function getLiquidityCandles(interval) {
+      const response = await fetch('/api?interval=' + interval);
+      const result = await response.json();
+
+      if (result.status !== 'success' || !result.candles?.length) {
+        return 'DATA TIDAK TERSEDIA';
+      }
+
+      const candles = result.candles.slice().reverse().map(c => ({
+        high: Number(c.high),
+        low: Number(c.low),
+        close: Number(c.close)
+      }));
+
+      return analyzeLiquidity(candles);
+    }
+
+    const [h4, h1, m15] = await Promise.all([
+      getLiquidityCandles('H4'),
+      getLiquidityCandles('H1'),
+      getLiquidityCandles('M15')
+    ]);
+
+    return 'H4: ' + h4 +
+      ' | H1: ' + h1 +
+      ' | M15: ' + m15;
+
+  } catch (error) {
+    console.log('Liquidity MTF error:', error);
+    return 'MENUNGGU — Gagal membaca liquidity';
+  }
+}
+      
 // FAIR VALUE GAP DETECTION
 function analyzeFVG(data) {
   if (data.length < 3) return 'Data candle belum cukup';
@@ -323,7 +361,7 @@ function analyzeOrderBlock(data) {
 const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
 
-const liquidity = analyzeLiquidity(candles);
+const liquidity = await analyzeLiquidityMultiTimeframe();
 document.getElementById('liquidityAnalysis').textContent = liquidity;
     
       const fvg = analyzeFVG(candles);
