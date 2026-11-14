@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const apiKey = process.env.TWELVE_DATA_API_KEY;
 
   if (!apiKey) {
@@ -20,7 +20,6 @@ export default async function handler(req, res) {
   const interval = allowedIntervals[selected] || "15min";
   
 try {
-  
  const url  = URL("https://api.twelvedata.com/time_series");
 
   url.searchParams.set("symbol", "XAU/USD");
@@ -45,11 +44,9 @@ try {
     candles: data.values || []
   });
 } catch (error) {
-  });
-  } catch (error) {
   return res.status(500).json({
     status: "error",
     message: "Terjadi kesalahan koneksi data"
   });
 }
-}
+};
