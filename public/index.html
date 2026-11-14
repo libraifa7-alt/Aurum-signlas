@@ -62,10 +62,11 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
 <option>USD/CAD</option><option>NZD/USD</option>
 </select>
 <select id="tf">
-<option>M1</option><option>M5</option><option selected>M15</option>
-<option>M30</option><option>M45</option><option>H1</option>
-<option>H2</option><option>H4</option><option>H6</option>
-<option>H8</option><option>H12</option>
+<option>M1</option>
+<option>M5</option>
+<option selected>M15</option>
+<option>M30</option>
+<option>H1</option>
 </select>
 </div>
 
@@ -95,49 +96,67 @@ Aurum Signals AI · Educational analysis only · Manual execution
 </footer>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 <script>
-  fetch('/api/xauusd')
-  .then(response => response.json())
-.then(data => {
-    if (data.status !== 'success' || !data.candles?.length) return;
+  
+const el = document.getElementById('candleChart');
 
-    const el = document.getElementById('candleChart');
-    if (!el || !window.LightweightCharts) return;
+if (el && window.LightweightCharts) {
+  const chart = LightweightCharts.createChart(el, {
+    width: el.clientWidth,
+    height: 340,
+    layout: {
+      background: { color: '#0b1220' },
+      textColor: '#cbd5e1'
+    },
+    grid: {
+      vertLines: { color: '#263247' },
+      horzLines: { color: '#263247' }
+    },
+    timeScale: { timeVisible: true }
+  });
 
-    const chart = LightweightCharts.createChart(el, {
-      width: el.clientWidth,
-      height: 340,
-      layout: {
-        background: { color: '#0b1220' },
-        textColor: '#cbd5e1'
-      },
-      grid: {
-        vertLines: { color: '#263247' },
-        horzLines: { color: '#263247' }
-      },
-      timeScale: { timeVisible: true }
-    });
+  const series = chart.addCandlestickSeries({
+    upColor: '#20c997',
+    downColor: '#ef5350',
+    borderUpColor: '#20c997',
+    borderDownColor: '#ef5350',
+    wickUpColor: '#20c997',
+    wickDownColor: '#ef5350'
+  });
 
-    const candles = data.candles.slice().reverse().map(c => ({
-      time: Math.floor(new Date(c.datetime.replace(' ', 'T')).getTime() / 1000),
-      open: Number(c.open),
-      high: Number(c.high),
-      low: Number(c.low),
-      close: Number(c.close)
-    }));
+  async function loadChart(interval) {
+    try {
+      const response = await fetch('/api?interval=' + interval);
+      const data = await response.json();
 
-    const series = chart.addCandlestickSeries({
-      upColor: '#20c997',
-      downColor: '#ef5350',
-      borderUpColor: '#20c997',
-      borderDownColor: '#ef5350',
-      wickUpColor: '#20c997',
-      wickDownColor: '#ef5350'
-    });
+      if (data.status !== 'success' || !data.candles?.length) {
+        console.log('Data grafik belum tersedia');
+        return;
+      }
 
-    series.setData(candles);
-    chart.timeScale().fitContent();
-  })
-  .catch(error => console.log('Chart error:', error));
+      const candles = data.candles.slice().reverse().map(c => ({
+        time: Math.floor(new Date(c.datetime.replace(' ', 'T') + 'Z').getTime() / 1000),
+        open: Number(c.open),
+        high: Number(c.high),
+        low: Number(c.low),
+        close: Number(c.close)
+      }));
+
+      series.setData(candles);
+      chart.timeScale().fitContent();
+    } catch (error) {
+      console.log('Chart error:', error);
+    }
+  }
+
+  const timeframe = document.getElementById('tf');
+
+  loadChart(timeframe.value || 'M15');
+
+  timeframe.addEventListener('change', function() {
+    loadChart(this.value);
+  });
+  }
+        
 fetch('/api/health')
   .then(response => response.json())
   .then(data => {
