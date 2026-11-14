@@ -121,9 +121,9 @@ const el = document.getElementById('candleChart');
 
 if (el && window.LightweightCharts) {
 console.log('LIGHTWEIGHT CHARTS AKTIF');  
-  const chart = LightweightCharts.createChart(el, {
-    width: el.clientWidth,
-    height: 340,
+const chart = LightweightCharts.createChart(el, {
+  width: Math.max(el.clientWidth, 300),
+  height: 340,
     layout: {
       background: { color: '#0b1220' },
       textColor: '#cbd5e1'
@@ -623,6 +623,9 @@ document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
   console.log('JUMLAH CANDLE:', candles.length);
       series.setData(candles);
       chart.timeScale().fitContent();
+      chart.applyOptions({
+  width: el.clientWidth
+});
 } catch (error) {
   console.log('Chart error:', error);
 
