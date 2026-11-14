@@ -280,46 +280,67 @@ return 'WAIT — H4: ' + signalH4 +
       
 
 // LIQUIDITY DETECTION
+
 function analyzeLiquidity(data) {
-  if (!data || data.length < 10) {
+  if (!data || data.length < 12) {
     return 'Data candle belum cukup';
   }
 
-  // Abaikan candle terakhir yang mungkin masih berjalan
+  // Abaikan candle terakhir yang belum selesai
   const candles = data.slice(0, -1);
-  const recent = candles.slice(-20);
+  const recent = candles.slice(-30);
 
-  if (recent.length < 10) {
+  if (recent.length < 12) {
     return 'Data candle belum cukup';
   }
 
-  const last = recent[recent.length - 1];
-  const previous = recent.slice(0, -1);
+  // Periksa 3 candle terakhir yang sudah selesai
+  const candidates = recent.slice(-3);
+  const history = recent.slice(0, -3);
+
+  // Cari level swing dari 10 candle sebelumnya
+  const levels = history.slice(-10);
 
   const buyLiquidity = Math.max(
-    ...previous.map(c => c.high)
+    ...levels.map(c => c.high)
   );
 
   const sellLiquidity = Math.min(
-    ...previous.map(c => c.low)
+    ...levels.map(c => c.low)
   );
 
-  if (
-    last.high > buyLiquidity &&
-    last.close < buyLiquidity
-  ) {
-    return 'BUY-SIDE SWEEP — Likuiditas atas tersapu';
-  }
+  for (let i = candidates.length - 1; i >= 0; i--) {
+    const candle = candidates[i];
 
-  if (
-    last.low < sellLiquidity &&
-    last.close > sellLiquidity
-  ) {
-    return 'SELL-SIDE SWEEP — Likuiditas bawah tersapu';
+    const body = Math.abs(candle.close - candle.open);
+    const range = candle.high - candle.low;
+
+    if (range <= 0) continue;
+
+    // BUY-SIDE SWEEP
+    if (
+      candle.high > buyLiquidity &&
+      candle.close < buyLiquidity &&
+      candle.close < candle.open &&
+      body / range >= 0.25
+    ) {
+      return 'BUY-SIDE SWEEP — Likuiditas atas tersapu dan harga ditolak';
+    }
+
+    // SELL-SIDE SWEEP
+    if (
+      candle.low < sellLiquidity &&
+      candle.close > sellLiquidity &&
+      candle.close > candle.open &&
+      body / range >= 0.25
+    ) {
+      return 'SELL-SIDE SWEEP — Likuiditas bawah tersapu dan harga ditolak';
+    }
   }
 
   return 'LIKUIDITAS — Belum ada sweep terdeteksi';
 }
+      
 // MULTI TIMEFRAME LIQUIDITY SWEEP
 
 
