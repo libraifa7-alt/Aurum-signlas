@@ -616,10 +616,12 @@ document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
   
       series.setData(candles);
       chart.timeScale().fitContent();
-    } catch (error) {
-      console.log('Chart error:', error);
+} catch (error) {
+  console.log('Chart error:', error);
+
+  document.getElementById('orderBlockAnalysis').textContent =
+    'ERROR GRAFIK: ' + error.message;
     }
-  }
 
   const timeframe = document.getElementById('tf');
 
