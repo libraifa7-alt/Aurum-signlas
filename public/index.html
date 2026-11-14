@@ -159,41 +159,35 @@ if (el && window.LightweightCharts) {
 
 
 
-
 function getStructureSignal(data) {
   if (!data || data.length < 30) return 'UNKNOWN';
 
-  const candles = data.slice(-30);
-  const last = candles[candles.length - 1];
-  const previous = candles.slice(0, -1);
+  // Abaikan candle terakhir yang mungkin belum selesai
+  const candles = data.slice(0, -1);
+  const recent = candles.slice(-20);
 
-  const swingHigh = Math.max(
-    ...previous.slice(-15).map(c => c.high)
-  );
+  if (recent.length < 20) return 'UNKNOWN';
 
-  const swingLow = Math.min(
-    ...previous.slice(-15).map(c => c.low)
-  );
+  const first = recent[0];
+  const last = recent[recent.length - 1];
 
-  const recent = previous.slice(-5);
-  const firstClose = recent[0].close;
-  const lastClose = recent[recent.length - 1].close;
+  const highs = recent.slice(0, -1).map(c => c.high);
+  const lows = recent.slice(0, -1).map(c => c.low);
 
-  if (last.close > swingHigh) {
-    return lastClose < firstClose
-      ? 'CHOCH_BULLISH'
-      : 'BOS_BULLISH';
-  }
+  const swingHigh = Math.max(...highs);
+  const swingLow = Math.min(...lows);
 
-  if (last.close < swingLow) {
-    return lastClose > firstClose
-      ? 'CHOCH_BEARISH'
-      : 'BOS_BEARISH';
-  }
+  const priceChange = last.close - first.close;
+  const threshold = first.close * 0.001;
+
+  if (last.close > swingHigh) return 'BOS_BULLISH';
+  if (last.close < swingLow) return 'BOS_BEARISH';
+
+  if (priceChange > threshold) return 'TREND_BULLISH';
+  if (priceChange < -threshold) return 'TREND_BEARISH';
 
   return 'RANGE';
 }
-      
       
 async function analyzeMarketStructure() {
   try {
