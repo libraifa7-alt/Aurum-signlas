@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
   const interval = allowedIntervals[selected] || "15min";
   
 try {
- const url  = URL("https://api.twelvedata.com/time_series");
+ const url = new URL("https://api.twelvedata.com/time_series");
 
   url.searchParams.set("symbol", "XAU/USD");
   url.searchParams.set("interval", interval);
