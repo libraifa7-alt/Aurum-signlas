@@ -119,9 +119,8 @@ Aurum Signals AI · Educational analysis only · Manual execution
   
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
-  document.querySelector('.status').textContent =
-  'CEK GRAFIK: ' + !!el + ' | LIBRARY: ' + !!window.LightweightCharts;
-
+document.querySelector('.status').textContent =
+'CEK GRAFIK: ' + !!el + ' | LIBRARY: ' + !!window.LightweightCharts;
 if (el && window.LightweightCharts) {
 console.log('LIGHTWEIGHT CHARTS AKTIF');  
 const chart = LightweightCharts.createChart(el, {
@@ -635,6 +634,7 @@ document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
   document.getElementById('orderBlockAnalysis').textContent =
     'ERROR GRAFIK: ' + error.message;
     }
+  }
 
   const timeframe = document.getElementById('tf');
 
