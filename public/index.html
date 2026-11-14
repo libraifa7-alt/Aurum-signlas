@@ -262,25 +262,45 @@ return 'WAIT — H4: ' + signalH4 +
 
 // LIQUIDITY DETECTION
 function analyzeLiquidity(data) {
-  if (data.length < 10) return 'Data candle belum cukup';
+  if (!data || data.length < 10) {
+    return 'Data candle belum cukup';
+  }
 
-  const recent = data.slice(-20);
+  // Abaikan candle terakhir yang mungkin masih berjalan
+  const candles = data.slice(0, -1);
+  const recent = candles.slice(-20);
+
+  if (recent.length < 10) {
+    return 'Data candle belum cukup';
+  }
+
   const last = recent[recent.length - 1];
   const previous = recent.slice(0, -1);
 
-  const buyLiquidity = Math.max(...previous.map(c => c.high));
-  const sellLiquidity = Math.min(...previous.map(c => c.low));
+  const buyLiquidity = Math.max(
+    ...previous.map(c => c.high)
+  );
 
-  if (last.high > buyLiquidity && last.close < buyLiquidity) {
-    return 'BUY-SIDE LIQUIDITY SWEEP — Harga menyapu likuiditas atas';
+  const sellLiquidity = Math.min(
+    ...previous.map(c => c.low)
+  );
+
+  if (
+    last.high > buyLiquidity &&
+    last.close < buyLiquidity
+  ) {
+    return 'BUY-SIDE SWEEP — Likuiditas atas tersapu';
   }
 
-  if (last.low < sellLiquidity && last.close > sellLiquidity) {
-    return 'SELL-SIDE LIQUIDITY SWEEP — Harga menyapu likuiditas bawah';
+  if (
+    last.low < sellLiquidity &&
+    last.close > sellLiquidity
+  ) {
+    return 'SELL-SIDE SWEEP — Likuiditas bawah tersapu';
   }
-    return 'LIKUIDITAS — Belum ada sweep terdeteksi';
-  }
-   
+
+  return 'LIKUIDITAS — Belum ada sweep terdeteksi';
+}
 // MULTI TIMEFRAME LIQUIDITY SWEEP
 
 async function analyzeLiquidityMultiTimeframe() {
