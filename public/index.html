@@ -272,7 +272,7 @@ document.getElementById('orderBlockAnalysis').textContent = orderBlock;
   });
   }
         
-fetch('/api/health')
+fetch('/api?interval=M15')
   .then(response => response.json())
   .then(data => {
     document.querySelector('.status').textContent =
