@@ -339,9 +339,9 @@ function analyzeLiquidity(data) {
     return 'LIKUIDITAS — Swing belum cukup';
   }
 
-  // Level likuiditas dari swing terpenting
-  const buyLiquidity = Math.max(...swingHighs);
-  const sellLiquidity = Math.min(...swingLows);
+// Level likuiditas dari swing terbaru
+const buyLiquidity = swingHighs[swingHighs.length - 1];
+const sellLiquidity = swingLows[swingLows.length - 1];
 
   // Periksa candle terbaru terlebih dahulu
   for (let i = candidates.length - 1; i >= 0; i--) {
