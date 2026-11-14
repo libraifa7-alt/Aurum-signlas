@@ -188,31 +188,50 @@ function getStructureSignal(data) {
 
   return 'RANGE';
 }
-      
-async function analyzeMarketStructure() {
+ const aurumCandleCache = new Map();
+
+async function getSharedCandles(interval) {
+  const cached = aurumCandleCache.get(interval);
+
+  if (cached && Date.now() - cached.time < 60000) {
+    return cached.data;
+  }
+
   try {
-    async function getCandles(interval) {
-      const response = await fetch('/api?interval=' + interval);
-      const result = await response.json();
+    const response = await fetch('/api?interval=' + interval);
+    const result = await response.json();
 
-      if (result.status !== 'success' || !result.candles?.length) {
-        return [];
-      }
-
-      return result.candles.slice().reverse().map(c => ({
-        open: Number(c.open),
-        high: Number(c.high),
-        low: Number(c.low),
-        close: Number(c.close)
-      }));
+    if (result.status !== 'success' || !result.candles?.length) {
+      return [];
     }
 
-    const [h4, h1, m15] = await Promise.all([
-      getCandles('H4'),
-      getCandles('H1'),
-      getCandles('M15')
-    ]);
+    const candles = result.candles.slice().reverse().map(c => ({
+      open: Number(c.open),
+      high: Number(c.high),
+      low: Number(c.low),
+      close: Number(c.close)
+    }));
 
+    aurumCandleCache.set(interval, {
+      time: Date.now(),
+      data: candles
+    });
+
+    return candles;
+  } catch (error) {
+    console.log('Shared candle error:', error);
+    return [];
+  }
+  }     
+
+      async function analyzeMarketStructure() {
+  try {
+    
+const [h4, h1, m15] = await Promise.all([
+  getSharedCandles('H4'),
+  getSharedCandles('H1'),
+  getSharedCandles('M15')
+]);
 console.log('JUMLAH CANDLE H4:', h4.length);
 console.log('JUMLAH CANDLE H1:', h1.length);
 console.log('JUMLAH CANDLE M15:', m15.length);
@@ -303,23 +322,23 @@ function analyzeLiquidity(data) {
 }
 // MULTI TIMEFRAME LIQUIDITY SWEEP
 
+
 async function analyzeLiquidityMultiTimeframe() {
   try {
     async function getLiquidityCandles(interval) {
-      const response = await fetch('/api?interval=' + interval);
-      const result = await response.json();
+      const candles = await getSharedCandles(interval);
 
-      if (result.status !== 'success' || !result.candles?.length) {
+      if (!candles.length) {
         return 'DATA TIDAK TERSEDIA';
       }
 
-      const candles = result.candles.slice().reverse().map(c => ({
-        high: Number(c.high),
-        low: Number(c.low),
-        close: Number(c.close)
+      const liquidityCandles = candles.map(c => ({
+        high: c.high,
+        low: c.low,
+        close: c.close
       }));
 
-      return analyzeLiquidity(candles);
+      return analyzeLiquidity(liquidityCandles);
     }
 
     const [h4, h1, m15] = await Promise.all([
@@ -337,7 +356,6 @@ async function analyzeLiquidityMultiTimeframe() {
     return 'MENUNGGU — Gagal membaca liquidity';
   }
 }
-      
 // FAIR VALUE GAP DETECTION
 function analyzeFVG(data) {
   if (data.length < 3) return 'Data candle belum cukup';
