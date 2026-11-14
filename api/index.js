@@ -1,4 +1,7 @@
 module.exports = async function handler(req, res) {
+    if (!globalThis.aurumCache) {
+    globalThis.aurumCache = new Map();
+    }
   const apiKey = process.env.TWELVE_DATA_API_KEY;
 
   if (!apiKey) {
@@ -18,6 +21,12 @@ module.exports = async function handler(req, res) {
   };
   const selected = String(req.query.interval || "M15").toUpperCase();
   const interval = allowedIntervals[selected] || "15min";
+    const cacheKey = interval;
+  const cached = globalThis.aurumCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.time < 60000) {
+    return res.status(200).json(cached.data);
+  }
   
 try {
  const url = new URL("https://api.twelvedata.com/time_series");
@@ -29,6 +38,17 @@ try {
 
   const response = await fetch(url);
   const data = await response.json();
+      if (response.ok && data.status !== "error" && data.values) {
+      globalThis.aurumCache.set(cacheKey, {
+        time: Date.now(),
+        data: {
+          status: "success",
+          symbol: "XAU/USD",
+          interval,
+          candles: data.values
+        }
+      });
+      }
 
   if (!response.ok || data.status === "error") {
     return res.status(502).json({
@@ -37,12 +57,12 @@ try {
     });
   }
 
-    return res.status(200).json({
-    status: "success",
-    symbol: "XAU/USD",
-    interval,
-    candles: data.values || []
-  });
+return res.status(200).json({
+  status: "success",
+  symbol: "XAU/USD",
+  interval,
+  candles: data.values || []
+});
 } catch (error) {
   return res.status(500).json({
     status: "error",
