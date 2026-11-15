@@ -119,8 +119,6 @@ Aurum Signals AI · Educational analysis only · Manual execution
   
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
-document.querySelector('.status').textContent =
-'CEK GRAFIK: ' + !!el + ' | LIBRARY: ' + !!window.LightweightCharts;
 if (el && window.LightweightCharts) {
 console.log('LIGHTWEIGHT CHARTS AKTIF');  
 const chart = LightweightCharts.createChart(el, {
@@ -707,6 +705,9 @@ fetch('/api?interval=M15')
     document.querySelector('.status').textContent =
       'SERVER: CONNECTED | CHART: ' + !!window.LightweightCharts +
       ' | ELEMENT: ' + !!document.getElementById('candleChart');
+  })
+  .then(() => {
+    console.log('STATUS SERVER BERHASIL');
   })
   .catch(() => {
     document.querySelector('.status').textContent =
