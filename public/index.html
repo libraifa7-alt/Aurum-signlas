@@ -914,13 +914,13 @@ if (
   console.log('H1 BULLISH BOS:', i);
 console.log('6 CANDLE SEBELUM BOS:', recent.slice(i - 6, i));
   console.log('WARNA 6 CANDLE:', recent.slice(i - 6, i).map(c => c.close < c.open ? 'BEARISH' : c.close > c.open ? 'BULLISH' : 'DOJI'));
-  bullishCandleColors = recent.slice(i - 6, i).map(c =>
+  bullishCandleColors = recent.slice(i - 12, i).map(c =>
   c.close < c.open ? 'BEARISH' :
   c.close > c.open ? 'BULLISH' : 'DOJI'
 );
   console.log('HASIL WARNA BOS:', bullishCandleColors);
 
-  for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
+  for (let j = i - 1; j >= Math.max(i - 12, 0); j--) {
     const ob = recent[j];
 
 if (ob.close < ob.open) {
@@ -945,7 +945,7 @@ if (
 ) {
   bearishBosCount++;
 
-  for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
+  for (let j = i - 1; j >= Math.max(i - 12, 0); j--) {
     const ob = recent[j];
     
   if (ob.close > ob.open) {
