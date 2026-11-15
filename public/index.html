@@ -121,19 +121,24 @@ const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
 if (el && window.LightweightCharts) {
 console.log('LIGHTWEIGHT CHARTS AKTIF');  
+console.log('UKURAN AREA GRAFIK:', el.clientWidth, el.clientHeight);
+
+document.querySelector('.status').textContent =
+  'UKURAN GRAFIK: ' + el.clientWidth + ' x ' + el.clientHeight;
+
 const chart = LightweightCharts.createChart(el, {
   width: Math.max(el.clientWidth, 300),
   height: 340,
-    layout: {
-      background: { color: '#0b1220' },
-      textColor: '#cbd5e1'
-    },
-    grid: {
-      vertLines: { color: '#263247' },
-      horzLines: { color: '#263247' }
-    },
-    timeScale: { timeVisible: true }
-  });
+  layout: {
+    background: { color: '#0b1220' },
+    textColor: '#cbd5e1'
+  },
+  grid: {
+    vertLines: { color: '#263247' },
+    horzLines: { color: '#263247' }
+  },
+  timeScale: { timeVisible: true }
+});
 
   const series = chart.addCandlestickSeries({
     upColor: '#20c997',
