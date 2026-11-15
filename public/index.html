@@ -172,26 +172,29 @@ function drawOrderBlockZone(obZone, candles) {
   if (!obZone || obZone.status !== 'VALID') return;
 
   const zoneColor = obZone.type === 'BULLISH'
-    ? 'rgba(32, 201, 151, 0.45)'
-    : 'rgba(239, 83, 80, 0.45)';
+    ? 'rgba(32, 201, 151, 0.30)'
+    : 'rgba(239, 83, 80, 0.30)';
 
-  orderBlockZoneSeries = chart.addHistogramSeries({
-    base: obZone.low,
-    priceScaleId: 'right',
-    priceLineVisible: false,
-    lastValueVisible: false,
-    priceFormat: {
+  orderBlockZoneSeries = chart.addBaselineSeries({
+    baseValue: {
       type: 'price',
-      precision: 2,
-      minMove: 0.01
-    }
+      price: obZone.low
+    },
+    priceScaleId: 'right',
+    topLineColor: zoneColor,
+    topFillColor1: zoneColor,
+    topFillColor2: zoneColor,
+    bottomLineColor: 'rgba(0, 0, 0, 0)',
+    bottomFillColor1: 'rgba(0, 0, 0, 0)',
+    bottomFillColor2: 'rgba(0, 0, 0, 0)',
+    priceLineVisible: false,
+    lastValueVisible: false
   });
 
   orderBlockZoneSeries.setData(
     candles.map(c => ({
       time: c.time,
-      value: obZone.high,
-      color: zoneColor
+      value: obZone.high
     }))
   );
 
@@ -221,6 +224,7 @@ function drawOrderBlockZone(obZone, candles) {
     })
   );
 }
+  
   async function loadChart(interval) {
     try {
 const symbol = document.getElementById('pair').value;
