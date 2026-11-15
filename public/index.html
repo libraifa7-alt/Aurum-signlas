@@ -158,10 +158,11 @@ const chart = LightweightCharts.createChart(el, {
 let orderBlockPriceLines = [];
 let orderBlockZoneSeries = null;  
 function drawOrderBlockZone(obZone, candles) {
-if (orderBlockZoneSeries) {
-  chart.removeSeries(orderBlockZoneSeries);
-  orderBlockZoneSeries = null;
-}  
+  if (orderBlockZoneSeries) {
+    chart.removeSeries(orderBlockZoneSeries);
+    orderBlockZoneSeries = null;
+  }
+
   orderBlockPriceLines.forEach(line => {
     series.removePriceLine(line);
   });
@@ -170,28 +171,29 @@ if (orderBlockZoneSeries) {
 
   if (!obZone || obZone.status !== 'VALID') return;
 
-const zoneColor = obZone.type === 'BULLISH'
-  ? 'rgba(32, 201, 151, 1)'
-  : 'rgba(239, 83, 80, 1)';
-orderBlockZoneSeries = chart.addBaselineSeries({
-  baseValue: {
-    type: 'price',
-    price: obZone.low
-  },
-  topLineColor: zoneColor,
-  topFillColor1: zoneColor,
-  topFillColor2: zoneColor,
-  bottomLineColor: 'rgba(0, 0, 0, 0)',
-  bottomFillColor1: 'rgba(0, 0, 0, 0)',
-  bottomFillColor2: 'rgba(0, 0, 0, 0)'
-});
+  const zoneColor = obZone.type === 'BULLISH'
+    ? 'rgba(32, 201, 151, 0.45)'
+    : 'rgba(239, 83, 80, 0.45)';
 
-orderBlockZoneSeries.setData(
-  candles.map(c => ({
-    time: c.time,
-    value: obZone.high
-  }))
-);
+  orderBlockZoneSeries = chart.addHistogramSeries({
+    base: obZone.low,
+    priceScaleId: 'right',
+    priceLineVisible: false,
+    lastValueVisible: false,
+    priceFormat: {
+      type: 'price',
+      precision: 2,
+      minMove: 0.01
+    }
+  });
+
+  orderBlockZoneSeries.setData(
+    candles.map(c => ({
+      time: c.time,
+      value: obZone.high,
+      color: zoneColor
+    }))
+  );
 
   const color = obZone.type === 'BULLISH'
     ? '#20c997'
@@ -218,8 +220,7 @@ orderBlockZoneSeries.setData(
       title: 'OB LOW'
     })
   );
-}  
-
+}
   async function loadChart(interval) {
     try {
 const symbol = document.getElementById('pair').value;
