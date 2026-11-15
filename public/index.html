@@ -425,29 +425,35 @@ const sellLiquidity = swingLows[swingLows.length - 1];
       
       
 
-
 function analyzeEqualHighLow(data) {
   if (!data || data.length < 20) {
     return 'Data candle belum cukup';
   }
 
-  // Abaikan candle terakhir yang belum selesai
   const candles = data.slice(0, -1).slice(-40);
 
   if (candles.length < 20) {
     return 'Data candle belum cukup';
   }
 
-  // Toleransi harga untuk XAU/USD
-  const tolerance = Math.max(
-    candles[candles.length - 1].close * 0.0001,
-    0.30
-  );
+  const symbol = document.getElementById('pair')?.value || 'XAU/USD';
+  const price = candles[candles.length - 1].close;
+
+  let tolerance;
+
+  if (symbol === 'XAU/USD') {
+    tolerance = Math.max(price * 0.0001, 0.30);
+  } else if (symbol === 'BTC/USD') {
+    tolerance = Math.max(price * 0.0001, 5);
+  } else if (symbol === 'WTI') {
+    tolerance = Math.max(price * 0.001, 0.05);
+  } else {
+    tolerance = price * 0.0001;
+  }
 
   const highs = [];
   const lows = [];
 
-  // Identifikasi swing high dan swing low
   for (let i = 1; i < candles.length - 1; i++) {
     const previous = candles[i - 1];
     const current = candles[i];
@@ -468,15 +474,12 @@ function analyzeEqualHighLow(data) {
     }
   }
 
-  // Hitung jumlah level yang berdekatan
   function hasEqualLevel(levels) {
     for (let i = 0; i < levels.length; i++) {
       let touches = 1;
 
       for (let j = i + 1; j < levels.length; j++) {
-        if (
-          Math.abs(levels[i] - levels[j]) <= tolerance
-        ) {
+        if (Math.abs(levels[i] - levels[j]) <= tolerance) {
           touches++;
         }
       }
@@ -506,6 +509,7 @@ function analyzeEqualHighLow(data) {
 
   return 'EQUAL LEVEL — Belum ada pola terdeteksi';
 }
+
   
   
       // MULTI TIMEFRAME LIQUIDITY SWEEP
