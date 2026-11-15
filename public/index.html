@@ -863,8 +863,20 @@ document.getElementById('fvgAnalysis').textContent = fvg;
 const orderBlock = analyzeOrderBlock(candles);
 document.getElementById('orderBlockAnalysis').textContent = orderBlock;
 
+// ANALISIS ORDER BLOCK
+const orderBlock = analyzeOrderBlock(candles);
+
+document.getElementById('orderBlockAnalysis').innerText =
+  orderBlock;
+
+// KONFIRMASI ORDER BLOCK H1 + M15
 const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
-document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
+
+document.getElementById('orderBlockMTF').innerText =
+  orderBlockMTF;
+
+console.log('ORDER BLOCK:', orderBlock);
+console.log('ORDER BLOCK MTF:', orderBlockMTF);
       
   console.log('JUMLAH CANDLE:', candles.length);
   document.querySelector('.status').textContent = 'BTC TEST: ' + candles.length + ' CANDLES';
