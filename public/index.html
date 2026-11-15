@@ -121,10 +121,12 @@ Aurum Signals AI · Educational analysis only · Manual execution
 <script>
   const aurumCandleCache = new Map();
   document.querySelector('.status').textContent = 'JAVASCRIPT AKTIF';
+  console.log('CEK LOADCHART DIMULAI');
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
 if (el && window.LightweightCharts) {
-console.log('LIGHTWEIGHT CHARTS AKTIF');  
+console.log('LIGHTWEIGHT CHARTS AKTIF');
+console.log('MASUK KE BLOK GRAFIK');  
 console.log('UKURAN AREA GRAFIK:', el.clientWidth, el.clientHeight);
 
 document.querySelector('.status').textContent =
@@ -939,6 +941,7 @@ return {
   high: result.high,
   low: result.low
 };
+}  
   async function analyzeOrderBlockMultiTimeframe() {
   try {
     const [h1, m15] = await Promise.all([
