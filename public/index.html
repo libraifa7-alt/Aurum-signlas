@@ -153,6 +153,43 @@ const chart = LightweightCharts.createChart(el, {
     wickDownColor: '#ef5350'
   });
 
+let orderBlockPriceLines = [];
+function drawOrderBlockZone(obZone) {
+  orderBlockPriceLines.forEach(line => {
+    series.removePriceLine(line);
+  });
+
+  orderBlockPriceLines = [];
+
+  if (!obZone || obZone.status !== 'VALID') return;
+
+  const color = obZone.type === 'BULLISH'
+    ? '#20c997'
+    : '#ef5350';
+
+  orderBlockPriceLines.push(
+    series.createPriceLine({
+      price: obZone.high,
+      color: color,
+      lineWidth: 2,
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'OB HIGH'
+    })
+  );
+
+  orderBlockPriceLines.push(
+    series.createPriceLine({
+      price: obZone.low,
+      color: color,
+      lineWidth: 2,
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'OB LOW'
+    })
+  );
+}  
+
   async function loadChart(interval) {
     try {
 const symbol = document.getElementById('pair').value;
@@ -896,13 +933,12 @@ function detectOrderBlockZone(data) {
     return null;
   }
 
-  return {
-    type: result.type,
-    high: result.high,
-    low: result.low
-  };
-}
-    
+return {
+  status: result.status,
+  type: result.type,
+  high: result.high,
+  low: result.low
+};
   async function analyzeOrderBlockMultiTimeframe() {
   try {
     const [h1, m15] = await Promise.all([
@@ -988,6 +1024,8 @@ document.getElementById('orderBlockAnalysis').innerText =
   orderBlock;
     // DETEKSI ZONA HARGA ORDER BLOCK
 const obZone = detectOrderBlockZone(candles);
+
+drawOrderBlockZone(obZone);
 
 const zoneElement = document.getElementById('orderBlockZone');
 
