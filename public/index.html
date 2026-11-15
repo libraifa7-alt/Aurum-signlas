@@ -640,36 +640,149 @@ function analyzeFVG(data) {
 }
 // ORDER BLOCK DETECTION
 function analyzeOrderBlock(data) {
-  if (!data || data.length < 10) {
+
+function analyzeOrderBlock(data) {
+  if (!data || data.length < 15) {
     return 'Data candle belum cukup';
   }
 
-  const candles = data.slice(0, -1);
-  const recent = candles.slice(-10);
+  // Abaikan candle terakhir yang belum selesai
+  const candles = data.slice(0, -1).slice(-40);
 
-  for (let i = recent.length - 1; i >= 1; i--) {
-    const previous = recent[i - 1];
+  if (candles.length < 12) {
+    return 'Data candle belum cukup';
+  }
+
+  // Pastikan seluruh harga berbentuk angka
+  const validCandles = candles.map(c => ({
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close)
+  }));
+
+  if (validCandles.some(c =>
+    !Number.isFinite(c.open) ||
+    !Number.isFinite(c.high) ||
+    !Number.isFinite(c.low) ||
+    !Number.isFinite(c.close) ||
+    c.high < c.low
+  )) {
+    return 'Data candle tidak valid';
+  }
+
+  const recent = validCandles;
+
+  // Periksa displacement terbaru
+  for (let i = recent.length - 1; i >= 7; i--) {
+
     const current = recent[i];
 
-    // BULLISH ORDER BLOCK
-    if (
-      previous.close < previous.open &&
-      current.close > previous.high
-    ) {
-      return 'BULLISH ORDER BLOCK — Candle bearish ditembus naik';
+    const body = Math.abs(current.close - current.open);
+    const range = current.high - current.low;
+
+    if (range <= 0) continue;
+
+    const bodyRatio = body / range;
+
+    // Rata-rata body enam candle sebelumnya
+    const history = recent.slice(i - 6, i);
+
+    const averageBody =
+      history.reduce(
+        (sum, c) => sum + Math.abs(c.close - c.open),
+        0
+      ) / history.length;
+
+    if (averageBody <= 0) continue;
+
+    // Cari swing high dan swing low terkonfirmasi
+    let swingHigh = null;
+    let swingLow = null;
+
+    // Minimal dua candle kiri dan kanan
+    for (let p = i - 3; p >= 2; p--) {
+
+      const pivot = recent[p];
+
+      const left = recent.slice(p - 2, p);
+      const right = recent.slice(p + 1, p + 3);
+
+      const isSwingHigh =
+        left.every(c => pivot.high > c.high) &&
+        right.every(c => pivot.high > c.high);
+
+      const isSwingLow =
+        left.every(c => pivot.low < c.low) &&
+        right.every(c => pivot.low < c.low);
+
+      // Ambil swing terbaru
+      if (!swingHigh && isSwingHigh) {
+        swingHigh = pivot.high;
+      }
+
+      if (!swingLow && isSwingLow) {
+        swingLow = pivot.low;
+      }
+
+      if (swingHigh !== null && swingLow !== null) {
+        break;
+      }
     }
 
-    // BEARISH ORDER BLOCK
+    // Syarat displacement
+    const strongDisplacement =
+      bodyRatio >= 0.55 &&
+      body >= averageBody * 1.2;
+
+    if (!strongDisplacement) continue;
+
+    // BULLISH BOS
     if (
-      previous.close > previous.open &&
-      current.close < previous.low
+      current.close > current.open &&
+      swingHigh !== null &&
+      current.close > swingHigh
     ) {
-      return 'BEARISH ORDER BLOCK — Candle bullish ditembus turun';
+
+      // Cari bearish candle sebelum BOS
+      for (
+        let j = i - 1;
+        j >= Math.max(i - 3, 0);
+        j--
+      ) {
+        const orderBlock = recent[j];
+
+        if (orderBlock.close < orderBlock.open) {
+          return 'BULLISH ORDER BLOCK — Swing High BOS + Displacement valid';
+        }
+      }
+    }
+
+    // BEARISH BOS
+    if (
+      current.close < current.open &&
+      swingLow !== null &&
+      current.close < swingLow
+    ) {
+
+      // Cari bullish candle sebelum BOS
+      for (
+        let j = i - 1;
+        j >= Math.max(i - 3, 0);
+        j--
+      ) {
+        const orderBlock = recent[j];
+
+        if (orderBlock.close > orderBlock.open) {
+          return 'BEARISH ORDER BLOCK — Swing Low BOS + Displacement valid';
+        }
+      }
     }
   }
 
-  return 'ORDER BLOCK — Belum ada pola terdeteksi';
-}
+  return 'ORDER BLOCK — Belum ada pola valid';
+  }
+  
   async function analyzeOrderBlockMultiTimeframe() {
   try {
     const [h1, m15] = await Promise.all([
