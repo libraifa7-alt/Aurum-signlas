@@ -188,6 +188,10 @@ function drawOrderBlockZone(obZone, candles) {
   // Ambil posisi harga pada grafik
   const highY = series.priceToCoordinate(obZone.high);
   const lowY = series.priceToCoordinate(obZone.low);
+  document.querySelector('.status').textContent =
+  'OB COORDINATE | HIGH: ' + highY +
+  ' | LOW: ' + lowY +
+  ' | WIDTH: ' + chart.timeScale().width();
 
   const chartElement = document.getElementById('candleChart');
 
