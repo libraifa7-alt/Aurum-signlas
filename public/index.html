@@ -699,7 +699,10 @@ let bearishBosAttemptCount = 0;
 let bullishSwingAvailableCount = 0;
 let bearishSwingAvailableCount = 0;
 let lastBullishClose = null;
-let lastBullishSwingHigh = null;  
+let lastBullishSwingHigh = null;
+let bullishBosClose = null;
+let bullishBosSwingHigh = null;
+let bullishBosIndex = null;  
 
 for (let i = recent.length - 1; i >= 7; i--) {
   const current = recent[i];
@@ -796,6 +799,9 @@ if (
   current.close > swingHigh
 ) {
   bullishBosCount++;
+  bullishBosClose = current.close;
+  bullishBosSwingHigh = swingHigh;
+  bullishBosIndex = i;
 
   for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
     const ob = recent[j];
@@ -859,9 +865,15 @@ return {
     ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
     ' | Bearish BOS Attempt: ' + bearishBosAttemptCount +
     ' | Last Bullish Close: ' +
-    (lastBullishClose === null ? 'N/A' : lastBullishClose.toFixed(2)) +
-    ' | Last Bullish Swing High: ' +
-    (lastBullishSwingHigh === null ? 'N/A' : lastBullishSwingHigh.toFixed(2))
+(lastBullishClose === null ? 'N/A' : lastBullishClose.toFixed(2)) +
+' | Last Bullish Swing High: ' +
+(lastBullishSwingHigh === null ? 'N/A' : lastBullishSwingHigh.toFixed(2)) +
+' | BOS Close: ' +
+(bullishBosClose === null ? 'N/A' : bullishBosClose.toFixed(2)) +
+' | BOS Swing High: ' +
+(bullishBosSwingHigh === null ? 'N/A' : bullishBosSwingHigh.toFixed(2)) +
+' | BOS Index: ' +
+(bullishBosIndex === null ? 'N/A' : bullishBosIndex)
 };
 }
   
