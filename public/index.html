@@ -57,9 +57,9 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
   </div>
 <div style="margin-bottom:15px">
 <select id="pair">
-<option>EUR/USD</option><option>GBP/USD</option>
-<option>USD/JPY</option><option>AUD/USD</option>
-<option>USD/CAD</option><option>NZD/USD</option>
+  <option value="XAU/USD">XAU/USD</option>
+  <option value="BTC/USD">BTC/USD</option>
+  <option value="WTI">WTI</option>
 </select>
 <select id="tf">
 <option>M1</option>
@@ -148,8 +148,9 @@ const chart = LightweightCharts.createChart(el, {
 
   async function loadChart(interval) {
     try {
-      const response = await fetch('/api?interval=' + interval);
-      const data = await response.json();
+const symbol = document.getElementById('pair').value;
+const response = await fetch('/api?interval=' + interval + '&symbol=' + encodeURIComponent(symbol));
+const data = await response.json();
 
       if (data.status !== 'success' || !data.candles?.length) {
         console.log('Data grafik belum tersedia');
@@ -201,14 +202,16 @@ function getStructureSignal(data) {
  const aurumCandleCache = new Map();
 
 async function getSharedCandles(interval) {
-  const cached = aurumCandleCache.get(interval);
+  const symbol = document.getElementById('pair').value;
+const cacheKey = symbol + ':' + interval;
+const cached = aurumCandleCache.get(cacheKey);
 
   if (cached && Date.now() - cached.time < 60000) {
     return cached.data;
   }
 
   try {
-    const response = await fetch('/api?interval=' + interval);
+    const response = await fetch('/api?interval=' + interval + '&symbol=' + encodeURIComponent(symbol));
     const result = await response.json();
 
     if (result.status !== 'success' || !result.candles?.length) {
@@ -222,7 +225,10 @@ async function getSharedCandles(interval) {
       close: Number(c.close)
     }));
 
-    aurumCandleCache.set(interval, {
+aurumCandleCache.set(cacheKey, {
+  time: Date.now(),
+  data: candles
+});
       time: Date.now(),
       data: candles
     });
@@ -679,11 +685,18 @@ document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
 
   const timeframe = document.getElementById('tf');
 
-  loadChart(timeframe.value || 'M15');
+loadChart(timeframe.value || 'M15');
 
-  timeframe.addEventListener('change', function() {
-    loadChart(this.value);
-  });
+timeframe.addEventListener('change', function() {
+  loadChart(this.value);
+});
+
+// TAMBAHKAN KODE BARU DI SINI
+const pairSelect = document.getElementById('pair');
+
+pairSelect.addEventListener('change', function() {
+  loadChart(timeframe.value || 'M15');
+});
   }
         
 fetch('/api?interval=M15')
