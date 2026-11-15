@@ -173,13 +173,22 @@ document.querySelector('.status').textContent =
       }));
       console.log('JUMLAH:', candles.length);
 console.log('CONTOH CANDLE:', candles[0]);
-console.log('WAKTU VALID:', candles.every(c => Number.isFinite(c.time)));
-console.log('HARGA VALID:', candles.every(c =>
+
+const waktuValid = candles.every(c =>
+  Number.isFinite(c.time)
+);
+
+const hargaValid = candles.every(c =>
   Number.isFinite(c.open) &&
   Number.isFinite(c.high) &&
   Number.isFinite(c.low) &&
   Number.isFinite(c.close)
-));
+);
+
+document.querySelector('.status').textContent =
+  'CANDLE: ' + candles.length +
+  ' | WAKTU: ' + waktuValid +
+  ' | HARGA: ' + hargaValid;
      const cacheKey = symbol + ':' + interval;
 
       aurumCandleCache.set(cacheKey, {
