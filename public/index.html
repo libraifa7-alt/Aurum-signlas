@@ -903,7 +903,8 @@ if (current.close < current.open && swingLow !== null) {
 if (
   current.close > current.open &&
   swingHigh !== null &&
-  current.close > swingHigh
+  current.close > swingHigh &&
+  strongDisplacement
 ) {
   bullishBosCount++;
   bullishBosClose = current.close;
@@ -930,7 +931,8 @@ if (ob.close < ob.open) {
 if (
   current.close < current.open &&
   swingLow !== null &&
-  current.close < swingLow
+  current.close < swingLow &&
+  strongDisplacement
 ) {
   bearishBosCount++;
 
