@@ -156,7 +156,12 @@ const chart = LightweightCharts.createChart(el, {
   });
 
 let orderBlockPriceLines = [];
-function drawOrderBlockZone(obZone) {
+let orderBlockZoneSeries = null;  
+function drawOrderBlockZone(obZone, candles) {
+if (orderBlockZoneSeries) {
+  chart.removeSeries(orderBlockZoneSeries);
+  orderBlockZoneSeries = null;
+}  
   orderBlockPriceLines.forEach(line => {
     series.removePriceLine(line);
   });
@@ -164,6 +169,30 @@ function drawOrderBlockZone(obZone) {
   orderBlockPriceLines = [];
 
   if (!obZone || obZone.status !== 'VALID') return;
+
+const zoneColor = obZone.type === 'BULLISH'
+  ? 'rgba(32, 201, 151, 0.25)'
+  : 'rgba(239, 83, 80, 0.25)';
+
+orderBlockZoneSeries = chart.addBaselineSeries({
+  baseValue: {
+    type: 'price',
+    price: obZone.low
+  },
+  topLineColor: zoneColor,
+  topFillColor1: zoneColor,
+  topFillColor2: zoneColor,
+  bottomLineColor: 'rgba(0, 0, 0, 0)',
+  bottomFillColor1: 'rgba(0, 0, 0, 0)',
+  bottomFillColor2: 'rgba(0, 0, 0, 0)'
+});
+
+orderBlockZoneSeries.setData(
+  candles.map(c => ({
+    time: c.time,
+    value: obZone.high
+  }))
+);
 
   const color = obZone.type === 'BULLISH'
     ? '#20c997'
@@ -1028,7 +1057,7 @@ document.getElementById('orderBlockAnalysis').innerText =
     // DETEKSI ZONA HARGA ORDER BLOCK
 const obZone = detectOrderBlockZone(candles);
 
-drawOrderBlockZone(obZone);
+drawOrderBlockZone(obZone, candles);
 
 const zoneElement = document.getElementById('orderBlockZone');
 
