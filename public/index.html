@@ -809,7 +809,8 @@ let lastBullishClose = null;
 let lastBullishSwingHigh = null;
 let bullishBosClose = null;
 let bullishBosSwingHigh = null;
-let bullishBosIndex = null;  
+let bullishBosIndex = null;
+let bullishCandleColors = [];  
 
 for (let i = recent.length - 1; i >= 7; i--) {
   const current = recent[i];
@@ -913,6 +914,10 @@ if (
   console.log('H1 BULLISH BOS:', i);
 console.log('6 CANDLE SEBELUM BOS:', recent.slice(i - 6, i));
   console.log('WARNA 6 CANDLE:', recent.slice(i - 6, i).map(c => c.close < c.open ? 'BEARISH' : c.close > c.open ? 'BULLISH' : 'DOJI'));
+  bullishCandleColors = recent.slice(i - 6, i).map(c =>
+  c.close < c.open ? 'BEARISH' :
+  c.close > c.open ? 'BULLISH' : 'DOJI'
+);
 
   for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
     const ob = recent[j];
@@ -970,7 +975,7 @@ return {
     ' | Bullish BOS: ' + bullishBosCount +
     ' | Bearish BOS: ' + bearishBosCount +
     ' | Opposing Candle: ' + opposingCandleCount +
-    ' | 6 CANDLE SEBELUM BOS: ' + bullishBosCandles +
+    ' | 6 CANDLE SEBELUM BOS: ' + bullishCandleColors.join(', ') +
     ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
     ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
     ' | Ratio Pass: ' + bodyRatioPassCount +
