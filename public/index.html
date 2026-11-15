@@ -149,7 +149,15 @@ const chart = LightweightCharts.createChart(el, {
 const symbol = document.getElementById('pair').value;
 console.log('SIMBOL YANG DIPILIH:', symbol);      
 const response = await fetch('/api?interval=' + interval + '&symbol=' + encodeURIComponent(symbol));
+
+document.querySelector('.status').textContent =
+  'API HTTP: ' + response.status;
+
 const data = await response.json();
+
+document.querySelector('.status').textContent =
+  'API STATUS: ' + data.status +
+  ' | CANDLES: ' + (data.candles?.length || 0);
 
       if (data.status !== 'success' || !data.candles?.length) {
         console.log('Data grafik belum tersedia');
