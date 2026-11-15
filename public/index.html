@@ -227,11 +227,8 @@ aurumCandleCache.set(cacheKey, {
   time: Date.now(),
   data: candles
 });
-      time: Date.now(),
-      data: candles
-    });
 
-    return candles;
+return candles;
   } catch (error) {
     console.log('Shared candle error:', error);
     return [];
