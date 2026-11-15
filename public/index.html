@@ -667,6 +667,11 @@ function analyzeOrderBlock(data) {
   }
   }
       document.querySelector('.status').textContent = 'DATA CANDLE: ' + candles.length;
+      document.querySelector('.status').textContent =
+  'CANDLE SIAP: ' + candles.length;
+
+console.log('CANDLE PERTAMA:', candles[0]);
+console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
       series.setData(candles);
 
 const latestCandle = candles[candles.length - 1];
