@@ -690,7 +690,12 @@ let opposingCandleCount = 0;
 let maxBodyRatio = 0;
 let maxBodyVsAverage = 0;
 let bodyRatioPassCount = 0;
-let bodyAveragePassCount = 0;  
+let bodyAveragePassCount = 0;
+
+let bullishBosAttemptCount = 0;
+let bearishBosAttemptCount = 0;
+let bullishSwingAvailableCount = 0;
+let bearishSwingAvailableCount = 0;
 
 for (let i = recent.length - 1; i >= 7; i--) {
   const current = recent[i];
@@ -763,6 +768,21 @@ if (strongDisplacement) {
 }
 
 if (!strongDisplacement) continue;
+  if (current.close > current.open && swingHigh !== null) {
+  bullishSwingAvailableCount++;
+
+  if (current.close > swingHigh) {
+    bullishBosAttemptCount++;
+  }
+}
+
+if (current.close < current.open && swingLow !== null) {
+  bearishSwingAvailableCount++;
+
+  if (current.close < swingLow) {
+    bearishBosAttemptCount++;
+  }
+}
 
 if (
   current.close > current.open &&
@@ -824,11 +844,14 @@ return {
     ' | Bearish BOS: ' + bearishBosCount +
     ' | Opposing Candle: ' + opposingCandleCount +
     ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
-' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
-' | Ratio Pass: ' + bodyRatioPassCount +
-' | Average Pass: ' + bodyAveragePassCount
+    ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
+    ' | Ratio Pass: ' + bodyRatioPassCount +
+    ' | Average Pass: ' + bodyAveragePassCount +
+    ' | Bullish Swing Available: ' + bullishSwingAvailableCount +
+    ' | Bearish Swing Available: ' + bearishSwingAvailableCount +
+    ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
+    ' | Bearish BOS Attempt: ' + bearishBosAttemptCount
 };
-}
 
 // ANALISIS ORDER BLOCK
 function analyzeOrderBlock(data) {
