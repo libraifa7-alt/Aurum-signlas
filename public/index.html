@@ -171,9 +171,8 @@ if (orderBlockZoneSeries) {
   if (!obZone || obZone.status !== 'VALID') return;
 
 const zoneColor = obZone.type === 'BULLISH'
-  ? 'rgba(32, 201, 151, 0.25)'
-  : 'rgba(239, 83, 80, 0.25)';
-
+  ? 'rgba(32, 201, 151, 1)'
+  : 'rgba(239, 83, 80, 1)';
 orderBlockZoneSeries = chart.addBaselineSeries({
   baseValue: {
     type: 'price',
