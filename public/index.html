@@ -190,10 +190,11 @@ const hargaValid = candles.every(c =>
   Number.isFinite(c.close)
 );
 
+const el = document.getElementById('candleChart');
+
 document.querySelector('.status').textContent =
-  'CANDLE: ' + candles.length +
-  ' | WAKTU: ' + waktuValid +
-  ' | HARGA: ' + hargaValid;
+  'AREA GRAFIK: ' + (el ? el.clientWidth : 'TIDAK ADA') +
+  ' x ' + (el ? el.clientHeight : 'TIDAK ADA');
      const cacheKey = symbol + ':' + interval;
 
       aurumCandleCache.set(cacheKey, {
