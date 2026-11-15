@@ -839,6 +839,7 @@ if (
     }
   }
 
+
 return {
   status: 'NO_PATTERN',
   reason:
@@ -856,14 +857,14 @@ return {
     ' | Bullish Swing Available: ' + bullishSwingAvailableCount +
     ' | Bearish Swing Available: ' + bearishSwingAvailableCount +
     ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
+    ' | Bearish BOS Attempt: ' + bearishBosAttemptCount +
     ' | Last Bullish Close: ' +
-  (lastBullishClose === null ? 'N/A' : lastBullishClose.toFixed(2)) +
-' | Last Bullish Swing High: ' +
-  (lastBullishSwingHigh === null ? 'N/A' : lastBullishSwingHigh.toFixed(2))
-    ' | Bearish BOS Attempt: ' + bearishBosAttemptCount
-    
+    (lastBullishClose === null ? 'N/A' : lastBullishClose.toFixed(2)) +
+    ' | Last Bullish Swing High: ' +
+    (lastBullishSwingHigh === null ? 'N/A' : lastBullishSwingHigh.toFixed(2))
 };
 }
+  
 // ANALISIS ORDER BLOCK
 function analyzeOrderBlock(data) {
   const result = detectOrderBlock(data);
