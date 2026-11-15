@@ -158,7 +158,7 @@ const data = await response.json();
       }
 
       const candles = data.candles.slice().reverse().map(c => ({
-        time: Math.floor(new Date(c.datetime.replace(' ', 'T') + 'Z').getTime() / 1000),
+     time: Math.floor(new Date(c.datetime.replace(' ', 'T') + '+07:00').getTime() / 1000),
         open: Number(c.open),
         high: Number(c.high),
         low: Number(c.low),
@@ -671,6 +671,8 @@ document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
       
   console.log('JUMLAH CANDLE:', candles.length);
       series.setData(candles);
+  console.log('CANDLE PERTAMA:', candles[0]);
+console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
       chart.timeScale().fitContent();
       chart.applyOptions({
   width: el.clientWidth
