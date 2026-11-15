@@ -1050,6 +1050,9 @@ console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
   series.setData(candles);
 
   chart.timeScale().fitContent();
+  const obZone = detectOrderBlockZone(candles);
+
+drawOrderBlockZone(obZone, candles);
 
   document.querySelector('.status').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
