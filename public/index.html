@@ -711,9 +711,16 @@ fetch('/api?interval=M15')
     document.querySelector('.status').textContent =
       '● SERVER CONNECTION PENDING';
   });
-fetch('/api/xauusd')
-  .then(response => response.json())
-  .then(data => {
+async function updateMarketOverview() {
+  const symbol = document.getElementById('pair').value;
+
+  try {
+    const response = await fetch(
+      '/api?interval=M15&symbol=' + encodeURIComponent(symbol)
+    );
+
+    const data = await response.json();
+
     if (data.status === 'success' && data.candles?.length) {
       const candle = data.candles[0];
 
@@ -721,16 +728,21 @@ fetch('/api/xauusd')
         Number(candle.close).toFixed(2);
 
       document.getElementById('goldTime').textContent =
-        'XAU/USD · Data dari Alpha Vantage';
+        symbol + ' · Market Data';
     } else {
       document.getElementById('goldPrice').textContent =
         'Data belum tersedia';
-          }
-  })
-  .catch(() => {
+    }
+  } catch (error) {
     document.getElementById('goldPrice').textContent =
       'Koneksi gagal';
-  });
+  }
+}
+
+updateMarketOverview();
+document.getElementById('pair').addEventListener('change', function() {
+  updateMarketOverview();
+});
 </script>
 </body>
 </html>
