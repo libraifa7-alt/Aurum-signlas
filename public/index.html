@@ -721,6 +721,7 @@ async function updateMarketOverview() {
     );
 
     const data = await response.json();
+    console.log('OVERVIEW DATA:', data);
 
     if (data.status === 'success' && data.candles?.length) {
       const candle = data.candles[0];
