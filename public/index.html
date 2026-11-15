@@ -681,9 +681,16 @@ function detectOrderBlock(data) {
     };
   }
 
-  for (let i = recent.length - 1; i >= 7; i--) {
-    const current = recent[i];
+let displacementCount = 0;
+let swingHighCount = 0;
+let swingLowCount = 0;
+let bullishBosCount = 0;
+let bearishBosCount = 0;
+let opposingCandleCount = 0;
 
+for (let i = recent.length - 1; i >= 7; i--) {
+  const current = recent[i];
+  
     const body = Math.abs(current.close - current.open);
     const range = current.high - current.low;
 
@@ -707,43 +714,52 @@ function detectOrderBlock(data) {
       const left = recent.slice(p - 2, p);
       const right = recent.slice(p + 1, p + 3);
 
-      if (
-        swingHigh === null &&
-        left.every(c => pivot.high > c.high) &&
-        right.every(c => pivot.high > c.high)
-      ) {
-        swingHigh = pivot.high;
-      }
-
-      if (
-        swingLow === null &&
-        left.every(c => pivot.low < c.low) &&
-        right.every(c => pivot.low < c.low)
-      ) {
-        swingLow = pivot.low;
-      }
+if (
+  swingHigh === null &&
+  left.every(c => pivot.high > c.high) &&
+  right.every(c => pivot.high > c.high)
+) {
+  swingHigh = pivot.high;
+  swingHighCount++;
+}
+if (
+  swingLow === null &&
+  left.every(c => pivot.low < c.low) &&
+  right.every(c => pivot.low < c.low)
+) {
+  swingLow = pivot.low;
+  swingLowCount++;
+}
 
       if (swingHigh !== null && swingLow !== null) break;
     }
 
-    const strongDisplacement =
-      body / range >= 0.55 &&
-      body >= averageBody * 1.2;
+const strongDisplacement =
+  body / range >= 0.55 &&
+  body >= averageBody * 1.2;
 
-    if (!strongDisplacement) continue;
+if (strongDisplacement) {
+  displacementCount++;
+}
 
-    if (
-      current.close > current.open &&
-      swingHigh !== null &&
-      current.close > swingHigh
-    ) {
-      for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
-        const ob = recent[j];
+if (!strongDisplacement) continue;
 
-        if (ob.close < ob.open) {
-          return {
-            status: 'VALID',
-            type: 'BULLISH',
+if (
+  current.close > current.open &&
+  swingHigh !== null &&
+  current.close > swingHigh
+) {
+  bullishBosCount++;
+
+  for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
+    const ob = recent[j];
+
+if (ob.close < ob.open) {
+  opposingCandleCount++;
+
+  return {
+    status: 'VALID',
+    type: 'BULLISH',
             high: ob.high,
             low: ob.low,
             reason: 'Swing High BOS + Displacement valid'
@@ -752,18 +768,22 @@ function detectOrderBlock(data) {
       }
     }
 
-    if (
-      current.close < current.open &&
-      swingLow !== null &&
-      current.close < swingLow
-    ) {
-      for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
-        const ob = recent[j];
+if (
+  current.close < current.open &&
+  swingLow !== null &&
+  current.close < swingLow
+) {
+  bearishBosCount++;
 
-        if (ob.close > ob.open) {
-          return {
-            status: 'VALID',
-            type: 'BEARISH',
+  for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
+    const ob = recent[j];
+    
+  if (ob.close > ob.open) {
+  opposingCandleCount++;
+
+  return {
+    status: 'VALID',
+    type: 'BEARISH',
             high: ob.high,
             low: ob.low,
             reason: 'Swing Low BOS + Displacement valid'
@@ -773,10 +793,17 @@ function detectOrderBlock(data) {
     }
   }
 
-  return {
-    status: 'NO_PATTERN',
-    reason: 'Belum ditemukan BOS dan displacement valid'
-  };
+return {
+  status: 'NO_PATTERN',
+  reason:
+    'OB DIAGNOSTIC' +
+    ' | Displacement: ' + displacementCount +
+    ' | Swing High: ' + swingHighCount +
+    ' | Swing Low: ' + swingLowCount +
+    ' | Bullish BOS: ' + bullishBosCount +
+    ' | Bearish BOS: ' + bearishBosCount +
+    ' | Opposing Candle: ' + opposingCandleCount
+};
 }
 
 // ANALISIS ORDER BLOCK
