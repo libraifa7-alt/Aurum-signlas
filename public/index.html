@@ -692,24 +692,28 @@ let maxBodyVsAverage = 0;
 
 for (let i = recent.length - 1; i >= 7; i--) {
   const current = recent[i];
-  
-if (range > 0 && body / range > maxBodyRatio) {
-  maxBodyRatio = body / range;
-}
 
-    if (range <= 0) continue;
+  const body = Math.abs(current.close - current.open);
+  const range = current.high - current.low;
 
-    const history = recent.slice(i - 6, i);
-
-    const averageBody = history.reduce(
-      (sum, c) => sum + Math.abs(c.close - c.open),
-      0
-    ) / history.length;
-
-    if (averageBody <= 0) continue;
-  if (averageBody > 0 && body / averageBody > maxBodyVsAverage) {
-  maxBodyVsAverage = body / averageBody;
+  if (range > 0 && body / range > maxBodyRatio) {
+    maxBodyRatio = body / range;
   }
+
+  if (range <= 0) continue;
+
+const history = recent.slice(i - 6, i);
+
+const averageBody = history.reduce(
+  (sum, c) => sum + Math.abs(c.close - c.open),
+  0
+) / history.length;
+
+if (averageBody <= 0) continue;
+
+if (body / averageBody > maxBodyVsAverage) {
+  maxBodyVsAverage = body / averageBody;
+}
 
     let swingHigh = null;
     let swingLow = null;
