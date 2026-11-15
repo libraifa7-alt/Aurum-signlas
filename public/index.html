@@ -99,6 +99,9 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
   <small class="sub">ORDER BLOCK</small>
   <p id="orderBlockAnalysis">Menunggu analisis Order Block...</p>
   <p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p>
+  <p id="orderBlockZone">
+  Menunggu deteksi zona harga OB...
+  </p>
 </div>
 </div>
 </section>
@@ -781,6 +784,124 @@ function analyzeOrderBlock(data) {
   return 'ORDER BLOCK — Belum ada pola valid';
 }
   
+function detectOrderBlockZone(data) {
+  if (!data || data.length < 15) {
+    return null;
+  }
+
+  const candles = data.slice(0, -1).slice(-40);
+
+  if (candles.length < 12) return null;
+
+  const recent = candles.map(c => ({
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close)
+  }));
+
+  if (recent.some(c =>
+    !Number.isFinite(c.open) ||
+    !Number.isFinite(c.high) ||
+    !Number.isFinite(c.low) ||
+    !Number.isFinite(c.close) ||
+    c.high < c.low
+  )) {
+    return null;
+  }
+
+  for (let i = recent.length - 1; i >= 7; i--) {
+    const current = recent[i];
+
+    const body = Math.abs(current.close - current.open);
+    const range = current.high - current.low;
+
+    if (range <= 0) continue;
+
+    const history = recent.slice(i - 6, i);
+
+    const averageBody = history.reduce(
+      (sum, c) => sum + Math.abs(c.close - c.open),
+      0
+    ) / history.length;
+
+    if (averageBody <= 0) continue;
+
+    let swingHigh = null;
+    let swingLow = null;
+
+    for (let p = i - 3; p >= 2; p--) {
+      const pivot = recent[p];
+
+      const left = recent.slice(p - 2, p);
+      const right = recent.slice(p + 1, p + 3);
+
+      if (
+        !swingHigh &&
+        left.every(c => pivot.high > c.high) &&
+        right.every(c => pivot.high > c.high)
+      ) {
+        swingHigh = pivot.high;
+      }
+
+      if (
+        !swingLow &&
+        left.every(c => pivot.low < c.low) &&
+        right.every(c => pivot.low < c.low)
+      ) {
+        swingLow = pivot.low;
+      }
+
+      if (swingHigh !== null && swingLow !== null) break;
+    }
+
+    const strongDisplacement =
+      body / range >= 0.55 &&
+      body >= averageBody * 1.2;
+
+    if (!strongDisplacement) continue;
+
+    if (
+      current.close > current.open &&
+      swingHigh !== null &&
+      current.close > swingHigh
+    ) {
+      for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
+        const ob = recent[j];
+
+        if (ob.close < ob.open) {
+          return {
+            type: 'BULLISH',
+            high: ob.high,
+            low: ob.low
+          };
+        }
+      }
+    }
+
+    if (
+      current.close < current.open &&
+      swingLow !== null &&
+      current.close < swingLow
+    ) {
+      for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
+        const ob = recent[j];
+
+        if (ob.close > ob.open) {
+          return {
+            type: 'BEARISH',
+            high: ob.high,
+            low: ob.low
+          };
+        }
+      }
+    }
+  }
+
+  return null;
+}
+      
+  
   async function analyzeOrderBlockMultiTimeframe() {
   try {
     const [h1, m15] = await Promise.all([
@@ -864,6 +985,29 @@ const orderBlock = analyzeOrderBlock(candles);
 
 document.getElementById('orderBlockAnalysis').innerText =
   orderBlock;
+    // DETEKSI ZONA HARGA ORDER BLOCK
+const obZone = detectOrderBlockZone(candles);
+
+const zoneElement = document.getElementById('orderBlockZone');
+
+if (
+  obZone &&
+  typeof obZone === 'object' &&
+  (
+    (obZone.type === 'BULLISH' &&
+      orderBlock.includes('BULLISH ORDER BLOCK')) ||
+    (obZone.type === 'BEARISH' &&
+      orderBlock.includes('BEARISH ORDER BLOCK'))
+  )
+) {
+  zoneElement.innerText =
+    obZone.type + ' ORDER BLOCK ZONE' +
+    ' | HIGH: ' + obZone.high.toFixed(2) +
+    ' | LOW: ' + obZone.low.toFixed(2);
+} else {
+  zoneElement.innerText =
+    'Belum ada zona Order Block valid';
+}
 
 // KONFIRMASI ORDER BLOCK H1 + M15
 const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
