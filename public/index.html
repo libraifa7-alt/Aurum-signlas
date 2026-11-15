@@ -918,6 +918,7 @@ console.log('6 CANDLE SEBELUM BOS:', recent.slice(i - 6, i));
   c.close < c.open ? 'BEARISH' :
   c.close > c.open ? 'BULLISH' : 'DOJI'
 );
+  console.log('HASIL WARNA BOS:', bullishCandleColors);
 
   for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
     const ob = recent[j];
