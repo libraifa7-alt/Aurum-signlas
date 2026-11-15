@@ -698,6 +698,8 @@ let bullishBosAttemptCount = 0;
 let bearishBosAttemptCount = 0;
 let bullishSwingAvailableCount = 0;
 let bearishSwingAvailableCount = 0;
+let lastBullishClose = null;
+let lastBullishSwingHigh = null;  
 
 for (let i = recent.length - 1; i >= 7; i--) {
   const current = recent[i];
@@ -769,9 +771,11 @@ if (strongDisplacement) {
   displacementCount++;
 }
 
-if (!strongDisplacement) continue;
-  if (current.close > current.open && swingHigh !== null) {
+if (current.close > current.open && swingHigh !== null) {
   bullishSwingAvailableCount++;
+
+  lastBullishClose = current.close;
+  lastBullishSwingHigh = swingHigh;
 
   if (current.close > swingHigh) {
     bullishBosAttemptCount++;
@@ -852,7 +856,12 @@ return {
     ' | Bullish Swing Available: ' + bullishSwingAvailableCount +
     ' | Bearish Swing Available: ' + bearishSwingAvailableCount +
     ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
+    ' | Last Bullish Close: ' +
+  (lastBullishClose === null ? 'N/A' : lastBullishClose.toFixed(2)) +
+' | Last Bullish Swing High: ' +
+  (lastBullishSwingHigh === null ? 'N/A' : lastBullishSwingHigh.toFixed(2))
     ' | Bearish BOS Attempt: ' + bearishBosAttemptCount
+    
 };
 }
 // ANALISIS ORDER BLOCK
