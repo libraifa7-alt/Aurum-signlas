@@ -911,7 +911,7 @@ if (
   bullishBosSwingHigh = swingHigh;
   bullishBosIndex = i;
 
-  for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
+  for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
     const ob = recent[j];
 
 if (ob.close < ob.open) {
@@ -936,7 +936,7 @@ if (
 ) {
   bearishBosCount++;
 
-  for (let j = i - 1; j >= Math.max(i - 3, 0); j--) {
+  for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
     const ob = recent[j];
     
   if (ob.close > ob.open) {
