@@ -116,6 +116,7 @@ Aurum Signals AI · Educational analysis only · Manual execution
 </footer>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 <script>
+  const aurumCandleCache = new Map();
   document.querySelector('.status').textContent = 'JAVASCRIPT AKTIF';
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
@@ -240,7 +241,7 @@ function getStructureSignal(data) {
 
   return 'RANGE';
 }
- const aurumCandleCache = new Map();
+
 
 async function getSharedCandles(interval) {
   const symbol = document.getElementById('pair').value;
