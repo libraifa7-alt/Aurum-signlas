@@ -658,6 +658,7 @@ function analyzeOrderBlock(data) {
     return 'WAIT — Gagal membaca Order Block';
   }
   }
+      document.querySelector('.status').textContent = 'DATA CANDLE: ' + candles.length;
       series.setData(candles);
 
 const latestCandle = candles[candles.length - 1];
