@@ -687,12 +687,15 @@ let swingLowCount = 0;
 let bullishBosCount = 0;
 let bearishBosCount = 0;
 let opposingCandleCount = 0;
+let maxBodyRatio = 0;
+let maxBodyVsAverage = 0;  
 
 for (let i = recent.length - 1; i >= 7; i--) {
   const current = recent[i];
   
-    const body = Math.abs(current.close - current.open);
-    const range = current.high - current.low;
+if (range > 0 && body / range > maxBodyRatio) {
+  maxBodyRatio = body / range;
+}
 
     if (range <= 0) continue;
 
@@ -704,6 +707,9 @@ for (let i = recent.length - 1; i >= 7; i--) {
     ) / history.length;
 
     if (averageBody <= 0) continue;
+  if (averageBody > 0 && body / averageBody > maxBodyVsAverage) {
+  maxBodyVsAverage = body / averageBody;
+  }
 
     let swingHigh = null;
     let swingLow = null;
@@ -802,7 +808,9 @@ return {
     ' | Swing Low: ' + swingLowCount +
     ' | Bullish BOS: ' + bullishBosCount +
     ' | Bearish BOS: ' + bearishBosCount +
-    ' | Opposing Candle: ' + opposingCandleCount
+    ' | Opposing Candle: ' + opposingCandleCount +
+    ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
+    ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3)
 };
 }
 
