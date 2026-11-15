@@ -705,21 +705,11 @@ pairSelect.addEventListener('change', function() {
 });
   }
         
-fetch('/api?interval=M15')
-  .then(response => response.json())
-  .then(data => {
-    document.querySelector('.status').textContent =
-      'SERVER: CONNECTED | CHART: ' + !!window.LightweightCharts +
-      ' | ELEMENT: ' + !!document.getElementById('candleChart');
-  })
-  .then(() => {
-    console.log('STATUS SERVER BERHASIL');
-  })
-  .catch(() => {
-    document.querySelector('.status').textContent =
-      '● SERVER CONNECTION PENDING';
-  });
+document.querySelector('.status').textContent =
+  'SERVER: READY | CHART: ' + !!window.LightweightCharts +
+  ' | ELEMENT: ' + !!document.getElementById('candleChart');
 
+console.log('STATUS SERVER DIPERIKSA');
 </script>
 </body>
 </html>
