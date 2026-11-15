@@ -640,8 +640,6 @@ function analyzeFVG(data) {
 }
 // ORDER BLOCK DETECTION
 function analyzeOrderBlock(data) {
-
-function analyzeOrderBlock(data) {
   if (!data || data.length < 15) {
     return 'Data candle belum cukup';
   }
@@ -781,7 +779,7 @@ function analyzeOrderBlock(data) {
   }
 
   return 'ORDER BLOCK — Belum ada pola valid';
-  }
+}
   
   async function analyzeOrderBlockMultiTimeframe() {
   try {
@@ -860,8 +858,6 @@ document.getElementById('liquidityConfirmation').innerText = confirmation;
       const fvg = analyzeFVG(candles);
 document.getElementById('fvgAnalysis').textContent = fvg;
       
-const orderBlock = analyzeOrderBlock(candles);
-document.getElementById('orderBlockAnalysis').textContent = orderBlock;
 
 // ANALISIS ORDER BLOCK
 const orderBlock = analyzeOrderBlock(candles);
