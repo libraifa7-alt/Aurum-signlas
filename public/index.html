@@ -658,7 +658,18 @@ function analyzeOrderBlock(data) {
     return 'WAIT — Gagal membaca Order Block';
   }
   }
-const structure = await analyzeMarketStructure();
+      series.setData(candles);
+
+const latestCandle = candles[candles.length - 1];
+
+document.getElementById('goldPrice').textContent =
+  latestCandle.close.toFixed(2);
+
+document.getElementById('goldTime').textContent =
+  document.getElementById('pair').value + ' · Market Data';
+
+chart.timeScale().fitContent();
+      const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
 
 const liquidity = await analyzeLiquidityMultiTimeframe();
@@ -678,14 +689,7 @@ document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
       
   console.log('JUMLAH CANDLE:', candles.length);
   document.querySelector('.status').textContent = 'BTC TEST: ' + candles.length + ' CANDLES';
-      series.setData(candles);
-  const latestCandle = candles[candles.length - 1];
-
-document.getElementById('goldPrice').textContent =
-  latestCandle.close.toFixed(2);
-
-document.getElementById('goldTime').textContent =
-  document.getElementById('pair').value + ' · Market Data';    
+      
   console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
       chart.timeScale().fitContent();
