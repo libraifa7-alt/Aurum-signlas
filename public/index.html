@@ -912,6 +912,7 @@ if (
   bullishBosIndex = i;
   console.log('H1 BULLISH BOS:', i);
 console.log('6 CANDLE SEBELUM BOS:', recent.slice(i - 6, i));
+  console.log('WARNA 6 CANDLE:', recent.slice(i - 6, i).map(c => c.close < c.open ? 'BEARISH' : c.close > c.open ? 'BULLISH' : 'DOJI'));
 
   for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
     const ob = recent[j];
