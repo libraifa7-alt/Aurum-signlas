@@ -665,6 +665,7 @@ const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
 document.getElementById('orderBlockMTF').innerText = orderBlockMTF;
       
   console.log('JUMLAH CANDLE:', candles.length);
+  document.querySelector('.status').textContent = 'BTC TEST: ' + candles.length + ' CANDLES';
       series.setData(candles);
   console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
