@@ -956,7 +956,9 @@ if (
     }
   }
 
-
+const bullishBosCandles = bullishBosIndex === null
+  ? 'N/A'
+  : JSON.stringify(recent.slice(bullishBosIndex - 6, bullishBosIndex));
 return {
   status: 'NO_PATTERN',
   reason:
@@ -967,6 +969,7 @@ return {
     ' | Bullish BOS: ' + bullishBosCount +
     ' | Bearish BOS: ' + bearishBosCount +
     ' | Opposing Candle: ' + opposingCandleCount +
+    ' | 6 CANDLE SEBELUM BOS: ' + bullishBosCandles +
     ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
     ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
     ' | Ratio Pass: ' + bodyRatioPassCount +
