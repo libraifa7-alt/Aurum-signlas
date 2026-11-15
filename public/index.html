@@ -297,7 +297,12 @@ const hargaValid = candles.every(c =>
   Number.isFinite(c.low) &&
   Number.isFinite(c.close)
 );
-
+if (!waktuValid || !hargaValid) {
+  document.querySelector('.status').textContent =
+    'DATA CANDLE TIDAK VALID | WAKTU: ' + waktuValid +
+    ' | HARGA: ' + hargaValid;
+  return;
+  }
 const el = document.getElementById('candleChart');
 
 document.querySelector('.status').textContent =
@@ -314,6 +319,7 @@ document.querySelector('.status').textContent =
           close: c.close
         }))
       });
+      
 // MULTI TIMEFRAME MARKET STRUCTURE
 
 
@@ -1051,11 +1057,6 @@ console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
 
   series.setData(candles);
 
-  chart.timeScale().fitContent();
-  const obZone = detectOrderBlockZone(candles);
-
-drawOrderBlockZone(obZone, candles);
-
   document.querySelector('.status').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
 } catch (error) {
@@ -1131,21 +1132,19 @@ console.log('ORDER BLOCK MTF:', orderBlockMTF);
   console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
       chart.timeScale().fitContent();
-      const obZone = detectOrderBlockZone(candles);
-
-drawOrderBlockZone(obZone, candles);
-      chart.applyOptions({
+chart.applyOptions({
   width: el.clientWidth
 });
+
 } catch (error) {
   console.log('Chart error:', error);
-
   document.getElementById('orderBlockAnalysis').textContent =
     'ERROR GRAFIK: ' + error.message;
-    }
   }
+}
 
-  const timeframe = document.getElementById('tf');
+const timeframe = document.getElementById('tf');
+const pairSelect = document.getElementById('pair');
 
 loadChart(timeframe.value || 'M15');
 
@@ -1153,14 +1152,12 @@ timeframe.addEventListener('change', function() {
   loadChart(this.value);
 });
 
-// TAMBAHKAN KODE BARU DI SINI
-const pairSelect = document.getElementById('pair');
-
 pairSelect.addEventListener('change', function() {
   loadChart(timeframe.value || 'M15');
 });
-  }
-        
+
+}
+
 document.querySelector('.status').textContent =
   'MEMUAT DATA CANDLE... | CHART: ' + !!window.LightweightCharts +
   ' | ELEMENT: ' + !!document.getElementById('candleChart');
