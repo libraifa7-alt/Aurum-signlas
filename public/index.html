@@ -253,24 +253,11 @@ orderBlockPriceLines.push(
     lineStyle: 2,
     axisLabelVisible: true,
     title: 'OB LOW'
-  })
+  )
 );
+}
 
-// Garis Swing High BOS
-if (bullish && Number.isFinite(obZone.bosLevel)) {
-  orderBlockPriceLines.push(
-    series.createPriceLine({
-      price: obZone.bosLevel,
-      color: '#3b82f6',
-      lineWidth: 2,
-      lineStyle: 0,
-      axisLabelVisible: true,
-      title: 'BOS SWING HIGH'
-    })
-  );
-}
-}
-  async function loadChart(interval) {
+async function loadChart(interval) {
     try {
       document.querySelector('.status').textContent =
         'LOADCHART BERJALAN: ' + interval;
