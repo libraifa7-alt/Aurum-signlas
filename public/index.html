@@ -119,11 +119,7 @@ Aurum Signals AI · Educational analysis only · Manual execution
 </footer>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 <script>
-window.onerror = function(message, source, lineno, colno) {
-  document.querySelector('.status').textContent =
-    'JAVASCRIPT ERROR: ' + message +
-    ' | BARIS: ' + lineno;
-};
+document.querySelector('.status').textContent = 'TES SCRIPT TERPISAH BERHASIL';
 </script>
 
 <script>
@@ -132,13 +128,6 @@ const aurumCandleCache = new Map();
 document.querySelector('.status').textContent =
   'SCRIPT UTAMA MULAI BERJALAN';
 
-console.log('SCRIPT UTAMA BERHASIL DIMULAI');
-
-window.onerror = function(message, source, lineno, colno) {
-  document.querySelector('.status').textContent =
-    'JAVASCRIPT ERROR: ' + message +
-    ' | BARIS: ' + lineno;
-};
   console.log('CEK LOADCHART DIMULAI');
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
@@ -1130,7 +1119,7 @@ return {
   high: result.high,
   low: result.low
 };
-}
+}  
   async function analyzeOrderBlockMultiTimeframe() {
   try {
     const [h1, m15] = await Promise.all([
@@ -1195,7 +1184,7 @@ document.getElementById('goldTime').textContent =
 document.getElementById('pair').value + ' · Market Data';
 
 chart.timeScale().fitContent();
-const structure = await analyzeMarketStructure();
+      const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
 
 const liquidity = await analyzeLiquidityMultiTimeframe();
