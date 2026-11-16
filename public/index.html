@@ -291,12 +291,38 @@ document.querySelector('.status').textContent =
       }
 
       const candles = data.candles.slice().reverse().map(c => ({
-     time: Math.floor(new Date(c.datetime.replace(' ', 'T') + '+07:00').getTime() / 1000),
-        open: Number(c.open),
-        high: Number(c.high),
-        low: Number(c.low),
-        close: Number(c.close)
-      }));
+  time: Math.floor(new Date(c.datetime.replace(' ', 'T') + '+07:00').getTime() / 1000),
+  open: Number(c.open),
+  high: Number(c.high),
+  low: Number(c.low),
+  close: Number(c.close)
+}));
+
+// TES BEARISH BOS HISTORIS
+const bearishHistoryTests = [];
+
+for (let end = 15; end < candles.length - 1; end++) {
+  const historicalData = candles.slice(0, end + 2);
+  const result = detectOrderBlock(historicalData);
+
+  if (
+    result.status === 'VALID' &&
+    result.type === 'BEARISH'
+  ) {
+    bearishHistoryTests.push({
+      candleIndex: end,
+      time: new Date(candles[end].time * 1000).toLocaleString('id-ID'),
+      high: result.high,
+      low: result.low,
+      reason: result.reason
+    });
+  }
+}
+
+console.log(
+  'HASIL TES BEARISH BOS HISTORIS:',
+  bearishHistoryTests
+);
       console.log('JUMLAH:', candles.length);
 console.log('CONTOH CANDLE:', candles[0]);
 
