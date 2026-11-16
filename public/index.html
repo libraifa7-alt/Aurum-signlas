@@ -124,8 +124,8 @@ document.querySelector('.status').textContent = 'TES SCRIPT TERPISAH BERHASIL';
 
 <script>
 const aurumCandleCache = new Map();
-document.querySelector('.status').textContent = 'JAVASCRIPT AKTIF';
-console.log('CEK LOADCHART DIMULAI');
+
+  console.log('CEK LOADCHART DIMULAI');
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
 if (el && window.LightweightCharts) {
@@ -236,17 +236,17 @@ const top = actualTop - (height - actualHeight) / 2;
   // Warna garis OB
   const color = bullish ? '#20c997' : '#ef5350';
 
-  // Garis OB HIGH
-  orderBlockPriceLines.push(
-    series.createPriceLine({
-      price: obZone.high,
-      color: color,
-      lineWidth: 2,
-      lineStyle: 2,
-      axisLabelVisible: true,
-      title: 'OB HIGH'
-    })
-  );
+// Garis OB HIGH
+orderBlockPriceLines.push(
+  series.createPriceLine({
+    price: obZone.high,
+    color: color,
+    lineWidth: 2,
+    lineStyle: 2,
+    axisLabelVisible: true,
+    title: 'OB HIGH'
+  })
+);
 
 // Garis OB LOW
 orderBlockPriceLines.push(
@@ -257,9 +257,10 @@ orderBlockPriceLines.push(
     lineStyle: 2,
     axisLabelVisible: true,
     title: 'OB LOW'
-  )
+  })
 );
-}
+
+} // Penutup fungsi drawOrderBlockZone
 
 async function loadChart(interval) {
     try {
@@ -1164,6 +1165,7 @@ chart.applyOptions({
   }
 }
 
+// EVENT TIMEFRAME
 const timeframe = document.getElementById('tf');
 const pairSelect = document.getElementById('pair');
 
@@ -1177,11 +1179,12 @@ pairSelect.addEventListener('change', function() {
   loadChart(timeframe.value || 'M15');
 });
 
-}
+} // Penutup blok IF
 
 document.querySelector('.status').textContent =
   'MEMUAT DATA CANDLE... | CHART: ' + !!window.LightweightCharts +
   ' | ELEMENT: ' + !!document.getElementById('candleChart');
+
 console.log('STATUS SERVER DIPERIKSA');
 </script>
 </body>
