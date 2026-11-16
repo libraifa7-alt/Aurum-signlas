@@ -917,7 +917,10 @@ if (current.close > current.open && swingHigh !== null) {
 if (current.close < current.open && swingLow !== null) {
   bearishSwingAvailableCount++;
 
-  if (current.close < swingLow) {
+  if (
+    current.close < swingLow &&
+    strongDisplacement
+  ) {
     bearishBosAttemptCount++;
   }
 }
