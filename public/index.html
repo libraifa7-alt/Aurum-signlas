@@ -1130,7 +1130,7 @@ return {
   high: result.high,
   low: result.low
 };
-}  
+}
   async function analyzeOrderBlockMultiTimeframe() {
   try {
     const [h1, m15] = await Promise.all([
@@ -1195,7 +1195,7 @@ document.getElementById('goldTime').textContent =
 document.getElementById('pair').value + ' · Market Data';
 
 chart.timeScale().fitContent();
-      const structure = await analyzeMarketStructure();
+const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
 
 const liquidity = await analyzeLiquidityMultiTimeframe();
