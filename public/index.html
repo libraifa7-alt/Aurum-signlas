@@ -119,9 +119,13 @@ Aurum Signals AI · Educational analysis only · Manual execution
 </footer>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 <script>
-  const aurumCandleCache = new Map();
-  document.querySelector('.status').textContent = 'JAVASCRIPT AKTIF';
-  console.log('CEK LOADCHART DIMULAI');
+document.querySelector('.status').textContent = 'TES SCRIPT TERPISAH BERHASIL';
+</script>
+
+<script>
+const aurumCandleCache = new Map();
+document.querySelector('.status').textContent = 'JAVASCRIPT AKTIF';
+console.log('CEK LOADCHART DIMULAI');
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
 if (el && window.LightweightCharts) {
