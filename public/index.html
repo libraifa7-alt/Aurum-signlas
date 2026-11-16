@@ -244,19 +244,32 @@ const top = actualTop - (height - actualHeight) / 2;
     })
   );
 
-  // Garis OB LOW
+// Garis OB LOW
+orderBlockPriceLines.push(
+  series.createPriceLine({
+    price: obZone.low,
+    color: color,
+    lineWidth: 2,
+    lineStyle: 2,
+    axisLabelVisible: true,
+    title: 'OB LOW'
+  })
+);
+
+// Garis Swing High BOS
+if (bullish && Number.isFinite(obZone.bosLevel)) {
   orderBlockPriceLines.push(
     series.createPriceLine({
-      price: obZone.low,
-      color: color,
+      price: obZone.bosLevel,
+      color: '#3b82f6',
       lineWidth: 2,
-      lineStyle: 2,
+      lineStyle: 0,
       axisLabelVisible: true,
-      title: 'OB LOW'
+      title: 'BOS SWING HIGH'
     })
   );
 }
-  
+}
   async function loadChart(interval) {
     try {
       document.querySelector('.status').textContent =
@@ -931,16 +944,14 @@ console.log('6 CANDLE SEBELUM BOS:', recent.slice(i - 6, i));
 if (ob.close < ob.open) {
   opposingCandleCount++;
 
-  return {
-    status: 'VALID',
-    type: 'BULLISH',
-            high: ob.high,
-            low: ob.low,
-            reason: 'Swing High BOS + Displacement valid'
-          };
-        }
-      }
-    }
+return {
+  status: 'VALID',
+  type: 'BULLISH',
+  high: ob.high,
+  low: ob.low,
+  bosLevel: swingHigh,
+  reason: 'Swing High BOS + Displacement valid'
+};
 
 if (
   current.close < current.open &&
