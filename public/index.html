@@ -876,6 +876,8 @@ if (
   swingHigh = pivot.high;
   swingHighCount++;
 }
+
+
 if (
   swingLow === null &&
   left.every(c => pivot.low < c.low) &&
@@ -884,6 +886,8 @@ if (
   swingLow = pivot.low;
   swingLowCount++;
 }
+      
+      
 
 if (swingHigh !== null && swingLow !== null) {
   break;
@@ -899,11 +903,9 @@ if (strongDisplacement) {
   displacementCount++;
 }
 
+
 if (current.close > current.open && swingHigh !== null) {
   bullishSwingAvailableCount++;
-
-  lastBullishClose = current.close;
-  lastBullishSwingHigh = swingHigh;
 
   if (current.close > swingHigh) {
     bullishBosAttemptCount++;
@@ -917,6 +919,8 @@ if (current.close < current.open && swingLow !== null) {
     bearishBosAttemptCount++;
   }
 }
+  
+  
 
 if (
   current.close > current.open &&
@@ -924,10 +928,13 @@ if (
   current.close > swingHigh &&
   strongDisplacement
 ) {
-  bullishBosCount++;
-  bullishBosClose = current.close;
-  bullishBosSwingHigh = swingHigh;
-  bullishBosIndex = i;
+bullishBosCount++;
+bullishBosClose = current.close;
+bullishBosSwingHigh = swingHigh;
+bullishBosIndex = i;
+
+lastBullishClose = current.close;
+lastBullishSwingHigh = swingHigh;
 
   console.log('H1 BULLISH BOS:', i);
   console.log('6 CANDLE SEBELUM BOS:', recent.slice(i - 6, i));
@@ -953,17 +960,42 @@ if (
     if (ob.close < ob.open) {
       opposingCandleCount++;
 
+
 return {
   status: 'VALID',
   type: 'BULLISH',
   high: ob.high,
   low: ob.low,
   bosLevel: swingHigh,
-  reason: 'Swing High BOS + Displacement valid'
+  reason:
+    'Swing High BOS + Displacement valid' +
+    ' | Displacement: ' + displacementCount +
+    ' | Swing High: ' + swingHighCount +
+    ' | Swing Low: ' + swingLowCount +
+    ' | Bullish BOS: ' + bullishBosCount +
+    ' | Bearish BOS: ' + bearishBosCount +
+    ' | Opposing Candle: ' + opposingCandleCount +
+    ' | 6 CANDLE SEBELUM BOS: ' + bullishCandleColors.join(', ') +
+    ' | DETAIL 6 CANDLE BOS: ' +
+      JSON.stringify(recent.slice(i - 6, i)) +
+    ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
+    ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
+    ' | Ratio Pass: ' + bodyRatioPassCount +
+    ' | Average Pass: ' + bodyAveragePassCount +
+    ' | Bullish Swing Available: ' + bullishSwingAvailableCount +
+    ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
+    ' | Last Bullish Close: ' + lastBullishClose.toFixed(2) +
+    ' | Last Bullish Swing High: ' + lastBullishSwingHigh.toFixed(2) +
+    ' | BOS Close: ' + bullishBosClose.toFixed(2) +
+    ' | BOS Swing High: ' + bullishBosSwingHigh.toFixed(2) +
+    ' | BOS Index: ' + bullishBosIndex
 };
+      
     } // Menutup IF opposing candle
   }   // Menutup FOR pencarian OB
 }     // Menutup IF Bullish BOS
+
+
 if (
   current.close < current.open &&
   swingLow !== null &&
@@ -983,14 +1015,27 @@ if (
         type: 'BEARISH',
         high: ob.high,
         low: ob.low,
-        reason: 'Swing Low BOS + Displacement valid'
+        reason:
+          'Swing Low BOS + Displacement valid' +
+          ' | Displacement: ' + displacementCount +
+          ' | Swing High: ' + swingHighCount +
+          ' | Swing Low: ' + swingLowCount +
+          ' | Bullish BOS: ' + bullishBosCount +
+          ' | Bearish BOS: ' + bearishBosCount +
+          ' | Opposing Candle: ' + opposingCandleCount +
+          ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
+          ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
+          ' | Ratio Pass: ' + bodyRatioPassCount +
+          ' | Average Pass: ' + bodyAveragePassCount +
+          ' | Bearish Swing Available: ' + bearishSwingAvailableCount +
+          ' | Bearish BOS Attempt: ' + bearishBosAttemptCount
       };
     }
   }
 } // Menutup IF Bearish BOS
 
 } // Menutup FOR utama (i)
-
+  
 const bullishBosCandles = bullishBosIndex === null
   ? 'N/A'
   : JSON.stringify(recent.slice(bullishBosIndex - 6, bullishBosIndex));
