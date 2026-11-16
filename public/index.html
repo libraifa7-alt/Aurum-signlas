@@ -216,9 +216,11 @@ setTimeout(() => {
       top: top + 'px',
       width: chart.timeScale().width() + 'px',
       height: Math.max(height, 20) + 'px',
-      background: zoneColor,
+      background: bullish
+  ? 'rgba(32, 201, 151, 0.65)'
+  : 'rgba(239, 83, 80, 0.65)',
       pointerEvents: 'none',
-      zIndex: '20'
+      zIndex: '9999'
     });
 
     chartElement.appendChild(orderBlockZoneOverlay);
