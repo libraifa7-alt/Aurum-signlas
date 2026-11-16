@@ -129,6 +129,12 @@ document.querySelector('.status').textContent =
   'SCRIPT UTAMA MULAI BERJALAN';
 
 console.log('SCRIPT UTAMA BERHASIL DIMULAI');
+
+window.onerror = function(message, source, lineno, colno) {
+  document.querySelector('.status').textContent =
+    'JAVASCRIPT ERROR: ' + message +
+    ' | BARIS: ' + lineno;
+};
   console.log('CEK LOADCHART DIMULAI');
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
