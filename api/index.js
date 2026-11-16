@@ -131,9 +131,10 @@ module.exports = async function handler(req, res) {
     }
 
     const allowedSymbols = {
-      "XAU/USD": "XAU/USD",
-      "BTC/USD": "BTC/USD"
-    };
+  "XAU": "XAU/USD",
+  "XAU/USD": "XAU/USD",
+  "BTC/USD": "BTC/USD"
+};
 
     const symbol = allowedSymbols[selectedSymbol];
 
