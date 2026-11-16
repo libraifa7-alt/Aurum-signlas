@@ -319,10 +319,22 @@ for (let end = 15; end < candles.length - 1; end++) {
   }
 }
 
-console.log(
-  'HASIL TES BEARISH BOS HISTORIS:',
-  bearishHistoryTests
-);
+// TAMPILKAN HASIL TES DI HALAMAN
+let bearishTestOutput = document.getElementById('bearishTestOutput');
+
+if (!bearishTestOutput) {
+  bearishTestOutput = document.createElement('pre');
+  bearishTestOutput.id = 'bearishTestOutput';
+  bearishTestOutput.style.cssText =
+    'white-space:pre-wrap;word-break:break-word;' +
+    'padding:12px;margin:10px;background:#111;color:#00ff00;' +
+    'font-size:12px;border:1px solid #555;';
+  document.body.appendChild(bearishTestOutput);
+}
+
+bearishTestOutput.textContent =
+  'HASIL TES BEARISH BOS HISTORIS:\n' +
+  JSON.stringify(bearishHistoryTests, null, 2);
       console.log('JUMLAH:', candles.length);
 console.log('CONTOH CANDLE:', candles[0]);
 
