@@ -118,16 +118,6 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
 Aurum Signals AI · Educational analysis only · Manual execution
 </footer>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
-<script>
-window.onerror = function(message, source, lineno, colno) {
-  document.querySelector('.status').textContent =
-    'JAVASCRIPT ERROR: ' + message +
-    ' | BARIS: ' + lineno;
-};
-
-document.querySelector('.status').textContent =
-  'TES SCRIPT TERPISAH BERHASIL';
-</script>
 
 <script>
 const aurumCandleCache = new Map();
