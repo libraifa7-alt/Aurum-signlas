@@ -207,15 +207,18 @@ setTimeout(() => {
   ) {
     orderBlockZoneOverlay = document.createElement('div');
 
-    const top = Math.min(highY, lowY);
-    const height = Math.abs(lowY - highY);
+const actualTop = Math.min(highY, lowY);
+const actualHeight = Math.abs(lowY - highY);
+
+const height = Math.max(actualHeight, 20);
+const top = actualTop - (height - actualHeight) / 2;
 
     Object.assign(orderBlockZoneOverlay.style, {
       position: 'absolute',
       left: '0px',
       top: top + 'px',
       width: chart.timeScale().width() + 'px',
-      height: Math.max(height, 20) + 'px',
+      height: height + 'px',
       background: bullish
   ? 'rgba(32, 201, 151, 0.65)'
   : 'rgba(239, 83, 80, 0.65)',
