@@ -967,7 +967,8 @@ async function analyzeLiquidityMultiTimeframe() {
     return 'MENUNGGU — Gagal membaca liquidity';
   }
 }
- async function analyzeLiquidityConfirmation() {
+
+async function analyzeLiquidityConfirmation() {
   try {
     const [h4, h1, m15] = await Promise.all([
       getSharedCandles('H4'),
@@ -979,38 +980,70 @@ async function analyzeLiquidityMultiTimeframe() {
       return 'WAIT — Data liquidity belum tersedia';
     }
 
+    // MARKET STRUCTURE H4 DAN H1
     const trendH4 = getStructureSignal(h4);
     const trendH1 = getStructureSignal(h1);
 
-    const sweepH1 = analyzeLiquidity(h1);
+    // LIQUIDITY SWEEP M15
     const sweepM15 = analyzeLiquidity(m15);
 
+    // ORDER BLOCK DAN FVG M15
+    const obM15 = detectOrderBlockZone(m15);
+    const fvgM15 = detectFVGZone(m15);
+
+    const obType = obM15 ? obM15.type : 'NONE';
+    const fvgType = fvgM15 ? fvgM15.type : 'NONE';
+
+    const bullishSweep = sweepM15.includes('SELL-SIDE SWEEP');
+    const bearishSweep = sweepM15.includes('BUY-SIDE SWEEP');
+
+    const bullishZones =
+      (obType === 'BULLISH' ? 1 : 0) +
+      (fvgType === 'BULLISH' ? 1 : 0);
+
+    const bearishZones =
+      (obType === 'BEARISH' ? 1 : 0) +
+      (fvgType === 'BEARISH' ? 1 : 0);
+
+    // KONFIRMASI BUY
     if (
-      trendH4.includes('BULLISH') &&
-      trendH1.includes('BULLISH') &&
-      sweepM15.includes('SELL-SIDE SWEEP')
+      bullishSweep &&
+      bullishZones >= 1 &&
+      bearishZones === 0
     ) {
-      return 'BUY CONFIRMATION — H4 dan H1 bullish, M15 sell-side sweep';
+      return 'BUY CONFIRMATION — M15 Sell-Side Sweep' +
+        ' | OB: ' + obType +
+        ' | FVG: ' + fvgType +
+        ' | H4: ' + trendH4 +
+        ' | H1: ' + trendH1;
     }
 
+    // KONFIRMASI SELL
     if (
-      trendH4.includes('BEARISH') &&
-      trendH1.includes('BEARISH') &&
-      sweepM15.includes('BUY-SIDE SWEEP')
+      bearishSweep &&
+      bearishZones >= 1 &&
+      bullishZones === 0
     ) {
-      return 'SELL CONFIRMATION — H4 dan H1 bearish, M15 buy-side sweep';
+      return 'SELL CONFIRMATION — M15 Buy-Side Sweep' +
+        ' | OB: ' + obType +
+        ' | FVG: ' + fvgType +
+        ' | H4: ' + trendH4 +
+        ' | H1: ' + trendH1;
     }
 
-    return 'WAIT — H4: ' + trendH4 +
-      ' | H1: ' + trendH1 +
-      ' | H1 Sweep: ' + sweepH1 +
-      ' | M15 Sweep: ' + sweepM15;
+    return 'WAIT — Konfirmasi SMC belum lengkap' +
+      ' | Sweep: ' + sweepM15 +
+      ' | OB: ' + obType +
+      ' | FVG: ' + fvgType +
+      ' | H4: ' + trendH4 +
+      ' | H1: ' + trendH1;
 
   } catch (error) {
     console.log('Liquidity confirmation error:', error);
-    return 'WAIT — Gagal membaca liquidity confirmation';
+    return 'WAIT — Gagal membaca konfirmasi SMC';
   }
- } 
+}
+      
       
 // FAIR VALUE GAP DETECTION
 function analyzeFVG(data) {
