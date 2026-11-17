@@ -1166,12 +1166,12 @@ return {
 
 console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
+
 try {
   document.querySelector('.status').textContent =
     'MENGIRIM DATA KE GRAFIK...';
-  
-candles.reverse();
-series.setData(candles);
+
+  series.setData(candles);
 
   document.querySelector('.status').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
@@ -1179,7 +1179,8 @@ series.setData(candles);
   document.querySelector('.status').textContent =
     'ERROR SETDATA: ' + error.message;
   console.log('ERROR SETDATA:', error);
-      }
+}
+  
 const latestCandle = candles[candles.length - 1];
 
 document.getElementById('goldPrice').textContent =
