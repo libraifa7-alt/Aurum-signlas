@@ -139,6 +139,8 @@ console.log('UKURAN AREA GRAFIK:', el.clientWidth, el.clientHeight);
 document.querySelector('.status').textContent =
   'UKURAN GRAFIK: ' + el.clientWidth + ' x ' + el.clientHeight;
 
+console.log('MULAI MEMBUAT GRAFIK');
+
 const chart = LightweightCharts.createChart(el, {
   width: Math.max(el.clientWidth, 300),
   height: 340,
