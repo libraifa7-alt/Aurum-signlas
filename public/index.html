@@ -1295,42 +1295,86 @@ return {
   low: result.low
 };
 }  
-  async function analyzeOrderBlockMultiTimeframe() {
+  
+async function analyzeOrderBlockMultiTimeframe() {
   try {
-    const [h1, m15] = await Promise.all([
+    const [h4, h1, m15] = await Promise.all([
+      getSharedCandles('H4'),
       getSharedCandles('H1'),
       getSharedCandles('M15')
     ]);
 
-    if (!h1.length || !m15.length) {
-      return 'WAIT — Data Order Block belum tersedia';
+    if (!h4.length || !h1.length || !m15.length) {
+      return 'WAIT — Data Market Structure belum tersedia';
     }
 
+    // BACA MARKET STRUCTURE
+    const structureH4 = getStructureSignal(h4);
+    const structureH1 = getStructureSignal(h1);
+    const structureM15 = getStructureSignal(m15);
+
+    if (
+      [structureH4, structureH1, structureM15]
+        .includes('UNKNOWN')
+    ) {
+      return 'WAIT — Data struktur belum cukup';
+    }
+
+    const direction = signal =>
+      signal.includes('BULLISH') ? 'BULLISH' :
+      signal.includes('BEARISH') ? 'BEARISH' : 'RANGE';
+
+    const trendH4 = direction(structureH4);
+    const trendH1 = direction(structureH1);
+    const trendM15 = direction(structureM15);
+
+    // BACA ORDER BLOCK
     const orderH1 = analyzeOrderBlock(h1);
     const orderM15 = analyzeOrderBlock(m15);
 
+    const obH1 =
+      orderH1.includes('BULLISH ORDER BLOCK') ? 'BULLISH' :
+      orderH1.includes('BEARISH ORDER BLOCK') ? 'BEARISH' : 'NONE';
+
+    const obM15 =
+      orderM15.includes('BULLISH ORDER BLOCK') ? 'BULLISH' :
+      orderM15.includes('BEARISH ORDER BLOCK') ? 'BEARISH' : 'NONE';
+
+    // KONFIRMASI BULLISH
     if (
-      orderH1.includes('BULLISH ORDER BLOCK') &&
-      orderM15.includes('BULLISH ORDER BLOCK')
+      trendH1 === 'BULLISH' &&
+      trendM15 === 'BULLISH' &&
+      obH1 === 'BULLISH' &&
+      obM15 === 'BULLISH'
     ) {
-      return 'BULLISH ORDER BLOCK CONFIRMED — H1 dan M15 searah';
+      return 'BUY ALIGNMENT — Struktur dan Order Block H1/M15 bullish' +
+        ' | H4: ' + trendH4;
     }
 
+    // KONFIRMASI BEARISH
     if (
-      orderH1.includes('BEARISH ORDER BLOCK') &&
-      orderM15.includes('BEARISH ORDER BLOCK')
+      trendH1 === 'BEARISH' &&
+      trendM15 === 'BEARISH' &&
+      obH1 === 'BEARISH' &&
+      obM15 === 'BEARISH'
     ) {
-      return 'BEARISH ORDER BLOCK CONFIRMED — H1 dan M15 searah';
+      return 'SELL ALIGNMENT — Struktur dan Order Block H1/M15 bearish' +
+        ' | H4: ' + trendH4;
     }
 
-    return 'WAIT — H1: ' + orderH1 +
-      ' | M15: ' + orderM15;
+    return 'WAIT — Struktur atau Order Block belum searah' +
+      ' | H4: ' + structureH4 +
+      ' | H1: ' + structureH1 +
+      ' | M15: ' + structureM15 +
+      ' | OB H1: ' + obH1 +
+      ' | OB M15: ' + obM15;
 
   } catch (error) {
     console.log('Order Block MTF error:', error);
-    return 'WAIT — Gagal membaca Order Block';
+    return 'WAIT — Gagal membaca konfirmasi MTF';
   }
-  }
+}
+      
       document.querySelector('.status').textContent = 'DATA CANDLE: ' + candles.length;
       document.querySelector('.status').textContent =
   'CANDLE SIAP: ' + candles.length;
