@@ -288,13 +288,22 @@ document.querySelector('.status').textContent =
         return;
       }
 
-      const candles = data.candles.slice().reverse().map(c => ({
-  time: Math.floor(new Date(c.datetime.replace(' ', 'T') + '+07:00').getTime() / 1000),
-  open: Number(c.open),
-  high: Number(c.high),
-  low: Number(c.low),
-  close: Number(c.close)
-}));
+      const candles = data.candles.slice().reverse().map(c => {
+  const dateText = String(c.datetime).trim();
+  const dateTime = dateText.replace(' ', 'T');
+
+  const isoTime = /^\d{4}-\d{2}-\d{2}$/.test(dateTime)
+    ? dateTime + 'T00:00:00+07:00'
+    : dateTime + '+07:00';
+
+  return {
+    time: Math.floor(new Date(isoTime).getTime() / 1000),
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close)
+  };
+});
 
 // TES BEARISH BOS HISTORIS
 const bearishHistoryTests = [];
