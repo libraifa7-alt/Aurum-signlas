@@ -736,4 +736,564 @@ async function analyzeLiquidityMultiTimeframe() {
     ]);
 
     if (!h4.length || !h1.length || !m15.length) {
-      return 'WAIT — Data liquidi
+      return 'WAIT — Data liquidity belum tersedia';
+    }
+
+    const trendH4 = getStructureSignal(h4);
+    const trendH1 = getStructureSignal(h1);
+
+    const sweepH1 = analyzeLiquidity(h1);
+    const sweepM15 = analyzeLiquidity(m15);
+
+    if (
+      trendH4.includes('BULLISH') &&
+      trendH1.includes('BULLISH') &&
+      sweepM15.includes('SELL-SIDE SWEEP')
+    ) {
+      return 'BUY CONFIRMATION — H4 dan H1 bullish, M15 sell-side sweep';
+    }
+
+    if (
+      trendH4.includes('BEARISH') &&
+      trendH1.includes('BEARISH') &&
+      sweepM15.includes('BUY-SIDE SWEEP')
+    ) {
+      return 'SELL CONFIRMATION — H4 dan H1 bearish, M15 buy-side sweep';
+    }
+
+    return 'WAIT — H4: ' + trendH4 +
+      ' | H1: ' + trendH1 +
+      ' | H1 Sweep: ' + sweepH1 +
+      ' | M15 Sweep: ' + sweepM15;
+
+  } catch (error) {
+    console.log('Liquidity confirmation error:', error);
+    return 'WAIT — Gagal membaca liquidity confirmation';
+  }
+ } 
+      
+// FAIR VALUE GAP DETECTION
+function analyzeFVG(data) {
+  if (!data || data.length < 4) {
+    return 'Data candle belum cukup';
+  }
+
+  // Abaikan candle terakhir yang belum selesai
+  const candles = data.slice(0, -1);
+
+  if (candles.length < 3) {
+    return 'Data candle belum cukup';
+  }
+
+  // Periksa tiga candle terakhir yang sudah selesai
+  const a = candles[candles.length - 3];
+  const c = candles[candles.length - 1];
+
+  // BULLISH FVG
+  if (a.high < c.low) {
+    return 'BULLISH FVG — Celah harga naik terdeteksi';
+  }
+
+  // BEARISH FVG
+  if (a.low > c.high) {
+    return 'BEARISH FVG — Celah harga turun terdeteksi';
+  }
+
+  return 'FVG — Belum ada gap terdeteksi';
+}
+// ORDER BLOCK DETECTION
+
+function detectOrderBlock(data) {
+  if (!data || data.length < 15) {
+    return {
+      status: 'DATA_KURANG',
+      reason: 'Data candle belum cukup'
+    };
+  }
+
+  // Abaikan candle terakhir yang belum selesai
+  const candles = data.slice(0, -1).slice(-40);
+
+  if (candles.length < 12) {
+    return {
+      status: 'DATA_KURANG',
+      reason: 'Data candle belum cukup'
+    };
+  }
+
+  const recent = candles.map(c => ({
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close)
+  }));
+
+  if (recent.some(c =>
+    !Number.isFinite(c.open) ||
+    !Number.isFinite(c.high) ||
+    !Number.isFinite(c.low) ||
+    !Number.isFinite(c.close) ||
+    c.high < c.low
+  )) {
+    return {
+      status: 'DATA_INVALID',
+      reason: 'Data candle tidak valid'
+    };
+  }
+
+let displacementCount = 0;
+let swingHighCount = 0;
+let swingLowCount = 0;
+let bullishBosCount = 0;
+let bearishBosCount = 0;
+let opposingCandleCount = 0;
+let maxBodyRatio = 0;
+let maxBodyVsAverage = 0;
+let bodyRatioPassCount = 0;
+let bodyAveragePassCount = 0;
+
+let bullishBosAttemptCount = 0;
+let bearishBosAttemptCount = 0;
+let bullishSwingAvailableCount = 0;
+let bearishSwingAvailableCount = 0;
+let lastBullishClose = null;
+let lastBullishSwingHigh = null;
+let bullishBosClose = null;
+let bullishBosSwingHigh = null;
+let bullishBosIndex = null;
+let bullishCandleColors = [];  
+
+for (let i = recent.length - 1; i >= 7; i--) {
+  const current = recent[i];
+
+
+const body = Math.abs(current.close - current.open);
+const range = current.high - current.low;
+
+if (range <= 0) continue;
+
+if (body / range > maxBodyRatio) {
+  maxBodyRatio = body / range;
+}
+
+if (body / range >= 0.35) {
+  bodyRatioPassCount++;
+}
+
+const history = recent.slice(i - 6, i);
+
+const averageBody = history.reduce(
+  (sum, c) => sum + Math.abs(c.close - c.open),
+  0
+) / history.length;
+
+if (averageBody <= 0) continue;
+
+if (body / averageBody >= 1.2) {
+  bodyAveragePassCount++;
+}
+
+if (body / averageBody > maxBodyVsAverage) {
+  maxBodyVsAverage = body / averageBody;
+}
+  
+    let swingHigh = null;
+    let swingLow = null;
+
+    for (let p = i - 3; p >= 2; p--) {
+      const pivot = recent[p];
+
+      const left = recent.slice(p - 2, p);
+      const right = recent.slice(p + 1, p + 3);
+
+if (
+  swingHigh === null &&
+  left.every(c => pivot.high > c.high) &&
+  right.every(c => pivot.high > c.high)
+) {
+  swingHigh = pivot.high;
+  swingHighCount++;
+}
+
+
+if (
+  swingLow === null &&
+  left.every(c => pivot.low < c.low) &&
+  right.every(c => pivot.low < c.low)
+) {
+  swingLow = pivot.low;
+  swingLowCount++;
+}
+      
+      
+
+if (swingHigh !== null && swingLow !== null) {
+  break;
+}
+
+} // Menutup FOR pencarian Swing High dan Swing Low
+
+const strongDisplacement =
+  body / range >= 0.35 &&
+  body >= averageBody * 1.2;
+
+if (strongDisplacement) {
+  displacementCount++;
+}
+
+
+if (current.close > current.open && swingHigh !== null) {
+  bullishSwingAvailableCount++;
+
+  if (current.close > swingHigh) {
+    bullishBosAttemptCount++;
+  }
+}
+
+if (current.close < current.open && swingLow !== null) {
+  bearishSwingAvailableCount++;
+
+  if (current.close < swingLow) {
+    bearishBosAttemptCount++;
+  }
+}
+  
+  
+
+if (
+  current.close > current.open &&
+  swingHigh !== null &&
+  current.close > swingHigh &&
+  strongDisplacement
+) {
+bullishBosCount++;
+bullishBosClose = current.close;
+bullishBosSwingHigh = swingHigh;
+bullishBosIndex = i;
+
+lastBullishClose = current.close;
+lastBullishSwingHigh = swingHigh;
+
+  console.log('H1 BULLISH BOS:', i);
+  console.log('6 CANDLE SEBELUM BOS:', recent.slice(i - 6, i));
+
+  console.log(
+    'WARNA 6 CANDLE:',
+    recent.slice(i - 6, i).map(c =>
+      c.close < c.open ? 'BEARISH' :
+      c.close > c.open ? 'BULLISH' : 'DOJI'
+    )
+  );
+
+  bullishCandleColors = recent.slice(i - 6, i).map(c =>
+    c.close < c.open ? 'BEARISH' :
+    c.close > c.open ? 'BULLISH' : 'DOJI'
+  );
+
+  console.log('HASIL WARNA BOS:', bullishCandleColors);
+
+  for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
+    const ob = recent[j];
+
+    if (ob.close < ob.open) {
+      opposingCandleCount++;
+
+
+return {
+  status: 'VALID',
+  type: 'BULLISH',
+  high: ob.high,
+  low: ob.low,
+  bosLevel: swingHigh,
+  reason:
+    'Swing High BOS + Displacement valid' +
+    ' | Displacement: ' + displacementCount +
+    ' | Swing High: ' + swingHighCount +
+    ' | Swing Low: ' + swingLowCount +
+    ' | Bullish BOS: ' + bullishBosCount +
+    ' | Bearish BOS: ' + bearishBosCount +
+    ' | Opposing Candle: ' + opposingCandleCount +
+    ' | 6 CANDLE SEBELUM BOS: ' + bullishCandleColors.join(', ') +
+    ' | DETAIL 6 CANDLE BOS: ' +
+      JSON.stringify(recent.slice(i - 6, i)) +
+    ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
+    ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
+    ' | Ratio Pass: ' + bodyRatioPassCount +
+    ' | Average Pass: ' + bodyAveragePassCount +
+    ' | Bullish Swing Available: ' + bullishSwingAvailableCount +
+    ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
+    ' | Last Bullish Close: ' + lastBullishClose.toFixed(2) +
+    ' | Last Bullish Swing High: ' + lastBullishSwingHigh.toFixed(2) +
+    ' | BOS Close: ' + bullishBosClose.toFixed(2) +
+    ' | BOS Swing High: ' + bullishBosSwingHigh.toFixed(2) +
+    ' | BOS Index: ' + bullishBosIndex
+};
+      
+    } // Menutup IF opposing candle
+  }   // Menutup FOR pencarian OB
+}     // Menutup IF Bullish BOS
+
+
+if (
+  current.close < current.open &&
+  swingLow !== null &&
+  current.close < swingLow &&
+  strongDisplacement
+) {
+  bearishBosCount++;
+
+  for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
+    const ob = recent[j];
+
+    if (ob.close > ob.open) {
+      opposingCandleCount++;
+
+      return {
+        status: 'VALID',
+        type: 'BEARISH',
+        high: ob.high,
+        low: ob.low,
+        reason:
+          'Swing Low BOS + Displacement valid' +
+          ' | Displacement: ' + displacementCount +
+          ' | Swing High: ' + swingHighCount +
+          ' | Swing Low: ' + swingLowCount +
+          ' | Bullish BOS: ' + bullishBosCount +
+          ' | Bearish BOS: ' + bearishBosCount +
+          ' | Opposing Candle: ' + opposingCandleCount +
+          ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
+          ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
+          ' | Ratio Pass: ' + bodyRatioPassCount +
+          ' | Average Pass: ' + bodyAveragePassCount +
+          ' | Bearish Swing Available: ' + bearishSwingAvailableCount +
+          ' | Bearish BOS Attempt: ' + bearishBosAttemptCount
+      };
+    }
+  }
+} // Menutup IF Bearish BOS
+
+} // Menutup FOR utama (i)
+  
+const bullishBosCandles = bullishBosIndex === null
+  ? 'N/A'
+  : JSON.stringify(recent.slice(bullishBosIndex - 6, bullishBosIndex));
+
+return {
+  status: 'NO_PATTERN',
+  reason:
+    'OB DIAGNOSTIC' +
+    ' | Displacement: ' + displacementCount +
+    ' | Swing High: ' + swingHighCount +
+    ' | Swing Low: ' + swingLowCount +
+    ' | Bullish BOS: ' + bullishBosCount +
+    ' | Bearish BOS: ' + bearishBosCount +
+    ' | Opposing Candle: ' + opposingCandleCount +
+    ' | 6 CANDLE SEBELUM BOS: ' + bullishCandleColors.join(', ') +
+    ' | DETAIL 6 CANDLE BOS: ' + bullishBosCandles +
+    ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
+    ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
+    ' | Ratio Pass: ' + bodyRatioPassCount +
+    ' | Average Pass: ' + bodyAveragePassCount +
+    ' | Bullish Swing Available: ' + bullishSwingAvailableCount +
+    ' | Bearish Swing Available: ' + bearishSwingAvailableCount +
+    ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
+    ' | Bearish BOS Attempt: ' + bearishBosAttemptCount +
+    ' | Last Bullish Close: ' +
+    (lastBullishClose === null ? 'N/A' : lastBullishClose.toFixed(2)) +
+    ' | Last Bullish Swing High: ' +
+    (lastBullishSwingHigh === null ? 'N/A' : lastBullishSwingHigh.toFixed(2)) +
+    ' | BOS Close: ' +
+    (bullishBosClose === null ? 'N/A' : bullishBosClose.toFixed(2)) +
+    ' | BOS Swing High: ' +
+    (bullishBosSwingHigh === null ? 'N/A' : bullishBosSwingHigh.toFixed(2)) +
+    ' | BOS Index: ' +
+    (bullishBosIndex === null ? 'N/A' : bullishBosIndex)
+};
+} // Menutup fungsi detectOrderBlock
+  
+
+  
+// ANALISIS ORDER BLOCK
+function analyzeOrderBlock(data) {
+  const result = detectOrderBlock(data);
+
+  if (result.status === 'VALID') {
+    return result.type + ' ORDER BLOCK — ' + result.reason;
+  }
+
+  return result.reason;
+}
+
+// DETEKSI ZONA ORDER BLOCK
+function detectOrderBlockZone(data) {
+  const result = detectOrderBlock(data);
+
+  if (result.status !== 'VALID') {
+    return null;
+  }
+
+return {
+  status: result.status,
+  type: result.type,
+  high: result.high,
+  low: result.low
+};
+}  
+  async function analyzeOrderBlockMultiTimeframe() {
+  try {
+    const [h1, m15] = await Promise.all([
+      getSharedCandles('H1'),
+      getSharedCandles('M15')
+    ]);
+
+    if (!h1.length || !m15.length) {
+      return 'WAIT — Data Order Block belum tersedia';
+    }
+
+    const orderH1 = analyzeOrderBlock(h1);
+    const orderM15 = analyzeOrderBlock(m15);
+
+    if (
+      orderH1.includes('BULLISH ORDER BLOCK') &&
+      orderM15.includes('BULLISH ORDER BLOCK')
+    ) {
+      return 'BULLISH ORDER BLOCK CONFIRMED — H1 dan M15 searah';
+    }
+
+    if (
+      orderH1.includes('BEARISH ORDER BLOCK') &&
+      orderM15.includes('BEARISH ORDER BLOCK')
+    ) {
+      return 'BEARISH ORDER BLOCK CONFIRMED — H1 dan M15 searah';
+    }
+
+    return 'WAIT — H1: ' + orderH1 +
+      ' | M15: ' + orderM15;
+
+  } catch (error) {
+    console.log('Order Block MTF error:', error);
+    return 'WAIT — Gagal membaca Order Block';
+  }
+  }
+      document.querySelector('.status').textContent = 'DATA CANDLE: ' + candles.length;
+      document.querySelector('.status').textContent =
+  'CANDLE SIAP: ' + candles.length;
+
+console.log('CANDLE PERTAMA:', candles[0]);
+console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
+try {
+  document.querySelector('.status').textContent =
+    'MENGIRIM DATA KE GRAFIK...';
+  
+  series.setData(candles);
+
+  document.querySelector('.status').textContent =
+    'GRAFIK BERHASIL: ' + candles.length;
+} catch (error) {
+  document.querySelector('.status').textContent =
+    'ERROR SETDATA: ' + error.message;
+  console.log('ERROR SETDATA:', error);
+      }
+const latestCandle = candles[candles.length - 1];
+
+document.getElementById('goldPrice').textContent =
+  latestCandle.close.toFixed(2);
+
+document.getElementById('goldTime').textContent =
+document.getElementById('pair').value + ' · Market Data';
+
+chart.timeScale().fitContent();
+      const structure = await analyzeMarketStructure();
+document.getElementById('marketStructure').textContent = structure;
+
+const liquidity = await analyzeLiquidityMultiTimeframe();
+document.getElementById('liquidityAnalysis').innerText = liquidity;
+      
+const confirmation = await analyzeLiquidityConfirmation();
+document.getElementById('liquidityConfirmation').innerText = confirmation;      
+    
+      const fvg = analyzeFVG(candles);
+document.getElementById('fvgAnalysis').textContent = fvg;
+      
+
+// ANALISIS ORDER BLOCK
+const orderBlock = analyzeOrderBlock(candles);
+
+document.getElementById('orderBlockAnalysis').innerText =
+  orderBlock;
+    // DETEKSI ZONA HARGA ORDER BLOCK
+const obZone = detectOrderBlockZone(candles);
+
+drawOrderBlockZone(obZone, candles);
+
+const zoneElement = document.getElementById('orderBlockZone');
+
+if (
+  obZone &&
+  typeof obZone === 'object' &&
+  (
+    (obZone.type === 'BULLISH' &&
+      orderBlock.includes('BULLISH ORDER BLOCK')) ||
+    (obZone.type === 'BEARISH' &&
+      orderBlock.includes('BEARISH ORDER BLOCK'))
+  )
+) {
+  zoneElement.innerText =
+    obZone.type + ' ORDER BLOCK ZONE' +
+    ' | HIGH: ' + obZone.high.toFixed(2) +
+    ' | LOW: ' + obZone.low.toFixed(2);
+} else {
+  zoneElement.innerText =
+    'Belum ada zona Order Block valid';
+}
+
+// KONFIRMASI ORDER BLOCK H1 + M15
+const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
+
+document.getElementById('orderBlockMTF').innerText =
+  orderBlockMTF;
+
+console.log('ORDER BLOCK:', orderBlock);
+console.log('ORDER BLOCK MTF:', orderBlockMTF);
+      
+  console.log('JUMLAH CANDLE:', candles.length);
+  document.querySelector('.status').textContent = 'BTC TEST: ' + candles.length + ' CANDLES';
+      
+  console.log('CANDLE PERTAMA:', candles[0]);
+console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
+      chart.timeScale().fitContent();
+chart.applyOptions({
+  width: el.clientWidth
+});
+
+} catch (error) {
+  console.log('Chart error:', error);
+  document.getElementById('orderBlockAnalysis').textContent =
+    'ERROR GRAFIK: ' + error.message;
+  }
+}
+
+// EVENT TIMEFRAME
+const timeframe = document.getElementById('tf');
+const pairSelect = document.getElementById('pair');
+
+loadChart(timeframe.value || 'M15');
+
+timeframe.addEventListener('change', function() {
+  loadChart(this.value);
+});
+
+pairSelect.addEventListener('change', function() {
+  loadChart(timeframe.value || 'M15');
+});
+
+} // Penutup blok IF
+
+document.querySelector('.status').textContent =
+  'MEMUAT DATA CANDLE... | CHART: ' + !!window.LightweightCharts +
+  ' | ELEMENT: ' + !!document.getElementById('candleChart');
+
+console.log('STATUS SERVER DIPERIKSA');
+</script>
+</body>
+</html>
