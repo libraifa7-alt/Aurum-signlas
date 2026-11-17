@@ -5,13 +5,15 @@ module.exports = async function handler(req, res) {
   }
 
   const allowedIntervals = {
-    M1: "1min",
-    M5: "5min",
-    M15: "15min",
-    M30: "30min",
-    H1: "1h",
-    H4: "4h"
-  };
+  M1: "1min",
+  M5: "5min",
+  M15: "15min",
+  M30: "30min",
+  M45: "45min",
+  H1: "1h",
+  H4: "4h",
+  D1: "1day"
+};
 
   const selectedSymbol = String(
     req.query.symbol || "XAU/USD"
@@ -34,23 +36,22 @@ module.exports = async function handler(req, res) {
     // JALUR KHUSUS WTI DARI YAHOO FINANCE
     if (selectedSymbol === "WTI") {
       const yahooIntervals = {
-        M1: "1m",
-        M5: "5m",
-        M15: "15m",
-        M30: "30m",
-        H1: "60m",
-        H4: "60m"
-      };
+  M1: "1m",
+  M5: "5m",
+  M15: "15m",
+  M30: "30m",
+  H1: "60m",
+  H4: "60m",
+  D1: "1d"
+};
 
-      const yahooInterval = yahooIntervals[selected] || "15m";
-
- const url = new URL(
+      const yahooInterval = yahooIntervals[selected === "M45" ? "M15" : selected] || "15m";
+const url = new URL(
   "https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF"
 );
 
-      url.searchParams.set("range", "5d");
-      url.searchParams.set("interval", yahooInterval);
-
+url.searchParams.set("range", selected === "D1" ? "1y" : "5d");
+url.searchParams.set("interval", yahooInterval);
       const response = await fetch(url, {
         headers: {
           "User-Agent": "Mozilla/5.0"
@@ -77,49 +78,69 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      const candles = timestamps.map((timestamp, i) => {
-        const open = quote.open?.[i];
-        const high = quote.high?.[i];
-        const low = quote.low?.[i];
-        const close = quote.close?.[i];
+      let candles = timestamps.map((timestamp, i) => {
+  const open = quote.open?.[i];
+  const high = quote.high?.[i];
+  const low = quote.low?.[i];
+  const close = quote.close?.[i];
 
-        if (
-          open == null ||
-          high == null ||
-          low == null ||
-          close == null
-        ) {
-          return null;
-        }
+  if (
+    open == null ||
+    high == null ||
+    low == null ||
+    close == null
+  ) {
+    return null;
+  }
 
-        const datetime = new Date(
-          (timestamp + 7 * 3600) * 1000
-        ).toISOString().slice(0, 19).replace("T", " ");
+  const datetime = new Date(
+    (timestamp + 7 * 3600) * 1000
+  ).toISOString().slice(0, 19).replace("T", " ");
 
-        return {
-          datetime,
-          open: String(open),
-          high: String(high),
-          low: String(low),
-          close: String(close)
-        };
-      }).filter(Boolean).reverse().slice(0, 100);
+  return {
+    datetime,
+    open: String(open),
+    high: String(high),
+    low: String(low),
+    close: String(close)
+  };
+}).filter(Boolean).reverse().slice(0, 100);
 
-      const output = {
-        status: "success",
-        symbol: "WTI",
-        interval: yahooInterval,
-        candles
-      };
+// GABUNGKAN 3 CANDLE M15 MENJADI 1 CANDLE M45
+if (selected === "M45") {
+  const grouped = [];
 
-      globalThis.aurumCache.set(cacheKey, {
-        time: Date.now(),
-        data: output
-      });
+  for (let i = 0; i + 2 < candles.length; i += 3) {
+    const group = candles.slice(i, i + 3);
 
-      return res.status(200).json(output);
-    }
+    grouped.push({
+      datetime: group[0].datetime,
+      open: group[0].open,
+      high: String(Math.max(...group.map(c => Number(c.high)))),
+      low: String(Math.min(...group.map(c => Number(c.low)))),
+      close: group[2].close
+    });
+  }
 
+  candles = grouped;
+}
+
+const output = {
+  status: "success",
+  symbol: "WTI",
+  interval: yahooInterval,
+  candles
+};
+
+globalThis.aurumCache.set(cacheKey, {
+  time: Date.now(),
+  data: output
+});
+
+return res.status(200).json(output);
+}
+
+// BTC DAN XAU TETAP MENGGUNAKAN TWELVE DATA
     // BTC DAN XAU TETAP MENGGUNAKAN TWELVE DATA
     const apiKey = process.env.TWELVE_DATA_API_KEY;
 
