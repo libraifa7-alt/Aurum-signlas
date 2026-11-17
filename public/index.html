@@ -167,7 +167,11 @@ const chart = LightweightCharts.createChart(el, {
 
 let orderBlockPriceLines = [];
 let orderBlockZoneSeries = null;
-let orderBlockZoneOverlay = null;  
+let orderBlockZoneOverlay = null;
+
+let fvgZoneOverlay = null;
+let fvgPriceLines = [];
+
 function drawOrderBlockZone(obZone, candles) {
   // Hapus zona sebelumnya
   if (orderBlockZoneSeries) {
@@ -262,6 +266,86 @@ orderBlockPriceLines.push(
 );
 
 } // Penutup fungsi drawOrderBlockZone
+  
+function drawFVGZone(fvgZone) {
+  // Hapus zona FVG sebelumnya
+  if (fvgZoneOverlay) {
+    fvgZoneOverlay.remove();
+    fvgZoneOverlay = null;
+  }
+
+  fvgPriceLines.forEach(line => {
+    series.removePriceLine(line);
+  });
+
+  fvgPriceLines = [];
+
+  if (!fvgZone || fvgZone.status !== 'VALID') return;
+
+  const highY = series.priceToCoordinate(fvgZone.high);
+  const lowY = series.priceToCoordinate(fvgZone.low);
+
+  const chartElement = document.getElementById('candleChart');
+
+  if (
+    chartElement &&
+    highY !== null &&
+    lowY !== null &&
+    Number.isFinite(highY) &&
+    Number.isFinite(lowY)
+  ) {
+    fvgZoneOverlay = document.createElement('div');
+
+    const top = Math.min(highY, lowY);
+    const height = Math.max(Math.abs(lowY - highY), 3);
+
+    const bullish = fvgZone.type === 'BULLISH';
+
+    const color = bullish
+      ? 'rgba(32, 201, 151, 0.35)'
+      : 'rgba(239, 83, 80, 0.35)';
+
+    Object.assign(fvgZoneOverlay.style, {
+      position: 'absolute',
+      left: '0px',
+      top: top + 'px',
+      width: chart.timeScale().width() + 'px',
+      height: height + 'px',
+      background: color,
+      pointerEvents: 'none',
+      zIndex: '9998'
+    });
+
+    chartElement.appendChild(fvgZoneOverlay);
+  }
+
+  const color = fvgZone.type === 'BULLISH'
+    ? '#20c997'
+    : '#ef5350';
+
+  fvgPriceLines.push(
+    series.createPriceLine({
+      price: fvgZone.high,
+      color: color,
+      lineWidth: 1,
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'FVG HIGH'
+    })
+  );
+
+  fvgPriceLines.push(
+    series.createPriceLine({
+      price: fvgZone.low,
+      color: color,
+      lineWidth: 1,
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'FVG LOW'
+    })
+  );
+}
+  
 
 async function loadChart(interval) {
     try {
@@ -957,6 +1041,45 @@ function analyzeFVG(data) {
 
   return 'FVG — Belum ada gap terdeteksi';
 }
+   
+function detectFVGZone(data) {
+  if (!Array.isArray(data) || data.length < 4) {
+    return null;
+  }
+
+  // Abaikan candle terakhir yang belum selesai
+  const candles = data.slice(0, -1);
+
+  if (candles.length < 3) {
+    return null;
+  }
+
+  const a = candles[candles.length - 3];
+  const c = candles[candles.length - 1];
+
+  // BULLISH FVG
+  if (a.high < c.low) {
+    return {
+      status: 'VALID',
+      type: 'BULLISH',
+      high: c.low,
+      low: a.high
+    };
+  }
+
+  // BEARISH FVG
+  if (a.low > c.high) {
+    return {
+      status: 'VALID',
+      type: 'BEARISH',
+      high: a.low,
+      low: c.high
+    };
+  }
+
+  return null;
+}
+      
 // ORDER BLOCK DETECTION
 
 function detectOrderBlock(data) {
@@ -1414,6 +1537,9 @@ document.getElementById('liquidityConfirmation').innerText = confirmation;
     
       const fvg = analyzeFVG(candles);
 document.getElementById('fvgAnalysis').textContent = fvg;
+
+const fvgZone = detectFVGZone(candles);
+drawFVGZone(fvgZone);
       
 
 // ANALISIS ORDER BLOCK
