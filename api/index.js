@@ -50,7 +50,12 @@ const url = new URL(
   "https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF"
 );
 
-url.searchParams.set("range", selected === "D1" ? "1y" : "5d");
+
+url.searchParams.set(
+  "range",
+  selected === "D1" ? "1y" : selected === "M45" ? "1mo" : "5d"
+);
+      
 url.searchParams.set("interval", yahooInterval);
       const response = await fetch(url, {
         headers: {
