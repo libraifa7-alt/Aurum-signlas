@@ -1042,43 +1042,76 @@ function analyzeFVG(data) {
   return 'FVG — Belum ada gap terdeteksi';
 }
    
+
 function detectFVGZone(data) {
   if (!Array.isArray(data) || data.length < 4) {
     return null;
   }
 
   // Abaikan candle terakhir yang belum selesai
-  const candles = data.slice(0, -1);
+  const candles = data.slice(0, -1).slice(-30);
 
   if (candles.length < 3) {
     return null;
   }
 
-  const a = candles[candles.length - 3];
-  const c = candles[candles.length - 1];
+  // Cari FVG terbaru yang belum tersentuh
+  for (let i = candles.length - 3; i >= 0; i--) {
+    const a = candles[i];
+    const c = candles[i + 2];
 
-  // BULLISH FVG
-  if (a.high < c.low) {
-    return {
-      status: 'VALID',
-      type: 'BULLISH',
-      high: c.low,
-      low: a.high
-    };
-  }
+    // BULLISH FVG
+    if (a.high < c.low) {
+      const high = c.low;
+      const low = a.high;
 
-  // BEARISH FVG
-  if (a.low > c.high) {
-    return {
-      status: 'VALID',
-      type: 'BEARISH',
-      high: a.low,
-      low: c.high
-    };
+      let mitigated = false;
+
+      for (let j = i + 3; j < candles.length; j++) {
+        if (candles[j].low <= high) {
+          mitigated = true;
+          break;
+        }
+      }
+
+      if (!mitigated) {
+        return {
+          status: 'VALID',
+          type: 'BULLISH',
+          high: high,
+          low: low
+        };
+      }
+    }
+
+    // BEARISH FVG
+    if (a.low > c.high) {
+      const high = a.low;
+      const low = c.high;
+
+      let mitigated = false;
+
+      for (let j = i + 3; j < candles.length; j++) {
+        if (candles[j].high >= low) {
+          mitigated = true;
+          break;
+        }
+      }
+
+      if (!mitigated) {
+        return {
+          status: 'VALID',
+          type: 'BEARISH',
+          high: high,
+          low: low
+        };
+      }
+    }
   }
 
   return null;
 }
+      
       
 // ORDER BLOCK DETECTION
 
