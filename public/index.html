@@ -197,8 +197,10 @@ function drawOrderBlockZone(obZone, candles) {
   const lowY = series.priceToCoordinate(obZone.low);
 setTimeout(() => {
   document.querySelector('.status').textContent =
-    'OB COORDINATE | HIGH: ' + highY +
-    ' | LOW: ' + lowY +
+    'OB COORDINATE | HIGH PRICE: ' + obZone.high +
+    ' | LOW PRICE: ' + obZone.low +
+    ' | HIGH Y: ' + highY +
+    ' | LOW Y: ' + lowY +
     ' | WIDTH: ' + chart.timeScale().width();
 }, 2000);
 
