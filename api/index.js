@@ -104,7 +104,7 @@ url.searchParams.set("interval", yahooInterval);
     low: String(low),
     close: String(close)
   };
-}).filter(Boolean).reverse().slice(0, 100);
+}).filter(Boolean).reverse().slice(0, 300);
 
 
     // GABUNGKAN 3 CANDLE M15 MENJADI 1 CANDLE M45
