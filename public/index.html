@@ -384,6 +384,7 @@ document.querySelector('.status').textContent =
 
 
 
+
 function getStructureSignal(data) {
   if (!Array.isArray(data) || data.length < 30) {
     return 'UNKNOWN';
@@ -403,11 +404,7 @@ function getStructureSignal(data) {
   const swingLows = [];
 
   // DETEKSI SWING HIGH DAN SWING LOW
-  for (
-    let i = leftBars;
-    i < candles.length - rightBars;
-    i++
-  ) {
+  for (let i = leftBars; i < candles.length - rightBars; i++) {
     const current = candles[i];
 
     let isSwingHigh = true;
@@ -436,16 +433,16 @@ function getStructureSignal(data) {
     if (isSwingHigh) {
       swingHighs.push({
         index: i,
-        price: current.high,
-        broken: false
+        confirmIndex: i + rightBars,
+        price: current.high
       });
     }
 
     if (isSwingLow) {
       swingLows.push({
         index: i,
-        price: current.low,
-        broken: false
+        confirmIndex: i + rightBars,
+        price: current.low
       });
     }
   }
@@ -454,82 +451,113 @@ function getStructureSignal(data) {
     return 'UNKNOWN';
   }
 
-  const lastHigh = swingHighs[swingHighs.length - 1];
-  const previousHigh = swingHighs[swingHighs.length - 2];
+  // MENENTUKAN ARAH STRUKTUR PADA WAKTU TERTENTU
+  function getTrendAt(index) {
+    const highs = swingHighs.filter(s => s.confirmIndex < index);
+    const lows = swingLows.filter(s => s.confirmIndex < index);
 
-  const lastLow = swingLows[swingLows.length - 1];
-  const previousLow = swingLows[swingLows.length - 2];
+    if (highs.length < 2 || lows.length < 2) {
+      return 'RANGE';
+    }
 
-  // TENTUKAN STRUKTUR SWING
-  const higherHigh = lastHigh.price > previousHigh.price;
-  const higherLow = lastLow.price > previousLow.price;
+    const lastHigh = highs[highs.length - 1].price;
+    const previousHigh = highs[highs.length - 2].price;
 
-  const lowerHigh = lastHigh.price < previousHigh.price;
-  const lowerLow = lastLow.price < previousLow.price;
+    const lastLow = lows[lows.length - 1].price;
+    const previousLow = lows[lows.length - 2].price;
 
-  let trend = 'RANGE';
+    if (lastHigh > previousHigh && lastLow > previousLow) {
+      return 'BULLISH';
+    }
 
-  if (higherHigh && higherLow) {
-    trend = 'BULLISH';
-  } else if (lowerHigh && lowerLow) {
-    trend = 'BEARISH';
+    if (lastHigh < previousHigh && lastLow < previousLow) {
+      return 'BEARISH';
+    }
+
+    return 'RANGE';
   }
 
-  // CARI LEVEL SWING YANG BELUM DITEMBUS
-  const confirmedCandles = candles.slice(0, -1);
+  // CARI SEMUA PENEMBUSAN SWING
+  const breakEvents = [];
 
-  const availableHighs = swingHighs.filter(swing =>
-    !confirmedCandles.some((candle, index) =>
-      index > swing.index &&
-      candle.close > swing.price
-    )
-  );
+  for (const swing of swingHighs) {
+    for (
+      let i = Math.max(swing.confirmIndex + 1, 1);
+      i < candles.length;
+      i++
+    ) {
+      if (
+        candles[i - 1].close <= swing.price &&
+        candles[i].close > swing.price
+      ) {
+        const previousTrend = getTrendAt(i);
 
-  const availableLows = swingLows.filter(swing =>
-    !confirmedCandles.some((candle, index) =>
-      index > swing.index &&
-      candle.close < swing.price
-    )
-  );
+        breakEvents.push({
+          index: i,
+          direction: 'BULLISH',
+          type: previousTrend === 'BEARISH'
+            ? 'CHOCH'
+            : 'BOS'
+        });
 
-  const activeHigh = availableHighs[availableHighs.length - 1];
-  const activeLow = availableLows[availableLows.length - 1];
-
-  const previousCandle = candles[candles.length - 2];
-  const lastCandle = candles[candles.length - 1];
-
-  // DETEKSI BREAK DAN CHoCH BULLISH
-  if (
-    activeHigh &&
-    previousCandle.close <= activeHigh.price &&
-    lastCandle.close > activeHigh.price
-  ) {
-    return trend === 'BEARISH'
-      ? 'CHOCH_BULLISH'
-      : 'BOS_BULLISH';
+        break;
+      }
+    }
   }
 
-  // DETEKSI BREAK DAN CHoCH BEARISH
-  if (
-    activeLow &&
-    previousCandle.close >= activeLow.price &&
-    lastCandle.close < activeLow.price
-  ) {
-    return trend === 'BULLISH'
-      ? 'CHOCH_BEARISH'
-      : 'BOS_BEARISH';
+  for (const swing of swingLows) {
+    for (
+      let i = Math.max(swing.confirmIndex + 1, 1);
+      i < candles.length;
+      i++
+    ) {
+      if (
+        candles[i - 1].close >= swing.price &&
+        candles[i].close < swing.price
+      ) {
+        const previousTrend = getTrendAt(i);
+
+        breakEvents.push({
+          index: i,
+          direction: 'BEARISH',
+          type: previousTrend === 'BULLISH'
+            ? 'CHOCH'
+            : 'BOS'
+        });
+
+        break;
+      }
+    }
   }
 
-  if (trend === 'BULLISH') {
+  // AMBIL PENEMBUSAN TERBARU
+  breakEvents.sort((a, b) => b.index - a.index);
+
+  const latestBreak = breakEvents[0];
+  const lastIndex = candles.length - 1;
+
+  if (latestBreak && lastIndex - latestBreak.index <= 10) {
+    return latestBreak.type + '_' + latestBreak.direction;
+  }
+
+  // JIKA TIDAK ADA PENEMBUSAN TERBARU, BACA ARAH TREN
+  const lastHigh = swingHighs[swingHighs.length - 1].price;
+  const previousHigh = swingHighs[swingHighs.length - 2].price;
+
+  const lastLow = swingLows[swingLows.length - 1].price;
+  const previousLow = swingLows[swingLows.length - 2].price;
+
+  if (lastHigh > previousHigh && lastLow > previousLow) {
     return 'TREND_BULLISH';
   }
 
-  if (trend === 'BEARISH') {
+  if (lastHigh < previousHigh && lastLow < previousLow) {
     return 'TREND_BEARISH';
   }
 
   return 'RANGE';
-}
+          }
+      
       
       
 
