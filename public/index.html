@@ -1014,28 +1014,17 @@ async function analyzeLiquidityMultiTimeframe() {
       
 // FAIR VALUE GAP DETECTION
 function analyzeFVG(data) {
-  if (!data || data.length < 4) {
-    return 'Data candle belum cukup';
+  const zone = detectFVGZone(data);
+
+  if (!zone) {
+    return 'FVG — Belum ada gap terdeteksi';
   }
 
-  // Abaikan candle terakhir yang belum selesai
-  const candles = data.slice(0, -1);
-
-  if (candles.length < 3) {
-    return 'Data candle belum cukup';
-  }
-
-  // Periksa tiga candle terakhir yang sudah selesai
-  const a = candles[candles.length - 3];
-  const c = candles[candles.length - 1];
-
-  // BULLISH FVG
-  if (a.high < c.low) {
+  if (zone.type === 'BULLISH') {
     return 'BULLISH FVG — Celah harga naik terdeteksi';
   }
 
-  // BEARISH FVG
-  if (a.low > c.high) {
+  if (zone.type === 'BEARISH') {
     return 'BEARISH FVG — Celah harga turun terdeteksi';
   }
 
