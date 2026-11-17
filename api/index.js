@@ -106,24 +106,58 @@ url.searchParams.set("interval", yahooInterval);
   };
 }).filter(Boolean).reverse().slice(0, 100);
 
-// GABUNGKAN 3 CANDLE M15 MENJADI 1 CANDLE M45
-if (selected === "M45") {
-  const grouped = [];
 
-  for (let i = 0; i + 2 < candles.length; i += 3) {
-    const group = candles.slice(i, i + 3);
+    // GABUNGKAN 3 CANDLE M15 MENJADI 1 CANDLE M45
+    if (selected === "M45") {
+      const groups = new Map();
 
-    grouped.push({
-      datetime: group[0].datetime,
-      open: group[0].open,
-      high: String(Math.max(...group.map(c => Number(c.high)))),
-      low: String(Math.min(...group.map(c => Number(c.low)))),
-      close: group[2].close
-    });
-  }
+      for (const candle of candles) {
+        const timestamp = Math.floor(
+          new Date(candle.datetime.replace(" ", "T") + "+07:00").getTime() / 1000
+        );
 
-  candles = grouped;
-}
+        if (!Number.isFinite(timestamp)) continue;
+
+        const bucket = Math.floor(timestamp / 2700) * 2700;
+
+        if (!groups.has(bucket)) {
+          groups.set(bucket, []);
+        }
+
+        groups.get(bucket).push({
+          ...candle,
+          _timestamp: timestamp
+        });
+      }
+
+      const grouped = [];
+
+      for (const [bucket, bars] of groups) {
+        if (bars.length !== 3) continue;
+
+        bars.sort((a, b) => a._timestamp - b._timestamp);
+
+        grouped.push({
+          bucket,
+          datetime: bars[0].datetime,
+          open: bars[0].open,
+          high: String(Math.max(...bars.map(c => Number(c.high)))),
+          low: String(Math.min(...bars.map(c => Number(c.low)))),
+          close: bars[2].close
+        });
+      }
+
+      grouped.sort((a, b) => b.bucket - a.bucket);
+
+      candles = grouped.map(c => ({
+        datetime: c.datetime,
+        open: c.open,
+        high: c.high,
+        low: c.low,
+        close: c.close
+      }));
+    }
+      
 
 const output = {
   status: "success",
