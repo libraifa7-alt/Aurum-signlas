@@ -846,23 +846,71 @@ async function analyzeMarketStructure() {
       'D1'
     ];
 
-    const results = await Promise.all(
-      timeframes.map(async timeframe => {
-        const candles = await getSharedCandles(timeframe);
+    
+const results = await Promise.all(
+  timeframes.map(async timeframe => {
+    const candles = await getSharedCandles(timeframe);
 
-        console.log(
-          'JUMLAH CANDLE ' + timeframe + ':',
-          candles.length
-        );
+    const sr = detectSupportResistance(candles);
 
-        
-return {
-  timeframe,
-  signal: getStructureSignal(candles),
-  supportResistance: detectSupportResistance(candles)
-};
-      })
-    );
+    // DIAGNOSTIK DATA YANG BENAR-BENAR DIANALISIS
+    window.aurumAnalysisDiagnostics =
+      window.aurumAnalysisDiagnostics || {};
+
+    window.aurumAnalysisDiagnostics[timeframe] = {
+      candleCount: candles.length,
+      lastCandleTime: candles.length
+        ? candles[candles.length - 1].time
+        : null,
+      lastCandleClose: candles.length
+        ? candles[candles.length - 1].close
+        : null,
+      calculatedPrice: sr ? sr.currentPrice : null,
+      support: sr ? sr.support : null,
+      resistance: sr ? sr.resistance : null
+    };
+
+    let analysisPanel =
+      document.getElementById('analysisDiagnostics');
+
+    if (!analysisPanel) {
+      analysisPanel = document.createElement('div');
+      analysisPanel.id = 'analysisDiagnostics';
+
+      analysisPanel.style.cssText =
+        'background:#111c2e;color:#cbd5e1;' +
+        'padding:12px;margin:12px 0;' +
+        'border:1px solid #20c997;border-radius:8px;' +
+        'font-size:12px;white-space:pre-wrap;' +
+        'overflow-wrap:anywhere;';
+
+      document.body.appendChild(analysisPanel);
+    }
+
+    analysisPanel.innerHTML =
+      '<strong style="color:#20c997">' +
+      'DIAGNOSTIK ANALISIS SUPPORT & RESISTANCE' +
+      '</strong><br><br>' +
+      Object.entries(window.aurumAnalysisDiagnostics)
+        .map(([tf, d]) =>
+          '<strong>' + tf + '</strong>' +
+          '<br>Jumlah candle: ' + d.candleCount +
+          '<br>Waktu candle: ' + d.lastCandleTime +
+          '<br>Close candle: ' + d.lastCandleClose +
+          '<br>Harga analisis: ' + d.calculatedPrice +
+          '<br>Support: ' + d.support +
+          '<br>Resistance: ' + d.resistance +
+          '<br><br>'
+        ).join('');
+
+    return {
+      timeframe,
+      signal: getStructureSignal(candles),
+      supportResistance: sr
+    };
+  })
+);
+    
     
 
     const direction = signal =>
