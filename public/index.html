@@ -831,11 +831,31 @@ function analyzeLiquidity(data) {
     }
   }
 
-  return 'LIKUIDITAS — Belum ada sweep terdeteksi';
+const candidateHigh = Math.max(
+  ...candidates.map(c => c.high)
+);
+
+const candidateLow = Math.min(
+  ...candidates.map(c => c.low)
+);
+
+const latest = candidates[candidates.length - 1];
+
+const latestBody = Math.abs(latest.close - latest.open);
+const latestRange = latest.high - latest.low;
+
+const latestBodyRatio = latestRange > 0
+  ? (latestBody / latestRange * 100).toFixed(1)
+  : '0';
+
+  return 'LIKUIDITAS — Belum ada sweep terdeteksi' +
+    ' | SH: ' + (buyLiquidity ?? 'NONE') +
+    ' | SL: ' + (sellLiquidity ?? 'NONE') +
+    ' | 5H: ' + candidateHigh +
+    ' | 5L: ' + candidateLow +
+    ' | Last Close: ' + latest.close +
+    ' | Body: ' + latestBodyRatio + '%';
 }
-      
-      
-      
 
 function analyzeEqualHighLow(data) {
   if (!data || data.length < 20) {
