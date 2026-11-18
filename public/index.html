@@ -809,24 +809,23 @@ function analyzeLiquidity(data) {
     const bodyRatio = body / range;
 
     // BUY-SIDE SWEEP
-    if (
-      buyLiquidity !== null &&
-      candle.high > buyLiquidity &&
-      candle.close < buyLiquidity &&
-      candle.close < candle.open &&
-      bodyRatio >= 0.25
-    ) {
+if (
+  buyLiquidity !== null &&
+  candle.high > buyLiquidity &&
+  candle.close < buyLiquidity &&
+  bodyRatio >= 0.10
+) {
       return 'BUY-SIDE SWEEP — Likuiditas atas tersapu dan harga ditolak';
     }
 
     // SELL-SIDE SWEEP
-    if (
-      sellLiquidity !== null &&
-      candle.low < sellLiquidity &&
-      candle.close > sellLiquidity &&
-      candle.close > candle.open &&
-      bodyRatio >= 0.25
-    ) {
+  
+if (
+  sellLiquidity !== null &&
+  candle.low < sellLiquidity &&
+  candle.close > sellLiquidity &&
+  bodyRatio >= 0.10
+) {
       return 'SELL-SIDE SWEEP — Likuiditas bawah tersapu dan harga ditolak';
     }
   }
