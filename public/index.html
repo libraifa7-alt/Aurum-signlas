@@ -977,6 +977,7 @@ async function analyzeLiquidityMultiTimeframe() {
   }
 }
 
+
 async function analyzeLiquidityConfirmation() {
   try {
     const [h4, h1, m15] = await Promise.all([
@@ -993,7 +994,8 @@ async function analyzeLiquidityConfirmation() {
     const trendH4 = getStructureSignal(h4);
     const trendH1 = getStructureSignal(h1);
 
-    // LIQUIDITY SWEEP M15
+    // LIQUIDITY SWEEP H1 DAN M15
+    const sweepH1 = analyzeLiquidity(h1);
     const sweepM15 = analyzeLiquidity(m15);
 
     // ORDER BLOCK DAN FVG M15
@@ -1003,9 +1005,20 @@ async function analyzeLiquidityConfirmation() {
     const obType = obM15 ? obM15.type : 'NONE';
     const fvgType = fvgM15 ? fvgM15.type : 'NONE';
 
-    const bullishSweep = sweepM15.includes('SELL-SIDE SWEEP');
-    const bearishSweep = sweepM15.includes('BUY-SIDE SWEEP');
+    // ARAH SWEEP
+    const bullishSweepM15 =
+      sweepM15.includes('SELL-SIDE SWEEP');
 
+    const bearishSweepM15 =
+      sweepM15.includes('BUY-SIDE SWEEP');
+
+    const bullishSweepH1 =
+      sweepH1.includes('SELL-SIDE SWEEP');
+
+    const bearishSweepH1 =
+      sweepH1.includes('BUY-SIDE SWEEP');
+
+    // ZONA BUY DAN SELL
     const bullishZones =
       (obType === 'BULLISH' ? 1 : 0) +
       (fvgType === 'BULLISH' ? 1 : 0);
@@ -1016,11 +1029,13 @@ async function analyzeLiquidityConfirmation() {
 
     // KONFIRMASI BUY
     if (
-      bullishSweep &&
+      bullishSweepM15 &&
+      !bearishSweepH1 &&
       bullishZones >= 1 &&
       bearishZones === 0
     ) {
       return 'BUY CONFIRMATION — M15 Sell-Side Sweep' +
+        ' | H1 Sweep: ' + sweepH1 +
         ' | OB: ' + obType +
         ' | FVG: ' + fvgType +
         ' | H4: ' + trendH4 +
@@ -1029,11 +1044,13 @@ async function analyzeLiquidityConfirmation() {
 
     // KONFIRMASI SELL
     if (
-      bearishSweep &&
+      bearishSweepM15 &&
+      !bullishSweepH1 &&
       bearishZones >= 1 &&
       bullishZones === 0
     ) {
       return 'SELL CONFIRMATION — M15 Buy-Side Sweep' +
+        ' | H1 Sweep: ' + sweepH1 +
         ' | OB: ' + obType +
         ' | FVG: ' + fvgType +
         ' | H4: ' + trendH4 +
@@ -1041,7 +1058,8 @@ async function analyzeLiquidityConfirmation() {
     }
 
     return 'WAIT — Konfirmasi SMC belum lengkap' +
-      ' | Sweep: ' + sweepM15 +
+      ' | Sweep H1: ' + sweepH1 +
+      ' | Sweep M15: ' + sweepM15 +
       ' | OB: ' + obType +
       ' | FVG: ' + fvgType +
       ' | H4: ' + trendH4 +
@@ -1051,7 +1069,8 @@ async function analyzeLiquidityConfirmation() {
     console.log('Liquidity confirmation error:', error);
     return 'WAIT — Gagal membaca konfirmasi SMC';
   }
-}
+        }
+      
       
       
 // FAIR VALUE GAP DETECTION
