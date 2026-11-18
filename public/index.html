@@ -714,7 +714,98 @@ async function getSharedCandles(interval) {
         '<br><br>'
       ).join('');
 
+  if (
+  lastCached &&
+  lastCached.time !== undefined &&
+  lastCached.time !== null
+) {
   return cached.data;
+}
+
+console.warn(
+  'CACHE TIDAK VALID — MENGAMBIL ULANG DATA:',
+  interval,
+  lastCached
+);
+
+aurumCandleCache.delete(cacheKey);
+  try {
+    const response = await fetch(
+      '/api?interval=' + interval +
+      '&symbol=' + encodeURIComponent(symbol)
+    );
+
+    const result = await response.json();
+
+    if (result.status !== 'success' || !result.candles?.length) {
+      return [];
+    }
+
+async function getSharedCandles(interval) {
+  const symbol = document.getElementById('pair').value;
+  const cacheKey = symbol + ':' + interval;
+  const cached = aurumCandleCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.time < 60000) {
+
+    const lastCached =
+      cached.data?.[cached.data.length - 1];
+
+    window.aurumCacheDiagnostics =
+      window.aurumCacheDiagnostics || {};
+
+    window.aurumCacheDiagnostics[interval] = {
+      count: cached.data?.length || 0,
+      lastCandle: lastCached || null,
+      lastCandleTime: lastCached?.time ?? 'UNDEFINED'
+    };
+
+    let cachePanel =
+      document.getElementById('cacheDiagnostics');
+
+    if (!cachePanel) {
+      cachePanel = document.createElement('div');
+      cachePanel.id = 'cacheDiagnostics';
+
+      cachePanel.style.cssText =
+        'background:#111c2e;color:#cbd5e1;' +
+        'padding:12px;margin:12px 0;' +
+        'border:1px solid #f59e0b;border-radius:8px;' +
+        'font-size:12px;white-space:pre-wrap;' +
+        'overflow-wrap:anywhere;';
+
+      document.body.appendChild(cachePanel);
+    }
+
+    cachePanel.innerHTML =
+      '<strong style="color:#f59e0b">' +
+      'DIAGNOSTIK CACHE CANDLE</strong><br><br>' +
+      Object.entries(window.aurumCacheDiagnostics)
+        .map(([tf, d]) =>
+          '<strong>' + tf + '</strong>' +
+          '<br>Jumlah candle: ' + d.count +
+          '<br>Waktu candle terakhir: ' +
+          d.lastCandleTime +
+          '<br>Data candle: ' +
+          JSON.stringify(d.lastCandle) +
+          '<br><br>'
+        ).join('');
+
+    if (
+      lastCached &&
+      lastCached.time !== undefined &&
+      lastCached.time !== null
+    ) {
+      return cached.data;
+    }
+
+    console.warn(
+      'CACHE TIDAK VALID — MENGAMBIL ULANG DATA:',
+      interval,
+      lastCached
+    );
+
+    aurumCandleCache.delete(cacheKey);
   }
 
   try {
@@ -729,69 +820,72 @@ async function getSharedCandles(interval) {
       return [];
     }
 
-    
-const candles = result.candles.slice().reverse().map(c => ({
-  time: c.datetime,
-  open: Number(c.open),
-  high: Number(c.high),
-  low: Number(c.low),
-  close: Number(c.close)
-}));
+    const candles = result.candles.slice().reverse().map(c => ({
+      time: c.datetime,
+      open: Number(c.open),
+      high: Number(c.high),
+      low: Number(c.low),
+      close: Number(c.close)
+    }));
 
-const diagnostic = {
-  requested: interval,
-  returned: result.interval,
-  count: candles.length,
-  lastCandle: candles[candles.length - 1],
-  firstCandle: candles[0]
-};
+    const diagnostic = {
+      requested: interval,
+      returned: result.interval,
+      count: candles.length,
+      lastCandle: candles[candles.length - 1],
+      firstCandle: candles[0]
+    };
 
-console.log('DIAGNOSTIK TIMEFRAME:', diagnostic);
-console.log('CEK TIME M15:', interval, candles[candles.length - 1].time);
+    console.log('DIAGNOSTIK TIMEFRAME:', diagnostic);
+    console.log(
+      'CEK TIME M15:',
+      interval,
+      candles[candles.length - 1].time
+    );
 
-window.aurumTimeframeDiagnostics =
-  window.aurumTimeframeDiagnostics || {};
+    window.aurumTimeframeDiagnostics =
+      window.aurumTimeframeDiagnostics || {};
 
-window.aurumTimeframeDiagnostics[interval] = diagnostic;
+    window.aurumTimeframeDiagnostics[interval] = diagnostic;
 
-let diagnosticPanel =
-  document.getElementById('timeframeDiagnostics');
+    let diagnosticPanel =
+      document.getElementById('timeframeDiagnostics');
 
-if (!diagnosticPanel) {
-  diagnosticPanel = document.createElement('div');
-  diagnosticPanel.id = 'timeframeDiagnostics';
+    if (!diagnosticPanel) {
+      diagnosticPanel = document.createElement('div');
+      diagnosticPanel.id = 'timeframeDiagnostics';
 
-  diagnosticPanel.style.cssText =
-    'background:#111c2e;color:#cbd5e1;' +
-    'padding:12px;margin:12px 0;' +
-    'border:1px solid #334155;border-radius:8px;' +
-    'font-size:12px;white-space:pre-wrap;' +
-    'overflow-wrap:anywhere;';
+      diagnosticPanel.style.cssText =
+        'background:#111c2e;color:#cbd5e1;' +
+        'padding:12px;margin:12px 0;' +
+        'border:1px solid #334155;border-radius:8px;' +
+        'font-size:12px;white-space:pre-wrap;' +
+        'overflow-wrap:anywhere;';
 
-document.body.appendChild(diagnosticPanel);
-}
+      document.body.appendChild(diagnosticPanel);
+    }
 
-diagnosticPanel.innerHTML =
-  '<strong style="color:#20c997">' +
-  'DIAGNOSTIK TIMEFRAME</strong><br><br>' +
-  Object.entries(window.aurumTimeframeDiagnostics)
-    .map(([tf, d]) =>
-      '<strong>' + tf + '</strong>' +
-      '<br>API: ' + d.returned +
-      '<br>Jumlah candle: ' + d.count +
-      '<br>Candle terakhir: ' +
-      JSON.stringify(d.lastCandle) +
-      '<br><br>'
-    ).join('');
+    diagnosticPanel.innerHTML =
+      '<strong style="color:#20c997">' +
+      'DIAGNOSTIK TIMEFRAME</strong><br><br>' +
+      Object.entries(window.aurumTimeframeDiagnostics)
+        .map(([tf, d]) =>
+          '<strong>' + tf + '</strong>' +
+          '<br>API: ' + d.returned +
+          '<br>Jumlah candle: ' + d.count +
+          '<br>Candle terakhir: ' +
+          JSON.stringify(d.lastCandle) +
+          '<br><br>'
+        ).join('');
 
-aurumCandleCache.set(cacheKey, {
-  time: Date.now(),
-  data: candles
-});
+    aurumCandleCache.set(cacheKey, {
+      time: Date.now(),
+      data: candles
+    });
 
-return candles;
+    return candles;
 
-  } catch (error) {
+    } catch (error) {
     console.log('Shared candle error:', error);
     return [];
   }
