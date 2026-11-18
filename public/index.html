@@ -682,11 +682,20 @@ const cached = aurumCandleCache.get(cacheKey);
     }
 
     const candles = result.candles.slice().reverse().map(c => ({
-      open: Number(c.open),
-      high: Number(c.high),
-      low: Number(c.low),
-      close: Number(c.close)
-    }));
+  time: c.datetime,
+  open: Number(c.open),
+  high: Number(c.high),
+  low: Number(c.low),
+  close: Number(c.close)
+}));
+
+console.log('DIAGNOSTIK TIMEFRAME:', {
+  requested: interval,
+  returned: result.interval,
+  count: candles.length,
+  lastCandle: candles[candles.length - 1],
+  firstCandle: candles[0]
+});
 
 aurumCandleCache.set(cacheKey, {
   time: Date.now(),
