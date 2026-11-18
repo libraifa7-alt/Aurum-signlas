@@ -666,15 +666,26 @@ function getStructureSignal(data) {
 
 async function getSharedCandles(interval) {
   const symbol = document.getElementById('pair').value;
-const cacheKey = symbol + ':' + interval;
-const cached = aurumCandleCache.get(cacheKey);
+  const cacheKey = symbol + ':' + interval;
+  const cached = aurumCandleCache.get(cacheKey);
 
   if (cached && Date.now() - cached.time < 60000) {
+    console.log(
+      'CEK CACHE TIMEFRAME:',
+      interval,
+      cached.data?.length,
+      cached.data?.[cached.data.length - 1]?.time
+    );
+
     return cached.data;
   }
 
   try {
-    const response = await fetch('/api?interval=' + interval + '&symbol=' + encodeURIComponent(symbol));
+    const response = await fetch(
+      '/api?interval=' + interval +
+      '&symbol=' + encodeURIComponent(symbol)
+    );
+
     const result = await response.json();
 
     if (result.status !== 'success' || !result.candles?.length) {
