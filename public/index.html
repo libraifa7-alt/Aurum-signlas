@@ -820,13 +820,19 @@ async function getSharedCandles(interval) {
       return [];
     }
 
-    const candles = result.candles.slice().reverse().map(c => ({
-      time: c.datetime,
-      open: Number(c.open),
-      high: Number(c.high),
-      low: Number(c.low),
-      close: Number(c.close)
-    }));
+    const candles = result.candles.slice().reverse().map(c => {
+  const date = new Date(
+    c.datetime.replace(' ', 'T') + '+07:00'
+  );
+
+  return {
+    time: Math.floor(date.getTime() / 1000),
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close)
+  };
+});
 
     const diagnostic = {
       requested: interval,
