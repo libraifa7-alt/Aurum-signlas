@@ -94,6 +94,14 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
     <p>Menunggu analisis tujuh timeframe...</p>
   </div>
 </div>
+
+<div class="signal">
+  <small class="sub">SUPPORT & RESISTANCE — 7 TIMEFRAMES</small>
+
+  <div id="supportResistanceMTF">
+    <p>Menunggu analisis Support & Resistance...</p>
+  </div>
+</div>
   
 <div class="signal">
   <small class="sub">LIQUIDITY</small>
@@ -685,15 +693,101 @@ aurumCandleCache.set(cacheKey, {
   data: candles
 });
 
+
 return candles;
   } catch (error) {
     console.log('Shared candle error:', error);
     return [];
   }
-  }     
+}
 
-      
+// DETEKSI SUPPORT & RESISTANCE MULTI TIMEFRAME
+function detectSupportResistance(data) {
+  if (!Array.isArray(data) || data.length < 15) {
+    return null;
+  }
+
+  // Abaikan candle terakhir yang belum selesai
+  const candles = data.slice(0, -1).slice(-80);
+
+  if (candles.length < 10) {
+    return null;
+  }
+
+  const leftBars = 2;
+  const rightBars = 2;
+
+  const swingHighs = [];
+  const swingLows = [];
+
+  for (
+    let i = leftBars;
+    i < candles.length - rightBars;
+    i++
+  ) {
+    const current = candles[i];
+
+    let isSwingHigh = true;
+    let isSwingLow = true;
+
+    
+for (let j = 1; j <= leftBars; j++) {
+  if (current.high <= candles[i - j].high) {
+    isSwingHigh = false;
+  }
+
+  if (current.low >= candles[i - j].low) {
+    isSwingLow = false;
+  }
+}
+
+for (let j = 1; j <= rightBars; j++) {
+  if (current.high <= candles[i + j].high) {
+    isSwingHigh = false;
+  }
+
+  if (current.low >= candles[i + j].low) {
+    isSwingLow = false;
+  }
+}
+    
+
+    if (isSwingHigh) {
+      swingHighs.push(current.high);
+    }
+
+    if (isSwingLow) {
+      swingLows.push(current.low);
+    }
+  }
+
+  const currentPrice = candles[candles.length - 1].close;
+
+  const supports = swingLows.filter(
+    level => level < currentPrice
+  );
+
+  const resistances = swingHighs.filter(
+    level => level > currentPrice
+  );
+
+  const support = supports.length
+    ? Math.max(...supports)
+    : null;
+
+  const resistance = resistances.length
+    ? Math.min(...resistances)
+    : null;
+
+  return {
+    currentPrice,
+    support,
+    resistance
+  };
+}
+
 async function analyzeMarketStructure() {
+  
   try {
     const timeframes = [
       'M5',
@@ -714,12 +808,15 @@ async function analyzeMarketStructure() {
           candles.length
         );
 
-        return {
-          timeframe,
-          signal: getStructureSignal(candles)
-        };
+        
+return {
+  timeframe,
+  signal: getStructureSignal(candles),
+  supportResistance: detectSupportResistance(candles)
+};
       })
     );
+    
 
     const direction = signal =>
       signal.includes('BULLISH') ? 'BULLISH' :
@@ -853,6 +950,64 @@ async function analyzeMarketStructure() {
       `;
     }
 
+    
+    // UPDATE SUPPORT & RESISTANCE 7 TIMEFRAMES
+    const srContainer = document.getElementById('supportResistanceMTF');
+
+    if (srContainer) {
+      const srRows = results.map(item => {
+        const sr = item.supportResistance;
+
+        const supportText = sr && sr.support !== null
+          ? sr.support.toFixed(2)
+          : 'Belum terdeteksi';
+
+        const resistanceText = sr && sr.resistance !== null
+          ? sr.resistance.toFixed(2)
+          : 'Belum terdeteksi';
+
+        const priceText = sr
+          ? sr.currentPrice.toFixed(2)
+          : 'Data belum cukup';
+
+        return `
+          <div style="
+            padding:10px 0;
+            border-bottom:1px solid #263247;
+            font-size:13px;
+          ">
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              margin-bottom:7px;
+              font-weight:600;
+            ">
+              <span>${item.timeframe}</span>
+              <span style="color:#cbd5e1">
+                Harga: ${priceText}
+              </span>
+            </div>
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              gap:8px;
+            ">
+              <span style="color:#20c997">
+                Support: ${supportText}
+              </span>
+
+              <span style="color:#ef5350;text-align:right">
+                Resistance: ${resistanceText}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      srContainer.innerHTML = srRows;
+    }
+
     const detail = results.map(item =>
       item.timeframe + ': ' + item.signal
     ).join(' | ');
@@ -860,13 +1015,13 @@ async function analyzeMarketStructure() {
     return bias + ' — ' + detail +
       ' | Bullish: ' + bullish + '/7' +
       ' | Bearish: ' + bearish + '/7';
-                    
 
   } catch (error) {
     console.log('Multi timeframe error:', error);
     return 'MENUNGGU — Gagal membaca timeframe';
   }
 }
+      
       
       
 
