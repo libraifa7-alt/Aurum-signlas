@@ -225,11 +225,16 @@ return res.status(200).json(output);
     }
 
     const output = {
-      status: "success",
-      symbol,
-      interval,
-      candles: data.values || []
-    };
+  status: "success",
+  symbol,
+  interval,
+  debug: {
+    receivedInterval: req.query.interval || null,
+    selected,
+    mappedInterval: interval
+  },
+  candles: data.values || []
+};
 
     globalThis.aurumCache.set(cacheKey, {
       time: Date.now(),
