@@ -808,7 +808,7 @@ for (let j = 1; j <= rightBars; j++) {
     }
   }
 
-  const currentPrice = candles[candles.length - 1].close;
+const currentPrice = data[data.length - 1].close;
 
   const supports = swingLows.filter(
     level => level < currentPrice
