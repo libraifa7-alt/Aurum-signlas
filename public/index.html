@@ -682,59 +682,106 @@ return candles;
   }
   }     
 
-      async function analyzeMarketStructure() {
+      
+async function analyzeMarketStructure() {
   try {
-    
-const [h4, h1, m15] = await Promise.all([
-  getSharedCandles('H4'),
-  getSharedCandles('H1'),
-  getSharedCandles('M15')
-]);
-console.log('JUMLAH CANDLE H4:', h4.length);
-console.log('JUMLAH CANDLE H1:', h1.length);
-console.log('JUMLAH CANDLE M15:', m15.length);
-const signalH4 = getStructureSignal(h4);
-const signalH1 = getStructureSignal(h1);
-const signalM15 = getStructureSignal(m15);
+    const timeframes = [
+      'M5',
+      'M15',
+      'M30',
+      'M45',
+      'H1',
+      'H4',
+      'D1'
+    ];
 
-if ([signalH4, signalH1, signalM15].includes('UNKNOWN')) {
-  return 'MENUNGGU — Data timeframe belum cukup';
-}
+    const results = await Promise.all(
+      timeframes.map(async timeframe => {
+        const candles = await getSharedCandles(timeframe);
 
-const direction = signal =>
-  signal.includes('BULLISH') ? 'BULLISH' :
-  signal.includes('BEARISH') ? 'BEARISH' : 'RANGE';
+        console.log(
+          'JUMLAH CANDLE ' + timeframe + ':',
+          candles.length
+        );
 
-const trendH4 = direction(signalH4);
-const trendH1 = direction(signalH1);
-const trendM15 = direction(signalM15);
+        return {
+          timeframe,
+          signal: getStructureSignal(candles)
+        };
+      })
+    );
 
-if (
-  trendH4 === 'BULLISH' &&
-  trendH1 === 'BULLISH' &&
-  trendM15 === 'BULLISH'
+    const direction = signal =>
+      signal.includes('BULLISH') ? 'BULLISH' :
+      signal.includes('BEARISH') ? 'BEARISH' :
+      signal === 'RANGE' ? 'RANGE' : 'UNKNOWN';
+
+    const trends = {};
+
+    results.forEach(item => {
+      trends[item.timeframe] = direction(item.signal);
+    });
+
+    const unknown = results.some(
+      item => trends[item.timeframe] === 'UNKNOWN'
+    );
+
+    const bullish = results.filter(
+      item => trends[item.timeframe] === 'BULLISH'
+    ).length;
+
+    const bearish = results.filter(
+      item => trends[item.timeframe] === 'BEARISH'
+    ).length;
+
+    const majorBullish =
+      trends.D1 === 'BULLISH' &&
+      trends.H4 === 'BULLISH';
+
+    const majorBearish =
+      trends.D1 === 'BEARISH' &&
+      trends.H4 === 'BEARISH';
+
+    const mediumBullish =
+      trends.H1 === 'BULLISH' &&
+      trends.M45 === 'BULLISH';
+
+    const mediumBearish =
+      trends.H1 === 'BEARISH' &&
+      trends.M45 === 'BEARISH';
+
+    let bias = 'WAIT';
+
+if (unknown) {
+  bias = 'WAIT — Data timeframe belum cukup';
+} else if (
+  majorBullish &&
+  mediumBullish &&
+  bullish >= 5
 ) {
-  return 'BUY BIAS — H4, H1, M15 searah bullish';
-}
-
-if (
-  trendH4 === 'BEARISH' &&
-  trendH1 === 'BEARISH' &&
-  trendM15 === 'BEARISH'
+  bias = 'BUY BIAS';
+} else if (
+  majorBearish &&
+  mediumBearish &&
+  bearish >= 5
 ) {
-  return 'SELL BIAS — H4, H1, M15 searah bearish';
+  bias = 'SELL BIAS';
 }
 
-return 'WAIT — H4: ' + signalH4 +
-  ' | H1: ' + signalH1 +
-  ' | M15: ' + signalM15;
-    
+    const detail = results.map(item =>
+      item.timeframe + ': ' + item.signal
+    ).join(' | ');
+
+    return bias + ' — ' + detail +
+      ' | Bullish: ' + bullish + '/7' +
+      ' | Bearish: ' + bearish + '/7';
 
   } catch (error) {
     console.log('Multi timeframe error:', error);
     return 'MENUNGGU — Gagal membaca timeframe';
   }
-  }
+}
+      
       
 
 // LIQUIDITY DETECTION
