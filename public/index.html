@@ -836,6 +836,7 @@ async function getSharedCandles(interval) {
   }
 }
 
+
 // DETEKSI SUPPORT & RESISTANCE MULTI TIMEFRAME
 function detectSupportResistance(data) {
   if (!Array.isArray(data) || data.length < 15) {
@@ -843,9 +844,25 @@ function detectSupportResistance(data) {
   }
 
   // Abaikan candle terakhir yang belum selesai
-  const candles = data.slice(0, -1).slice(-80);
+  const candles = data
+    .slice(0, -1)
+    .slice(-80)
+    .filter(c =>
+      Number.isFinite(Number(c.high)) &&
+      Number.isFinite(Number(c.low))
+    )
+    .map(c => ({
+      high: Number(c.high),
+      low: Number(c.low)
+    }));
 
   if (candles.length < 10) {
+    return null;
+  }
+
+  const currentPrice = Number(data[data.length - 1].close);
+
+  if (!Number.isFinite(currentPrice)) {
     return null;
   }
 
@@ -865,27 +882,25 @@ function detectSupportResistance(data) {
     let isSwingHigh = true;
     let isSwingLow = true;
 
-    
-for (let j = 1; j <= leftBars; j++) {
-  if (current.high <= candles[i - j].high) {
-    isSwingHigh = false;
-  }
+    for (let j = 1; j <= leftBars; j++) {
+      if (current.high <= candles[i - j].high) {
+        isSwingHigh = false;
+      }
 
-  if (current.low >= candles[i - j].low) {
-    isSwingLow = false;
-  }
-}
+      if (current.low >= candles[i - j].low) {
+        isSwingLow = false;
+      }
+    }
 
-for (let j = 1; j <= rightBars; j++) {
-  if (current.high <= candles[i + j].high) {
-    isSwingHigh = false;
-  }
+    for (let j = 1; j <= rightBars; j++) {
+      if (current.high <= candles[i + j].high) {
+        isSwingHigh = false;
+      }
 
-  if (current.low >= candles[i + j].low) {
-    isSwingLow = false;
-  }
-}
-    
+      if (current.low >= candles[i + j].low) {
+        isSwingLow = false;
+      }
+    }
 
     if (isSwingHigh) {
       swingHighs.push(current.high);
@@ -896,8 +911,7 @@ for (let j = 1; j <= rightBars; j++) {
     }
   }
 
-const currentPrice = data[data.length - 1].close;
-
+  // Cari swing terdekat dari harga sekarang
   const supports = swingLows.filter(
     level => level < currentPrice
   );
@@ -906,13 +920,35 @@ const currentPrice = data[data.length - 1].close;
     level => level > currentPrice
   );
 
-  const support = supports.length
+  let support = supports.length
     ? Math.max(...supports)
     : null;
 
-  const resistance = resistances.length
+  let resistance = resistances.length
     ? Math.min(...resistances)
     : null;
+
+  // FALLBACK SUPPORT
+  if (support === null) {
+    const fallbackSupports = candles
+      .map(c => c.low)
+      .filter(level => level < currentPrice);
+
+    support = fallbackSupports.length
+      ? Math.max(...fallbackSupports)
+      : null;
+  }
+
+  // FALLBACK RESISTANCE
+  if (resistance === null) {
+    const fallbackResistances = candles
+      .map(c => c.high)
+      .filter(level => level > currentPrice);
+
+    resistance = fallbackResistances.length
+      ? Math.min(...fallbackResistances)
+      : null;
+  }
 
   return {
     currentPrice,
@@ -920,6 +956,7 @@ const currentPrice = data[data.length - 1].close;
     resistance
   };
 }
+      
 
 async function analyzeMarketStructure() {
   
