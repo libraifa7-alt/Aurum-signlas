@@ -487,7 +487,7 @@ document.querySelector('.status').textContent =
 
 
 
-function getStructureSignal(data) {
+function getStructureSignal(data, timeframe = 'UNKNOWN') {
   if (!Array.isArray(data) || data.length < 30) {
     return 'UNKNOWN';
   }
@@ -635,9 +635,71 @@ function getStructureSignal(data) {
   // AMBIL PENEMBUSAN TERBARU
   breakEvents.sort((a, b) => b.index - a.index);
 
+  
   const latestBreak = breakEvents[0];
   const lastIndex = candles.length - 1;
 
+  // DIAGNOSTIK STRUKTUR BOS / CHOCH
+  const structureDiagnostic = {
+    timeframe,
+    candleCount: candles.length,
+    lastCandleTime: candles[lastIndex].time,
+    lastClose: candles[lastIndex].close,
+    swingHighCount: swingHighs.length,
+    swingLowCount: swingLows.length,
+    breakEventCount: breakEvents.length,
+    latestBreak: latestBreak
+      ? latestBreak.type + '_' + latestBreak.direction
+      : 'NONE',
+    latestBreakIndex: latestBreak
+      ? latestBreak.index
+      : null,
+    candlesSinceBreak: latestBreak
+      ? lastIndex - latestBreak.index
+      : null
+  };
+
+  window.aurumStructureDiagnostics =
+    window.aurumStructureDiagnostics || {};
+
+  window.aurumStructureDiagnostics[timeframe] =
+    structureDiagnostic;
+
+  let structurePanel =
+    document.getElementById('structureDiagnostics');
+
+  if (!structurePanel) {
+    structurePanel = document.createElement('div');
+    structurePanel.id = 'structureDiagnostics';
+
+    structurePanel.style.cssText =
+      'background:#111c2e;color:#cbd5e1;' +
+      'padding:12px;margin:12px 0;' +
+      'border:1px solid #ef5350;border-radius:8px;' +
+      'font-size:12px;white-space:pre-wrap;' +
+      'overflow-wrap:anywhere;';
+
+    document.body.appendChild(structurePanel);
+  }
+
+  structurePanel.innerHTML =
+    '<strong style="color:#ef5350">' +
+    'DIAGNOSTIK STRUKTUR BOS / CHOCH' +
+    '</strong><br><br>' +
+    Object.entries(window.aurumStructureDiagnostics)
+      .map(([tf, d]) =>
+        '<strong>' + tf + '</strong>' +
+        '<br>Jumlah candle: ' + d.candleCount +
+        '<br>Jumlah swing high: ' + d.swingHighCount +
+        '<br>Jumlah swing low: ' + d.swingLowCount +
+        '<br>Jumlah break: ' + d.breakEventCount +
+        '<br>Break terbaru: ' + d.latestBreak +
+        '<br>Index break: ' + d.latestBreakIndex +
+        '<br>Jarak break: ' + d.candlesSinceBreak +
+        '<br>Close terakhir: ' + d.lastClose +
+        '<br><br>'
+      ).join('');
+  
   if (latestBreak && lastIndex - latestBreak.index <= 10) {
     return latestBreak.type + '_' + latestBreak.direction;
   }
@@ -1056,12 +1118,10 @@ const results = await Promise.all(
         ).join('');
 
     return {
-      timeframe,
-      signal: getStructureSignal(candles),
-      supportResistance: sr
-    };
-  })
-);
+  timeframe,
+  signal: getStructureSignal(candles, timeframe),
+  supportResistance: sr
+};
     
     
 
