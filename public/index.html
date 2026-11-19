@@ -213,20 +213,20 @@ function drawOrderBlockZone(obZone, candles) {
 
   const bullish = obZone.type === 'BULLISH';
 
-  const zoneColor = bullish
-    ? 'rgba(32, 201, 151, 0.30)'
-    : 'rgba(239, 83, 80, 0.30)';
-
   // Ambil posisi harga pada grafik
   const highY = series.priceToCoordinate(obZone.high);
   const lowY = series.priceToCoordinate(obZone.low);
 
+  // Ambil posisi waktu candle sumber OB
+  const startX = chart.timeScale().timeToCoordinate(obZone.obTime);
 
   const chartElement = document.getElementById('candleChart');
 
-  // Buat kotak warna OB
+  // Buat kotak OB mulai dari candle sumber
   if (
     chartElement &&
+    startX !== null &&
+    Number.isFinite(startX) &&
     highY !== null &&
     lowY !== null &&
     Number.isFinite(highY) &&
@@ -234,21 +234,26 @@ function drawOrderBlockZone(obZone, candles) {
   ) {
     orderBlockZoneOverlay = document.createElement('div');
 
-const actualTop = Math.min(highY, lowY);
-const actualHeight = Math.abs(lowY - highY);
+    const actualTop = Math.min(highY, lowY);
+    const actualHeight = Math.abs(lowY - highY);
 
-const height = Math.max(actualHeight, 20);
-const top = actualTop - (height - actualHeight) / 2;
+    const height = Math.max(actualHeight, 20);
+    const top = actualTop - (height - actualHeight) / 2;
+
+    const chartWidth = chart.timeScale().width();
+
+    const left = Math.max(0, startX);
+    const width = Math.max(0, chartWidth - left);
 
     Object.assign(orderBlockZoneOverlay.style, {
       position: 'absolute',
-      left: '0px',
+      left: left + 'px',
       top: top + 'px',
-      width: chart.timeScale().width() + 'px',
+      width: width + 'px',
       height: height + 'px',
       background: bullish
-  ? 'rgba(32, 201, 151, 0.65)'
-  : 'rgba(239, 83, 80, 0.65)',
+        ? 'rgba(32, 201, 151, 0.65)'
+        : 'rgba(239, 83, 80, 0.65)',
       pointerEvents: 'none',
       zIndex: '9999'
     });
@@ -259,29 +264,29 @@ const top = actualTop - (height - actualHeight) / 2;
   // Warna garis OB
   const color = bullish ? '#20c997' : '#ef5350';
 
-// Garis OB HIGH
-orderBlockPriceLines.push(
-  series.createPriceLine({
-    price: obZone.high,
-    color: color,
-    lineWidth: 2,
-    lineStyle: 2,
-    axisLabelVisible: true,
-    title: 'OB HIGH'
-  })
-);
+  // Garis OB HIGH
+  orderBlockPriceLines.push(
+    series.createPriceLine({
+      price: obZone.high,
+      color: color,
+      lineWidth: 2,
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'OB HIGH'
+    })
+  );
 
-// Garis OB LOW
-orderBlockPriceLines.push(
-  series.createPriceLine({
-    price: obZone.low,
-    color: color,
-    lineWidth: 2,
-    lineStyle: 2,
-    axisLabelVisible: true,
-    title: 'OB LOW'
-  })
-);
+  // Garis OB LOW
+  orderBlockPriceLines.push(
+    series.createPriceLine({
+      price: obZone.low,
+      color: color,
+      lineWidth: 2,
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'OB LOW'
+    })
+  );
 
 } // Penutup fungsi drawOrderBlockZone
   
@@ -303,10 +308,15 @@ function drawFVGZone(fvgZone) {
   const highY = series.priceToCoordinate(fvgZone.high);
   const lowY = series.priceToCoordinate(fvgZone.low);
 
+  // Posisi waktu awal FVG
+  const startX = chart.timeScale().timeToCoordinate(fvgZone.fvgTime);
+
   const chartElement = document.getElementById('candleChart');
 
   if (
     chartElement &&
+    startX !== null &&
+    Number.isFinite(startX) &&
     highY !== null &&
     lowY !== null &&
     Number.isFinite(highY) &&
@@ -323,11 +333,15 @@ function drawFVGZone(fvgZone) {
       ? 'rgba(32, 201, 151, 0.35)'
       : 'rgba(239, 83, 80, 0.35)';
 
+    const chartWidth = chart.timeScale().width();
+    const left = Math.max(0, startX);
+    const width = Math.max(0, chartWidth - left);
+
     Object.assign(fvgZoneOverlay.style, {
       position: 'absolute',
-      left: '0px',
+      left: left + 'px',
       top: top + 'px',
-      width: chart.timeScale().width() + 'px',
+      width: width + 'px',
       height: height + 'px',
       background: color,
       pointerEvents: 'none',
@@ -1774,7 +1788,10 @@ function detectFVGZone(data) {
           status: 'VALID',
           type: 'BULLISH',
           high: high,
-          low: low
+          low: low,
+          fvgIndex: i,
+          fvgTime: a.time,
+          endTime: c.time
         };
       }
     }
@@ -1801,7 +1818,10 @@ function detectFVGZone(data) {
           status: 'VALID',
           type: 'BEARISH',
           high: high,
-          low: low
+          low: low,
+          fvgIndex: i,
+          fvgTime: a.time,
+          endTime: c.time
         };
       }
     }
@@ -2006,43 +2026,45 @@ lastBullishSwingHigh = swingHigh;
   for (let j = i - 1; j >= Math.max(i - 6, 0); j--) {
     const ob = recent[j];
 
-    if (ob.close < ob.open) {
-      opposingCandleCount++;
+if (ob.close < ob.open) {
+  opposingCandleCount++;
 
-
-return {
-  status: 'VALID',
-  type: 'BULLISH',
-  high: ob.high,
-  low: ob.low,
-  bosLevel: swingHigh,
-  reason:
-    'Swing High BOS + Displacement valid' +
-    ' | Displacement: ' + displacementCount +
-    ' | Swing High: ' + swingHighCount +
-    ' | Swing Low: ' + swingLowCount +
-    ' | Bullish BOS: ' + bullishBosCount +
-    ' | Bearish BOS: ' + bearishBosCount +
-    ' | Opposing Candle: ' + opposingCandleCount +
-    ' | 6 CANDLE SEBELUM BOS: ' + bullishCandleColors.join(', ') +
-    ' | DETAIL 6 CANDLE BOS: ' +
-      JSON.stringify(recent.slice(i - 6, i)) +
-    ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
-    ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
-    ' | Ratio Pass: ' + bodyRatioPassCount +
-    ' | Average Pass: ' + bodyAveragePassCount +
-    ' | Bullish Swing Available: ' + bullishSwingAvailableCount +
-    ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
-    ' | Last Bullish Close: ' + lastBullishClose.toFixed(2) +
-    ' | Last Bullish Swing High: ' + lastBullishSwingHigh.toFixed(2) +
-    ' | BOS Close: ' + bullishBosClose.toFixed(2) +
-    ' | BOS Swing High: ' + bullishBosSwingHigh.toFixed(2) +
-    ' | BOS Index: ' + bullishBosIndex
-};
-      
-    } // Menutup IF opposing candle
-  }   // Menutup FOR pencarian OB
-}     // Menutup IF Bullish BOS
+  return {
+    status: 'VALID',
+    type: 'BULLISH',
+    high: ob.high,
+    low: ob.low,
+    bosLevel: swingHigh,
+    obIndex: j,
+    bosIndex: i,
+    obTime: candles[j].time,
+    bosTime: candles[i].time,
+    reason:
+      'Swing High BOS + Displacement valid' +
+      ' | Displacement: ' + displacementCount +
+      ' | Swing High: ' + swingHighCount +
+      ' | Swing Low: ' + swingLowCount +
+      ' | Bullish BOS: ' + bullishBosCount +
+      ' | Bearish BOS: ' + bearishBosCount +
+      ' | Opposing Candle: ' + opposingCandleCount +
+      ' | 6 CANDLE SEBELUM BOS: ' + bullishCandleColors.join(', ') +
+      ' | DETAIL 6 CANDLE BOS: ' +
+        JSON.stringify(recent.slice(i - 6, i)) +
+      ' | Max Body Ratio: ' + maxBodyRatio.toFixed(3) +
+      ' | Max Body/Average: ' + maxBodyVsAverage.toFixed(3) +
+      ' | Ratio Pass: ' + bodyRatioPassCount +
+      ' | Average Pass: ' + bodyAveragePassCount +
+      ' | Bullish Swing Available: ' + bullishSwingAvailableCount +
+      ' | Bullish BOS Attempt: ' + bullishBosAttemptCount +
+      ' | Last Bullish Close: ' + lastBullishClose.toFixed(2) +
+      ' | Last Bullish Swing High: ' + lastBullishSwingHigh.toFixed(2) +
+      ' | BOS Close: ' + bullishBosClose.toFixed(2) +
+      ' | BOS Swing High: ' + bullishBosSwingHigh.toFixed(2) +
+      ' | BOS Index: ' + bullishBosIndex
+  };
+} // Menutup IF opposing candle
+} // Menutup FOR pencarian OB
+} // Menutup IF Bullish BOS
 
 
 if (
@@ -2064,6 +2086,11 @@ if (
         type: 'BEARISH',
         high: ob.high,
         low: ob.low,
+        bosLevel: swingLow,
+        obIndex: j,
+        bosIndex: i,
+        obTime: candles[j].time,
+        bosTime: candles[i].time,
         reason:
           'Swing Low BOS + Displacement valid' +
           ' | Displacement: ' + displacementCount +
@@ -2143,13 +2170,18 @@ function detectOrderBlockZone(data) {
     return null;
   }
 
-return {
-  status: result.status,
-  type: result.type,
-  high: result.high,
-  low: result.low
-};
-}  
+  return {
+    status: result.status,
+    type: result.type,
+    high: result.high,
+    low: result.low,
+    bosLevel: result.bosLevel,
+    obIndex: result.obIndex,
+    bosIndex: result.bosIndex,
+    obTime: result.obTime,
+    bosTime: result.bosTime
+  };
+}
   
 async function analyzeOrderBlockMultiTimeframe() {
   try {
@@ -2319,10 +2351,7 @@ console.log('ORDER BLOCK MTF:', orderBlockMTF);
       
   console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
-      chart.timeScale().fitContent();
-chart.applyOptions({
-  width: el.clientWidth
-});
+      
 
 } catch (error) {
   console.log('Chart error:', error);
