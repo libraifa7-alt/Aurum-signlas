@@ -745,34 +745,61 @@ async function getSharedCandles(interval) {
       return [];
     }
 
-    const candles = result.candles.slice().reverse().map(c => {
-  const rawDate = String(c.datetime);
+    
+const candles = result.candles
+  .slice()
+  .reverse()
+  .map(c => {
+    const rawDate = String(c.datetime);
+    let date;
 
-  let date;
+    if (/[zZ]|[+-]\d{2}:\d{2}$/.test(rawDate)) {
+      date = new Date(rawDate);
+    } else if (rawDate.includes(' ')) {
+      date = new Date(
+        rawDate.replace(' ', 'T') + '+07:00'
+      );
+    } else if (rawDate.includes('T')) {
+      date = new Date(rawDate + '+07:00');
+    } else {
+      date = new Date(
+        rawDate + 'T00:00:00+07:00'
+      );
+    }
 
-  if (/[zZ]|[+-]\d{2}:\d{2}$/.test(rawDate)) {
-    date = new Date(rawDate);
-  } else if (rawDate.includes(' ')) {
-    date = new Date(
-      rawDate.replace(' ', 'T') + '+07:00'
-    );
-  } else if (rawDate.includes('T')) {
-    date = new Date(rawDate + '+07:00');
-  } else {
-    date = new Date(
-      rawDate + 'T00:00:00+07:00'
-    );
-  }
+    const candle = {
+      time: Math.floor(date.getTime() / 1000),
+      open: Number(c.open),
+      high: Number(c.high),
+      low: Number(c.low),
+      close: Number(c.close)
+    };
 
-  return {
-    time: Math.floor(date.getTime() / 1000),
-    open: Number(c.open),
-    high: Number(c.high),
-    low: Number(c.low),
-    close: Number(c.close)
-  };
-});
+    if (
+      !Number.isFinite(candle.time) ||
+      !Number.isFinite(candle.open) ||
+      !Number.isFinite(candle.high) ||
+      !Number.isFinite(candle.low) ||
+      !Number.isFinite(candle.close) ||
+      candle.high < candle.low ||
+      candle.high < Math.max(candle.open, candle.close) ||
+      candle.low > Math.min(candle.open, candle.close)
+    ) {
+      return null;
+    }
 
+    return candle;
+  })
+  .filter(c => c !== null);
+
+if (candles.length === 0) {
+  console.warn(
+    'SEMUA CANDLE TIDAK VALID:',
+    interval
+  );
+  return [];
+}
+    
     const diagnostic = {
       requested: interval,
       returned: result.interval,
