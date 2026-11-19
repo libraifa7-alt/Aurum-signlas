@@ -1122,13 +1122,13 @@ const results = await Promise.all(
   signal: getStructureSignal(candles, timeframe),
   supportResistance: sr
 };
-    
-    
+  })
+);
 
-    const direction = signal =>
-      signal.includes('BULLISH') ? 'BULLISH' :
-      signal.includes('BEARISH') ? 'BEARISH' :
-      signal === 'RANGE' ? 'RANGE' : 'UNKNOWN';
+const direction = signal =>
+  signal.includes('BULLISH') ? 'BULLISH' :
+  signal.includes('BEARISH') ? 'BEARISH' :
+  signal === 'RANGE' ? 'RANGE' : 'UNKNOWN';
 
     const trends = {};
 
