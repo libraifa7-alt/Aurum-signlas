@@ -1205,8 +1205,9 @@ const results = await Promise.all(
     const candles = await getSharedCandles(timeframe);
 
     const sr = detectSupportResistance(candles);
+const fvgZone = detectFVGZone(candles);
 
-    // DIAGNOSTIK DATA YANG BENAR-BENAR DIANALISIS
+// DIAGNOSTIK DATA YANG BENAR-BENAR DIANALISIS
     window.aurumAnalysisDiagnostics =
       window.aurumAnalysisDiagnostics || {};
 
@@ -1218,9 +1219,14 @@ const results = await Promise.all(
       lastCandleClose: candles.length
         ? candles[candles.length - 1].close
         : null,
-      calculatedPrice: sr ? sr.currentPrice : null,
+            calculatedPrice: sr ? sr.currentPrice : null,
       support: sr ? sr.support : null,
-      resistance: sr ? sr.resistance : null
+      resistance: sr ? sr.resistance : null,
+      fvgStatus: fvgZone ? fvgZone.status : 'NONE',
+      fvgType: fvgZone ? fvgZone.type : 'NONE',
+      fvgHigh: fvgZone ? fvgZone.high : null,
+      fvgLow: fvgZone ? fvgZone.low : null,
+      fvgTime: fvgZone ? fvgZone.fvgTime : null
     };
 
     let analysisPanel =
@@ -1242,7 +1248,7 @@ const results = await Promise.all(
 
     analysisPanel.innerHTML =
       '<strong style="color:#20c997">' +
-      'DIAGNOSTIK ANALISIS SUPPORT & RESISTANCE' +
+      'DIAGNOSTIK ANALISIS SUPPORT, RESISTANCE & FVG' +
       '</strong><br><br>' +
       Object.entries(window.aurumAnalysisDiagnostics)
         .map(([tf, d]) =>
@@ -1252,9 +1258,14 @@ const results = await Promise.all(
           '<br>Close candle: ' + d.lastCandleClose +
           '<br>Harga analisis: ' + d.calculatedPrice +
           '<br>Support: ' + d.support +
-          '<br>Resistance: ' + d.resistance +
-          '<br><br>'
-        ).join('');
+'<br>Resistance: ' + d.resistance +
+'<br>Status FVG: ' + d.fvgStatus +
+'<br>Jenis FVG: ' + d.fvgType +
+'<br>FVG HIGH: ' + d.fvgHigh +
+'<br>FVG LOW: ' + d.fvgLow +
+'<br>Waktu FVG: ' + d.fvgTime +
+'<br><br>'
+).join('');
 
     return {
   timeframe,
