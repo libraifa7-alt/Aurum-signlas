@@ -324,6 +324,18 @@ activeObZone = obZone;
   // Ambil posisi waktu candle sumber OB
   const startX = chart.timeScale().timeToCoordinate(obZone.obTime);
 
+console.log('CEK WAKTU OB:', obZone.obTime);
+console.log('CEK KOORDINAT OB:', startX);
+
+if (
+  highY === null ||
+  lowY === null ||
+  startX === null ||
+  !Number.isFinite(highY) ||
+  !Number.isFinite(lowY) ||
+  !Number.isFinite(startX)
+) {
+
   const chartElement = document.getElementById('candleChart');
 
   // Buat kotak OB mulai dari candle sumber
