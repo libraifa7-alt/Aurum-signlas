@@ -272,16 +272,66 @@ footer{
   }
 
   
-  .chart{
+  
+.chart{
     height:360px;
     padding:5px;
   }
 }
+
+/* AURUM BOTTOM NAVIGATION */
+.aurum-bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  min-height:66px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  align-items:center;
+  background:#ffffff;
+  border-top:1px solid #e8eaf0;
+  box-shadow:0 -3px 15px rgba(0,0,0,.06);
+  z-index:9999;
+  padding:7px 3px;
+  box-sizing:border-box;
+}
+
+.nav-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  color:#8490a3;
+  text-decoration:none;
+  min-width:0;
+}
+
+.nav-item span{
+  font-size:21px;
+  line-height:1;
+}
+
+.nav-item small{
+  font-size:9px;
+  font-weight:600;
+}
+
+.nav-item.active{
+  color:#b58a35;
+}
+
+body{
+  padding-bottom:80px;
+}
+
 </style>
 </head>
 
-<body>
+<body id="top">
 <header>
+  
   
   <div class="brand">✦ AURUM SIGNALS AI</div>
   <div class="status">● CEK DEPLOY TERBARU</div>
@@ -390,19 +440,52 @@ footer{
     </section>
   </div>
 
-  <section class="panel" style="margin-top:16px">
-    <h3>Trading Signals</h3>
-    <p class="sub">Signal status</p>
-    <p class="gold">WAIT — Awaiting verified market data</p>
-    <p class="sub">No live BUY or SELL recommendation is currently available.</p>
-  </section>
+  
+<section id="tradingSignals" class="panel" style="margin-top:16px">
+  <h3>Trading Signals</h3>
+  <p class="sub">Signal status</p>
+  <p class="gold">WAIT — Awaiting verified market data</p>
+  <p class="sub">No live BUY or SELL recommendation is currently available.</p>
+</section>
 </main>
 
 <footer>
   Aurum Signals AI · Educational analysis only · Manual execution
 </footer>
-  
+<nav class="aurum-bottom-nav" aria-label="Navigasi Aurum">
+  <a href="#top" class="nav-item active">
+    <span>⌂</span>
+    <small>Beranda</small>
+  </a>
+
+  <a href="#tradingSignals" class="nav-item">
+    <span>ϟ</span>
+    <small>Sinyal</small>
+  </a>
+
+  <a href="#goldChart" class="nav-item">
+    <span>▥</span>
+    <small>Grafik</small>
+  </a>
+
+  <a href="#aurumNews" class="nav-item">
+    <span>▤</span>
+    <small>Berita</small>
+  </a>
+
+  <a href="#aurumChat" class="nav-item">
+    <span>◉</span>
+    <small>Obrolan</small>
+  </a>
+
+  <a href="#aurumGuide" class="nav-item">
+    <span>◇</span>
+    <small>Panduan</small>
+  </a>
+</nav>
+
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
+  
 <script>
 document.querySelector('.status').textContent = 'TES SCRIPT TERPISAH BERHASIL';
 </script>
