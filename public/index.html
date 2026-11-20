@@ -4,268 +4,399 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aurum Signals AI</title>
+
 <style>
 :root{
-  --bg:#f4f6f9;
+  --bg:#f5f6fa;
   --panel:#ffffff;
-  --line:#e2e8f0;
-  --gold:#a87919;
-  --muted:#64748b;
+  --line:#e8eaf0;
+  --gold:#b58a35;
+  --muted:#8490a3;
   --green:#159b72;
+  --red:#e45b63;
+  --text:#20283a;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   background:var(--bg);
-  color:#172033;
+  color:var(--text);
   font-family:Arial,sans-serif;
 }
 
 header{
-  padding:20px 5%;
+  min-height:70px;
+  padding:16px 5%;
   background:#ffffff;
   border-bottom:1px solid var(--line);
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:12px;
 }
 
 .brand{
-  font-size:22px;
-  font-weight:bold;
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:.4px;
   color:var(--gold);
 }
 
 .status{
-  font-size:12px;
+  font-size:11px;
   color:var(--green);
+  font-weight:600;
 }
 
 main{
-  max-width:1200px;
+  max-width:1280px;
   margin:auto;
-  padding:25px 5%;
+  padding:28px 5%;
+}
+
+.dashboard-heading{
+  margin-bottom:22px;
 }
 
 h1{
-  font-size:27px;
-  margin-bottom:6px;
-  color:#172033;
+  font-size:28px;
+  font-weight:700;
+  margin:0 0 7px;
+  color:var(--text);
 }
 
 .sub{
   color:var(--muted);
   font-size:13px;
+  line-height:1.6;
 }
 
 .cards{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin:25px 0;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+  margin:24px 0;
 }
 
-.card,.panel{
-  background:#ffffff;
+.card,
+.panel{
+  background:var(--panel);
   border:1px solid var(--line);
-  border-radius:12px;
-  padding:18px;
-  box-shadow:0 2px 8px rgba(15,23,42,0.04);
+  border-radius:15px;
+  padding:19px;
+  box-shadow:0 4px 14px rgba(31,41,55,.035);
 }
 
 .card small{
+  display:block;
   color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.6px;
 }
 
 .card strong{
   display:block;
-  font-size:22px;
+  font-size:23px;
+  font-weight:700;
   margin-top:12px;
-  color:#172033;
+  color:var(--text);
 }
 
 .gold{
   color:var(--gold);
 }
 
+.green{
+  color:var(--green);
+}
+
 .layout{
   display:grid;
-  grid-template-columns:2fr 1fr;
-  gap:16px;
+  grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);
+  gap:18px;
+  align-items:start;
 }
 
 .panel h3{
-  margin-top:0;
-  color:#172033;
+  font-size:17px;
+  font-weight:700;
+  margin:0 0 18px;
+  color:var(--text);
 }
 
-.chart{
-  height:260px;
+.price-card{
+  margin-bottom:17px;
+  background:linear-gradient(135deg,#ffffff,#fbf8f0);
+}
+
+.price-card strong{
+  font-size:27px;
+  color:var(--gold);
+  margin:10px 0;
+}
+
+.market-controls{
   display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#ffffff,#f1f5f9);
-  border:1px solid var(--line);
-  border-radius:9px;
-  color:var(--muted);
-  text-align:center;
-  padding:15px;
+  gap:10px;
+  margin-bottom:14px;
 }
 
-select,button{
+select,
+button{
   background:#ffffff;
-  color:#172033;
-  border:1px solid #cbd5e1;
-  padding:11px;
-  border-radius:7px;
+  color:var(--text);
+  border:1px solid #dfe3eb;
+  padding:11px 13px;
+  border-radius:9px;
+  font-size:13px;
+}
+
+select{
+  min-width:100px;
 }
 
 button{
   cursor:pointer;
-  background:#b58a35;
+  background:var(--gold);
   color:#ffffff;
   font-weight:bold;
   border:0;
 }
 
+.chart{
+  width:100%;
+  height:360px;
+  display:block;
+  overflow:hidden;
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px;
+}
+
 .signal{
   border-bottom:1px solid var(--line);
-  padding:13px 0;
+  padding:14px 0;
 }
 
 .signal:last-child{
-  border:0;
+  border-bottom:0;
 }
 
-.green{
-  color:var(--green);
+.signal small{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+.signal p{
+  font-size:13px;
+  line-height:1.6;
+  color:var(--text);
+  overflow-wrap:anywhere;
+}
+
+.signal p:last-child{
+  margin-bottom:0;
 }
 
 footer{
   text-align:center;
   color:var(--muted);
-  font-size:12px;
-  padding:30px;
+  font-size:11px;
+  padding:28px 15px;
+  border-top:1px solid var(--line);
+  background:#ffffff;
 }
 
-@media(max-width:700px){
-  .cards{grid-template-columns:repeat(2,1fr)}
-  .layout{grid-template-columns:1fr}
-  header{padding:16px 5%}
-  h1{font-size:23px}
+@media(max-width:850px){
+  .layout{
+    grid-template-columns:1fr;
+  }
 }
+
+@media(max-width:600px){
+  header{
+    padding:15px 4%;
+  }
+
+  .brand{
+    font-size:16px;
+  }
+
+  .status{
+    font-size:9px;
+  }
+
+  main{
+    padding:22px 4%;
+  }
+
+  h1{
+    font-size:23px;
+  }
+
+  .cards{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin:20px 0;
+  }
+
+  .card,
+  .panel{
+    padding:15px;
+    border-radius:12px;
+  }
+
+  .card strong{
+    font-size:20px;
+  }
+
+  .panel h3{
+    font-size:16px;
+  }
+
+  .market-controls select{
+    flex:1;
+    min-width:0;
+  }
+
   
+  .chart{
+    height:360px;
+    padding:5px;
+  }
+}
 </style>
 </head>
+
 <body>
 <header>
-<div class="brand">✦ AURUM SIGNALS AI</div>
-<div class="status">● CEK DEPLOY TERBARU</div>
-</header>
-<main>
-<h1>Trading Dashboard</h1>
-<p class="sub">ICT Smart Money Concepts · Forex Market Analysis</p>
-
-<div class="cards">
-<div class="card"><small>MARKET</small><strong class="gold">FOREX</strong></div>
-<div class="card"><small>TIMEFRAME</small><strong>M15</strong></div>
-<div class="card"><small>ACTIVE SIGNALS</small><strong id="signals">0</strong></div>
-<div class="card"><small>ENGINE</small><strong class="gold">READY</strong></div>
-</div>
-
-<div class="layout">
-<section class="panel">
-<h3>Market Overview</h3>
-  <div class="card">
-  <small>GOLD PRICE (XAU/USD)</small>
-  <strong class="gold" id="goldPrice">Memuat harga...</strong>
-  <small id="goldTime">Menunggu data pasar</small>
-  </div>
-<div style="margin-bottom:15px">
-<select id="pair">
-  <option value="XAU/USD">XAU/USD</option>
-  <option value="BTC/USD">BTC/USD</option>
-  <option value="WTI">WTI</option>
-</select>
-
-<select id="tf">
-  <option>M1</option>
-  <option>M5</option>
-  <option selected>M15</option>
-  <option>M30</option>
-  <option>M45</option>
-  <option>H1</option>
-  <option>H4</option>
-  <option>D1</option>
-</select>
-</div>
-
-<div class="chart" id="goldChart" style="height:360px;display:block;padding:10px;background:#ffffff">
-<div id="candleChart" style="width:100%;height:340px;position:relative"></div>
-</div>
-</section>
-
-<section class="panel">
-<h3>ICT AI Analysis</h3>
-
-<div class="signal">
-  <small class="sub">MARKET STRUCTURE</small>
-  <p id="marketStructure">Menunggu analisis candle...</p>
-</div>
-
-<div class="signal">
-  <small class="sub">TREND METER — 7 TIMEFRAMES</small>
-
-  <div id="trendMeter">
-    <p>Menunggu analisis tujuh timeframe...</p>
-  </div>
-</div>
-
-<div class="signal">
-  <small class="sub">SUPPORT & RESISTANCE — 7 TIMEFRAMES</small>
-
-  <div id="supportResistanceMTF">
-    <p>Menunggu analisis Support & Resistance...</p>
-  </div>
-</div>
   
-<div class="signal">
-  <small class="sub">LIQUIDITY</small>
-  <p id="liquidityAnalysis">Menunggu analisis liquidity...</p>
+  <div class="brand">✦ AURUM SIGNALS AI</div>
+  <div class="status">● CEK DEPLOY TERBARU</div>
+</header>
 
-  <small class="sub">LIQUIDITY CONFIRMATION</small>
-  <p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p>
-</div>
+<main>
+  <div class="dashboard-heading">
+    <h1>Trading Dashboard</h1>
+    <p class="sub">ICT Smart Money Concepts · Forex Market Analysis</p>
+  </div>
 
-<div class="signal">
-  <small class="sub">FAIR VALUE GAP</small>
-  <p id="fvgAnalysis">Menunggu analisis FVG...</p>
-</div>
+  <div class="cards">
+    <div class="card">
+      <small>MARKET</small>
+      <strong class="gold">FOREX</strong>
+    </div>
+    <div class="card">
+      <small>TIMEFRAME</small>
+      <strong>M15</strong>
+    </div>
+    <div class="card">
+      <small>ACTIVE SIGNALS</small>
+      <strong id="signals">0</strong>
+    </div>
+    <div class="card">
+      <small>ENGINE</small>
+      <strong class="gold">READY</strong>
+    </div>
+  </div>
 
-<div class="signal">
-  <small class="sub">ORDER BLOCK</small>
-  <p id="orderBlockAnalysis">Menunggu analisis Order Block...</p>
-  <p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p>
-  <p id="orderBlockZone">
-  Menunggu deteksi zona harga OB...
-  </p>
-</div>
-</div>
-</section>
-</div>
+  <div class="layout">
+    <section class="panel">
+      <h3>Market Overview</h3>
 
-<section class="panel" style="margin-top:16px">
-<h3>Trading Signals</h3>
-<p class="sub">Signal status</p>
-<p class="gold">WAIT — Awaiting verified market data</p>
-<p class="sub">No live BUY or SELL recommendation is currently available.</p>
-</section>
+      <div class="card price-card">
+        <small>GOLD PRICE (XAU/USD)</small>
+        <strong class="gold" id="goldPrice">Memuat harga...</strong>
+        <small id="goldTime">Menunggu data pasar</small>
+      </div>
+
+      <div class="market-controls">
+        <select id="pair">
+          <option value="XAU/USD">XAU/USD</option>
+          <option value="BTC/USD">BTC/USD</option>
+          <option value="WTI">WTI</option>
+        </select>
+
+        <select id="tf">
+          <option>M1</option>
+          <option>M5</option>
+          <option selected>M15</option>
+          <option>M30</option>
+          <option>M45</option>
+          <option>H1</option>
+          <option>H4</option>
+          <option>D1</option>
+        </select>
+      </div>
+
+      <div class="chart" id="goldChart" style="height:360px;display:block;padding:10px;background:#ffffff">
+        <div id="candleChart" style="width:100%;height:340px;position:relative"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>ICT AI Analysis</h3>
+
+      <div class="signal">
+        <small class="sub">MARKET STRUCTURE</small>
+        <p id="marketStructure">Menunggu analisis candle...</p>
+      </div>
+
+      <div class="signal">
+        <small class="sub">TREND METER — 7 TIMEFRAMES</small>
+        <div id="trendMeter">
+          <p>Menunggu analisis tujuh timeframe...</p>
+        </div>
+      </div>
+
+      <div class="signal">
+        <small class="sub">SUPPORT & RESISTANCE — 7 TIMEFRAMES</small>
+        <div id="supportResistanceMTF">
+          <p>Menunggu analisis Support & Resistance...</p>
+        </div>
+      </div>
+
+      <div class="signal">
+        <small class="sub">LIQUIDITY</small>
+        <p id="liquidityAnalysis">Menunggu analisis liquidity...</p>
+
+        <small class="sub">LIQUIDITY CONFIRMATION</small>
+        <p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p>
+      </div>
+
+      <div class="signal">
+        <small class="sub">FAIR VALUE GAP</small>
+        <p id="fvgAnalysis">Menunggu analisis FVG...</p>
+      </div>
+
+      <div class="signal">
+        <small class="sub">ORDER BLOCK</small>
+        <p id="orderBlockAnalysis">Menunggu analisis Order Block...</p>
+        <p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p>
+        <p id="orderBlockZone">Menunggu deteksi zona harga OB...</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:16px">
+    <h3>Trading Signals</h3>
+    <p class="sub">Signal status</p>
+    <p class="gold">WAIT — Awaiting verified market data</p>
+    <p class="sub">No live BUY or SELL recommendation is currently available.</p>
+  </section>
 </main>
+
 <footer>
-Aurum Signals AI · Educational analysis only · Manual execution
+  Aurum Signals AI · Educational analysis only · Manual execution
 </footer>
+  
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 <script>
 document.querySelector('.status').textContent = 'TES SCRIPT TERPISAH BERHASIL';
