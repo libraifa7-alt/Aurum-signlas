@@ -194,6 +194,7 @@ if (el && window.LightweightCharts) {
   let activeFvgZone = null;
   let zoneCandles = [];
 
+
 function updateZoneOverlays() {
   if (!chart || !series) return;
 
@@ -202,7 +203,15 @@ function updateZoneOverlays() {
 
   const chartWidth = chart.timeScale().width();
 
-  function updateOverlay(zone, overlay, timeKey, color, minHeight) {
+  function updateOverlay(
+    zone,
+    overlay,
+    timeKey,
+    color,
+    borderColor,
+    minHeight,
+    zIndex
+  ) {
     if (!zone || zone.status !== 'VALID') {
       if (overlay) overlay.remove();
       return null;
@@ -231,6 +240,7 @@ function updateZoneOverlays() {
 
     const actualTop = Math.min(highY, lowY);
     const actualHeight = Math.abs(lowY - highY);
+
     const height = Math.max(actualHeight, minHeight);
     const top = actualTop - (height - actualHeight) / 2;
 
@@ -243,38 +253,60 @@ function updateZoneOverlays() {
       top: top + 'px',
       width: width + 'px',
       height: height + 'px',
+      boxSizing: 'border-box',
       background: color,
+      borderTop: '1px solid ' + borderColor,
+      borderBottom: '1px solid ' + borderColor,
       pointerEvents: 'none',
-      zIndex: '9999'
+      zIndex: String(zIndex)
     });
 
     return overlay;
   }
 
-  const obColor = activeObZone?.type === 'BULLISH'
-    ? 'rgba(32, 201, 151, 0.65)'
-    : 'rgba(239, 83, 80, 0.65)';
+  // ORDER BLOCK
+  const obBullish = activeObZone?.type === 'BULLISH';
+
+  const obColor = obBullish
+    ? 'rgba(32, 201, 151, 0.25)'
+    : 'rgba(239, 83, 80, 0.25)';
+
+  const obBorder = obBullish
+    ? '#20c997'
+    : '#ef5350';
 
   orderBlockZoneOverlay = updateOverlay(
     activeObZone,
     orderBlockZoneOverlay,
     'obTime',
     obColor,
-    20
+    obBorder,
+    20,
+    9998
   );
 
-  const fvgColor = activeFvgZone?.type === 'BULLISH'
-    ? 'rgba(32, 201, 151, 0.35)'
-    : 'rgba(239, 83, 80, 0.35)';
+    // FAIR VALUE GAP
+  const fvgBullish = activeFvgZone?.type === 'BULLISH';
 
-    fvgZoneOverlay = updateOverlay(
+  const fvgColor = fvgBullish
+    ? 'rgba(32, 201, 151, 0.20)'
+    : 'rgba(239, 83, 80, 0.20)';
+
+  const fvgBorder = fvgBullish
+    ? '#20c997'
+    : '#ef5350';
+
+  fvgZoneOverlay = updateOverlay(
     activeFvgZone,
     fvgZoneOverlay,
     'fvgTime',
     fvgColor,
-    3
+    fvgBorder,
+    3,
+    9999
   );
 }
+  
 
 chart.timeScale().subscribeVisibleTimeRangeChange(updateZoneOverlays);
 chart.timeScale().subscribeVisibleLogicalRangeChange(updateZoneOverlays);
