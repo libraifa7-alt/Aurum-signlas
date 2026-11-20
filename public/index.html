@@ -432,10 +432,12 @@ activeFvgZone = fvgZone;
   const lowY = series.priceToCoordinate(fvgZone.low);
 
   // Posisi waktu awal FVG
-  const startX = chart.timeScale().timeToCoordinate(fvgZone.fvgTime);
+const startX = chart.timeScale().timeToCoordinate(fvgZone.fvgTime);
 
-  const chartElement = document.getElementById('candleChart');
+console.log('CEK WAKTU FVG:', fvgZone.fvgTime);
+console.log('CEK KOORDINAT FVG:', startX);
 
+const chartElement = document.getElementById('candleChart');
   if (
     chartElement &&
     startX !== null &&
