@@ -153,26 +153,26 @@ document.querySelector('.status').textContent =
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
 if (el && window.LightweightCharts) {
-console.log('LIGHTWEIGHT CHARTS AKTIF');
-console.log('MASUK KE BLOK GRAFIK');  
-console.log('UKURAN AREA GRAFIK:', el.clientWidth, el.clientHeight);
+  console.log('LIGHTWEIGHT CHARTS AKTIF');
+  console.log('MASUK KE BLOK GRAFIK');
+  console.log('UKURAN AREA GRAFIK:', el.clientWidth, el.clientHeight);
 
-document.querySelector('.status').textContent =
-  'UKURAN GRAFIK: ' + el.clientWidth + ' x ' + el.clientHeight;
+  document.querySelector('.status').textContent =
+    'UKURAN GRAFIK: ' + el.clientWidth + ' x ' + el.clientHeight;
 
-const chart = LightweightCharts.createChart(el, {
-  width: Math.max(el.clientWidth, 300),
-  height: 340,
-  layout: {
-    background: { color: '#0b1220' },
-    textColor: '#cbd5e1'
-  },
-  grid: {
-    vertLines: { color: '#263247' },
-    horzLines: { color: '#263247' }
-  },
-  timeScale: { timeVisible: true }
-});
+  const chart = LightweightCharts.createChart(el, {
+    width: Math.max(el.clientWidth, 300),
+    height: 340,
+    layout: {
+      background: { color: '#0b1220' },
+      textColor: '#cbd5e1'
+    },
+    grid: {
+      vertLines: { color: '#263247' },
+      horzLines: { color: '#263247' }
+    },
+    timeScale: { timeVisible: true }
+  });
 
   const series = chart.addCandlestickSeries({
     upColor: '#20c997',
@@ -183,13 +183,112 @@ const chart = LightweightCharts.createChart(el, {
     wickDownColor: '#ef5350'
   });
 
-let orderBlockPriceLines = [];
-let orderBlockZoneSeries = null;
-let orderBlockZoneOverlay = null;
+  let orderBlockPriceLines = [];
+  let orderBlockZoneSeries = null;
+  let orderBlockZoneOverlay = null;
 
-let fvgZoneOverlay = null;
-let fvgPriceLines = [];
+  let fvgZoneOverlay = null;
+  let fvgPriceLines = [];
 
+  let activeObZone = null;
+  let activeFvgZone = null;
+  let zoneCandles = [];
+
+function updateZoneOverlays() {
+  if (!chart || !series) return;
+
+  const chartElement = document.getElementById('candleChart');
+  if (!chartElement) return;
+
+  const chartWidth = chart.timeScale().width();
+
+  function updateOverlay(zone, overlay, timeKey, color, minHeight) {
+    if (!zone || zone.status !== 'VALID') {
+      if (overlay) overlay.remove();
+      return null;
+    }
+
+    const highY = series.priceToCoordinate(zone.high);
+    const lowY = series.priceToCoordinate(zone.low);
+    const startX = chart.timeScale().timeToCoordinate(zone[timeKey]);
+
+    if (
+      highY === null ||
+      lowY === null ||
+      startX === null ||
+      !Number.isFinite(highY) ||
+      !Number.isFinite(lowY) ||
+      !Number.isFinite(startX)
+    ) {
+      if (overlay) overlay.remove();
+      return null;
+    }
+
+    if (!overlay) {
+      overlay = document.createElement('div');
+      chartElement.appendChild(overlay);
+    }
+
+    const actualTop = Math.min(highY, lowY);
+    const actualHeight = Math.abs(lowY - highY);
+    const height = Math.max(actualHeight, minHeight);
+    const top = actualTop - (height - actualHeight) / 2;
+
+    const left = Math.max(0, startX);
+    const width = Math.max(0, chartWidth - left);
+
+    Object.assign(overlay.style, {
+      position: 'absolute',
+      left: left + 'px',
+      top: top + 'px',
+      width: width + 'px',
+      height: height + 'px',
+      background: color,
+      pointerEvents: 'none',
+      zIndex: '9999'
+    });
+
+    return overlay;
+  }
+
+  const obColor = activeObZone?.type === 'BULLISH'
+    ? 'rgba(32, 201, 151, 0.65)'
+    : 'rgba(239, 83, 80, 0.65)';
+
+  orderBlockZoneOverlay = updateOverlay(
+    activeObZone,
+    orderBlockZoneOverlay,
+    'obTime',
+    obColor,
+    20
+  );
+
+  const fvgColor = activeFvgZone?.type === 'BULLISH'
+    ? 'rgba(32, 201, 151, 0.35)'
+    : 'rgba(239, 83, 80, 0.35)';
+
+    fvgZoneOverlay = updateOverlay(
+    activeFvgZone,
+    fvgZoneOverlay,
+    'fvgTime',
+    fvgColor,
+    3
+  );
+}
+
+chart.timeScale().subscribeVisibleTimeRangeChange(updateZoneOverlays);
+chart.timeScale().subscribeVisibleLogicalRangeChange(updateZoneOverlays);
+
+const chartResizeObserver = new ResizeObserver(() => {
+  chart.applyOptions({
+    width: el.clientWidth,
+    height: 340
+  });
+
+  updateZoneOverlays();
+});
+
+chartResizeObserver.observe(el);
 function drawOrderBlockZone(obZone, candles) {
   // Hapus zona sebelumnya
   if (orderBlockZoneSeries) {
@@ -209,7 +308,12 @@ function drawOrderBlockZone(obZone, candles) {
 
   orderBlockPriceLines = [];
 
-  if (!obZone || obZone.status !== 'VALID') return;
+  if (!obZone || obZone.status !== 'VALID') {
+  activeObZone = null;
+  return;
+}
+
+activeObZone = obZone;
 
   const bullish = obZone.type === 'BULLISH';
 
@@ -303,7 +407,12 @@ function drawFVGZone(fvgZone) {
 
   fvgPriceLines = [];
 
-  if (!fvgZone || fvgZone.status !== 'VALID') return;
+  if (!fvgZone || fvgZone.status !== 'VALID') {
+  activeFvgZone = null;
+  return;
+}
+
+activeFvgZone = fvgZone;
 
   const highY = series.priceToCoordinate(fvgZone.high);
   const lowY = series.priceToCoordinate(fvgZone.low);
@@ -2304,17 +2413,20 @@ document.getElementById('fvgAnalysis').textContent = fvg;
 
 const fvgZone = detectFVGZone(candles);
 drawFVGZone(fvgZone);
-      
 
 // ANALISIS ORDER BLOCK
 const orderBlock = analyzeOrderBlock(candles);
 
 document.getElementById('orderBlockAnalysis').innerText =
   orderBlock;
-    // DETEKSI ZONA HARGA ORDER BLOCK
+
+// DETEKSI ZONA HARGA ORDER BLOCK
 const obZone = detectOrderBlockZone(candles);
 
 drawOrderBlockZone(obZone, candles);
+
+// PERBARUI POSISI ZONA OB DAN FVG
+updateZoneOverlays();
 
 const zoneElement = document.getElementById('orderBlockZone');
 
