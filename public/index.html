@@ -4426,6 +4426,22 @@ console.log('STATUS SERVER DIPERIKSA');
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
   
 
+<!-- AURUM PWA SERVICE WORKER -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function () {
+        console.log('AURUM PWA SERVICE WORKER AKTIF');
+      })
+      .catch(function (error) {
+        console.error('AURUM PWA ERROR:', error);
+      });
+  });
+}
+</script>
+<!-- END AURUM PWA SERVICE WORKER -->
+
 </body>
 </html>
   
