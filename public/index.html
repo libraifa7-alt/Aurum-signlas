@@ -2683,22 +2683,22 @@ if (cached && Date.now() - cached.time < 60000) {
     return;
   }
 
-  candles = data.candles.slice().reverse().map(c => {
-    const dateText = String(c.datetime).trim();
-    const dateTime = dateText.replace(' ', 'T');
+  candles = data.candles.map(c => {
+  const dateText = String(c.datetime).trim();
+  const dateTime = dateText.replace(' ', 'T');
 
-    const isoTime = /^\d{4}-\d{2}-\d{2}$/.test(dateTime)
-      ? dateTime + 'T00:00:00+07:00'
-      : dateTime + '+07:00';
+  const isoTime = /^\d{4}-\d{2}-\d{2}$/.test(dateTime)
+    ? dateTime + 'T00:00:00+07:00'
+    : dateTime;
 
-    return {
-      time: Math.floor(new Date(isoTime).getTime() / 1000),
-      open: Number(c.open),
-      high: Number(c.high),
-      low: Number(c.low),
-      close: Number(c.close)
-    };
-  });
+  return {
+    time: Math.floor(new Date(isoTime).getTime() / 1000),
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close)
+  };
+});
 
   // SIMPAN DATA KE CACHE
   aurumCandleCache.set(cacheKey, {
@@ -3107,7 +3107,6 @@ async function getSharedCandles(interval) {
     
 const candles = result.candles
   .slice()
-  .reverse()
   .map(c => {
     const rawDate = String(c.datetime);
     let date;
@@ -4556,44 +4555,72 @@ async function analyzeOrderBlockMultiTimeframe() {
   }
 }
       
-      document.querySelector('.status').textContent = 'DATA CANDLE: ' + candles.length;
       document.querySelector('.status').textContent =
+  'DATA CANDLE: ' + candles.length;
+
+document.querySelector('.status').textContent =
   'CANDLE SIAP: ' + candles.length;
 
 console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
+
+if (!candles || candles.length === 0) {
+  document.querySelector('.status').textContent =
+    'CANDLE KOSONG';
+
+  console.warn('TIDAK ADA DATA CANDLE');
+  return;
+}
+
 try {
   document.querySelector('.status').textContent =
     'MENGIRIM DATA KE GRAFIK...';
-  
+
+  console.log('JUMLAH CANDLE:', candles.length);
+
+  console.log('URUTAN WAKTU:', candles.every((c, i) =>
+    i === 0 || c.time > candles[i - 1].time
+  ));
+
+  console.log('CANDLE PERTAMA:', candles[0]);
+  console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
+
   series.setData(candles);
 
   document.querySelector('.status').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
+
 } catch (error) {
   document.querySelector('.status').textContent =
     'ERROR SETDATA: ' + error.message;
+
   console.log('ERROR SETDATA:', error);
-      }
+}
+
+if (candles.length === 0) {
+  return;
+}
+
 const latestCandle = candles[candles.length - 1];
 
 document.getElementById('goldPrice').textContent =
   latestCandle.close.toFixed(2);
 
 document.getElementById('goldTime').textContent =
-document.getElementById('pair').value + ' · Market Data';
+  document.getElementById('pair').value + ' · Market Data';
 
 chart.timeScale().fitContent();
-      const structure = await analyzeMarketStructure();
+
+const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
 
 const liquidity = await analyzeLiquidityMultiTimeframe();
 document.getElementById('liquidityAnalysis').innerText = liquidity;
-      
+
 const confirmation = await analyzeLiquidityConfirmation();
-document.getElementById('liquidityConfirmation').innerText = confirmation;      
-    
-      const fvg = analyzeFVG(candles);
+document.getElementById('liquidityConfirmation').innerText = confirmation;
+
+const fvg = analyzeFVG(candles);
 document.getElementById('fvgAnalysis').textContent = fvg;
 
 const fvgZone = detectFVGZone(candles);
