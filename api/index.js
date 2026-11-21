@@ -373,6 +373,10 @@ do {
   allBars.push(...pageData.data);
 
   nextCursor = pageData.next_cursor || null;
+  console.log(
+  "AURUM HAS NEXT CURSOR:",
+  Boolean(nextCursor)
+);
 
   pageCount++;
 
