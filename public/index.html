@@ -1892,14 +1892,34 @@ body {
         <p id="fvgAnalysis">Menunggu analisis FVG...</p>
       </div>
 
-      <div class="signal">
-        <small class="sub">ORDER BLOCK</small>
-        <p id="orderBlockAnalysis">Menunggu analisis Order Block...</p>
-        <p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p>
-        <p id="orderBlockZone">Menunggu deteksi zona harga OB...</p>
-      </div>
-    </section>
+      
+<div class="signal">
+  <small class="sub">ORDER BLOCK</small>
+  <p id="orderBlockAnalysis">Menunggu analisis Order Block...</p>
+  <p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p>
+  <p id="orderBlockZone">Menunggu deteksi zona harga OB...</p>
+
+  <div id="aurumTradePlan" style="
+    margin-top:12px;
+    padding:14px;
+    border-radius:12px;
+    background:#151c2b;
+    color:#ffffff;
+    display:none;
+  ">
+    <strong>AURUM TRADE PLAN</strong>
+    <p id="tradeDirection">WAIT</p>
+    <p>ENTRY: <span id="tradeEntry">--</span></p>
+    <p>STOP LOSS: <span id="tradeSL">--</span></p>
+    <p>TP1: <span id="tradeTP1">--</span></p>
+    <p>TP2: <span id="tradeTP2">--</span></p>
+    <p>TP3: <span id="tradeTP3">--</span></p>
+    <p id="tradeRiskReward">Risk/Reward: --</p>
   </div>
+</div>
+</section>
+  </div>
+    
 
   
 
@@ -2282,17 +2302,52 @@ if (el && window.LightweightCharts) {
     wickDownColor: '#ef5350'
   });
 
-  let orderBlockPriceLines = [];
-  let orderBlockZoneSeries = null;
-  let orderBlockZoneOverlay = null;
+let orderBlockPriceLines = [];
+let orderBlockZoneSeries = null;
+let orderBlockZoneOverlay = null;
 
-  let fvgZoneOverlay = null;
-  let fvgPriceLines = [];
+let tradePlanPriceLines = [];
+let activeTradePlan = null;
 
-  let activeObZone = null;
-  let activeFvgZone = null;
-  let zoneCandles = [];
+// GAMBAR GARIS ENTRY, SL DAN TP
+function drawTradePlanLines(plan) {
+  tradePlanPriceLines.forEach(line => {
+    series.removePriceLine(line);
+  });
 
+  tradePlanPriceLines = [];
+
+  if (!plan) return;
+
+  const levels = [
+    { price: plan.entryLow, title: 'ENTRY LOW', color: '#2196f3' },
+    { price: plan.entryHigh, title: 'ENTRY HIGH', color: '#2196f3' },
+    { price: plan.sl, title: 'STOP LOSS', color: '#ef5350' },
+    { price: plan.tp1, title: 'TAKE PROFIT 1', color: '#20c997' },
+    { price: plan.tp2, title: 'TAKE PROFIT 2', color: '#20c997' },
+    { price: plan.tp3, title: 'TAKE PROFIT 3', color: '#20c997' }
+  ];
+
+  levels.forEach(level => {
+    tradePlanPriceLines.push(
+      series.createPriceLine({
+        price: level.price,
+        color: level.color,
+        lineWidth: 2,
+        lineStyle: 2,
+        axisLabelVisible: true,
+        title: level.title
+      })
+    );
+  });
+}
+
+let fvgZoneOverlay = null;
+let fvgPriceLines = [];
+
+let activeObZone = null;
+let activeFvgZone = null;
+let zoneCandles = [];
 
 function updateZoneOverlays() {
   if (!chart || !series) return;
@@ -4452,6 +4507,7 @@ function analyzeOrderBlock(data) {
   return result.reason;
 }
 
+
 // DETEKSI ZONA ORDER BLOCK
 function detectOrderBlockZone(data) {
   const result = detectOrderBlock(data);
@@ -4472,6 +4528,39 @@ function detectOrderBlockZone(data) {
     bosTime: result.bosTime
   };
 }
+
+// AURUM TRADE PLAN ENGINE
+function calculateTradePlan(obZone) {
+  if (!obZone || obZone.status !== 'VALID') return null;
+
+  const high = Number(obZone.high);
+  const low = Number(obZone.low);
+
+  if (!Number.isFinite(high) || !Number.isFinite(low) || high <= low) return null;
+
+  const bullish = obZone.type === 'BULLISH';
+  if (!bullish && obZone.type !== 'BEARISH') return null;
+
+  const entry = (high + low) / 2;
+  const buffer = (high - low) * 0.10;
+  const sl = bullish ? low - buffer : high + buffer;
+  const risk = Math.abs(entry - sl);
+
+  if (risk <= 0) return null;
+
+  return {
+    type: obZone.type,
+    entryLow: low,
+    entryHigh: high,
+    entry,
+    sl,
+    tp1: bullish ? entry + risk : entry - risk,
+    tp2: bullish ? entry + risk * 2 : entry - risk * 2,
+    tp3: bullish ? entry + risk * 3 : entry - risk * 3,
+    riskReward: '1:1 / 1:2 / 1:3'
+  };
+}
+      
   
 async function analyzeOrderBlockMultiTimeframe() {
   try {
@@ -4630,6 +4719,7 @@ const orderBlock = analyzeOrderBlock(candles);
 document.getElementById('orderBlockAnalysis').innerText =
   orderBlock;
 
+
 // DETEKSI ZONA HARGA ORDER BLOCK
 const obZone = detectOrderBlockZone(candles);
 
@@ -4658,6 +4748,53 @@ if (
   zoneElement.innerText =
     'Belum ada zona Order Block valid';
 }
+
+// TAMPILKAN AURUM TRADE PLAN
+const tradePlan = calculateTradePlan(obZone);
+const tradeCard = document.getElementById('aurumTradePlan');
+
+const validTradePlan =
+  tradePlan &&
+  orderBlock.includes(tradePlan.type + ' ORDER BLOCK')
+    ? tradePlan
+    : null;
+
+drawTradePlanLines(validTradePlan);
+
+if (tradeCard && validTradePlan) {
+  activeTradePlan = validTradePlan;
+  tradeCard.style.display = 'block';
+
+  document.getElementById('tradeDirection').innerText =
+    validTradePlan.type === 'BULLISH' ? 'BUY' : 'SELL';
+
+  document.getElementById('tradeEntry').innerText =
+    validTradePlan.entryLow.toFixed(2) + ' - ' +
+    validTradePlan.entryHigh.toFixed(2);
+
+  document.getElementById('tradeSL').innerText =
+    validTradePlan.sl.toFixed(2);
+
+  document.getElementById('tradeTP1').innerText =
+    validTradePlan.tp1.toFixed(2);
+
+  document.getElementById('tradeTP2').innerText =
+    validTradePlan.tp2.toFixed(2);
+
+  document.getElementById('tradeTP3').innerText =
+    validTradePlan.tp3.toFixed(2);
+
+  document.getElementById('tradeRiskReward').innerText =
+    'Risk/Reward: ' + validTradePlan.riskReward;
+
+} else {
+  activeTradePlan = null;
+
+  if (tradeCard) {
+    tradeCard.style.display = 'none';
+  }
+}
+      
 
 // KONFIRMASI ORDER BLOCK H1 + M15
 const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
