@@ -1,0 +1,13 @@
+
+{
+  "id": "/",
+  "name": "Aurum Signals AI",
+  "short_name": "Aurum AI",
+  "description": "ICT Smart Money Concepts · Forex Market Analysis",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080808",
+  "theme_color": "#080808"
+}
