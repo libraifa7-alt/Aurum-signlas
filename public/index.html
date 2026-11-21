@@ -869,6 +869,60 @@ body{
 
 /* END AURUM GOLDEN ENERGY PARTICLES */
 
+
+/* AURUM GOLDEN ENERGY TRAIL */
+
+.energy-particle {
+  position: absolute;
+  isolation: isolate;
+}
+
+.energy-particle::after {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 3px;
+  top: 2px;
+  left: -27px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(218, 165, 55, 0.15),
+    rgba(255, 215, 100, 0.9)
+  );
+
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.8;
+  transform: rotate(var(--trail-angle, 35deg));
+  transform-origin: right center;
+
+  animation: aurumTrailGlow 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.energy-one { --trail-angle: 35deg; }
+.energy-two { --trail-angle: 145deg; }
+.energy-three { --trail-angle: -35deg; }
+.energy-four { --trail-angle: -145deg; }
+.energy-five { --trail-angle: 55deg; }
+.energy-six { --trail-angle: -55deg; }
+
+@keyframes aurumTrailGlow {
+  0%, 100% {
+    opacity: 0.25;
+    filter: blur(3px);
+  }
+
+  50% {
+    opacity: 1;
+    filter: blur(1px);
+  }
+}
+
+/* END AURUM GOLDEN ENERGY TRAIL */
+
 </style>
 </head>
   
