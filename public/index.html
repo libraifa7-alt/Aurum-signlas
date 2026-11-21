@@ -706,6 +706,55 @@ body{
   }
 }
 
+/* AURUM GOLDEN LIGHT SWEEP */
+
+.aurum-orb {
+  position: relative;
+  overflow: visible;
+}
+
+.aurum-orb .gold-light-sweep {
+  display: block;
+  position: absolute;
+  width: 55px;
+  height: 180px;
+  top: 20px;
+  left: -70px;
+  transform: rotate(35deg);
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 238, 180, 0.65),
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 215, 120, 0.5),
+    transparent
+  );
+
+  filter: blur(7px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+
+  animation: aurumGoldSweep 5s ease-in-out infinite;
+}
+
+@keyframes aurumGoldSweep {
+  0%, 65% {
+    left: -70px;
+    opacity: 0;
+  }
+
+  72% {
+    opacity: 0.9;
+  }
+
+  90%, 100% {
+    left: 240px;
+    opacity: 0;
+  }
+}
+
 </style>
 </head>
   
@@ -720,9 +769,12 @@ body{
   <div class="splash-content">
 
     <div class="aurum-orb">
-      <div class="orb-core"></div>
-      <div class="orb-ring ring-one"></div>
-      <div class="orb-ring ring-two"></div>
+  <div class="orb-core"></div>
+  <div class="orb-ring ring-one"></div>
+  <div class="orb-ring ring-two"></div>
+
+  <!-- AURUM GOLDEN LIGHT SWEEP -->
+  <div class="gold-light-sweep"></div>
 
       <div class="orb-particle particle-one"></div>
       <div class="orb-particle particle-two"></div>
