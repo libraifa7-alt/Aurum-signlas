@@ -4348,6 +4348,7 @@ console.log('STATUS SERVER DIPERIKSA');
 
 </script>
 
+
 <!-- AURUM SPLASH SCREEN INTERACTION -->
 
 <script>
@@ -4357,11 +4358,21 @@ console.log('STATUS SERVER DIPERIKSA');
 
   if (!splash || !enterButton) return;
 
+  // CEK APAKAH PENGGUNA SUDAH PERNAH MASUK
+  if (localStorage.getItem('aurumSplashSeen') === 'true') {
+    splash.classList.add('hidden');
+    splash.style.display = 'none';
+    return;
+  }
+
   let startX = 0;
   let startY = 0;
 
   function enterDashboard() {
     if (splash.classList.contains('hidden')) return;
+
+    // SIMPAN STATUS SUDAH MASUK
+    localStorage.setItem('aurumSplashSeen', 'true');
 
     splash.classList.add('hidden');
 
@@ -4403,10 +4414,12 @@ console.log('STATUS SERVER DIPERIKSA');
       enterDashboard();
     }
   });
+
 })();
 </script>
-  
+
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
+  
 
 </body>
 </html>
