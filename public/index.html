@@ -491,8 +491,103 @@ body{
   letter-spacing: 3px;
 }
 
+
+/* AURUM PREMIUM GOLD ANIMATION */
+
+.orb-core {
+  animation: aurumCorePulse 3s ease-in-out infinite;
+}
+
+@keyframes aurumCorePulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.07);
+    filter: brightness(1.4);
+  }
+}
+
+.ring-one {
+  animation: aurumRingOne 9s linear infinite;
+}
+
+.ring-two {
+  animation: aurumRingTwo 12s linear infinite;
+}
+
+@keyframes aurumRingOne {
+  from {
+    transform: rotate(-28deg);
+  }
+  to {
+    transform: rotate(332deg);
+  }
+}
+
+@keyframes aurumRingTwo {
+  from {
+    transform: rotate(55deg);
+  }
+  to {
+    transform: rotate(415deg);
+  }
+}
+
+.orb-particle {
+  animation: aurumParticleGlow 2s ease-in-out infinite;
+}
+
+.particle-one { animation-delay: 0s; }
+.particle-two { animation-delay: 0.4s; }
+.particle-three { animation-delay: 0.8s; }
+.particle-four { animation-delay: 1.2s; }
+.particle-five { animation-delay: 1.6s; }
+
+@keyframes aurumParticleGlow {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.7);
+  }
+}
+
+.swipe-arrow {
+  display: inline-block;
+  animation: aurumSwipeArrow 1.2s ease-in-out infinite;
+}
+
+@keyframes aurumSwipeArrow {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateX(12px);
+    opacity: 1;
+  }
+}
+
+.aurum-orb {
+  animation: aurumOrbGlow 4s ease-in-out infinite;
+}
+
+@keyframes aurumOrbGlow {
+  0%, 100% {
+    box-shadow: 0 0 35px rgba(212, 160, 55, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 75px rgba(212, 160, 55, 0.4);
+  }
+}
+
 </style>
 </head>
+  
   
 
 
