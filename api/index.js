@@ -311,9 +311,16 @@ const minutes = timeframeMinutes[selected] || 15;
 
 const limit = selected === "M45" ? 400 : 120;
 
-const fromDate = new Date(
-  Date.now() - minutes * 60 * 1000 * limit * 1.2
+
+const lookbackMs = Math.max(
+  minutes * 60 * 1000 * limit * 1.2,
+  7 * 24 * 60 * 60 * 1000
 );
+
+const fromDate = new Date(
+  Date.now() - lookbackMs
+);
+      
 
 const toDate = new Date();
 
