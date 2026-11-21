@@ -338,6 +338,11 @@ body{
 </header>
 
 <main>
+
+  <!-- HALAMAN BERANDA -->
+  <section id="homePage" class="app-page active">
+
+
   <div class="dashboard-heading">
     <h1>Trading Dashboard</h1>
     <p class="sub">ICT Smart Money Concepts · Forex Market Analysis</p>
@@ -362,7 +367,16 @@ body{
     </div>
   </div>
 
+  <!-- Penutup cards dashboard -->
+
+  </section>
+  <!-- END HALAMAN BERANDA -->
+
+  <!-- HALAMAN PASAR -->
+  <section id="marketPage" class="app-page">
+
   <div class="layout">
+    
     <section class="panel">
       <h3>Market Overview</h3>
 
@@ -449,9 +463,14 @@ body{
   <p class="sub">No live BUY or SELL recommendation is currently available.</p>
 </section>
 
+</section>
+<!-- END HALAMAN PASAR -->
+
+<!-- HALAMAN BERITA -->
+<section id="newsPage" class="app-page">
+
 <!-- AURUM NEWS PAGE -->
 <section id="aurumNews" class="panel" style="margin-top:16px">
-
   <h3>✦ PUTUSAN AURUM</h3>
   <p class="sub">MARKET INTELLIGENCE & FUNDAMENTAL ANALYSIS</p>
 
@@ -503,12 +522,19 @@ body{
   </p>
 
 
+
 </section>
 <!-- END AURUM NEWS PAGE -->
 
+  </section>
+  <!-- END HALAMAN BERITA -->
+
+  <!-- HALAMAN OBROLAN -->
+  <section id="chatPage" class="app-page">
+
 <!-- AURUM AI CHAT PAGE -->
 <section id="aurumChat" class="panel" style="margin-top:16px">
-
+  
   <h3>✦ AURUM AI CHAT</h3>
   <p class="sub">SMART MONEY CONCEPTS AI ASSISTANT</p>
 
@@ -563,12 +589,19 @@ body{
   </p>
 
 
+
 </section>
 <!-- END AURUM AI CHAT PAGE -->
 
+  </section>
+  <!-- END HALAMAN OBROLAN -->
+
+  <!-- HALAMAN PANDUAN -->
+  <section id="guidePage" class="app-page">
+
 <!-- AURUM GUIDE PAGE -->
 <section id="aurumGuide" class="panel" style="margin-top:16px">
-
+  
   <h3>✦ AURUM USER GUIDE</h3>
   <p class="sub">TRADING KNOWLEDGE & PLATFORM GUIDE</p>
 
@@ -654,50 +687,109 @@ body{
     Aurum Signals AI · Knowledge Center
   </p>
 
+
 </section>
 <!-- END AURUM GUIDE PAGE -->
 
+  </section>
+  <!-- END HALAMAN PANDUAN -->
+
 </main>
-  
-  
 
 <footer>
   Aurum Signals AI · Educational analysis only · Manual execution
 </footer>
+
 <nav class="aurum-bottom-nav" aria-label="Navigasi Aurum">
-  <a href="#top" class="nav-item active">
+  <a href="#homePage" class="nav-item active" data-page="homePage">
     <span>⌂</span>
     <small>Beranda</small>
   </a>
 
-  <a href="#tradingSignals" class="nav-item">
-    <span>ϟ</span>
-    <small>Sinyal</small>
-  </a>
-
-  <a href="#goldChart" class="nav-item">
+  <a href="#marketPage" class="nav-item" data-page="marketPage">
     <span>▥</span>
-    <small>Grafik</small>
+    <small>Pasar</small>
   </a>
 
-  <a href="#aurumNews" class="nav-item">
+  <a href="#newsPage" class="nav-item" data-page="newsPage">
     <span>▤</span>
     <small>Berita</small>
   </a>
 
-  <a href="#aurumChat" class="nav-item">
+  <a href="#chatPage" class="nav-item" data-page="chatPage">
     <span>◉</span>
     <small>Obrolan</small>
   </a>
 
-  <a href="#aurumGuide" class="nav-item">
+
+  <a href="#guidePage" class="nav-item" data-page="guidePage">
     <span>◇</span>
     <small>Panduan</small>
   </a>
 </nav>
 
-<script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+(function () {
+  function initAurumNavigation() {
+    const navItems = document.querySelectorAll(
+      '.aurum-bottom-nav .nav-item'
+    );
+
+    const pages = document.querySelectorAll('.app-page');
+
+    function showPage(pageId) {
+      const targetPage = document.getElementById(pageId);
+      if (!targetPage) return;
+
+      pages.forEach(function (page) {
+        page.classList.toggle('active', page.id === pageId);
+      });
+
+      navItems.forEach(function (item) {
+        item.classList.toggle(
+          'active',
+          item.dataset.page === pageId
+        );
+      });
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto'
+      });
+
+      if (pageId === 'marketPage') {
+        requestAnimationFrame(function () {
+          window.dispatchEvent(new Event('resize'));
+        });
+      }
+    }
+
+    navItems.forEach(function (item) {
+      item.addEventListener('click', function (event) {
+        event.preventDefault();
+        showPage(this.dataset.page);
+      });
+    });
+
+    showPage('homePage');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener(
+      'DOMContentLoaded',
+      initAurumNavigation
+    );
+  } else {
+    initAurumNavigation();
+  }
+})();
+</script>
   
+  
+
+
+<script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
+
 <script>
 document.querySelector('.status').textContent = 'TES SCRIPT TERPISAH BERHASIL';
 </script>
@@ -707,6 +799,8 @@ const aurumCandleCache = new Map();
 
 document.querySelector('.status').textContent =
   'SCRIPT UTAMA MULAI BERJALAN';
+</script>
+  
 
   console.log('CEK LOADCHART DIMULAI');
 const el = document.getElementById('candleChart');
