@@ -322,20 +322,230 @@ footer{
   color:#b58a35;
 }
 
+
 body{
   padding-bottom:80px;
 }
 
+/* AURUM PREMIUM SPLASH SCREEN */
+.aurum-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, #241a08 0%, #090909 48%, #000000 100%);
+  color: #f5d58a;
+  text-align: center;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
+}
+
+.aurum-splash.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-content {
+  width: 100%;
+  max-width: 420px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.aurum-orb {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin-bottom: 28px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 202, 90, 0.16) 0%,
+    rgba(180, 125, 25, 0.08) 42%,
+    transparent 72%
+  );
+  box-shadow: 0 0 55px rgba(212, 160, 55, 0.2);
+}
+
+.orb-core {
+  position: absolute;
+  width: 125px;
+  height: 125px;
+  top: 47px;
+  left: 47px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    #fff0bd,
+    #d9a441 28%,
+    #8a5b12 62%,
+    #160f05 100%
+  );
+  box-shadow:
+    0 0 20px #d6a23b,
+    0 0 55px rgba(218, 165, 55, 0.55),
+    inset -12px -12px 25px rgba(0, 0, 0, 0.7);
+}
+
+.orb-ring {
+  position: absolute;
+  border: 1px solid rgba(226, 177, 75, 0.75);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(226, 177, 75, 0.3);
+}
+
+.ring-one {
+  width: 195px;
+  height: 75px;
+  top: 72px;
+  left: 12px;
+  transform: rotate(-28deg);
+}
+
+.ring-two {
+  width: 195px;
+  height: 75px;
+  top: 72px;
+  left: 12px;
+  transform: rotate(55deg);
+}
+
+.orb-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffe2a0;
+  box-shadow: 0 0 12px 3px #d9a441;
+}
+
+.particle-one { top: 25px; left: 105px; }
+.particle-two { top: 105px; right: 5px; }
+.particle-three { bottom: 25px; left: 65px; }
+.particle-four { top: 65px; left: 15px; }
+.particle-five { bottom: 45px; right: 35px; }
+
+.splash-content h1 {
+  margin: 8px 0 0;
+  color: #f3d18a;
+  font-size: 34px;
+  letter-spacing: 7px;
+  text-shadow: 0 0 18px rgba(218, 165, 55, 0.5);
+}
+
+.splash-content h2 {
+  margin: 5px 0;
+  color: #c99b42;
+  font-size: 17px;
+  letter-spacing: 8px;
+}
+
+.splash-subtitle {
+  margin: 14px 0 35px;
+  color: #b9a477;
+  font-size: 10px;
+  letter-spacing: 3px;
+}
+
+.splash-swipe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(218, 165, 55, 0.45);
+  border-radius: 30px;
+  color: #e4c47e;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.swipe-arrow {
+  font-size: 24px;
+  color: #f5d58a;
+}
+
+#aurumEnterButton {
+  margin-top: 18px;
+  padding: 13px 25px;
+  border: 1px solid #d6a23b;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #e5bd68, #8d641e);
+  color: #160f05;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.splash-footer {
+  margin-top: 35px;
+  color: #806b43;
+  font-size: 9px;
+  letter-spacing: 3px;
+}
+
 </style>
 </head>
+  
+
 
 <body id="top">
+
+<!-- AURUM PREMIUM SPLASH SCREEN -->
+<div id="aurumSplash" class="aurum-splash">
+
+  <div class="splash-content">
+
+    <div class="aurum-orb">
+      <div class="orb-core"></div>
+      <div class="orb-ring ring-one"></div>
+      <div class="orb-ring ring-two"></div>
+
+      <div class="orb-particle particle-one"></div>
+      <div class="orb-particle particle-two"></div>
+      <div class="orb-particle particle-three"></div>
+      <div class="orb-particle particle-four"></div>
+      <div class="orb-particle particle-five"></div>
+    </div>
+
+    <h1>✦ AURUM</h1>
+    <h2>SIGNALS AI</h2>
+
+    <p class="splash-subtitle">
+      INTELLIGENT MARKET ANALYSIS
+    </p>
+
+    <div class="splash-swipe">
+      <span class="swipe-arrow">➜</span>
+      <span>GESER KE KANAN UNTUK MASUK</span>
+    </div>
+
+    <button id="aurumEnterButton">
+      MASUK KE DASHBOARD
+    </button>
+
+    <p class="splash-footer">
+      ICT SMART MONEY CONCEPTS
+    </p>
+
+  </div>
+</div>
+<!-- END AURUM PREMIUM SPLASH SCREEN -->
+
 <header>
-  
-  
+
   <div class="brand">✦ AURUM SIGNALS AI</div>
   <div class="status">● CEK DEPLOY TERBARU</div>
+
 </header>
+  
 
 <main>
 
@@ -3204,6 +3414,47 @@ document.querySelector('.status').textContent =
   ' | ELEMENT: ' + !!document.getElementById('candleChart');
 
 console.log('STATUS SERVER DIPERIKSA');
+
 </script>
+
+<!-- AURUM SPLASH SCREEN INTERACTION -->
+<script>
+(function () {
+  const splash = document.getElementById('aurumSplash');
+  const enterButton = document.getElementById('aurumEnterButton');
+
+  if (!splash || !enterButton) return;
+
+  let startX = 0;
+  let startY = 0;
+
+  function enterDashboard() {
+    splash.classList.add('hidden');
+
+    setTimeout(function () {
+      splash.style.display = 'none';
+    }, 750);
+  }
+
+  enterButton.addEventListener('click', enterDashboard);
+
+  splash.addEventListener('pointerdown', function (event) {
+    startX = event.clientX;
+    startY = event.clientY;
+  });
+
+  splash.addEventListener('pointerup', function (event) {
+    const moveX = event.clientX - startX;
+    const moveY = Math.abs(event.clientY - startY);
+
+    if (moveX > 80 && moveY < 100) {
+      enterDashboard();
+    }
+  });
+})();
+</script>
+<!-- END AURUM SPLASH SCREEN INTERACTION -->
+
 </body>
 </html>
+  
