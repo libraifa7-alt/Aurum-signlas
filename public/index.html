@@ -923,8 +923,106 @@ body{
 
 /* END AURUM GOLDEN ENERGY TRAIL */
 
+
+<style>
+
+/* AURUM GOLDEN PARTICLE BURST */
+
+.burst-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffd76a;
+  box-shadow:
+    0 0 8px #ffd76a,
+    0 0 16px rgba(255, 190, 55, 0.9);
+  pointer-events: none;
+  z-index: 13;
+  opacity: 0;
+  animation: aurumParticleBurst 3s ease-out infinite;
+}
+
+.burst-two { animation-delay: 0.35s; }
+.burst-three { animation-delay: 0.7s; }
+.burst-four { animation-delay: 1.05s; }
+.burst-five { animation-delay: 1.4s; }
+.burst-six { animation-delay: 1.75s; }
+.burst-seven { animation-delay: 2.1s; }
+.burst-eight { animation-delay: 2.45s; }
+
+.burst-one {
+  --burst-x: 75px;
+  --burst-y: -65px;
+}
+
+.burst-two {
+  --burst-x: 95px;
+  --burst-y: 5px;
+}
+
+.burst-three {
+  --burst-x: 65px;
+  --burst-y: 75px;
+}
+
+.burst-four {
+  --burst-x: 0px;
+  --burst-y: 95px;
+}
+
+.burst-five {
+  --burst-x: -75px;
+  --burst-y: 65px;
+}
+
+.burst-six {
+  --burst-x: -95px;
+  --burst-y: 0px;
+}
+
+.burst-seven {
+  --burst-x: -65px;
+  --burst-y: -75px;
+}
+
+.burst-eight {
+  --burst-x: 0px;
+  --burst-y: -95px;
+}
+
+@keyframes aurumParticleBurst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform:
+      translate(
+        calc(-50% + var(--burst-x)),
+        calc(-50% + var(--burst-y))
+      )
+      scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* END AURUM GOLDEN PARTICLE BURST */
+
 </style>
 </head>
+  
   
   
 
@@ -952,6 +1050,16 @@ body{
 <div class="energy-particle energy-five"></div>
 <div class="energy-particle energy-six"></div>
 <!-- END AURUM GOLDEN ENERGY PARTICLES -->
+<!-- AURUM GOLDEN PARTICLE BURST -->
+<div class="burst-particle burst-one"></div>
+<div class="burst-particle burst-two"></div>
+<div class="burst-particle burst-three"></div>
+<div class="burst-particle burst-four"></div>
+<div class="burst-particle burst-five"></div>
+<div class="burst-particle burst-six"></div>
+<div class="burst-particle burst-seven"></div>
+<div class="burst-particle burst-eight"></div>
+<!-- END AURUM GOLDEN PARTICLE BURST -->      
 
       <div class="orb-particle particle-one"></div>
       <div class="orb-particle particle-two"></div>
