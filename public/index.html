@@ -706,7 +706,7 @@ body{
   }
 }
 
-/* AURUM GOLDEN LIGHT SWEEP */
+/* AURUM GOLDEN LIGHT SWEEP - PREMIUM VERSION */
 
 .aurum-orb {
   position: relative;
@@ -716,41 +716,48 @@ body{
 .aurum-orb .gold-light-sweep {
   display: block;
   position: absolute;
-  width: 55px;
-  height: 180px;
-  top: 20px;
+  width: 65px;
+  height: 190px;
+  top: 15px;
   left: -70px;
   transform: rotate(35deg);
 
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 238, 180, 0.65),
-    rgba(255, 255, 255, 0.85),
-    rgba(255, 215, 120, 0.5),
+    rgba(218, 165, 55, 0.25),
+    rgba(255, 215, 100, 0.85),
+    rgba(255, 230, 150, 0.95),
+    rgba(218, 165, 55, 0.4),
     transparent
   );
 
-  filter: blur(7px);
+  filter: blur(9px);
+  mix-blend-mode: screen;
   opacity: 0;
   pointer-events: none;
   z-index: 10;
 
-  animation: aurumGoldSweep 5s ease-in-out infinite;
+  animation: aurumGoldSweep 6s ease-in-out infinite;
 }
 
 @keyframes aurumGoldSweep {
-  0%, 65% {
+  0%, 55% {
     left: -70px;
     opacity: 0;
   }
 
-  72% {
-    opacity: 0.9;
+  60% {
+    opacity: 0.85;
   }
 
-  90%, 100% {
+  88% {
     left: 240px;
+    opacity: 0.65;
+  }
+
+  100% {
+    left: 260px;
     opacity: 0;
   }
 }
