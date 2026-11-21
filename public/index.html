@@ -762,6 +762,113 @@ body{
   }
 }
 
+<style>
+
+/* AURUM GOLDEN ENERGY PARTICLES */
+
+.aurum-orb {
+  position: relative;
+  overflow: visible;
+}
+
+.energy-particle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffd76a;
+  box-shadow:
+    0 0 6px #ffd76a,
+    0 0 14px rgba(255, 190, 55, 0.9),
+    0 0 24px rgba(255, 170, 30, 0.5);
+  pointer-events: none;
+  z-index: 12;
+}
+
+.energy-one {
+  top: 10%;
+  left: 50%;
+  animation: aurumEnergyOne 4s linear infinite;
+}
+
+.energy-two {
+  top: 50%;
+  left: 90%;
+  animation: aurumEnergyTwo 5s linear infinite;
+}
+
+.energy-three {
+  top: 90%;
+  left: 50%;
+  animation: aurumEnergyThree 4.5s linear infinite;
+}
+
+.energy-four {
+  top: 50%;
+  left: 10%;
+  animation: aurumEnergyFour 5.5s linear infinite;
+}
+
+.energy-five {
+  top: 20%;
+  left: 20%;
+  animation: aurumEnergyFive 6s ease-in-out infinite;
+}
+
+.energy-six {
+  top: 80%;
+  left: 80%;
+  animation: aurumEnergySix 5s ease-in-out infinite;
+}
+
+@keyframes aurumEnergyOne {
+  0% { transform: translate(0, 0) scale(0.7); }
+  50% { transform: translate(65px, 65px) scale(1.5); }
+  100% { transform: translate(0, 0) scale(0.7); }
+}
+
+@keyframes aurumEnergyTwo {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-65px, 65px) scale(0.6); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes aurumEnergyThree {
+  0% { transform: translate(0, 0) scale(0.7); }
+  50% { transform: translate(-65px, -65px) scale(1.5); }
+  100% { transform: translate(0, 0) scale(0.7); }
+}
+
+@keyframes aurumEnergyFour {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(65px, -65px) scale(0.6); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes aurumEnergyFive {
+  0%, 100% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(35px, 25px) scale(1.5);
+    opacity: 1;
+  }
+}
+
+@keyframes aurumEnergySix {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-35px, -25px) scale(0.6);
+    opacity: 1;
+  }
+}
+
+/* END AURUM GOLDEN ENERGY PARTICLES */
+
 </style>
 </head>
   
@@ -780,8 +887,17 @@ body{
   <div class="orb-ring ring-one"></div>
   <div class="orb-ring ring-two"></div>
 
-  <!-- AURUM GOLDEN LIGHT SWEEP -->
-  <div class="gold-light-sweep"></div>
+<!-- AURUM GOLDEN LIGHT SWEEP -->
+<div class="gold-light-sweep"></div>
+
+<!-- AURUM GOLDEN ENERGY PARTICLES -->
+<div class="energy-particle energy-one"></div>
+<div class="energy-particle energy-two"></div>
+<div class="energy-particle energy-three"></div>
+<div class="energy-particle energy-four"></div>
+<div class="energy-particle energy-five"></div>
+<div class="energy-particle energy-six"></div>
+<!-- END AURUM GOLDEN ENERGY PARTICLES -->
 
       <div class="orb-particle particle-one"></div>
       <div class="orb-particle particle-two"></div>
