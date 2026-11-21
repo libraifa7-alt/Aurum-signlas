@@ -5,19 +5,46 @@ module.exports = async function handler(req, res) {
     globalThis.aurumCache = new Map();
   }
 
-  
-  
+  // AURUM REDIS CONNECTION
+  async function aurumRedis(command) {
+    const redisUrl = process.env.KV_REST_API_URL;
+    const redisToken = process.env.KV_REST_API_TOKEN;
+
+    if (!redisUrl || !redisToken) {
+      return null;
+    }
+
+    const response = await fetch(redisUrl, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + redisToken,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(command)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.error) {
+      throw new Error(
+        result.error || "Redis connection failed"
+      );
+    }
+
+    return result.result;
+  }
+  // END AURUM REDIS CONNECTION
 
   const allowedIntervals = {
-  M1: "1min",
-  M5: "5min",
-  M15: "15min",
-  M30: "30min",
-  M45: "45min",
-  H1: "1h",
-  H4: "4h",
-  D1: "1day"
-};
+    M1: "1min",
+    M5: "5min",
+    M15: "15min",
+    M30: "30min",
+    M45: "45min",
+    H1: "1h",
+    H4: "4h",
+    D1: "1day"
+  };
 
   const selectedSymbol = String(
     req.query.symbol || "XAU/USD"
@@ -33,53 +60,87 @@ module.exports = async function handler(req, res) {
   const cached = globalThis.aurumCache.get(cacheKey);
 
   // AURUM SMART API CACHE OPTIMIZATION
+  const cacheTTL = selectedSymbol === "WTI"
+    ? 60000
+    : ({
+        "1min": 60000,
+        "5min": 120000,
+        "15min": 180000,
+        "30min": 300000,
+        "45min": 300000,
+        "1h": 600000,
+        "4h": 900000,
+        "1day": 1800000
+      }[interval] || 180000);
 
-const cacheTTL = selectedSymbol === "WTI"
-  ? 60000
-  : ({
-      "1min": 60000,
-      "5min": 120000,
-      "15min": 180000,
-      "30min": 300000,
-      "45min": 300000,
-      "1h": 600000,
-      "4h": 900000,
-      "1day": 1800000
-    }[interval] || 180000);
+  if (cached && Date.now() - cached.time < cacheTTL) {
+    return res.status(200).json(cached.data);
+  }
 
+    try {
 
-if (cached && Date.now() - cached.time < cacheTTL) {
-  return res.status(200).json(cached.data);
-}
+    // AURUM REDIS CACHE READ
+    const redisKey = "aurum:candles:" + cacheKey;
 
+    let redisCached = null;
 
+    try {
+      const redisData = await aurumRedis([
+        "GET",
+        redisKey
+      ]);
 
-try {
-  
+      if (redisData) {
+        redisCached = JSON.parse(redisData);
+      }
+    } catch (redisError) {
+      console.error(
+        "REDIS READ ERROR:",
+        redisError.message
+      );
+    }
+
+    // GUNAKAN CACHE REDIS JIKA MASIH SEGAR
+    if (redisCached && redisCached.data) {
+      globalThis.aurumCache.set(cacheKey, {
+        time: redisCached.time,
+        data: redisCached.data
+      });
+
+      if (Date.now() - redisCached.time < cacheTTL) {
+        return res.status(200).json(redisCached.data);
+      }
+    }
+
     // JALUR KHUSUS WTI DARI YAHOO FINANCE
     if (selectedSymbol === "WTI") {
       const yahooIntervals = {
-  M1: "1m",
-  M5: "5m",
-  M15: "15m",
-  M30: "30m",
-  H1: "60m",
-  H4: "60m",
-  D1: "1d"
-};
+        M1: "1m",
+        M5: "5m",
+        M15: "15m",
+        M30: "30m",
+        H1: "60m",
+        H4: "60m",
+        D1: "1d"
+      };
 
-      const yahooInterval = yahooIntervals[selected === "M45" ? "M15" : selected] || "15m";
-const url = new URL(
-  "https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF"
-);
-
-
-url.searchParams.set(
-  "range",
-  selected === "D1" ? "1y" : selected === "M45" ? "1mo" : "5d"
-);
       
-url.searchParams.set("interval", yahooInterval);
+      const yahooInterval = yahooIntervals[
+        selected === "M45" ? "M15" : selected
+      ] || "15m";
+
+      const url = new URL(
+        "https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF"
+      );
+
+      url.searchParams.set(
+        "range",
+        selected === "D1" ? "1y" :
+        selected === "M45" ? "1mo" : "5d"
+      );
+
+      url.searchParams.set("interval", yahooInterval);
+
       const response = await fetch(url, {
         headers: {
           "User-Agent": "Mozilla/5.0"
@@ -90,9 +151,18 @@ url.searchParams.set("interval", yahooInterval);
       const result = data.chart?.result?.[0];
 
       if (!response.ok || !result) {
+        if (redisCached && redisCached.data) {
+          return res.status(200).json({
+            ...redisCached.data,
+            cache: "stale"
+          });
+        }
+
         return res.status(502).json({
           status: "error",
-          message: data.chart?.error?.description || "Gagal mengambil data WTI"
+          message:
+            data.chart?.error?.description ||
+            "Gagal mengambil data WTI"
         });
       }
 
@@ -100,6 +170,13 @@ url.searchParams.set("interval", yahooInterval);
       const quote = result.indicators?.quote?.[0];
 
       if (!quote) {
+        if (redisCached && redisCached.data) {
+          return res.status(200).json({
+            ...redisCached.data,
+            cache: "stale"
+          });
+        }
+
         return res.status(502).json({
           status: "error",
           message: "Data candle WTI tidak tersedia"
@@ -107,164 +184,174 @@ url.searchParams.set("interval", yahooInterval);
       }
 
       let candles = timestamps.map((timestamp, i) => {
-  const open = quote.open?.[i];
-  const high = quote.high?.[i];
-  const low = quote.low?.[i];
-  const close = quote.close?.[i];
+        const open = quote.open?.[i];
+        const high = quote.high?.[i];
+        const low = quote.low?.[i];
+        const close = quote.close?.[i];
 
-  if (
-    open == null ||
-    high == null ||
-    low == null ||
-    close == null
-  ) {
-    return null;
-  }
-
-  const datetime = new Date(
-    (timestamp + 7 * 3600) * 1000
-  ).toISOString().slice(0, 19).replace("T", " ");
-
-  return {
-    datetime,
-    open: String(open),
-    high: String(high),
-    low: String(low),
-    close: String(close)
-  };
-}).filter(Boolean).reverse().slice(0, 300);
-
-
-    // GABUNGKAN 3 CANDLE M15 MENJADI 1 CANDLE M45
-    if (selected === "M45") {
-      const groups = new Map();
-
-      for (const candle of candles) {
-        const timestamp = Math.floor(
-          new Date(candle.datetime.replace(" ", "T") + "+07:00").getTime() / 1000
-        );
-
-        if (!Number.isFinite(timestamp)) continue;
-
-        const bucket = Math.floor(timestamp / 2700) * 2700;
-
-        if (!groups.has(bucket)) {
-          groups.set(bucket, []);
+        if (
+          open == null ||
+          high == null ||
+          low == null ||
+          close == null
+        ) {
+          return null;
         }
 
-        groups.get(bucket).push({
-          ...candle,
-          _timestamp: timestamp
-        });
+        return {
+          datetime: new Date(timestamp * 1000).toISOString(),
+          open,
+          high,
+          low,
+          close,
+          volume: quote.volume?.[i] || 0
+        };
+      
+      }).filter(Boolean);
+
+      // AGREGASI KHUSUS TIMEFRAME M45
+      if (selected === "M45") {
+        const aggregated = [];
+
+        for (let i = 0; i + 2 < candles.length; i += 3) {
+          const group = candles.slice(i, i + 3);
+
+          aggregated.push({
+            datetime: group[0].datetime,
+            open: group[0].open,
+            high: Math.max(...group.map(c => c.high)),
+            low: Math.min(...group.map(c => c.low)),
+            close: group[2].close,
+            volume: group.reduce(
+              (sum, c) => sum + c.volume,
+              0
+            )
+          });
+        }
+
+        candles = aggregated;
       }
 
-      const grouped = [];
+      // HASIL DATA WTI
+      const output = {
+        status: "success",
+        symbol: selectedSymbol,
+        interval: selected,
+        candles
+      };
 
-      for (const [bucket, bars] of groups) {
-        if (bars.length !== 3) continue;
+      // SIMPAN KE MEMORY CACHE
+      globalThis.aurumCache.set(cacheKey, {
+        time: Date.now(),
+        data: output
+      });
 
-        bars.sort((a, b) => a._timestamp - b._timestamp);
-
-        grouped.push({
-          bucket,
-          datetime: bars[0].datetime,
-          open: bars[0].open,
-          high: String(Math.max(...bars.map(c => Number(c.high)))),
-          low: String(Math.min(...bars.map(c => Number(c.low)))),
-          close: bars[2].close
-        });
+      // SIMPAN KE REDIS SELAMA 7 HARI
+      try {
+        await aurumRedis([
+          "SET",
+          redisKey,
+          JSON.stringify({
+            time: Date.now(),
+            data: output
+          }),
+          "EX",
+          "604800"
+        ]);
+      } catch (redisError) {
+        console.error(
+          "REDIS WRITE ERROR:",
+          redisError.message
+        );
       }
 
-      grouped.sort((a, b) => b.bucket - a.bucket);
-
-      candles = grouped.map(c => ({
-        datetime: c.datetime,
-        open: c.open,
-        high: c.high,
-        low: c.low,
-        close: c.close
-      }));
+      return res.status(200).json(output);
     }
       
 
-const output = {
-  status: "success",
-  symbol: "WTI",
-  interval: yahooInterval,
-  candles
-};
 
-globalThis.aurumCache.set(cacheKey, {
-  time: Date.now(),
-  data: output
-});
+    // JALUR DATA XAU/USD DAN BTC/USD DARI TWELVE DATA
 
-return res.status(200).json(output);
-}
+    const symbol = selectedSymbol === "XAU/USD"
+      ? "XAU/USD"
+      : selectedSymbol;
 
-// BTC DAN XAU TETAP MENGGUNAKAN TWELVE DATA
-    // BTC DAN XAU TETAP MENGGUNAKAN TWELVE DATA
     const apiKey = process.env.TWELVE_DATA_API_KEY;
 
     if (!apiKey) {
+      if (redisCached && redisCached.data) {
+        return res.status(200).json({
+          ...redisCached.data,
+          cache: "stale"
+        });
+      }
+
       return res.status(500).json({
         status: "error",
-        message: "API Key belum ditemukan"
+        message: "TWELVE_DATA_API_KEY belum diatur"
       });
     }
 
-    const allowedSymbols = {
-  "XAU": "XAU/USD",
-  "XAU/USD": "XAU/USD",
-  "BTC/USD": "BTC/USD"
-};
-
-    const symbol = allowedSymbols[selectedSymbol];
-
-    if (!symbol) {
-      return res.status(400).json({
-        status: "error",
-        message: "Instrumen tidak didukung"
-      });
-    }
-
-    const url = new URL(
+    const twelveUrl = new URL(
       "https://api.twelvedata.com/time_series"
     );
 
-    url.searchParams.set("symbol", symbol);
-    url.searchParams.set("interval", interval);
-    url.searchParams.set("outputsize", "100");
-    url.searchParams.set("apikey", apiKey);
+    twelveUrl.searchParams.set("symbol", symbol);
+    twelveUrl.searchParams.set("interval", interval);
+    twelveUrl.searchParams.set("outputsize", "100");
+    twelveUrl.searchParams.set("apikey", apiKey);
 
-    const response = await fetch(url);
+    const response = await fetch(twelveUrl);
     const data = await response.json();
 
-    if (!response.ok || data.status === "error") {
+    if (!response.ok || data.status === "error" || !data.values) {
+      if (redisCached && redisCached.data) {
+        return res.status(200).json({
+          ...redisCached.data,
+          cache: "stale"
+        });
+      }
+
       return res.status(502).json({
         status: "error",
-        message: data.message || "Gagal mengambil data market"
+        message: data.message || "Gagal mengambil data Twelve Data"
       });
     }
 
     const output = {
-  status: "success",
-  symbol,
-  interval,
-  debug: {
-    receivedInterval: req.query.interval || null,
-    selected,
-    mappedInterval: interval
-  },
-  candles: data.values || []
-};
+      status: "success",
+      symbol: selectedSymbol,
+      interval: selected,
+      candles: data.values
+    };
 
+    // SIMPAN KE MEMORY CACHE
     globalThis.aurumCache.set(cacheKey, {
       time: Date.now(),
       data: output
     });
 
+    // SIMPAN KE REDIS SELAMA 7 HARI
+    try {
+      await aurumRedis([
+        "SET",
+        redisKey,
+        JSON.stringify({
+          time: Date.now(),
+          data: output
+        }),
+        "EX",
+        "604800"
+      ]);
+    } catch (redisError) {
+      console.error(
+        "REDIS WRITE ERROR:",
+        redisError.message
+      );
+    }
+
     return res.status(200).json(output);
+      
 
   } catch (error) {
     return res.status(500).json({
