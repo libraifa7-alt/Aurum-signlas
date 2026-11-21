@@ -1794,14 +1794,16 @@ body {
   </div>
 
   <div class="cards">
-    <div class="card">
-      <small>MARKET</small>
-      <strong class="gold">FOREX</strong>
-    </div>
-    <div class="card">
-      <small>TIMEFRAME</small>
-      <strong>M15</strong>
-    </div>
+  <div class="card">
+    <small>MARKET</small>
+    <strong class="gold">FOREX</strong>
+  </div>
+
+  <div class="card">
+    <small>TIMEFRAME</small>
+    <strong id="dashboardTimeframe">M15</strong>
+  </div>
+    
     <div class="card">
       <small>ACTIVE SIGNALS</small>
       <strong id="signals">0</strong>
@@ -4683,6 +4685,17 @@ console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
 // EVENT TIMEFRAME
 const timeframe = document.getElementById('tf');
 const pairSelect = document.getElementById('pair');
+
+// UPDATE KARTU TIMEFRAME AURUM
+const dashboardTimeframe = document.getElementById('dashboardTimeframe');
+
+if (timeframe && dashboardTimeframe) {
+  dashboardTimeframe.textContent = timeframe.value;
+
+  timeframe.addEventListener('change', function () {
+    dashboardTimeframe.textContent = this.value;
+  });
+}
 
 loadChart(timeframe.value || 'M15');
 
