@@ -4580,7 +4580,8 @@ try {
   console.log('CANDLE PERTAMA:', candles[0]);
   console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
 
-  series.setData(candles);
+  console.log('TOTAL CANDLE:', candles.length);
+series.setData(candles);
 
   document.querySelector('.status').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
