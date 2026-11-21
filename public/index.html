@@ -2770,12 +2770,7 @@ const el = document.getElementById('candleChart');
 document.querySelector('.status').textContent =
   'AREA GRAFIK: ' + (el ? el.clientWidth : 'TIDAK ADA') +
   ' x ' + (el ? el.clientHeight : 'TIDAK ADA');
-     const cacheKey = symbol + ':' + interval;
-
-aurumCandleCache.set(cacheKey, {
-  time: Date.now(),
-  data: candles
-});
+     
       
 // MULTI TIMEFRAME MARKET STRUCTURE
 
