@@ -400,11 +400,24 @@ if (allBars.length > 0) {
   };
 }
 
+// AURUM TIMEFRAME DEBUG
+console.log(
+  "AURUM TIMEFRAME CHECK:",
+  selectedSymbol,
+  selected,
+  "MARKET:",
+  marketTimeframe,
+  "LIMIT:",
+  limit
+);
+
+// AURUM MARKETAPI TOTAL CANDLE
 console.log(
   "AURUM MARKETAPI TOTAL RAW CANDLE:",
   allBars.length
 );
 
+// AURUM MARKETAPI TOTAL PAGE
 console.log(
   "AURUM MARKETAPI TOTAL PAGE:",
   pageCount
