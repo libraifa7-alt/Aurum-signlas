@@ -317,6 +317,7 @@ const fromDate = new Date(
 
 const toDate = new Date();
 
+
 const marketUrl = new URL(
   "https://api.marketapi.app/v1/bars"
 );
@@ -327,15 +328,85 @@ marketUrl.searchParams.set("from", fromDate.toISOString());
 marketUrl.searchParams.set("to", toDate.toISOString());
 marketUrl.searchParams.set("limit", String(limit));
 
-const response = await fetch(marketUrl, {
-  headers: {
-    "Authorization": "Bearer " + apiKey
+// AURUM MARKETAPI PAGINATION
+let allBars = [];
+let nextCursor = null;
+let response = null;
+let data = null;
+let pageCount = 0;
+const maxPages = 20;
+
+do {
+  const pageUrl = new URL(marketUrl.toString());
+
+  if (nextCursor) {
+    pageUrl.searchParams.set("cursor", nextCursor);
   }
-});
 
-const data = await response.json();
+  const pageResponse = await fetch(pageUrl, {
+    headers: {
+      "Authorization": "Bearer " + apiKey
+    }
+  });
 
-if (!response.ok || !Array.isArray(data.data)) {
+  const pageData = await pageResponse.json();
+
+  if (
+    !pageResponse.ok ||
+    !Array.isArray(pageData.data)
+  ) {
+    if (allBars.length === 0) {
+      response = pageResponse;
+      data = pageData;
+    } else {
+      console.error(
+        "MARKETAPI PAGINATION ERROR:",
+        pageData
+      );
+    }
+
+    break;
+  }
+
+  response = pageResponse;
+
+  allBars.push(...pageData.data);
+
+  nextCursor = pageData.next_cursor || null;
+
+  pageCount++;
+
+} while (
+  nextCursor &&
+  allBars.length < limit &&
+  pageCount < maxPages
+);
+
+// GABUNGKAN SEMUA HALAMAN CANDLE
+if (allBars.length > 0) {
+  data = {
+    data: allBars
+  };
+}
+
+console.log(
+  "AURUM MARKETAPI TOTAL RAW CANDLE:",
+  allBars.length
+);
+
+console.log(
+  "AURUM MARKETAPI TOTAL PAGE:",
+  pageCount
+);
+      
+
+
+if (
+  !response ||
+  !response.ok ||
+  !data ||
+  !Array.isArray(data.data)
+) {
   if (redisCached && redisCached.data) {
     return res.status(200).json({
       ...redisCached.data,
@@ -346,12 +417,13 @@ if (!response.ok || !Array.isArray(data.data)) {
   return res.status(502).json({
     status: "error",
     message:
-      data.detail ||
-      data.title ||
-      data.message ||
+      data?.detail ||
+      data?.title ||
+      data?.message ||
       "Gagal mengambil data MarketAPI"
   });
 }
+      
 
 // URUTKAN CANDLE DARI YANG TERLAMA
 let rawCandles = data.data
@@ -446,6 +518,7 @@ const output = {
 
     return res.status(200).json(output);
 
+
   } catch (error) {
     return res.status(500).json({
       status: "error",
@@ -453,3 +526,4 @@ const output = {
     });
   }
 };
+
