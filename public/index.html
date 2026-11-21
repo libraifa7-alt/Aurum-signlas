@@ -3418,6 +3418,7 @@ console.log('STATUS SERVER DIPERIKSA');
 </script>
 
 <!-- AURUM SPLASH SCREEN INTERACTION -->
+
 <script>
 (function () {
   const splash = document.getElementById('aurumSplash');
@@ -3429,6 +3430,8 @@ console.log('STATUS SERVER DIPERIKSA');
   let startY = 0;
 
   function enterDashboard() {
+    if (splash.classList.contains('hidden')) return;
+
     splash.classList.add('hidden');
 
     setTimeout(function () {
@@ -3438,6 +3441,24 @@ console.log('STATUS SERVER DIPERIKSA');
 
   enterButton.addEventListener('click', enterDashboard);
 
+  // DETEKSI SENTUHAN HP ANDROID
+  splash.addEventListener('touchstart', function (event) {
+    const touch = event.changedTouches[0];
+    startX = touch.clientX;
+    startY = touch.clientY;
+  }, { passive: true });
+
+  splash.addEventListener('touchend', function (event) {
+    const touch = event.changedTouches[0];
+    const moveX = touch.clientX - startX;
+    const moveY = Math.abs(touch.clientY - startY);
+
+    if (moveX > 70 && moveY < 100) {
+      enterDashboard();
+    }
+  }, { passive: true });
+
+  // DETEKSI POINTER
   splash.addEventListener('pointerdown', function (event) {
     startX = event.clientX;
     startY = event.clientY;
@@ -3447,12 +3468,13 @@ console.log('STATUS SERVER DIPERIKSA');
     const moveX = event.clientX - startX;
     const moveY = Math.abs(event.clientY - startY);
 
-    if (moveX > 80 && moveY < 100) {
+    if (moveX > 70 && moveY < 100) {
       enterDashboard();
     }
   });
 })();
 </script>
+  
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
 
 </body>
