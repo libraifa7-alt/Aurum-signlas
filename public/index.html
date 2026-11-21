@@ -799,10 +799,8 @@ const aurumCandleCache = new Map();
 
 document.querySelector('.status').textContent =
   'SCRIPT UTAMA MULAI BERJALAN';
-</script>
-  
 
-  console.log('CEK LOADCHART DIMULAI');
+console.log('CEK LOADCHART DIMULAI');
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
 if (el && window.LightweightCharts) {
@@ -813,8 +811,7 @@ if (el && window.LightweightCharts) {
   document.querySelector('.status').textContent =
     'UKURAN GRAFIK: ' + el.clientWidth + ' x ' + el.clientHeight;
 
-  
-const chart = LightweightCharts.createChart(el, {
+  const chart = LightweightCharts.createChart(el, {
     width: Math.max(el.clientWidth, 300),
     height: 340,
     layout: {
