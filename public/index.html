@@ -1365,8 +1365,36 @@ body{
 
 /* END AURUM MINIMAL PREMIUM LAYOUT */
 
+
+<style>
+
+/* AURUM PREMIUM SWIPE TRANSITION */
+
+/* SMOOTH CONTENT MOVEMENT */
+.splash-content {
+  transition:
+    transform 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.7s ease;
+}
+
+/* SLIDE TO RIGHT WHEN ENTERING */
+.aurum-splash.hidden .splash-content {
+  transform: translateX(90px) scale(0.96);
+  opacity: 0;
+}
+
+/* SMOOTH SPLASH FADE */
+.aurum-splash {
+  transition:
+    opacity 0.7s ease,
+    visibility 0.7s ease;
+}
+
+/* END AURUM PREMIUM SWIPE TRANSITION */
+
 </style>
 </head>
+  
   
   
   
