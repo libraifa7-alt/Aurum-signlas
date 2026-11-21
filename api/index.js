@@ -272,66 +272,160 @@ module.exports = async function handler(req, res) {
 
     // JALUR DATA XAU/USD DAN BTC/USD DARI TWELVE DATA
 
-    const symbol = selectedSymbol === "XAU/USD"
-      ? "XAU/USD"
-      : selectedSymbol;
+// JALUR DATA XAU/USD DAN BTC/USD DARI MARKETAPI
 
-    const apiKey = process.env.TWELVE_DATA_API_KEY;
+const symbol = selectedSymbol.replaceAll("/", "");
 
-    if (!apiKey) {
-      if (redisCached && redisCached.data) {
-        return res.status(200).json({
-          ...redisCached.data,
-          cache: "stale"
-        });
-      }
+const apiKey = process.env.MARKETAPI_API_KEY;
 
-      return res.status(500).json({
-        status: "error",
-        message: "TWELVE_DATA_API_KEY belum diatur"
-      });
-    }
-
-    const twelveUrl = new URL(
-      "https://api.twelvedata.com/time_series"
-    );
-
-    twelveUrl.searchParams.set("symbol", symbol);
-    twelveUrl.searchParams.set("interval", interval);
-    twelveUrl.searchParams.set("outputsize", "100");
-    twelveUrl.searchParams.set("apikey", apiKey);
-
-    const response = await fetch(twelveUrl);
-    const data = await response.json();
-
-    if (!response.ok || data.status === "error" || !data.values) {
-      if (redisCached && redisCached.data) {
-        return res.status(200).json({
-          ...redisCached.data,
-          cache: "stale"
-        });
-      }
-
-      return res.status(502).json({
-        status: "error",
-        message: data.message || "Gagal mengambil data Twelve Data"
-      });
-    }
-
-    const output = {
-      status: "success",
-      symbol: selectedSymbol,
-      interval: selected,
-      candles: data.values
-    };
-
-    // SIMPAN KE MEMORY CACHE
-    globalThis.aurumCache.set(cacheKey, {
-      time: Date.now(),
-      data: output
+if (!apiKey) {
+  if (redisCached && redisCached.data) {
+    return res.status(200).json({
+      ...redisCached.data,
+      cache: "stale"
     });
+  }
 
-    // SIMPAN KE REDIS SELAMA 7 HARI
+  return res.status(500).json({
+    status: "error",
+    message: "MARKETAPI_API_KEY belum diatur"
+  });
+}
+
+// MARKETAPI TIDAK MENDUKUNG M45 LANGSUNG
+// M45 DIBENTUK DARI 3 CANDLE M15
+const marketTimeframe = selected === "M45" ? "M15" : selected;
+
+const timeframeMinutes = {
+  M1: 1,
+  M5: 5,
+  M15: 15,
+  M30: 30,
+  M45: 45,
+  H1: 60,
+  H4: 240,
+  D1: 1440
+};
+
+const minutes = timeframeMinutes[selected] || 15;
+
+const limit = selected === "M45" ? 400 : 120;
+
+const fromDate = new Date(
+  Date.now() - minutes * 60 * 1000 * limit * 1.2
+);
+
+const toDate = new Date();
+
+const marketUrl = new URL(
+  "https://api.marketapi.app/v1/bars"
+);
+
+marketUrl.searchParams.set("symbol", symbol);
+marketUrl.searchParams.set("timeframe", marketTimeframe);
+marketUrl.searchParams.set("from", fromDate.toISOString());
+marketUrl.searchParams.set("to", toDate.toISOString());
+marketUrl.searchParams.set("limit", String(limit));
+
+const response = await fetch(marketUrl, {
+  headers: {
+    "Authorization": "Bearer " + apiKey
+  }
+});
+
+const data = await response.json();
+
+if (!response.ok || !Array.isArray(data.data)) {
+  if (redisCached && redisCached.data) {
+    return res.status(200).json({
+      ...redisCached.data,
+      cache: "stale"
+    });
+  }
+
+  return res.status(502).json({
+    status: "error",
+    message:
+      data.detail ||
+      data.title ||
+      data.message ||
+      "Gagal mengambil data MarketAPI"
+  });
+}
+
+// URUTKAN CANDLE DARI YANG TERLAMA
+let rawCandles = data.data
+  .filter(c => c.time && c.open != null &&
+    c.high != null && c.low != null && c.close != null)
+  .sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
+
+// KONVERSI FORMAT MARKETAPI KE FORMAT AURUM
+let candles;
+
+if (selected === "M45") {
+  const groups = new Map();
+
+  rawCandles.forEach(c => {
+    const timestamp = Date.parse(c.time);
+    const bucket = Math.floor(timestamp / 2700000) * 2700000;
+
+    if (!groups.has(bucket)) {
+  groups.set(bucket, {
+    timestamp,
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close),
+    volume: Number(c.tick_volume || 0)
+  });
+} else {
+  const group = groups.get(bucket);
+
+  group.high = Math.max(group.high, Number(c.high));
+  group.low = Math.min(group.low, Number(c.low));
+  group.close = Number(c.close);
+  group.volume += Number(c.tick_volume || 0);
+}
+});
+
+candles = Array.from(groups.entries())
+  .sort((a, b) => a[0] - b[0])
+  .slice(-100)
+  .map(([time, c]) => ({
+    datetime: new Date(time).toISOString(),
+    open: c.open,
+    high: c.high,
+    low: c.low,
+    close: c.close,
+    volume: c.volume
+  }));
+
+} else {
+  candles = rawCandles.slice(-100).map(c => ({
+    datetime: c.time,
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close),
+    volume: Number(c.tick_volume || 0)
+  }));
+}
+if (!candles.length) {
+  return res.status(502).json({
+    status: "error",
+    message: "MarketAPI tidak mengirim candle untuk simbol ini"
+  });
+}
+
+const output = {
+  status: "success",
+  symbol: selectedSymbol,
+  interval: selected,
+  candles
+};
+      
+
+        // SIMPAN KE REDIS SELAMA 7 HARI
     try {
       await aurumRedis([
         "SET",
@@ -351,7 +445,6 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(200).json(output);
-      
 
   } catch (error) {
     return res.status(500).json({
@@ -360,4 +453,3 @@ module.exports = async function handler(req, res) {
     });
   }
 };
-        
