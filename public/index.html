@@ -2638,42 +2638,76 @@ async function loadChart(interval) {
       document.querySelector('.status').textContent =
         'LOADCHART BERJALAN: ' + interval;
 
-      const symbol = document.getElementById('pair').value;
+      
+const symbol = document.getElementById('pair').value;
+
 console.log('SIMBOL YANG DIPILIH:', symbol);
-document.querySelector('.status').textContent =
-  'PAIR DIPILIH: ' + symbol;      
-const response = await fetch('/api?interval=' + interval + '&symbol=' + encodeURIComponent(symbol));
 
 document.querySelector('.status').textContent =
-  'API HTTP: ' + response.status;
+  'PAIR DIPILIH: ' + symbol;
 
-const data = await response.json();
+const cacheKey = symbol + ':' + interval;
+const cached = aurumCandleCache.get(cacheKey);
 
-document.querySelector('.status').textContent =
-  'API STATUS: ' + data.status +
-  ' | CANDLES: ' + (data.candles?.length || 0);
+const response = cached && Date.now() - cached.time < 60000
+  ? null
+  : await fetch(
+      '/api?interval=' + interval +
+      '&symbol=' + encodeURIComponent(symbol)
+    );
 
-      if (data.status !== 'success' || !data.candles?.length) {
-        console.log('Data grafik belum tersedia');
-        return;
-      }
+if (response) {
+  document.querySelector('.status').textContent =
+    'API HTTP: ' + response.status;
+}
 
-      const candles = data.candles.slice().reverse().map(c => {
-  const dateText = String(c.datetime).trim();
-  const dateTime = dateText.replace(' ', 'T');
+let candles;
 
-  const isoTime = /^\d{4}-\d{2}-\d{2}$/.test(dateTime)
-    ? dateTime + 'T00:00:00+07:00'
-    : dateTime + '+07:00';
+if (cached && Date.now() - cached.time < 60000) {
+  // AMBIL DATA DARI CACHE
+  candles = cached.data;
 
-  return {
-    time: Math.floor(new Date(isoTime).getTime() / 1000),
-    open: Number(c.open),
-    high: Number(c.high),
-    low: Number(c.low),
-    close: Number(c.close)
-  };
-});
+  document.querySelector('.status').textContent =
+    'CACHE AKTIF | CANDLES: ' + candles.length;
+
+} else {
+  // AMBIL DATA DARI API
+  const data = await response.json();
+
+  document.querySelector('.status').textContent =
+    'API STATUS: ' + data.status +
+    ' | CANDLES: ' + (data.candles?.length || 0);
+
+  if (data.status !== 'success' || !data.candles?.length) {
+    console.log('Data grafik belum tersedia');
+    return;
+  }
+
+  candles = data.candles.slice().reverse().map(c => {
+    const dateText = String(c.datetime).trim();
+    const dateTime = dateText.replace(' ', 'T');
+
+    const isoTime = /^\d{4}-\d{2}-\d{2}$/.test(dateTime)
+      ? dateTime + 'T00:00:00+07:00'
+      : dateTime + '+07:00';
+
+    return {
+      time: Math.floor(new Date(isoTime).getTime() / 1000),
+      open: Number(c.open),
+      high: Number(c.high),
+      low: Number(c.low),
+      close: Number(c.close)
+    };
+  });
+
+  // SIMPAN DATA KE CACHE
+  aurumCandleCache.set(cacheKey, {
+    time: Date.now(),
+    data: candles
+  });
+}
+      
+      
 
 // TES BEARISH BOS HISTORIS
 const bearishHistoryTests = [];
@@ -2738,15 +2772,10 @@ document.querySelector('.status').textContent =
   ' x ' + (el ? el.clientHeight : 'TIDAK ADA');
      const cacheKey = symbol + ':' + interval;
 
-      aurumCandleCache.set(cacheKey, {
-        time: Date.now(),
-        data: candles.map(c => ({
-          open: c.open,
-          high: c.high,
-          low: c.low,
-          close: c.close
-        }))
-      });
+aurumCandleCache.set(cacheKey, {
+  time: Date.now(),
+  data: candles
+});
       
 // MULTI TIMEFRAME MARKET STRUCTURE
 
