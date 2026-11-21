@@ -1,8 +1,12 @@
 
+
 module.exports = async function handler(req, res) {
   if (!globalThis.aurumCache) {
     globalThis.aurumCache = new Map();
   }
+
+  
+  
 
   const allowedIntervals = {
   M1: "1min",
@@ -43,12 +47,15 @@ const cacheTTL = selectedSymbol === "WTI"
       "1day": 1800000
     }[interval] || 180000);
 
+
 if (cached && Date.now() - cached.time < cacheTTL) {
   return res.status(200).json(cached.data);
 }
 
-// END AURUM SMART API CACHE OPTIMIZATION
-  try {
+
+
+try {
+  
     // JALUR KHUSUS WTI DARI YAHOO FINANCE
     if (selectedSymbol === "WTI") {
       const yahooIntervals = {
