@@ -2262,6 +2262,56 @@ body {
 }
 
 /* END AURUM MOTION */
+/* AURUM LIVE MARKET TICKER */
+
+.aurum-live-ticker {
+  width: 100%;
+  overflow: hidden;
+  padding: 12px 8px;
+  margin-bottom: 10px;
+  background: #fff;
+  border-top: 1px solid #eee5d5;
+  border-bottom: 1px solid #eee5d5;
+}
+
+.ticker-track {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 12px;
+  min-width: 100%;
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  font-size: 10px;
+}
+
+.ticker-item strong {
+  color: #a87922;
+  font-weight: 900;
+}
+
+.ticker-item span {
+  color: #737987;
+  font-size: 9px;
+}
+
+.ticker-item b {
+  color: #252c3a;
+  font-size: 10px;
+}
+
+.ticker-item small {
+  color: #16a477;
+  font-size: 9px;
+}
+
+/* END AURUM LIVE MARKET TICKER */
+
 </style>
 </head>
   
@@ -2364,6 +2414,34 @@ body {
   
 <!-- HALAMAN BERANDA -->
 <section id="homePage" class="app-page active">
+  <!-- AURUM LIVE MARKET TICKER -->
+<div class="aurum-live-ticker">
+  <div class="ticker-track">
+
+    <div class="ticker-item">
+      <strong>XAU</strong>
+      <span>GOLD</span>
+      <b id="tickerXAU">Memuat...</b>
+      <small id="changeXAU">--</small>
+    </div>
+
+    <div class="ticker-item">
+      <strong>BTC</strong>
+      <span>BITCOIN</span>
+      <b id="tickerBTC">Memuat...</b>
+      <small id="changeBTC">--</small>
+    </div>
+
+    <div class="ticker-item">
+      <strong>WTI</strong>
+      <span>OIL</span>
+      <b id="tickerWTI">Memuat...</b>
+      <small id="changeWTI">--</small>
+    </div>
+
+  </div>
+</div>
+<!-- END AURUM LIVE MARKET TICKER -->
 
   <!-- AURUM HERO -->
   <section class="aurum-home-hero">
