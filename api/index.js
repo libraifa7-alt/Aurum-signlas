@@ -623,11 +623,15 @@ if (selectedSymbol === "XAU/USD" && interval === "1min") {
   }
 }
 
+const providerFetchedAt = new Date().toISOString();
+const lastCandleAt = candles[candles.length - 1]?.datetime || null;
 const output = {
   status: "success",
   symbol: selectedSymbol,
   interval: selected,
   source: "Twelve Data",
+  providerFetchedAt,
+  lastCandleAt,
   livePrice,
   livePriceUpdatedAt,
   livePriceSource,
