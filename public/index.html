@@ -6754,9 +6754,30 @@ if ('serviceWorker' in navigator) {
       if(p)p.textContent=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       if(c){c.textContent=(change>=0?'+':'')+change.toFixed(2)+'%';c.style.color=change>=0?'#159b72':'#e45b63';}
       if(path){
-        const points=candles.slice(-24).map(x=>Number(x.close)).filter(Number.isFinite);
+        // Smooth the visual trace without changing the underlying market data.
+        const rawPoints=candles.slice(-24).map(x=>Number(x.close)).filter(Number.isFinite);
+        const points=rawPoints.map((value,index)=>{
+          const from=Math.max(0,index-2),to=Math.min(rawPoints.length-1,index+2);
+          const window=rawPoints.slice(from,to+1);
+          return window.reduce((sum,item)=>sum+item,0)/window.length;
+        });
         const min=Math.min(...points),max=Math.max(...points),spread=max-min||1;
-        path.setAttribute('d',points.map((v,i)=>(i?'L':'M')+(i*180/Math.max(1,points.length-1)).toFixed(1)+' '+(36-((v-min)/spread)*29).toFixed(1)).join(' '));
+        const coords=points.map((value,index)=>({
+          x:index*180/Math.max(1,points.length-1),
+          y:25-((value-min)/spread)*15
+        }));
+        let curve='M '+coords[0].x.toFixed(1)+' '+coords[0].y.toFixed(1);
+        for(let i=0;i<coords.length-1;i++){
+          const current=coords[i],next=coords[i+1];
+          const after=coords[Math.min(i+2,coords.length-1)];
+          const before=coords[Math.max(0,i-1)];
+          const c1x=current.x+(next.x-before.x)/6;
+          const c1y=current.y+(next.y-before.y)/6;
+          const c2x=next.x-(after.x-current.x)/6;
+          const c2y=next.y-(after.y-current.y)/6;
+          curve+=' C '+c1x.toFixed(1)+' '+c1y.toFixed(1)+', '+c2x.toFixed(1)+' '+c2y.toFixed(1)+', '+next.x.toFixed(1)+' '+next.y.toFixed(1);
+        }
+        path.setAttribute('d',curve);
         path.style.stroke=asset.symbol==='XAU/USD'?'#e45b63':asset.symbol==='BTC/USD'?'#3298dc':'#329f91';
       }
     }catch(error){
