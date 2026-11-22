@@ -436,7 +436,7 @@ async function respondWithStaleCache() {
     cache: "stale_candles"
   };
 
-  if (selectedSymbol === "XAU/USD" && interval === "1min") {
+  if (selectedSymbol === "XAU/USD") {
     const quote = await getCachedGoldQuote();
     fallback.livePrice = quote.price;
     fallback.livePriceUpdatedAt = quote.updatedAt;
@@ -635,14 +635,15 @@ let livePriceUpdatedAt = null;
 let livePriceSource = "time_series";
 let livePriceStatus = "fallback";
 let livePriceError = null;
-if (selectedSymbol === "XAU/USD" && interval === "1min") {
+if (selectedSymbol === "XAU/USD") {
   const quote = await getCachedGoldQuote();
   livePrice = quote.price;
   livePriceUpdatedAt = quote.updatedAt;
   livePriceSource = quote.source;
   livePriceStatus = quote.status;
   livePriceError = quote.error;
-  if (quote.price !== null) {
+  // Keep higher-timeframe provider OHLC intact; display the shared quote separately.
+  if (quote.price !== null && interval === "1min") {
     const last = candles[candles.length - 1];
     last.close = quote.price;
     last.high = Math.max(Number(last.high), quote.price);
