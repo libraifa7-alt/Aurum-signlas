@@ -460,6 +460,14 @@ let rawCandles = data.data
     c.high != null && c.low != null && c.close != null)
   .sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
 
+// DIAGNOSTIK RENTANG DATA BTC
+console.log(
+  "AURUM BTC RAW RANGE:",
+  selectedSymbol,
+  rawCandles[0]?.time,
+  rawCandles[rawCandles.length - 1]?.time
+);
+
 // KONVERSI FORMAT MARKETAPI KE FORMAT AURUM
 let candles;
 
