@@ -2590,6 +2590,10 @@ body {
 .aurum-chart-heading strong{font-size:16px;color:#252c3a}
 .aurum-chart-heading small,.aurum-chart-heading>span{font-size:9px;color:#8b929e;letter-spacing:.8px}
 .aurum-chart-heading>span{color:#1ba77e;font-weight:800}
+#chartPage .aurum-chart-heading>span{color:#b7791f;font-weight:800}
+#chartPage .aurum-chart-heading>span.is-live{color:#159b72}
+#chartPage .aurum-chart-heading>span.is-delayed{color:#b7791f}
+#chartPage .aurum-chart-heading>span.is-closed{color:#64748b}
 #chartPage .market-controls{display:grid;grid-template-columns:1.3fr 1fr;gap:8px;margin:0 0 10px}
 #chartPage .market-controls select{min-width:0;width:100%;border:1px solid #e6eaf1;border-radius:10px;background:#f8faff;font-size:11px;font-weight:700}
 .aurum-chart-timeframes{display:flex;gap:5px;margin-bottom:10px;overflow:hidden}
@@ -4247,11 +4251,15 @@ if (chartStatus) {
     state = 'PASAR TUTUP';
   }
   chartStatus.textContent = '● ' + state;
+  chartStatus.classList.remove('is-live','is-delayed','is-closed');
+  chartStatus.classList.add(state === 'LIVE DATA' ? 'is-live' : state === 'PASAR TUTUP' ? 'is-closed' : 'is-delayed');
   chartStatus.title = chartFeedMeta?.fromCache
     ? 'Data berasal dari cache; kesegaran live belum diverifikasi'
     : state === 'LIVE DATA'
       ? 'Timestamp sumber data masih dalam batas 2 menit'
-      : 'Data terbaru belum memenuhi syarat status LIVE';
+      : state === 'PASAR TUTUP'
+        ? 'Pasar sedang tutup; menampilkan data sesi terakhir'
+        : 'Data terbaru belum memenuhi syarat status LIVE';
 }
       
       
