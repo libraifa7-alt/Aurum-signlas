@@ -303,6 +303,51 @@ if (!twelveApiKey) {
   });
 }
 
+async function respondWithStaleCache() {
+  const fallback = {
+    ...redisCached.data,
+    cache: "stale_candles"
+  };
+
+  // Fetch Gold quote independently so candle outages do not freeze the displayed price.
+  if (selectedSymbol === "XAU/USD" && interval === "1min") {
+    try {
+      const quoteUrl = new URL("https://api.twelvedata.com/price");
+      quoteUrl.searchParams.set("symbol", selectedSymbol);
+      quoteUrl.searchParams.set("apikey", twelveApiKey);
+      const quoteResponse = await fetch(quoteUrl, { cache: "no-store" });
+      const quoteData = await quoteResponse.json();
+      const quote = Number(quoteData.price);
+
+      if (quoteResponse.ok && Number.isFinite(quote) && quote > 0) {
+        fallback.livePrice = quote;
+        fallback.livePriceUpdatedAt = new Date().toISOString();
+        fallback.livePriceSource = "Twelve Data /price";
+        fallback.livePriceStatus = "live_quote";
+        fallback.livePriceError = null;
+
+        const last = fallback.candles?.[fallback.candles.length - 1];
+        if (last) {
+          last.close = quote;
+          last.high = Math.max(Number(last.high), quote);
+          last.low = Math.min(Number(last.low), quote);
+        }
+        fallback.cache = "stale_candles_live_quote";
+      } else {
+        fallback.livePrice = null;
+        fallback.livePriceStatus = "quote_unavailable";
+        fallback.livePriceError = String(quoteData.message || quoteData.code || "Kuotasi terbaru tidak tersedia").slice(0, 180);
+      }
+    } catch (quoteError) {
+      fallback.livePrice = null;
+      fallback.livePriceStatus = "quote_error";
+      fallback.livePriceError = String(quoteError.message || "Gagal mengambil kuotasi").slice(0, 180);
+    }
+  }
+
+  return res.status(200).json(fallback);
+}
+
 // Safe diagnostic for the Gold quote endpoint; never returns the API key.
 if (debugQuote) {
   try {
@@ -362,10 +407,7 @@ if (
   );
 
   if (redisCached && redisCached.data) {
-    return res.status(200).json({
-      ...redisCached.data,
-      cache: "stale"
-    });
+    return await respondWithStaleCache();
   }
 
   return res.status(502).json({
@@ -430,10 +472,7 @@ if (convertedCandles.length === 0) {
   );
 
   if (redisCached && redisCached.data) {
-    return res.status(200).json({
-      ...redisCached.data,
-      cache: "stale"
-    });
+    return await respondWithStaleCache();
   }
 
   return res.status(502).json({
