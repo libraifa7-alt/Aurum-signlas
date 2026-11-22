@@ -2597,8 +2597,8 @@ body {
 #chartPage .market-controls{display:grid;grid-template-columns:1.3fr 1fr;gap:8px;margin:0 0 10px}
 #chartPage .market-controls select{min-width:0;width:100%;border:1px solid #e6eaf1;border-radius:10px;background:#f8faff;font-size:11px;font-weight:700}
 .aurum-chart-timeframes{display:flex;gap:5px;margin-bottom:10px;overflow:hidden}
-.aurum-chart-timeframes span{flex:1;text-align:center;padding:7px 2px;border-radius:7px;background:#f1f5fc;color:#68748a;font-size:8px;font-weight:800}
-.aurum-chart-timeframes span.active{background:#e9c96f;color:#594313}
+.aurum-chart-timeframes button{flex:1;text-align:center;padding:7px 2px;border:0;border-radius:7px;background:#f1f5fc;color:#68748a;font-size:8px;font-weight:800;cursor:pointer}
+.aurum-chart-timeframes button.active{background:#e9c96f;color:#594313}
 #chartPage .chart{height:390px;padding:6px;border-radius:12px;border:1px solid #e7eaf0;box-shadow:none}
 #chartPage #candleChart{height:370px!important}
 .aurum-bottom-nav{grid-template-columns:repeat(6,minmax(0,1fr));min-height:66px;padding:6px 5px;gap:2px;border:1px solid #eeeaf0;border-radius:19px 19px 0 0;background:rgba(255,255,255,.97);box-shadow:0 -5px 22px rgba(31,41,55,.10)}
@@ -3351,7 +3351,7 @@ body {
           <option>M1</option><option>M5</option><option selected>M15</option><option>M30</option><option>M45</option><option>H1</option><option>H4</option><option>D1</option>
         </select>
       </div>
-      <div class="aurum-chart-timeframes" aria-hidden="true"><span>M1</span><span class="active">M15</span><span>M30</span><span>H1</span><span>H4</span><span>D1</span></div>
+      <div class="aurum-chart-timeframes" aria-label="Pilih timeframe grafik"><button type="button" data-timeframe="M1">M1</button><button type="button" data-timeframe="M15">M15</button><button type="button" data-timeframe="M30">M30</button><button type="button" data-timeframe="H1">H1</button><button type="button" data-timeframe="H4">H4</button><button type="button" data-timeframe="D1">D1</button></div>
       <div class="chart" id="goldChart"><div id="candleChart" style="width:100%;height:340px;position:relative"></div></div>
       <p class="aurum-disclaimer">Grafik menggunakan data pasar yang diterima AURUM. Periksa status data sebelum mengambil keputusan.</p>
     </section>
@@ -6361,17 +6361,7 @@ try {
   console.log('TOTAL CANDLE:', candles.length);
 series.setData(candles);
 
-// Keep the live quote visible without rewriting higher-timeframe historical candles.
-if (window.aurumLiveQuoteLine) {
-  try { series.removePriceLine(window.aurumLiveQuoteLine); } catch (_) {}
-  window.aurumLiveQuoteLine = null;
-}
-if (symbol === "XAU/USD" && Number.isFinite(Number(chartFeedMeta?.livePrice)) && Number(chartFeedMeta.livePrice) > 0) {
-  window.aurumLiveQuoteLine = series.createPriceLine({
-    price: Number(chartFeedMeta.livePrice), color: "#159b72", lineWidth: 2,
-    lineStyle: 2, axisLabelVisible: true, title: "LIVE XAU/USD"
-  });
-}
+// Live spot is displayed by the dedicated quote trace above; avoid a duplicate price-line label.
 
   document.querySelector('.status').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
@@ -6747,8 +6737,29 @@ if (timeframe && dashboardTimeframe) {
 
 loadChart(timeframe.value || 'M15');
 
+const timeframeButtons = document.querySelectorAll('.aurum-chart-timeframes button[data-timeframe]');
+function syncTimeframeButtons(value) {
+  timeframeButtons.forEach(button => {
+    const selected = button.dataset.timeframe === value;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+}
+syncTimeframeButtons(timeframe.value || 'M15');
+
 timeframe.addEventListener('change', function() {
+  syncTimeframeButtons(this.value);
   loadChart(this.value);
+});
+
+timeframeButtons.forEach(button => {
+  button.addEventListener('click', function() {
+    const nextTimeframe = this.dataset.timeframe;
+    if (!nextTimeframe) return;
+    timeframe.value = nextTimeframe;
+    syncTimeframeButtons(nextTimeframe);
+    loadChart(nextTimeframe);
+  });
 });
 
 pairSelect.addEventListener('change', function() {
