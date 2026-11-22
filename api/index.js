@@ -401,7 +401,7 @@ let nextCursor = null;
 let response = null;
 let data = null;
 let pageCount = 0;
-const maxPages = 20;
+const maxPages = 2;
 
 do {
   const pageUrl = new URL(marketUrl.toString());
