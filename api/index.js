@@ -67,7 +67,7 @@ module.exports = async function handler(req, res) {
   const cacheTTL = selectedSymbol === "WTI"
     ? 60000
     : selectedSymbol === "XAU/USD" && interval === "1min"
-      ? 15000
+      ? 60000
       : ({
           "1min": 60000,
           "5min": 120000,
@@ -303,45 +303,127 @@ if (!twelveApiKey) {
   });
 }
 
+async function getCachedGoldQuote() {
+  const quoteKey = "aurum:quote:XAUUSD:v1";
+  const errorKey = "aurum:quote-error:XAUUSD:v1";
+  let saved = null;
+  let savedError = null;
+
+  try {
+    const raw = await aurumRedis(["GET", quoteKey]);
+    if (raw) saved = JSON.parse(raw);
+  } catch (error) {
+    console.warn("AURUM GOLD QUOTE CACHE READ:", error.message);
+  }
+
+  const ageMs = saved?.receivedAt ? Date.now() - Date.parse(saved.receivedAt) : Infinity;
+  if (saved && Number.isFinite(Number(saved.price)) && ageMs >= 0 && ageMs < 60000) {
+    return {
+      price: Number(saved.price),
+      updatedAt: saved.receivedAt,
+      source: "Twelve Data /price",
+      status: "live_quote",
+      cache: "redis_quote",
+      error: null
+    };
+  }
+
+  try {
+    const rawError = await aurumRedis(["GET", errorKey]);
+    if (rawError) savedError = JSON.parse(rawError);
+  } catch (error) {
+    console.warn("AURUM GOLD QUOTE ERROR CACHE READ:", error.message);
+  }
+
+  const errorAge = savedError?.receivedAt ? Date.now() - Date.parse(savedError.receivedAt) : Infinity;
+  if (savedError && errorAge >= 0 && errorAge < 300000) {
+    return {
+      price: saved && Number.isFinite(Number(saved.price)) ? Number(saved.price) : null,
+      updatedAt: saved?.receivedAt || null,
+      source: "Twelve Data /price",
+      status: saved ? "stale_quote" : "quote_unavailable",
+      cache: saved ? "redis_stale_quote" : "negative_cache",
+      error: savedError.message || "Kuotasi sementara tidak tersedia"
+    };
+  }
+
+  try {
+    const priceUrl = new URL("https://api.twelvedata.com/price");
+    priceUrl.searchParams.set("symbol", "XAU/USD");
+    priceUrl.searchParams.set("apikey", twelveApiKey);
+    const response = await fetch(priceUrl, { cache: "no-store" });
+    const payload = await response.json();
+    const price = Number(payload.price);
+
+    if (response.ok && Number.isFinite(price) && price > 0) {
+      const record = { price, receivedAt: new Date().toISOString() };
+      try {
+        await aurumRedis(["SET", quoteKey, JSON.stringify(record), "EX", "86400"]);
+        await aurumRedis(["DEL", errorKey]);
+      } catch (error) {
+        console.warn("AURUM GOLD QUOTE CACHE WRITE:", error.message);
+      }
+      return {
+        price,
+        updatedAt: record.receivedAt,
+        source: "Twelve Data /price",
+        status: "live_quote",
+        cache: "provider",
+        error: null
+      };
+    }
+
+    const message = String(payload.message || payload.code || "Twelve Data tidak mengirim kuotasi").slice(0, 180);
+    try {
+      await aurumRedis(["SET", errorKey, JSON.stringify({ message, receivedAt: new Date().toISOString() }), "EX", "300"]);
+    } catch (error) {
+      console.warn("AURUM GOLD QUOTE ERROR CACHE WRITE:", error.message);
+    }
+    return {
+      price: saved && Number.isFinite(Number(saved.price)) ? Number(saved.price) : null,
+      updatedAt: saved?.receivedAt || null,
+      source: "Twelve Data /price",
+      status: saved ? "stale_quote" : "quote_unavailable",
+      cache: saved ? "redis_stale_quote" : "provider_error",
+      error: message
+    };
+  } catch (error) {
+    const message = String(error.message || "Gagal mengambil kuotasi").slice(0, 180);
+    try {
+      await aurumRedis(["SET", errorKey, JSON.stringify({ message, receivedAt: new Date().toISOString() }), "EX", "300"]);
+    } catch (_) {}
+    return {
+      price: saved && Number.isFinite(Number(saved.price)) ? Number(saved.price) : null,
+      updatedAt: saved?.receivedAt || null,
+      source: "Twelve Data /price",
+      status: saved ? "stale_quote" : "quote_error",
+      cache: saved ? "redis_stale_quote" : "request_error",
+      error: message
+    };
+  }
+}
+
 async function respondWithStaleCache() {
   const fallback = {
     ...redisCached.data,
     cache: "stale_candles"
   };
 
-  // Fetch Gold quote independently so candle outages do not freeze the displayed price.
   if (selectedSymbol === "XAU/USD" && interval === "1min") {
-    try {
-      const quoteUrl = new URL("https://api.twelvedata.com/price");
-      quoteUrl.searchParams.set("symbol", selectedSymbol);
-      quoteUrl.searchParams.set("apikey", twelveApiKey);
-      const quoteResponse = await fetch(quoteUrl, { cache: "no-store" });
-      const quoteData = await quoteResponse.json();
-      const quote = Number(quoteData.price);
-
-      if (quoteResponse.ok && Number.isFinite(quote) && quote > 0) {
-        fallback.livePrice = quote;
-        fallback.livePriceUpdatedAt = new Date().toISOString();
-        fallback.livePriceSource = "Twelve Data /price";
-        fallback.livePriceStatus = "live_quote";
-        fallback.livePriceError = null;
-
-        const last = fallback.candles?.[fallback.candles.length - 1];
-        if (last) {
-          last.close = quote;
-          last.high = Math.max(Number(last.high), quote);
-          last.low = Math.min(Number(last.low), quote);
-        }
-        fallback.cache = "stale_candles_live_quote";
-      } else {
-        fallback.livePrice = null;
-        fallback.livePriceStatus = "quote_unavailable";
-        fallback.livePriceError = String(quoteData.message || quoteData.code || "Kuotasi terbaru tidak tersedia").slice(0, 180);
+    const quote = await getCachedGoldQuote();
+    fallback.livePrice = quote.price;
+    fallback.livePriceUpdatedAt = quote.updatedAt;
+    fallback.livePriceSource = quote.source;
+    fallback.livePriceStatus = quote.status;
+    fallback.livePriceError = quote.error;
+    if (quote.price !== null) {
+      const last = fallback.candles?.[fallback.candles.length - 1];
+      if (last) {
+        last.close = quote.price;
+        last.high = Math.max(Number(last.high), quote.price);
+        last.low = Math.min(Number(last.low), quote.price);
       }
-    } catch (quoteError) {
-      fallback.livePrice = null;
-      fallback.livePriceStatus = "quote_error";
-      fallback.livePriceError = String(quoteError.message || "Gagal mengambil kuotasi").slice(0, 180);
+      fallback.cache = "stale_candles_" + quote.cache;
     }
   }
 
@@ -350,30 +432,17 @@ async function respondWithStaleCache() {
 
 // Safe diagnostic for the Gold quote endpoint; never returns the API key.
 if (debugQuote) {
-  try {
-    const diagnosticUrl = new URL("https://api.twelvedata.com/price");
-    diagnosticUrl.searchParams.set("symbol", selectedSymbol);
-    diagnosticUrl.searchParams.set("apikey", twelveApiKey);
-    const diagnosticResponse = await fetch(diagnosticUrl, { cache: "no-store" });
-    const diagnosticData = await diagnosticResponse.json();
-    const diagnosticPrice = Number(diagnosticData.price);
-    return res.status(200).json({
-      status: diagnosticResponse.ok && Number.isFinite(diagnosticPrice) && diagnosticPrice > 0 ? "success" : "provider_error",
-      diagnostic: "xauusd_price_endpoint",
-      symbol: selectedSymbol,
-      httpStatus: diagnosticResponse.status,
-      price: Number.isFinite(diagnosticPrice) && diagnosticPrice > 0 ? diagnosticPrice : null,
-      receivedAt: new Date().toISOString(),
-      providerCode: diagnosticData.code || null,
-      providerMessage: diagnosticData.message || null
-    });
-  } catch (diagnosticError) {
-    return res.status(502).json({
-      status: "request_error",
-      diagnostic: "xauusd_price_endpoint",
-      message: String(diagnosticError.message || "Gagal menghubungi Twelve Data").slice(0, 180)
-    });
-  }
+  const quote = await getCachedGoldQuote();
+  return res.status(200).json({
+    status: quote.price !== null ? "success" : "provider_error",
+    diagnostic: "xauusd_price_endpoint",
+    symbol: selectedSymbol,
+    price: quote.price,
+    receivedAt: quote.updatedAt,
+    quoteStatus: quote.status,
+    quoteCache: quote.cache,
+    providerMessage: quote.error
+  });
 }
 
 // Twelve Data supports 45min directly; request the selected interval.
@@ -533,37 +602,24 @@ if (!candles.length) {
   });
 }
 
-// For Gold M1, request the latest quote separately from completed candles.
-// REST quote is still subject to the user's Twelve Data plan and provider latency.
+// Use a shared Redis quote cache to avoid burning one Twelve Data credit per page poll.
 let livePrice = null;
 let livePriceUpdatedAt = null;
 let livePriceSource = "time_series";
 let livePriceStatus = "fallback";
 let livePriceError = null;
 if (selectedSymbol === "XAU/USD" && interval === "1min") {
-  try {
-    const priceUrl = new URL("https://api.twelvedata.com/price");
-    priceUrl.searchParams.set("symbol", selectedSymbol);
-    priceUrl.searchParams.set("apikey", twelveApiKey);
-    const priceResponse = await fetch(priceUrl);
-    const priceData = await priceResponse.json();
-    const quote = Number(priceData.price);
-    if (priceResponse.ok && Number.isFinite(quote) && quote > 0) {
-      livePrice = quote;
-      livePriceUpdatedAt = new Date().toISOString();
-      livePriceSource = "Twelve Data /price";
-      livePriceStatus = "live_quote";
-      const last = candles[candles.length - 1];
-      last.close = quote;
-      last.high = Math.max(Number(last.high), quote);
-      last.low = Math.min(Number(last.low), quote);
-    } else {
-      livePriceError = String(priceData.message || priceData.code || "Twelve Data /price tidak memberikan kuotasi").slice(0, 180);
-      console.warn("AURUM XAU LIVE PRICE UNAVAILABLE:", livePriceError);
-    }
-  } catch (priceError) {
-    livePriceError = String(priceError.message || "Gagal mengambil kuotasi").slice(0, 180);
-    console.warn("AURUM XAU LIVE PRICE ERROR:", livePriceError);
+  const quote = await getCachedGoldQuote();
+  livePrice = quote.price;
+  livePriceUpdatedAt = quote.updatedAt;
+  livePriceSource = quote.source;
+  livePriceStatus = quote.status;
+  livePriceError = quote.error;
+  if (quote.price !== null) {
+    const last = candles[candles.length - 1];
+    last.close = quote.price;
+    last.high = Math.max(Number(last.high), quote.price);
+    last.low = Math.min(Number(last.low), quote.price);
   }
 }
 
