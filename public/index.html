@@ -2576,6 +2576,11 @@ body {
   padding:10px 11px!important;margin:6px 0;border:1px solid #e8edf3;
   border-radius:9px;background:#fbfcfe;color:#526074;
 }
+/* Sembunyikan panel lanjutan pada halaman Analisis; elemen/ID tetap ada agar mesin analisis tidak terganggu */
+#marketPage #liquidityAnalysisSection,
+#marketPage #fvgAnalysisSection,
+#marketPage #orderBlockAnalysisSection{display:none!important;}
+
 #marketPage #liquidityAnalysis,#marketPage #liquidityConfirmation,
 #marketPage #fvgAnalysis,#marketPage #orderBlockAnalysis,
 #marketPage #orderBlockMTF,#marketPage #orderBlockZone{
@@ -3056,9 +3061,9 @@ body {
         <div class="aurum-analysis-section"><small class="aurum-section-kicker">BIAS PASAR · MARKET STRUCTURE</small><p id="marketStructure">Menunggu analisis candle...</p></div>
         <div class="aurum-analysis-section"><small class="aurum-section-kicker">METER TREN · 7 TIMEFRAME</small><div id="trendMeter"><p>Menunggu analisis tujuh timeframe...</p></div></div>
         <div class="aurum-analysis-section"><small class="aurum-section-kicker">LEVEL SUPPORT & RESISTANCE</small><div id="supportResistanceMTF"><p>Menunggu analisis Support & Resistance...</p></div></div>
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">LIQUIDITY</small><p id="liquidityAnalysis">Menunggu analisis liquidity...</p><small class="aurum-section-kicker">KONFIRMASI LIQUIDITY</small><p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p></div>
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">FAIR VALUE GAP · FVG</small><p id="fvgAnalysis">Menunggu analisis FVG...</p></div>
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">ORDER BLOCK</small><p id="orderBlockAnalysis">Menunggu analisis Order Block...</p><p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p><p id="orderBlockZone">Menunggu deteksi zona harga OB...</p></div>
+        <div id="liquidityAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">LIQUIDITY</small><p id="liquidityAnalysis">Menunggu analisis liquidity...</p><small class="aurum-section-kicker">KONFIRMASI LIQUIDITY</small><p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p></div>
+        <div id="fvgAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">FAIR VALUE GAP · FVG</small><p id="fvgAnalysis">Menunggu analisis FVG...</p></div>
+        <div id="orderBlockAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">ORDER BLOCK</small><p id="orderBlockAnalysis">Menunggu analisis Order Block...</p><p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p><p id="orderBlockZone">Menunggu deteksi zona harga OB...</p></div>
       </div>
     </section>
   </section>
