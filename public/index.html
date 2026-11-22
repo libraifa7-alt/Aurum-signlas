@@ -2529,6 +2529,20 @@ body {
  #marketPage #trendMeter .aurum-tf-ring{width:29px;height:29px}
  #marketPage #trendMeter .aurum-tf-card>b{font-size:5px}
 }
+
+/* TRAXA BLUE / RED COLOR PASS */
+#marketPage #trendMeter .aurum-trend-hero{
+ background:linear-gradient(115deg,#fff1f1 0%,#ffffff 48%,#eef7ff 100%);
+ border-color:#e8eaf0;
+}
+#marketPage #trendMeter .aurum-trend-meter-label span:first-child{color:#ef535b}
+#marketPage #trendMeter .aurum-trend-meter-label span:last-child{color:#269bd2}
+#marketPage #trendMeter .aurum-trend-percentages span:first-child{color:#269bd2}
+#marketPage #trendMeter .aurum-trend-percentages span:last-child{color:#ef535b}
+#marketPage #trendMeter .aurum-trend-meter-box{background:#fbfcff}
+#marketPage #trendMeter .aurum-tf-card{background:linear-gradient(180deg,#fff,#f8fbff)}
+#marketPage #trendMeter .aurum-tf-card[style*="38, 157, 206"]{border-color:#c8e8f8}
+#marketPage #trendMeter .aurum-tf-card[style*="239, 83, 91"]{border-color:#f6d0d2}
 </style>
 
 </head>
@@ -4551,9 +4565,9 @@ const direction = signal =>
           ? 'BEARISH'
           : 'MIXED';
       const overallColor = overall === 'BULLISH'
-        ? '#279f83'
+        ? '#269bd2'
         : overall === 'BEARISH'
-          ? '#e45b65'
+          ? '#ef535b'
           : '#8994a5';
 
       const latestPrice = document.getElementById('goldPrice')?.textContent || '--';
@@ -4563,9 +4577,9 @@ const direction = signal =>
         const bearishBlocks = Math.round((bearish / total) * 21);
         const neutralBlocks = Math.max(0, 21 - bullishBlocks - bearishBlocks);
         const color = index < bullishBlocks
-          ? '#329bd6'
+          ? '#269bd2'
           : index < bullishBlocks + bearishBlocks
-            ? '#ed5b65'
+            ? '#ef535b'
             : '#e5e8ed';
         return '<span class="aurum-meter-segment" style="background:' + color + '"></span>';
       }).join('');
@@ -4573,9 +4587,9 @@ const direction = signal =>
       const timeframeCards = results.map(item => {
         const state = trends[item.timeframe];
         const color = state === 'BULLISH'
-          ? '#299dce'
+          ? '#269bd2'
           : state === 'BEARISH'
-            ? '#e65d68'
+            ? '#ef535b'
             : '#9aa3b1';
         const shortLabel = state === 'UNKNOWN' ? 'N/A' : state;
         const symbol = state === 'BULLISH' ? '▲' : state === 'BEARISH' ? '▼' : '—';
@@ -4594,7 +4608,7 @@ const direction = signal =>
         const support = sr && sr.support != null ? sr.support.toFixed(2) : '--';
         const resistance = sr && sr.resistance != null ? sr.resistance.toFixed(2) : '--';
         const state = trends[item.timeframe];
-        const color = state === 'BULLISH' ? '#299dce' : state === 'BEARISH' ? '#e65d68' : '#8994a5';
+        const color = state === 'BULLISH' ? '#269bd2' : state === 'BEARISH' ? '#ef535b' : '#8994a5';
         return `
           <div class="aurum-trend-table-row">
             <strong>${item.timeframe}</strong>
