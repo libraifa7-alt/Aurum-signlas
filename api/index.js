@@ -56,6 +56,7 @@ module.exports = async function handler(req, res) {
 
   const interval = allowedIntervals[selected] || "15min";
   const debugRaw = req.query.debug === "raw" && selectedSymbol === "XAU/USD";
+  const debugQuote = req.query.debug === "quote" && selectedSymbol === "XAU/USD";
 
   // Versioned provider cache prevents old MarketAPI candles being reused.
   const cacheSource = selectedSymbol === "WTI" ? "yahoo" : "twelvedata";
@@ -78,7 +79,7 @@ module.exports = async function handler(req, res) {
           "1day": 1800000
         }[interval] || 180000);
 
-  if (!debugRaw && cached && Date.now() - cached.time < cacheTTL) {
+  if (!debugRaw && !debugQuote && cached && Date.now() - cached.time < cacheTTL) {
     return res.status(200).json(cached.data);
   }
 
@@ -113,7 +114,7 @@ module.exports = async function handler(req, res) {
         data: redisCached.data
       });
 
-      if (!debugRaw && Date.now() - redisCached.time < cacheTTL) {
+      if (!debugRaw && !debugQuote && Date.now() - redisCached.time < cacheTTL) {
         return res.status(200).json(redisCached.data);
       }
     }
@@ -300,6 +301,34 @@ if (!twelveApiKey) {
     status: "error",
     message: "TWELVE_DATA_API_KEY belum diatur"
   });
+}
+
+// Safe diagnostic for the Gold quote endpoint; never returns the API key.
+if (debugQuote) {
+  try {
+    const diagnosticUrl = new URL("https://api.twelvedata.com/price");
+    diagnosticUrl.searchParams.set("symbol", selectedSymbol);
+    diagnosticUrl.searchParams.set("apikey", twelveApiKey);
+    const diagnosticResponse = await fetch(diagnosticUrl, { cache: "no-store" });
+    const diagnosticData = await diagnosticResponse.json();
+    const diagnosticPrice = Number(diagnosticData.price);
+    return res.status(200).json({
+      status: diagnosticResponse.ok && Number.isFinite(diagnosticPrice) && diagnosticPrice > 0 ? "success" : "provider_error",
+      diagnostic: "xauusd_price_endpoint",
+      symbol: selectedSymbol,
+      httpStatus: diagnosticResponse.status,
+      price: Number.isFinite(diagnosticPrice) && diagnosticPrice > 0 ? diagnosticPrice : null,
+      receivedAt: new Date().toISOString(),
+      providerCode: diagnosticData.code || null,
+      providerMessage: diagnosticData.message || null
+    });
+  } catch (diagnosticError) {
+    return res.status(502).json({
+      status: "request_error",
+      diagnostic: "xauusd_price_endpoint",
+      message: String(diagnosticError.message || "Gagal menghubungi Twelve Data").slice(0, 180)
+    });
+  }
 }
 
 // Twelve Data supports 45min directly; request the selected interval.
