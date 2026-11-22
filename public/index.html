@@ -4252,6 +4252,7 @@ if (cached && Date.now() - cached.time < 60000) {
   const data = await response.json();
   chartFeedMeta = {
     fromCache: false,
+    livePrice: data.livePrice,
     livePriceStatus: data.livePriceStatus,
     livePriceUpdatedAt: data.livePriceUpdatedAt,
     lastCandleAt: data.lastCandleAt || (data.candles && data.candles.length ? data.candles[data.candles.length - 1].datetime : null),
@@ -6319,6 +6320,18 @@ try {
   console.log('TOTAL CANDLE:', candles.length);
 series.setData(candles);
 
+// Keep the live quote visible without rewriting higher-timeframe historical candles.
+if (window.aurumLiveQuoteLine) {
+  try { series.removePriceLine(window.aurumLiveQuoteLine); } catch (_) {}
+  window.aurumLiveQuoteLine = null;
+}
+if (symbol === "XAU/USD" && Number.isFinite(Number(chartFeedMeta?.livePrice)) && Number(chartFeedMeta.livePrice) > 0) {
+  window.aurumLiveQuoteLine = series.createPriceLine({
+    price: Number(chartFeedMeta.livePrice), color: "#159b72", lineWidth: 2,
+    lineStyle: 2, axisLabelVisible: true, title: "LIVE XAU/USD"
+  });
+}
+
   document.querySelector('.status').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
 
@@ -6973,6 +6986,7 @@ if ('serviceWorker' in navigator) {
       if(path){
         // TRAXA-style sparkline: lightly smoothed candles with flowing cubic curves.
         const rawPoints=candles.slice(-30).map(x=>Number(x.close)).filter(Number.isFinite);
+        if(asset.symbol==="XAU/USD" && Number.isFinite(Number(data.livePrice)) && Number(data.livePrice)>0) rawPoints.push(Number(data.livePrice));
         const points=rawPoints.map((value,index)=>{
           const from=Math.max(0,index-1),to=Math.min(rawPoints.length-1,index+1);
           const window=rawPoints.slice(from,to+1);
@@ -7075,7 +7089,12 @@ if ('serviceWorker' in navigator) {
       }else{
         priceEl.textContent=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       }
-      draw(candles,symbol);
+      const displayCandles=candles.slice();
+      if(symbol==="XAU/USD" && Number.isFinite(Number(data.livePrice)) && Number(data.livePrice)>0){
+        const last=displayCandles[displayCandles.length-1];
+        displayCandles[displayCandles.length-1]={...last,close:Number(data.livePrice),high:Math.max(Number(last.high),Number(data.livePrice)),low:Math.min(Number(last.low),Number(data.livePrice))};
+      }
+      draw(displayCandles,symbol);
     }catch(e){console.warn('AURUM setup live tick:',e);}
     finally{busy=false;}
   }
