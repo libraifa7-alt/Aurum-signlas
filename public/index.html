@@ -6706,12 +6706,20 @@ const latestCandle = candles[candles.length - 1];
 
 // Initial value is formatted here; subsequent refreshes animate the live tick above.
 const priceNode=document.getElementById('goldPrice');
-if(priceNode && !Number.isFinite(Number(String(priceNode.textContent).replace(/[^0-9.]/g,'')))){
-  priceNode.textContent=latestCandle.close.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const initialQuoteTime=Date.parse(chartFeedMeta?.livePriceUpdatedAt||'');
+const initialQuoteAge=Number.isFinite(initialQuoteTime)?Date.now()-initialQuoteTime:Infinity;
+const initialHasFreshGoldQuote=symbol==='XAU/USD' && !chartFeedMeta?.fromCache &&
+  chartFeedMeta?.livePriceStatus==='live_quote' &&
+  Number.isFinite(Number(chartFeedMeta.livePrice)) && Number(chartFeedMeta.livePrice)>0 &&
+  initialQuoteAge>=0 && initialQuoteAge<=120000;
+const initialDisplayPrice=initialHasFreshGoldQuote?Number(chartFeedMeta.livePrice):Number(latestCandle.close);
+if(priceNode && Number.isFinite(initialDisplayPrice)){
+  priceNode.textContent=initialDisplayPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-
-document.getElementById('goldTime').textContent =
-  document.getElementById('pair').value + ' · Market Data';
+const goldTimeNode=document.getElementById('goldTime');
+if(goldTimeNode) goldTimeNode.textContent = symbol==='XAU/USD'
+  ? (initialHasFreshGoldQuote?'XAU/USD · LIVE '+new Date(chartFeedMeta.livePriceUpdatedAt).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB':'XAU/USD · Harga candle terakhir')
+  : symbol+' · '+(chartFeedMeta?.fromCache?'Cache candle': 'Market Data')+' · '+new Date(latestCandle.time*1000).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB';
 
 chart.timeScale().fitContent();
 
@@ -7536,7 +7544,11 @@ console.log('STATUS SERVER DIPERIKSA');
         ? (hasFreshGoldQuote ? 'XAU/USD · LIVE '+new Date(data.livePriceUpdatedAt).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB' : 'XAU/USD · Harga candle terakhir')
         : symbol+' · '+(data.source || 'Data candle')+' · '+new Date(candles[candles.length-1].datetime).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB';
     }catch(e){
-      if(pairEl.value===symbol){priceEl.textContent='--';const timeEl=document.getElementById('goldTime');if(timeEl)timeEl.textContent=symbol+' · Data belum tersedia';}
+      if(pairEl.value===symbol && String(priceEl.textContent||'').startsWith('Memuat')){
+        priceEl.textContent='--';
+        const timeEl=document.getElementById('goldTime');
+        if(timeEl)timeEl.textContent=symbol+' · Data belum tersedia';
+      }
       console.warn('AURUM setup live tick:',e);
     }
     finally{busy=false;}
