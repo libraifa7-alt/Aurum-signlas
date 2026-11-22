@@ -279,51 +279,11 @@ module.exports = async function handler(req, res) {
 
     // JALUR DATA XAU/USD DAN BTC/USD DARI TWELVE DATA
 
-// JALUR DATA XAU/USD DAN BTC/USD DARI MARKETAPI
+// JALUR DATA XAU/USD DAN BTC/USD DARI TWELVE DATA
 
-    // AURUM MARKETAPI COOLDOWN CHECK
-const marketApiCooldownKey =
-  "aurum:marketapi:cooldown";
+const twelveApiKey = process.env.TWELVE_DATA_API_KEY;
 
-let marketApiCoolingDown = false;
-
-try {
-  const cooldown = await aurumRedis([
-    "GET",
-    marketApiCooldownKey
-  ]);
-
-  marketApiCoolingDown = Boolean(cooldown);
-} catch (cooldownError) {
-  console.error(
-    "MARKETAPI COOLDOWN CHECK ERROR:",
-    cooldownError.message
-  );
-}
-
-if (marketApiCoolingDown) {
-  if (redisCached && redisCached.data) {
-    return res.status(200).json({
-      ...redisCached.data,
-      cache: "stale"
-    });
-  }
-
-  return res.status(503).json({
-    status: "error",
-    message: "MarketAPI cooldown aktif"
-  });
-}
-
-
-const symbol =
-  selectedSymbol === "BTC/USD"
-    ? "BITCOIN"
-    : selectedSymbol.replaceAll("/", "");
-
-const apiKey = process.env.MARKETAPI_API_KEY;
-
-if (!apiKey) {
+if (!twelveApiKey) {
   if (redisCached && redisCached.data) {
     return res.status(200).json({
       ...redisCached.data,
@@ -333,209 +293,42 @@ if (!apiKey) {
 
   return res.status(500).json({
     status: "error",
-    message: "MARKETAPI_API_KEY belum diatur"
+    message: "TWELVE_DATA_API_KEY belum diatur"
   });
 }
-      
 
-// MARKETAPI TIDAK MENDUKUNG M45 LANGSUNG
 // M45 DIBENTUK DARI 3 CANDLE M15
-const marketTimeframe = selected === "M45" ? "M15" : selected;
+const providerInterval =
+  selected === "M45" ? "15min" : interval;
 
-const timeframeMinutes = {
-  M1: 1,
-  M5: 5,
-  M15: 15,
-  M30: 30,
-  M45: 45,
-  H1: 60,
-  H4: 240,
-  D1: 1440
-};
+const outputsize =
+  selected === "M45" ? 300 : 100;
 
-const minutes = timeframeMinutes[selected] || 15;
-
-const limit = selected === "M45" ? 400 : 120;
-
-
-
-
-
-// AURUM SMART HISTORICAL RANGE
-// Hanya mengambil data yang dibutuhkan chart
-
-const targetBars = selected === "M45"
-  ? 300
-  : 100;
-
-const sourceMinutes =
-  timeframeMinutes[marketTimeframe] || minutes;
-
-const lookbackMs =
-  sourceMinutes *
-  60 *
-  1000 *
-  targetBars *
-  1.2;
-
-const fromDate = new Date(
-  Date.now() - lookbackMs
+// REQUEST TWELVE DATA
+const twelveUrl = new URL(
+  "https://api.twelvedata.com/time_series"
 );
 
-const toDate = new Date();
+twelveUrl.searchParams.set("symbol", selectedSymbol);
+twelveUrl.searchParams.set("interval", providerInterval);
+twelveUrl.searchParams.set("outputsize", String(outputsize));
+twelveUrl.searchParams.set("timezone", "UTC");
+twelveUrl.searchParams.set("order", "ASC");
+twelveUrl.searchParams.set("apikey", twelveApiKey);
 
-const marketUrl = new URL(
-  "https://api.marketapi.app/v1/bars"
-);
-
-marketUrl.searchParams.set("symbol", symbol);
-marketUrl.searchParams.set("timeframe", marketTimeframe);
-marketUrl.searchParams.set("from", fromDate.toISOString());
-marketUrl.searchParams.set("to", toDate.toISOString());
-marketUrl.searchParams.set("limit", String(limit));
-      
-
-// AURUM MARKETAPI PAGINATION
-let allBars = [];
-let nextCursor = null;
-let response = null;
-let data = null;
-let pageCount = 0;
-const maxPages = 2;
-
-do {
-  const pageUrl = new URL(marketUrl.toString());
-
-  if (nextCursor) {
-    pageUrl.searchParams.set("cursor", nextCursor);
-  }
-
-  const pageResponse = await fetch(pageUrl, {
-    headers: {
-      "Authorization": "Bearer " + apiKey
-    }
-  });
-
-  const pageData = await pageResponse.json();
-
-
-  if (
-    !pageResponse.ok ||
-    !Array.isArray(pageData.data)
-  ) {
-    console.error(
-      "AURUM MARKETAPI FIRST PAGE ERROR:",
-      {
-        status: pageResponse.status,
-        statusText: pageResponse.statusText,
-        pageData: pageData
-      }
-    );
-
-    if (allBars.length === 0) {
-      response = pageResponse;
-      data = pageData;
-    } else {
-      console.error(
-        "MARKETAPI PAGINATION ERROR:",
-        pageData
-      );
-    }
-
-    break;
-  }
-  
-
-  response = pageResponse;
-
-  allBars.push(...pageData.data);
-
-  nextCursor = pageData.next_cursor || null;
-  console.log(
-  "AURUM HAS NEXT CURSOR:",
-  Boolean(nextCursor)
-);
-
-  pageCount++;
-
-} while (
-  nextCursor &&
-  pageCount < maxPages
-);
-
-
-// GABUNGKAN SEMUA HALAMAN CANDLE
-if (allBars.length > 0) {
-  data = {
-    data: allBars
-  };
-
-  // AURUM RAW CANDLE DIAGNOSTIC
-  console.log(
-    "AURUM FIRST RAW CANDLE:",
-    allBars[0]
-  );
-
-  console.log(
-    "AURUM LAST RAW CANDLE:",
-    allBars[allBars.length - 1]
-  );
-}
-      
-
-// AURUM TIMEFRAME DEBUG
-console.log(
-  "AURUM TIMEFRAME CHECK:",
-  selectedSymbol,
-  selected,
-  "MARKET:",
-  marketTimeframe,
-  "LIMIT:",
-  limit
-);
-
-// AURUM MARKETAPI TOTAL CANDLE
-console.log(
-  "AURUM MARKETAPI TOTAL RAW CANDLE:",
-  allBars.length
-);
-
-// AURUM MARKETAPI TOTAL PAGE
-console.log(
-  "AURUM MARKETAPI TOTAL PAGE:",
-  pageCount
-);
-      
-
+// AMBIL DAN VALIDASI DATA
+const twelveResponse = await fetch(twelveUrl);
+const twelveData = await twelveResponse.json();
 
 if (
-  !response ||
-  !response.ok ||
-  !data ||
-  !Array.isArray(data.data)
+  !twelveResponse.ok ||
+  twelveData.status === "error" ||
+  !Array.isArray(twelveData.values)
 ) {
-
-  // AKTIFKAN COOLDOWN JIKA MARKETAPI SALDONYA HABIS
-  if (response && response.status === 402) {
-    try {
-      await aurumRedis([
-        "SET",
-        marketApiCooldownKey,
-        "1",
-        "EX",
-        "300"
-      ]);
-
-      console.error(
-        "AURUM MARKETAPI COOLDOWN ACTIVATED: 300 SECONDS"
-      );
-    } catch (cooldownError) {
-      console.error(
-        "MARKETAPI COOLDOWN WRITE ERROR:",
-        cooldownError.message
-      );
-    }
-  }
+  console.error(
+    "AURUM TWELVE DATA ERROR:",
+    twelveData
+  );
 
   if (redisCached && redisCached.data) {
     return res.status(200).json({
@@ -547,13 +340,76 @@ if (
   return res.status(502).json({
     status: "error",
     message:
-      data?.detail ||
-      data?.title ||
-      data?.message ||
-      "Gagal mengambil data MarketAPI"
+      twelveData.message ||
+      "Gagal mengambil data Twelve Data"
   });
 }
-      
+
+// KONVERSI FORMAT TWELVE DATA KE FORMAT AURUM
+const convertedCandles = twelveData.values
+  .map(c => {
+    const datetime = String(c.datetime || "");
+    const normalizedTime = datetime.includes("T")
+      ? datetime
+      : datetime.replace(" ", "T");
+
+    return {
+      time: normalizedTime.endsWith("Z")
+        ? normalizedTime
+        : normalizedTime + "Z",
+      open: Number(c.open),
+      high: Number(c.high),
+      low: Number(c.low),
+      close: Number(c.close),
+      tick_volume: Number(c.volume || 0)
+    };
+  })
+  .filter(c =>
+    c.time &&
+    Number.isFinite(Date.parse(c.time)) &&
+    Number.isFinite(c.open) &&
+    Number.isFinite(c.high) &&
+    Number.isFinite(c.low) &&
+    Number.isFinite(c.close)
+  );
+
+if (convertedCandles.length === 0) {
+  console.error(
+    "AURUM TWELVE DATA EMPTY OR INVALID:",
+    twelveData
+  );
+
+  if (redisCached && redisCached.data) {
+    return res.status(200).json({
+      ...redisCached.data,
+      cache: "stale"
+    });
+  }
+
+  return res.status(502).json({
+    status: "error",
+    message: "Twelve Data tidak mengirim candle valid"
+  });
+}
+
+const data = {
+  data: convertedCandles
+};
+
+console.log(
+  "AURUM TWELVE DATA TOTAL CANDLE:",
+  convertedCandles.length
+);
+
+console.log(
+  "AURUM TWELVE DATA FIRST CANDLE:",
+  convertedCandles[0]
+);
+
+console.log(
+  "AURUM TWELVE DATA LAST CANDLE:",
+  convertedCandles[convertedCandles.length - 1]
+);
 
 // URUTKAN CANDLE DARI YANG TERLAMA
 let rawCandles = data.data
