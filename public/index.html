@@ -6856,6 +6856,65 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 
+<script id="aurum-setup-live-tick">
+(function(){
+  const priceEl=document.getElementById('goldPrice');
+  const chart=document.getElementById('aurumMiniChart');
+  const pairEl=document.getElementById('pair');
+  if(!priceEl||!chart||!pairEl)return;
+  let busy=false;
+  function draw(candles,symbol){
+    const points=candles.slice(-30).map(c=>Number(c.close)).filter(Number.isFinite);
+    if(points.length<2)return;
+    const min=Math.min(...points),max=Math.max(...points),spread=max-min||1;
+    const xy=points.map((v,i)=>({x:i*420/(points.length-1),y:7+((max-v)/spread)*39}));
+    let d='M '+xy[0].x.toFixed(1)+' '+xy[0].y.toFixed(1);
+    for(let i=0;i<xy.length-1;i++){
+      const p0=xy[Math.max(0,i-1)],p1=xy[i],p2=xy[i+1],p3=xy[Math.min(xy.length-1,i+2)];
+      d+=' C '+(p1.x+(p2.x-p0.x)/6).toFixed(1)+' '+(p1.y+(p2.y-p0.y)/6).toFixed(1)+', '+(p2.x-(p3.x-p1.x)/6).toFixed(1)+' '+(p2.y-(p3.y-p1.y)/6).toFixed(1)+', '+p2.x.toFixed(1)+' '+p2.y.toFixed(1);
+    }
+    const up=points[points.length-1]>=points[0];
+    const stroke=symbol==='XAU/USD'?'#e16f79':(up?'#399bd0':'#e16f79');
+    const fill=symbol==='XAU/USD'?'rgba(226,112,124,.18)':(up?'rgba(91,166,218,.20)':'rgba(226,112,124,.16)');
+    chart.innerHTML='<defs><linearGradient id="aurumSetupLiveFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+stroke+'" stop-opacity=".24"/><stop offset="100%" stop-color="'+stroke+'" stop-opacity=".01"/></linearGradient></defs>'+
+      '<path d="'+d+' L 420 58 L 0 58 Z" fill="url(#aurumSetupLiveFill)"/>'+
+      '<path class="aurum-setup-line" d="'+d+'" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+  async function refresh(){
+    if(busy||document.hidden)return;
+    busy=true;
+    try{
+      const symbol=pairEl.value||'XAU/USD';
+      const res=await fetch('/api?interval=M1&symbol='+encodeURIComponent(symbol),{cache:'no-store'});
+      if(!res.ok)throw new Error('HTTP '+res.status);
+      const data=await res.json(),candles=data.candles;
+      if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('No candles');
+      const latest=Number(candles[candles.length-1].close),prev=Number(candles[candles.length-2].close);
+      if(!Number.isFinite(latest)||!Number.isFinite(prev))throw new Error('Invalid price');
+      const old=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
+      const direction=latest>=prev?'up':'down';
+      priceEl.classList.remove('price-up','price-down','price-flash');
+      priceEl.classList.add('price-'+direction);
+      priceEl.dataset.arrow=direction==='up'?'▲':'▼';
+      if(Number.isFinite(old)&&old>0&&old!==latest){
+        const start=performance.now(),duration=700,fmt=new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        function step(now){
+          const t=Math.min(1,(now-start)/duration),e=1-Math.pow(1-t,3);
+          priceEl.textContent=fmt.format(old+(latest-old)*e);
+          if(t<1)requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+        void priceEl.offsetWidth;priceEl.classList.add('price-flash');
+      }else{
+        priceEl.textContent=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      }
+      draw(candles,symbol);
+    }catch(e){console.warn('AURUM setup live tick:',e);}
+    finally{busy=false;}
+  }
+  setInterval(refresh,60000);
+})();
+</script>
 </body>
 </html>
 
