@@ -5769,9 +5769,104 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
 </script>
 <!-- END AURUM PWA SERVICE WORKER -->
 
+<!-- AURUM TICKER DATA ENGINE -->
+<script>
+(function () {
+  const tickerAssets = [
+    {
+      symbol: 'XAU/USD',
+      priceId: 'tickerXAU',
+      changeId: 'changeXAU'
+    },
+    {
+      symbol: 'BTC/USD',
+      priceId: 'tickerBTC',
+      changeId: 'changeBTC'
+    },
+    {
+      symbol: 'WTI',
+      priceId: 'tickerWTI',
+      changeId: 'changeWTI'
+    }
+  ];
+
+  async function updateTicker(asset) {
+    const priceElement = document.getElementById(asset.priceId);
+    const changeElement = document.getElementById(asset.changeId);
+
+    if (!priceElement || !changeElement) return;
+
+    try {
+      const response = await fetch(
+        '/api?interval=M1&symbol=' +
+        encodeURIComponent(asset.symbol),
+        { cache: 'no-store' }
+      );
+
+      if (!response.ok) {
+        throw new Error('HTTP ' + response.status);
+      }
+
+      const data = await response.json();
+      const candles = data.candles;
+
+      if (
+        data.status !== 'success' ||
+        !Array.isArray(candles) ||
+        candles.length < 2
+      ) {
+        throw new Error('Data candle belum tersedia');
+      }
+
+      const latest = Number(candles[candles.length - 1].close);
+      const previous = Number(candles[candles.length - 2].close);
+
+      if (
+        !Number.isFinite(latest) ||
+        !Number.isFinite(previous) ||
+        previous === 0
+      ) {
+        throw new Error('Harga tidak valid');
+      }
+
+      const change = ((latest - previous) / previous) * 100;
+
+      priceElement.textContent = latest.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      changeElement.textContent =
+        (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+
+      changeElement.style.color =
+        change >= 0 ? '#16a477' : '#e45b63';
+
+    } catch (error) {
+      priceElement.textContent = '--';
+      changeElement.textContent = 'DATA ERROR';
+
+      console.error('AURUM TICKER ERROR:', asset.symbol, error);
+    }
+  }
+
+  async function refreshAurumTicker() {
+    await Promise.all(
+      tickerAssets.map(asset => updateTicker(asset))
+    );
+  }
+
+  refreshAurumTicker();
+  setInterval(refreshAurumTicker, 60000);
+})();
+</script>
+<!-- END AURUM TICKER DATA ENGINE -->
+
 </body>
 </html>
+
   
