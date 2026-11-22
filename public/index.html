@@ -6821,6 +6821,8 @@ if ('serviceWorker' in navigator) {
     })+' WIB';
   }
   function setGoldFeedStatus(isLive, timestamp, isQuoteTime){
+    const session=$('aurumMarketSession');
+    if(session)session.textContent=isLive?'MARKET SESSION · LIVE DATA':'MARKET SESSION · DATA TERTUNDA';
     const badge=$('homeLiveStatus');
     if(badge){
       badge.classList.toggle('delayed',!isLive);
