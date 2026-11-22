@@ -2576,6 +2576,20 @@ body {
   padding:10px 11px!important;margin:6px 0;border:1px solid #e8edf3;
   border-radius:9px;background:#fbfcfe;color:#526074;
 }
+#marketPage .aurum-daily-range-section{padding-top:12px!important}
+#marketPage .aurum-between-level{padding:12px;border:1px solid #e7ebf2;border-radius:12px;background:#fbfcff;margin-bottom:10px}
+#marketPage .aurum-daily-heading{font-size:9px;font-weight:900;letter-spacing:1px;color:#596579;margin-bottom:12px}
+#marketPage .aurum-between-labels{display:flex;justify-content:space-between;gap:8px;font-size:9px;color:#269bd2;font-weight:700}
+#marketPage .aurum-between-labels span:last-child{color:#ef535b}
+#marketPage .aurum-between-track{height:8px;border-radius:99px;margin:13px 0 6px;position:relative;background:linear-gradient(90deg,#269bd2 0%,#cbd5e1 50%,#ef535b 100%)}
+#marketPage .aurum-between-marker{position:absolute;top:50%;width:4px;height:17px;border-radius:4px;background:#263247;transform:translate(-50%,-50%);box-shadow:0 1px 4px #0003}
+#marketPage .aurum-between-caption{display:block;color:#7b8797;font-size:9px}
+#marketPage .aurum-range-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:10px 2px;border-bottom:1px solid #edf0f4;font-size:10px;color:#687487}
+#marketPage .aurum-range-row:last-child{border-bottom:0}
+#marketPage .aurum-range-row b{display:grid;gap:4px;text-align:right;font-size:10px;font-weight:700}
+#marketPage .aurum-range-row i{font-style:normal;color:#ef535b}
+#marketPage .aurum-range-row em{font-style:normal;color:#269bd2}
+
 /* Sembunyikan panel lanjutan pada halaman Analisis; elemen/ID tetap ada agar mesin analisis tidak terganggu */
 #marketPage #liquidityAnalysisSection,
 #marketPage #fvgAnalysisSection,
@@ -3061,6 +3075,7 @@ body {
         <div class="aurum-analysis-section"><small class="aurum-section-kicker">BIAS PASAR · MARKET STRUCTURE</small><p id="marketStructure">Menunggu analisis candle...</p></div>
         <div class="aurum-analysis-section"><small class="aurum-section-kicker">METER TREN · 7 TIMEFRAME</small><div id="trendMeter"><p>Menunggu analisis tujuh timeframe...</p></div></div>
         <div class="aurum-analysis-section"><small class="aurum-section-kicker">LEVEL SUPPORT & RESISTANCE</small><div id="supportResistanceMTF"><p>Menunggu analisis Support & Resistance...</p></div></div>
+        <div class="aurum-analysis-section aurum-daily-range-section"><div id="aurumDailyRange"><p>Menunggu data rentang harian D1...</p></div></div>
         <div id="liquidityAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">LIQUIDITY</small><p id="liquidityAnalysis">Menunggu analisis liquidity...</p><small class="aurum-section-kicker">KONFIRMASI LIQUIDITY</small><p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p></div>
         <div id="fvgAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">FAIR VALUE GAP · FVG</small><p id="fvgAnalysis">Menunggu analisis FVG...</p></div>
         <div id="orderBlockAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">ORDER BLOCK</small><p id="orderBlockAnalysis">Menunggu analisis Order Block...</p><p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p><p id="orderBlockZone">Menunggu deteksi zona harga OB...</p></div>
@@ -4650,7 +4665,8 @@ const fvgZone = detectFVGZone(candles);
     return {
   timeframe,
   signal: getStructureSignal(candles, timeframe),
-  supportResistance: sr
+  supportResistance: sr,
+  candles
 };
   })
 );
@@ -4884,6 +4900,39 @@ const direction = signal =>
       }).join('');
 
       srContainer.innerHTML = srRows;
+    }
+
+    // DAILY RANGE BLOCK — D1, TODAY'S RANGE AND YESTERDAY'S RANGE
+    const dailyRangeContainer = document.getElementById('aurumDailyRange');
+    if (dailyRangeContainer) {
+      const dailyResult = results.find(item => item.timeframe === 'D1');
+      const dailyCandles = dailyResult && Array.isArray(dailyResult.candles)
+        ? dailyResult.candles
+        : [];
+      const todayCandle = dailyCandles.length ? dailyCandles[dailyCandles.length - 1] : null;
+      const yesterdayCandle = dailyCandles.length > 1 ? dailyCandles[dailyCandles.length - 2] : null;
+      const nearestResult = results.find(item => item.timeframe === 'M5' && item.supportResistance);
+      const nearestSR = nearestResult ? nearestResult.supportResistance : null;
+      const currentPrice = todayCandle && Number.isFinite(Number(todayCandle.close))
+        ? Number(todayCandle.close)
+        : (nearestSR && Number.isFinite(Number(nearestSR.currentPrice)) ? Number(nearestSR.currentPrice) : null);
+      const formatPrice = value => Number.isFinite(Number(value)) ? Number(value).toFixed(2) : '--';
+      const support = nearestSR && nearestSR.support != null ? Number(nearestSR.support) : null;
+      const resistance = nearestSR && nearestSR.resistance != null ? Number(nearestSR.resistance) : null;
+      let positionPercent = null;
+      if (currentPrice !== null && support !== null && resistance !== null && resistance > support) {
+        positionPercent = Math.max(0, Math.min(100, ((currentPrice - support) / (resistance - support)) * 100));
+      }
+      const positionMarkup = positionPercent === null
+        ? '<div class="aurum-between-track"><span class="aurum-between-marker" style="left:50%"></span></div><small class="aurum-between-caption">Posisi harga belum dapat dihitung</small>'
+        : '<div class="aurum-between-track"><span class="aurum-between-marker" style="left:' + positionPercent.toFixed(1) + '%"></span></div><small class="aurum-between-caption">' + formatPrice(currentPrice) + ' · ' + formatPrice(support) + ' support · ' + formatPrice(resistance) + ' resistance</small>';
+      const todayMarkup = todayCandle
+        ? '<div class="aurum-range-row"><span>Today\'s range</span><b><i>High ' + formatPrice(todayCandle.high) + '</i><em>Low ' + formatPrice(todayCandle.low) + '</em></b></div>'
+        : '<div class="aurum-range-row"><span>Today\'s range</span><b>Data D1 belum tersedia</b></div>';
+      const yesterdayMarkup = yesterdayCandle
+        ? '<div class="aurum-range-row"><span>Yesterday\'s range</span><b><i>High ' + formatPrice(yesterdayCandle.high) + '</i><em>Low ' + formatPrice(yesterdayCandle.low) + '</em></b></div>'
+        : '<div class="aurum-range-row"><span>Yesterday\'s range</span><b>Data D1 belum tersedia</b></div>';
+      dailyRangeContainer.innerHTML = '<div class="aurum-between-level"><div class="aurum-daily-heading">D1 · DI ANTARA LEVEL</div><div class="aurum-between-labels"><span>Support ' + formatPrice(support) + '</span><span>Resistance ' + formatPrice(resistance) + '</span></div>' + positionMarkup + '</div>' + todayMarkup + yesterdayMarkup;
     }
 
     const detail = results.map(item =>
