@@ -796,16 +796,7 @@ async function respondWithStaleCache() {
     fallback.livePriceStatus = quote.status;
     fallback.livePriceError = quote.error;
     if (quote.price !== null) {
-      // Only M1 may absorb the quote into its forming candle.
-      // Higher timeframes preserve historical OHLC and expose a separate live quote.
-      if (interval === "1min") {
-        const last = fallback.candles?.[fallback.candles.length - 1];
-        if (last) {
-          last.close = quote.price;
-          last.high = Math.max(Number(last.high), quote.price);
-          last.low = Math.min(Number(last.low), quote.price);
-        }
-      }
+      // Keep provider OHLC unchanged. The live quote is exposed separately.
       fallback.cache = "stale_candles_" + quote.cache;
     }
   }
@@ -1009,13 +1000,7 @@ if (selectedSymbol === "XAU/USD") {
   livePriceSource = quote.source;
   livePriceStatus = quote.status;
   livePriceError = quote.error;
-  // Keep higher-timeframe provider OHLC intact; display the shared quote separately.
-  if (quote.price !== null && interval === "1min") {
-    const last = candles[candles.length - 1];
-    last.close = quote.price;
-    last.high = Math.max(Number(last.high), quote.price);
-    last.low = Math.min(Number(last.low), quote.price);
-  }
+  // Keep provider OHLC unchanged; the live quote is displayed in a separate series.
 }
 
 const providerFetchedAt = new Date().toISOString();
