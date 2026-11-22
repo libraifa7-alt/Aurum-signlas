@@ -389,7 +389,6 @@ do {
 
 } while (
   nextCursor &&
-  allBars.length < limit &&
   pageCount < maxPages
 );
 
