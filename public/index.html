@@ -3079,31 +3079,6 @@ body {
     <section class="aurum-signal-panel active" data-signal-panel="setup" role="tabpanel">
       <div class="aurum-todays-signals-head"><span>●</span><div><strong>TODAY'S SIGNALS</strong><small>Setup pasar AURUM hari ini</small></div></div>
       <div id="aurumNoSignals" class="aurum-no-signals">Belum ada sinyal terkonfirmasi untuk pasar ini.</div>
-      <div id="aurumSetupSnapshot" style="margin-top:12px;padding:13px;border:1px solid #e7ebf2;border-radius:13px;background:linear-gradient(135deg,#f7fbff,#fff)">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:11px">
-          <strong style="font-size:10px;letter-spacing:1px;color:#526174">RINGKASAN PASAR</strong>
-          <small id="setupTimeframe" style="font-size:9px;color:#8993a2">TIMEFRAME --</small>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
-          <div style="padding:10px;border-radius:9px;background:#fff;border:1px solid #edf0f4">
-            <small style="display:block;font-size:8px;color:#8993a2;letter-spacing:.7px">ARAH PASAR</small>
-            <strong id="setupTrend" style="display:block;margin-top:6px;font-size:13px;color:#a17a22">MENUNGGU DATA</strong>
-          </div>
-          <div style="padding:10px;border-radius:9px;background:#fff;border:1px solid #edf0f4">
-            <small style="display:block;font-size:8px;color:#8993a2;letter-spacing:.7px">RENTANG CANDLE</small>
-            <strong id="setupRange" style="display:block;margin-top:6px;font-size:11px;color:#526174">-- / --</strong>
-          </div>
-          <div style="padding:10px;border-radius:9px;background:#fff;border:1px solid #edf0f4">
-            <small style="display:block;font-size:8px;color:#269bd2;letter-spacing:.7px">SUPPORT TERDEKAT</small>
-            <strong id="setupSupport" style="display:block;margin-top:6px;font-size:12px;color:#269bd2">--</strong>
-          </div>
-          <div style="padding:10px;border-radius:9px;background:#fff;border:1px solid #edf0f4">
-            <small style="display:block;font-size:8px;color:#ef535b;letter-spacing:.7px">RESISTANCE TERDEKAT</small>
-            <strong id="setupResistance" style="display:block;margin-top:6px;font-size:12px;color:#ef535b">--</strong>
-          </div>
-        </div>
-        <small style="display:block;margin-top:9px;font-size:8px;line-height:1.5;color:#9299a6">Level dihitung dari candle timeframe grafik aktif, bukan angka perkiraan.</small>
-      </div>
       <div id="aurumTradePlan" class="aurum-trade-plan" style="display:none">
         <div class="aurum-panel-heading"><span class="aurum-heading-icon">◎</span><div><strong>AURUM TRADE PLAN</strong><small>Rencana berdasarkan konfirmasi analisis</small></div></div>
         <p id="tradeDirection">WAIT</p>
@@ -6166,6 +6141,11 @@ if (marketBias === 'BUY' && mtfBias === 'BUY') {
 } else if (marketBias === 'SELL' && mtfBias === 'SELL') {
   finalSignal = 'SELL';
 }
+
+const noSignalsPanel = document.getElementById('aurumNoSignals');
+if (noSignalsPanel) noSignalsPanel.style.display = finalSignal === 'WAIT' ? 'block' : 'none';
+const tradePlanPanel = document.getElementById('aurumTradePlan');
+if (tradePlanPanel && finalSignal === 'WAIT') tradePlanPanel.style.display = 'none';
 
 if (signalStatus && signalDetail) {
   signalStatus.textContent = finalSignal;
