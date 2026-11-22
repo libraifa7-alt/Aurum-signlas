@@ -2860,9 +2860,9 @@ body {
 #homePage .home-market-top small{font-size:7px;line-height:1.2}
 #homePage .home-market-price{font-size:13px;font-weight:750;line-height:1.2;letter-spacing:-.25px}
 #homePage .home-market-change{font-size:8px;line-height:1.2;min-height:10px}
-#homePage .home-market-spark{height:27px;margin-top:1px;overflow:hidden}
-#homePage .home-market-spark .market-spark-line{stroke-width:1.6!important;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-#homePage .home-market-spark .market-spark-area{opacity:.9}
+#homePage .home-market-spark{height:34px;margin-top:1px;overflow:hidden}
+#homePage .home-market-spark .market-spark-line{stroke-width:1.55!important;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+#homePage .home-market-spark .market-spark-area{opacity:1}
 </style>
 
 
@@ -6758,16 +6758,27 @@ if ('serviceWorker' in navigator) {
       if(p)p.textContent=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       if(c){c.textContent=(change>=0?'+':'')+change.toFixed(2)+'%';c.style.color=change>=0?'#159b72':'#e45b63';}
       if(path){
-        // TRAXA-style sparkline: more raw candle points, compact height, natural market trace.
-        const points=candles.slice(-36).map(x=>Number(x.close)).filter(Number.isFinite);
+        // TRAXA-style sparkline: lightly smoothed candles with flowing cubic curves.
+        const rawPoints=candles.slice(-30).map(x=>Number(x.close)).filter(Number.isFinite);
+        const points=rawPoints.map((value,index)=>{
+          const from=Math.max(0,index-1),to=Math.min(rawPoints.length-1,index+1);
+          const window=rawPoints.slice(from,to+1);
+          return window.reduce((sum,item)=>sum+item,0)/window.length;
+        });
         const min=Math.min(...points),max=Math.max(...points),spread=max-min||1;
         const coords=points.map((value,index)=>({
           x:index*180/Math.max(1,points.length-1),
-          y:6+((max-value)/spread)*15
+          y:5+((max-value)/spread)*21
         }));
         let curve='M '+coords[0].x.toFixed(1)+' '+coords[0].y.toFixed(1);
-        for(let i=1;i<coords.length;i++){
-          curve+=' L '+coords[i].x.toFixed(1)+' '+coords[i].y.toFixed(1);
+        for(let i=0;i<coords.length-1;i++){
+          const p0=coords[Math.max(0,i-1)],p1=coords[i];
+          const p2=coords[i+1],p3=coords[Math.min(coords.length-1,i+2)];
+          const c1x=p1.x+(p2.x-p0.x)/6;
+          const c1y=p1.y+(p2.y-p0.y)/6;
+          const c2x=p2.x-(p3.x-p1.x)/6;
+          const c2y=p2.y-(p3.y-p1.y)/6;
+          curve+=' C '+c1x.toFixed(1)+' '+c1y.toFixed(1)+', '+c2x.toFixed(1)+' '+c2y.toFixed(1)+', '+p2.x.toFixed(1)+' '+p2.y.toFixed(1);
         }
         path.setAttribute('d',curve);
         path.classList.add('market-spark-line');
@@ -6782,6 +6793,7 @@ if ('serviceWorker' in navigator) {
         }
         area.setAttribute('d',curve+' L 180 42 L 0 42 Z');
         area.style.fill=fillColor;
+        area.style.opacity='0.9';
       }
     }catch(error){
       if($(asset.price))$(asset.price).textContent='--';
