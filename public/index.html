@@ -4546,6 +4546,7 @@ const chartElement = document.getElementById('candleChart');
   
 
 async function loadChart(interval) {
+    const requestId = window.aurumChartLoadSequence = (window.aurumChartLoadSequence || 0) + 1;
     try {
       document.querySelector('.status').textContent =
         'LOADCHART BERJALAN: ' + interval;
@@ -4590,6 +4591,8 @@ if (useBrowserCache) {
 } else {
   // AMBIL DATA DARI API
   const data = await response.json();
+  if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
+  if (data.symbol && data.symbol !== symbol) throw new Error('Simbol API tidak cocok: diminta ' + symbol + ', diterima ' + data.symbol);
   chartFeedMeta = {
     fromCache: false,
     livePrice: data.livePrice,
@@ -4632,6 +4635,8 @@ if (useBrowserCache) {
     data: candles
   });
 }
+
+if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 
 // Status grafik harus mengikuti timestamp/provider, bukan label LIVE statis.
 const chartStatus = document.getElementById('chartFeedStatus');
@@ -6708,6 +6713,7 @@ document.getElementById('goldTime').textContent =
 chart.timeScale().fitContent();
 
 const structure = await analyzeMarketStructure();
+if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 document.getElementById('marketStructure').textContent = structure;
 
 // RINGKASAN SETUP BERDASARKAN CANDLE TIMEFRAME AKTIF
@@ -6846,6 +6852,7 @@ try {
 }
 // KONFIRMASI ORDER BLOCK H1 + M15
 const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
+if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 
 document.getElementById('orderBlockMTF').innerText =
   orderBlockMTF;
@@ -6900,9 +6907,11 @@ if (signalStatus && signalDetail) {
 }      
 
 const liquidity = await analyzeLiquidityMultiTimeframe();
+if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 document.getElementById('liquidityAnalysis').innerText = liquidity;
 
 const confirmation = await analyzeLiquidityConfirmation();
+if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 document.getElementById('liquidityConfirmation').innerText = confirmation;
 
 const fvg = analyzeFVG(candles);
@@ -7031,7 +7040,12 @@ console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
       
 
 } catch (error) {
+  if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
   console.log('Chart error:', error);
+  const priceNode = document.getElementById('goldPrice');
+  const timeNode = document.getElementById('goldTime');
+  if (priceNode) priceNode.textContent = '--';
+  if (timeNode) timeNode.textContent = symbol + ' · Data belum tersedia';
   document.getElementById('orderBlockAnalysis').textContent =
     'ERROR GRAFIK: ' + error.message;
   }
@@ -7080,6 +7094,13 @@ timeframeButtons.forEach(button => {
 });
 
 pairSelect.addEventListener('change', function() {
+  const symbol = this.value;
+  const priceNode = document.getElementById('goldPrice');
+  const timeNode = document.getElementById('goldTime');
+  if (priceNode) priceNode.textContent = 'Memuat ' + symbol + '…';
+  if (timeNode) timeNode.textContent = symbol + ' · Mengambil data instrumen';
+  const mark = document.getElementById('marketAssetMark');
+  if (mark) mark.textContent = symbol === 'XAU/USD' ? 'Au' : symbol === 'BTC/USD' ? '₿' : 'OIL';
   loadChart(timeframe.value || 'M15');
 });
 
@@ -7472,6 +7493,7 @@ console.log('STATUS SERVER DIPERIKSA');
       const res=await fetch('/api?interval=M1&symbol='+encodeURIComponent(symbol),{cache:'no-store'});
       if(!res.ok)throw new Error('HTTP '+res.status);
       const data=await res.json(),candles=data.candles;
+      if(pairEl.value!==symbol || (data.symbol && data.symbol!==symbol)) return;
       if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('No candles');
       const quoteTime=Date.parse(data.livePriceUpdatedAt||'');
       const quoteAge=Number.isFinite(quoteTime)?Date.now()-quoteTime:Infinity;
@@ -7506,7 +7528,14 @@ console.log('STATUS SERVER DIPERIKSA');
         displayCandles[displayCandles.length-1]={...last,close:Number(data.livePrice),high:Math.max(Number(last.high),Number(data.livePrice)),low:Math.min(Number(last.low),Number(data.livePrice))};
       }
       draw(displayCandles,symbol);
-    }catch(e){console.warn('AURUM setup live tick:',e);}
+      const timeEl=document.getElementById('goldTime');
+      if(timeEl) timeEl.textContent = symbol==='XAU/USD'
+        ? (hasFreshGoldQuote ? 'XAU/USD · LIVE '+new Date(data.livePriceUpdatedAt).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB' : 'XAU/USD · Harga candle terakhir')
+        : symbol+' · '+(data.source || 'Data candle')+' · '+new Date(candles[candles.length-1].datetime).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB';
+    }catch(e){
+      if(pairEl.value===symbol){priceEl.textContent='--';const timeEl=document.getElementById('goldTime');if(timeEl)timeEl.textContent=symbol+' · Data belum tersedia';}
+      console.warn('AURUM setup live tick:',e);
+    }
     finally{busy=false;}
   }
   // Refresh at the shared 60s API cache cadence to reduce duplicate requests.
