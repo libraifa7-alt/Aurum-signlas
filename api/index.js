@@ -66,7 +66,7 @@ module.exports = async function handler(req, res) {
   const cacheTTL = selectedSymbol === "WTI"
     ? 60000
     : selectedSymbol === "XAU/USD" && interval === "1min"
-      ? 30000
+      ? 15000
       : ({
           "1min": 60000,
           "5min": 120000,
@@ -470,6 +470,8 @@ if (!candles.length) {
 let livePrice = null;
 let livePriceUpdatedAt = null;
 let livePriceSource = "time_series";
+let livePriceStatus = "fallback";
+let livePriceError = null;
 if (selectedSymbol === "XAU/USD" && interval === "1min") {
   try {
     const priceUrl = new URL("https://api.twelvedata.com/price");
@@ -482,15 +484,18 @@ if (selectedSymbol === "XAU/USD" && interval === "1min") {
       livePrice = quote;
       livePriceUpdatedAt = new Date().toISOString();
       livePriceSource = "Twelve Data /price";
+      livePriceStatus = "live_quote";
       const last = candles[candles.length - 1];
       last.close = quote;
       last.high = Math.max(Number(last.high), quote);
       last.low = Math.min(Number(last.low), quote);
     } else {
-      console.warn("AURUM XAU LIVE PRICE UNAVAILABLE:", priceData);
+      livePriceError = String(priceData.message || priceData.code || "Twelve Data /price tidak memberikan kuotasi").slice(0, 180);
+      console.warn("AURUM XAU LIVE PRICE UNAVAILABLE:", livePriceError);
     }
   } catch (priceError) {
-    console.warn("AURUM XAU LIVE PRICE ERROR:", priceError.message);
+    livePriceError = String(priceError.message || "Gagal mengambil kuotasi").slice(0, 180);
+    console.warn("AURUM XAU LIVE PRICE ERROR:", livePriceError);
   }
 }
 
@@ -502,6 +507,8 @@ const output = {
   livePrice,
   livePriceUpdatedAt,
   livePriceSource,
+  livePriceStatus,
+  livePriceError,
   candles
 };
       
