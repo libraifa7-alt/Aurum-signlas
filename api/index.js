@@ -473,6 +473,12 @@ const output = {
   candles
 };
       
+// Keep fresh provider data in this instance to avoid a Redis read on every poll.
+globalThis.aurumCache.set(cacheKey, {
+  time: Date.now(),
+  data: output
+});
+
 
         // SIMPAN KE REDIS SELAMA 7 HARI
     try {
