@@ -392,6 +392,15 @@ module.exports = async function handler(req, res) {
         }
       }
 
+      if (!candleData && chartCoolingDown && cachedGold && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
+        candleData = {
+          ...cachedGold,
+          candleStatus: "stale_candles",
+          candleError: chartError,
+          cache: "stale_candle_fallback"
+        };
+      }
+
       if (!candleData || !Array.isArray(candleData.candles) || !candleData.candles.length) {
         return res.status(503).json({
           status: "provider_error",
