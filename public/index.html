@@ -6769,25 +6769,21 @@ pairSelect.addEventListener('change', function() {
   loadChart(timeframe.value || 'M15');
 });
 
-// Poll only the shared XAUS spot quote while the chart page is visible.
-// This draws a separate live trace; historical candlesticks remain untouched.
-let aurumLiveQuotePollBusy = false;
+// Refresh the selected timeframe from the backend while the chart is visible.
+// Backend/provider caching remains authoritative; no synthetic candles are created.
+let aurumChartRefreshBusy = false;
 setInterval(async function() {
-  if (document.hidden || aurumLiveQuotePollBusy ||
-      !document.getElementById('chartPage')?.classList.contains('active') ||
-      pairSelect.value !== 'XAU/USD') return;
-  aurumLiveQuotePollBusy = true;
+  if (document.hidden || aurumChartRefreshBusy ||
+      !document.getElementById('chartPage')?.classList.contains('active')) return;
+  aurumChartRefreshBusy = true;
   try {
-    const response = await fetch('/api?interval=M1&symbol=' + encodeURIComponent('XAU/USD'), { cache: 'no-store' });
-    if (!response.ok) return;
-    const payload = await response.json();
-    updateLiveQuoteTrace(payload);
+    await loadChart(timeframe.value || 'M1');
   } catch (error) {
-    console.warn('AURUM live Gold trace:', error);
+    console.warn('AURUM chart auto-refresh:', error);
   } finally {
-    aurumLiveQuotePollBusy = false;
+    aurumChartRefreshBusy = false;
   }
-}, 60000);
+}, 65000);
 
 } // Penutup blok IF
 
