@@ -6496,8 +6496,8 @@ const noSignalsPanel = document.getElementById('aurumNoSignals');
 if (noSignalsPanel) {
   noSignalsPanel.style.display = finalSignal === 'WAIT' ? 'block' : 'none';
   noSignalsPanel.textContent = finalSignal === 'WAIT'
-    ? 'Belum ada sinyal terkonfirmasi. Market Structure: ' + marketBias +
-      ' · Konfirmasi MTF: ' + mtfBias + '. ' + orderBlockMTF
+    ? 'Belum ada sinyal terkonfirmasi. Market Structure: ' + structure +
+      ' · Konfirmasi MTF: ' + orderBlockMTF
     : 'Sinyal ' + finalSignal + ' terkonfirmasi berdasarkan Market Structure dan MTF.';
 }
 const tradePlanPanel = document.getElementById('aurumTradePlan');
