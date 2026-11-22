@@ -3250,7 +3250,7 @@ body {
 
 <header>
 
-  <div class="brand">✦ AURUM SIGNALS AI</div>
+  <div class="brand"><img class="aurum-header-logo" src="/aurum-icon-192.png" alt="Logo AURUM"> <span>AURUM SIGNALS AI</span></div>
   <div class="status">● CEK DEPLOY TERBARU</div>
 
 </header>
@@ -7496,6 +7496,76 @@ body { padding-bottom: 70px; }
   .aurum-clock-face { width: 182px; height: 182px; }
 }
 </style>
+
+
+<style id="aurum-traxa-ticker-logo-v1">
+/* Compact AURUM mark + continuously moving market ribbon */
+header .brand{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.aurum-header-logo{
+  display:block;
+  width:29px;
+  height:29px;
+  flex:0 0 29px;
+  object-fit:cover;
+  border-radius:5px;
+  border:1px solid rgba(181,138,53,.35);
+  box-shadow:0 2px 7px rgba(31,41,55,.12);
+}
+.aurum-live-ticker{
+  display:flex;
+  align-items:center;
+  min-height:34px;
+  padding:7px 0;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.aurum-live-ticker .ticker-track{
+  display:flex;
+  flex:0 0 auto;
+  width:max-content;
+  min-width:max-content;
+  justify-content:flex-start;
+  gap:22px;
+  will-change:transform;
+  animation:aurumTickerScroll 24s linear infinite;
+}
+.aurum-live-ticker .ticker-item{flex:0 0 auto;}
+.aurum-live-ticker:hover .ticker-track{animation-play-state:paused;}
+@keyframes aurumTickerScroll{
+  from{transform:translateX(0);}
+  to{transform:translateX(-50%);}
+}
+@media (prefers-reduced-motion:reduce){
+  .aurum-live-ticker .ticker-track{
+    animation:aurumTickerScroll 24s linear infinite !important;
+  }
+}
+</style>
+<script id="aurum-traxa-ticker-loop">
+(function(){
+  const track=document.querySelector('#homePage .aurum-live-ticker .ticker-track');
+  if(!track || track.dataset.loopReady==='1')return;
+  const originals=Array.from(track.children);
+  if(!originals.length)return;
+  originals.forEach(function(item){
+    const clone=item.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(function(node){node.removeAttribute('id');});
+    clone.setAttribute('aria-hidden','true');
+    track.appendChild(clone);
+    const sync=function(){
+      const target=Array.from(track.children)[originals.indexOf(item)+originals.length];
+      if(target)target.innerHTML=item.innerHTML.replace(/\sid="[^"]*"/g,'');
+    };
+    new MutationObserver(sync).observe(item,{subtree:true,childList:true,characterData:true});
+  });
+  track.dataset.loopReady='1';
+})();
+</script>
 
 </body>
 </html>
