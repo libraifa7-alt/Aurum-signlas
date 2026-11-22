@@ -3801,6 +3801,65 @@ function drawTradePlanLines(plan) {
   });
 }
 
+
+/* AURUM PAPER SIGNAL JOURNAL — local device only; no broker execution. */
+window.aurumJournalKey = 'aurum.paper-journal.v1';
+window.aurumJournalRead = function(){
+  try { const rows=JSON.parse(localStorage.getItem(window.aurumJournalKey)||'[]'); return Array.isArray(rows)?rows:[]; }
+  catch(e){ console.warn('AURUM journal read:',e); return []; }
+};
+window.aurumJournalWrite = function(rows){
+  try { localStorage.setItem(window.aurumJournalKey,JSON.stringify(rows.slice(-500))); return true; }
+  catch(e){ console.warn('AURUM journal write:',e); return false; }
+};
+window.aurumJournalCapture = function(plan, symbol, candleTime){
+  if(!plan || !['BUY','SELL'].includes(plan.direction)) return;
+  const rows=window.aurumJournalRead(), now=Date.now();
+  const sameOpen=rows.some(r=>r.symbol===symbol && r.direction===plan.direction &&
+    r.status==='PENDING_ENTRY' && Math.abs(Number(r.entry)-Number(plan.entry))<0.000001 &&
+    Math.abs(Number(r.sl)-Number(plan.sl))<0.000001);
+  const recentDuplicate=rows.some(r=>r.symbol===symbol && r.direction===plan.direction &&
+    Math.abs(Number(r.entry)-Number(plan.entry))<0.000001 &&
+    Math.abs(Number(r.sl)-Number(plan.sl))<0.000001 && now-Date.parse(r.createdAt)<1800000);
+  if(sameOpen||recentDuplicate) return;
+  rows.push({
+    id:'AUR-'+now+'-'+Math.random().toString(36).slice(2,8),
+    symbol,direction:plan.direction,entryLow:Number(plan.entryLow),entryHigh:Number(plan.entryHigh),
+    entry:Number(plan.entry),sl:Number(plan.sl),tp1:Number(plan.tp1),tp2:Number(plan.tp2),tp3:Number(plan.tp3),
+    createdAt:new Date(now).toISOString(),signalCandleTime:candleTime||null,
+    status:'PENDING_ENTRY',enteredAt:null,enteredCandleTime:null,closedAt:null,
+    exitPrice:null,resultPoints:null,source:'AURUM analysis',tracking:'paper'
+  });
+  window.aurumJournalWrite(rows);
+  if(window.aurumRenderPerformance) window.aurumRenderPerformance();
+};
+window.aurumJournalMonitor = function(symbol, candle){
+  if(!candle || !Number.isFinite(Number(candle.high)) || !Number.isFinite(Number(candle.low))) return;
+  const rows=window.aurumJournalRead(); let changed=false;
+  const high=Number(candle.high),low=Number(candle.low),stamp=String(candle.time||'');
+  rows.forEach(r=>{
+    if(r.symbol!==symbol || !['PENDING_ENTRY','OPEN'].includes(r.status)) return;
+    if(r.status==='PENDING_ENTRY'){
+      if(high>=Number(r.entryLow) && low<=Number(r.entryHigh)){
+        r.status='OPEN';r.enteredAt=new Date().toISOString();r.enteredCandleTime=stamp;changed=true;
+      }
+      return;
+    }
+    if(stamp && stamp===r.enteredCandleTime) return;
+    const buy=r.direction==='BUY';
+    const stopHit=buy?low<=Number(r.sl):high>=Number(r.sl);
+    const targetHit=buy?high>=Number(r.tp1):low<=Number(r.tp1);
+    if(stopHit&&targetHit){r.status='AMBIGUOUS';r.closedAt=new Date().toISOString();r.exitPrice=null;r.resultPoints=null;r.note='SL dan TP tersentuh dalam candle yang sama; hasil tidak dihitung';changed=true;return;}
+    if(stopHit||targetHit){
+      r.status=targetHit?'TP_HIT':'SL_HIT';
+      r.exitPrice=targetHit?Number(r.tp1):Number(r.sl);
+      r.resultPoints=buy?r.exitPrice-Number(r.entry):Number(r.entry)-r.exitPrice;
+      r.closedAt=new Date().toISOString();changed=true;
+    }
+  });
+  if(changed){window.aurumJournalWrite(rows);if(window.aurumRenderPerformance)window.aurumRenderPerformance();}
+};
+
 let fvgZoneOverlay = null;
 let fvgPriceLines = [];
 
@@ -6517,6 +6576,23 @@ const validTradePlan =
     ? tradePlan
     : null;
 
+// Catat sinyal yang lolos seluruh konfirmasi sebagai simulasi/paper tracking.
+if (validTradePlan && window.aurumJournalCapture) {
+  window.aurumJournalCapture({
+    direction: finalSignal,
+    entryLow: validTradePlan.entryLow,
+    entryHigh: validTradePlan.entryHigh,
+    entry: validTradePlan.entry,
+    sl: validTradePlan.sl,
+    tp1: validTradePlan.tp1,
+    tp2: validTradePlan.tp2,
+    tp3: validTradePlan.tp3
+  }, document.getElementById('pair')?.value || 'XAU/USD', latestCandle.time);
+}
+if (window.aurumJournalMonitor) {
+  window.aurumJournalMonitor(document.getElementById('pair')?.value || 'XAU/USD', latestCandle);
+}
+
 drawTradePlanLines(validTradePlan);
 
 if (tradeCard && validTradePlan) {
@@ -6703,34 +6779,67 @@ if ('serviceWorker' in navigator) {
 <script id="aurum-performance-interactions">
 (function(){
   const panel=document.querySelector('#marketPage [data-signal-panel="performance"]');
-  if(!panel || panel.dataset.bound==='1') return;
-  panel.dataset.bound='1';
+  if(!panel)return;
   const labels={today:'TODAY',yesterday:'YESTERDAY','7days':'7 DAYS','30days':'30 DAYS'};
+  let period='today';
+  function rangeStart(key){
+    const now=new Date(),start=new Date(now);start.setHours(0,0,0,0);
+    if(key==='yesterday'){start.setDate(start.getDate()-1);return {start:start.getTime(),end:(()=>{const e=new Date(start);e.setDate(e.getDate()+1);return e.getTime();})()};}
+    if(key==='7days'){start.setDate(start.getDate()-6);return {start:start.getTime(),end:Infinity};}
+    if(key==='30days'){start.setDate(start.getDate()-29);return {start:start.getTime(),end:Infinity};}
+    return {start:start.getTime(),end:Infinity};
+  }
+  function render(){
+    const rows=window.aurumJournalRead?window.aurumJournalRead():[];
+    const range=rangeStart(period);
+    const selected=rows.filter(r=>{const t=Date.parse(r.createdAt);return Number.isFinite(t)&&t>=range.start&&t<range.end;});
+    const tp=selected.filter(r=>r.status==='TP_HIT').length;
+    const sl=selected.filter(r=>r.status==='SL_HIT').length;
+    const be=selected.filter(r=>r.status==='BREAK_EVEN').length;
+    const closed=tp+sl+be;
+    const net=selected.filter(r=>['TP_HIT','SL_HIT','BREAK_EVEN'].includes(r.status)).reduce((sum,r)=>sum+(Number(r.resultPoints)||0),0);
+    const rate=tp+sl?Math.round(tp/(tp+sl)*100):null;
+    const put=(selector,value)=>{const node=panel.querySelector(selector);if(node)node.textContent=value;};
+    put('#aurumPipsLabel','POINTS WON · '+labels[period]);
+    put('#aurumPipsValue',closed?((net>=0?'+':'')+net.toFixed(2)+' pts'):'—');
+    put('#aurumWinRate',rate===null?'—':rate+'%');
+    const stat=(key,value)=>{const node=panel.querySelector('[data-performance-stat="'+key+'"] span');if(node)node.textContent=String(value);};
+    stat('signals',selected.length);stat('tp',tp);stat('sl',sl);stat('be',be);
+    const pending=selected.filter(r=>r.status==='PENDING_ENTRY').length;
+    const open=selected.filter(r=>r.status==='OPEN').length;
+    const ambiguous=selected.filter(r=>r.status==='AMBIGUOUS').length;
+    put('#aurumPerformanceNote',closed?('Hasil selesai: '+closed+' · Menunggu entry: '+pending+' · Posisi simulasi: '+open):('Belum ada hasil selesai · Menunggu entry: '+pending+' · Posisi simulasi: '+open));
+    const hint=panel.querySelector('.aurum-performance-hint');
+    if(hint)hint.textContent='Paper tracking lokal perangkat ini. TP dihitung saat TP1 tersentuh; candle yang menyentuh TP dan SL bersamaan tidak dihitung ('+ambiguous+' ambigu). Bukan catatan transaksi broker.';
+    const share=panel.querySelector('#aurumSharePerformance');
+    if(share)share.dataset.shareText='AURUM Signals AI · '+labels[period]+' · Sinyal: '+selected.length+' · TP: '+tp+' · SL: '+sl+' · Win rate: '+(rate===null?'belum tersedia':rate+'%')+' · Net: '+(closed?net.toFixed(2)+' pts':'belum tersedia')+' · Paper tracking lokal';
+  }
+  window.aurumRenderPerformance=render;
   panel.querySelectorAll('[data-performance-period]').forEach(function(button){
     button.addEventListener('click',function(){
-      panel.querySelectorAll('[data-performance-period]').forEach(function(item){item.classList.toggle('active',item===button);});
-      const label=labels[button.dataset.performancePeriod]||'TODAY';
-      const pipsLabel=panel.querySelector('#aurumPipsLabel');
-      if(pipsLabel)pipsLabel.textContent='PIPS WON · '+label;
-      const note=panel.querySelector('#aurumPerformanceNote');
-      if(note)note.textContent='Belum ada hasil sinyal terverifikasi untuk periode ini';
+      period=button.dataset.performancePeriod||'today';
+      panel.querySelectorAll('[data-performance-period]').forEach(item=>item.classList.toggle('active',item===button));
+      render();
     });
   });
   panel.querySelectorAll('[data-performance-stat]').forEach(function(button){
     button.addEventListener('click',function(){
+      const key=button.dataset.performanceStat;
+      const rows=window.aurumJournalRead?window.aurumJournalRead():[];
+      const range=rangeStart(period);
+      const selected=rows.filter(r=>{const t=Date.parse(r.createdAt);return Number.isFinite(t)&&t>=range.start&&t<range.end;});
+      const names={signals:'semua sinyal tercatat',tp:'sinyal yang mencapai TP1',sl:'sinyal yang mencapai SL',be:'sinyal break even'};
       const note=panel.querySelector('#aurumPerformanceNote');
-      if(note)note.textContent='Riwayat '+button.querySelector('small').textContent+' belum tersedia';
+      if(note)note.textContent=(names[key]||'Riwayat')+': '+selected.filter(r=>key==='signals'||(key==='tp'&&r.status==='TP_HIT')||(key==='sl'&&r.status==='SL_HIT')||(key==='be'&&r.status==='BREAK_EVEN')).length;
     });
   });
   const share=panel.querySelector('#aurumSharePerformance');
   if(share)share.addEventListener('click',async function(){
-    const message='AURUM Signals AI — Riwayat performa belum tersedia. Statistik akan ditampilkan setelah hasil sinyal tercatat dan tervalidasi.';
-    try{
-      if(navigator.share) await navigator.share({title:'AURUM Signals Performance',text:message});
-      else if(navigator.clipboard && navigator.clipboard.writeText){await navigator.clipboard.writeText(message);share.textContent='✓ PERFORMANCE COPIED';}
-      else {share.textContent='SHARE BELUM DIDUKUNG PERANGKAT';}
-    }catch(error){if(error && error.name!=='AbortError')share.textContent='SHARE TIDAK TERSEDIA';}
+    const message=share.dataset.shareText||'AURUM Signals AI — Belum ada riwayat performa.';
+    try{if(navigator.share)await navigator.share({title:'AURUM Signals Performance',text:message});else if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(message);share.textContent='✓ PERFORMANCE COPIED';}else share.textContent='SHARE BELUM DIDUKUNG PERANGKAT';}
+    catch(error){if(error&&error.name!=='AbortError')share.textContent='SHARE TIDAK TERSEDIA';}
   });
+  render();
 })();
 </script>
 <script id="aurum-home-live-ui">
