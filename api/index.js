@@ -119,6 +119,26 @@ module.exports = async function handler(req, res) {
       }
     }
 
+    // Cooldown agar kegagalan/kuota Twelve Data tidak dipanggil ulang
+    // pada setiap refresh atau permintaan timeframe.
+    const providerErrorKey = "aurum:provider-error:" + cacheKey;
+    if (!debugRaw && redisCached && redisCached.data) {
+      try {
+        const errorRaw = await aurumRedis(["GET", providerErrorKey]);
+        if (errorRaw) {
+          const providerError = JSON.parse(errorRaw);
+          const errorAge = providerError?.receivedAt
+            ? Date.now() - Date.parse(providerError.receivedAt)
+            : Infinity;
+          if (errorAge >= 0 && errorAge < 300000) {
+            return await respondWithStaleCache();
+          }
+        }
+      } catch (error) {
+        console.warn("AURUM PROVIDER COOLDOWN READ:", error.message);
+      }
+    }
+
     
       
       
@@ -505,6 +525,21 @@ if (
     "AURUM TWELVE DATA ERROR:",
     twelveData
   );
+
+  try {
+    await aurumRedis([
+      "SET",
+      providerErrorKey,
+      JSON.stringify({
+        message: String(twelveData.message || twelveData.code || "Twelve Data request failed").slice(0, 180),
+        receivedAt: new Date().toISOString()
+      }),
+      "EX",
+      "300"
+    ]);
+  } catch (error) {
+    console.warn("AURUM PROVIDER COOLDOWN WRITE:", error.message);
+  }
 
   if (redisCached && redisCached.data) {
     return await respondWithStaleCache();
