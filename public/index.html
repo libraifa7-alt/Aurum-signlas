@@ -3251,10 +3251,49 @@ body {
 <header>
 
   <div class="brand"><img class="aurum-header-logo" src="/aurum-icon-192.png" alt="Logo AURUM"> <span>AURUM SIGNALS AI</span></div>
+  <div class="header-actions">
+    <button type="button" class="aurum-header-action" id="aurumOpenNotifications" aria-label="Notifications">♧<i id="aurumNotificationDot"></i></button>
+    <button type="button" class="aurum-header-action aurum-profile-action" id="aurumOpenProfile" aria-label="Profile">A</button>
+  </div>
   <div class="status">● CEK DEPLOY TERBARU</div>
 
 </header>
   
+
+<!-- AURUM PROFILE / SETTINGS PANEL -->
+<div class="aurum-panel-backdrop" id="aurumProfileBackdrop" hidden>
+  <section class="aurum-side-panel aurum-profile-panel" role="dialog" aria-modal="true" aria-labelledby="aurumProfileTitle">
+    <button class="aurum-panel-close" type="button" data-aurum-close aria-label="Close">×</button>
+    <div class="aurum-profile-head"><span class="aurum-profile-avatar">A</span><div><strong id="aurumProfileTitle">AURUM Member</strong><small>Pengaturan aplikasi AURUM</small></div></div>
+    <div class="aurum-settings-group">
+      <div class="aurum-setting-row"><span>Appearance</span><button type="button" id="aurumAppearanceToggle">Light mode</button></div>
+      <div class="aurum-setting-row"><span>Password</span><button type="button" data-aurum-password>Change</button></div>
+      <div class="aurum-setting-row"><span>Unlock sound</span><button type="button" id="aurumSoundToggle">Off</button></div>
+      <div class="aurum-setting-row"><span>Language</span><div class="aurum-language-options"><button type="button" data-aurum-language="EN">EN</button><button type="button" data-aurum-language="BM">BM</button><button type="button" data-aurum-language="中文">中文</button><button type="button" data-aurum-language="ID">ID</button></div></div>
+    </div>
+    <div class="aurum-notice-card"><strong>Notifications <span id="aurumNotificationState">are on</span></strong><small>Izinkan notifikasi perangkat untuk menerima pemberitahuan sinyal.</small><button type="button" id="aurumTestNotification">Send test</button></div>
+    <div class="aurum-panel-promo"><div><strong>Invite friends</strong><small>Bagikan AURUM Signals AI.</small></div><button type="button" id="aurumInviteButton">Invite</button></div>
+    <div class="aurum-panel-promo"><div><strong>Telegram channel</strong><small>Channel belum dihubungkan.</small></div><span class="aurum-muted-pill">Belum tersedia</span></div>
+    <button type="button" class="aurum-setup-guide" id="aurumSetupGuide">Setup guide: home screen & notifications</button>
+    <details class="aurum-account-details"><summary>Username & trading accounts</summary><p>AURUM saat ini menyimpan preferensi dan jurnal sinyal di perangkat ini. Tidak terhubung ke akun broker dan tidak mengeksekusi transaksi.</p></details>
+    <button type="button" class="aurum-signout" data-aurum-close>Close settings</button>
+  </section>
+</div>
+
+<!-- AURUM NOTIFICATION CENTER -->
+<div class="aurum-panel-backdrop aurum-notification-backdrop" id="aurumNotificationsBackdrop" hidden>
+  <section class="aurum-side-panel aurum-notifications-panel" role="dialog" aria-modal="true" aria-labelledby="aurumNotificationsTitle">
+    <button class="aurum-panel-close" type="button" data-aurum-close aria-label="Close">×</button>
+    <h2 id="aurumNotificationsTitle">Notifications</h2>
+    <div class="aurum-notification-tabs" role="tablist">
+      <button type="button" class="active" data-aurum-notif-tab="recent">Recent</button>
+      <button type="button" data-aurum-notif-tab="alerts">Alerts</button>
+      <button type="button" data-aurum-notif-tab="password">Change password</button>
+    </div>
+    <p class="aurum-notification-intro" id="aurumNotificationIntro">Riwayat sinyal yang tercatat pada perangkat ini. Ketuk item untuk melihat detail.</p>
+    <div class="aurum-notification-content" id="aurumNotificationContent"></div>
+  </section>
+</div>
 
 <main>
 
@@ -7698,6 +7737,123 @@ header .status {
   font-weight:700 !important;
 }
 </style>
+
+
+<style id="aurum-traxa-account-panels-v1">
+header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important}
+header .status{margin-left:auto!important}
+.header-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.aurum-header-action{position:relative;width:34px;height:34px;border:1px solid #dfe3ea;border-radius:50%;background:#f7f8fb;color:#667085;font-size:17px;display:grid;place-items:center;cursor:pointer}
+.aurum-header-action i{position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:#e35d63;border:1px solid #fff}
+.aurum-profile-action{font-size:13px;font-weight:800;color:#987322;border-color:#d9bd72;background:#fffaf0}
+.aurum-panel-backdrop{position:fixed;inset:0;z-index:30000;background:rgba(25,29,38,.62);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:flex-start;padding:8px;overflow:auto}
+.aurum-panel-backdrop[hidden]{display:none!important}
+.aurum-side-panel{position:relative;width:min(100%,330px);max-height:calc(100dvh - 16px);overflow:auto;background:#fbfaf8;border:1px solid #e5d7b5;border-radius:15px;padding:15px 13px;box-shadow:0 14px 40px rgba(0,0,0,.2);color:#333846}
+.aurum-profile-panel{margin-right:auto}
+.aurum-notification-backdrop{justify-content:flex-end}
+.aurum-notifications-panel{width:min(100%,350px);margin-left:auto}
+.aurum-panel-close{position:absolute;right:10px;top:8px;width:27px;height:27px;border:1px solid #e3e5eb;border-radius:50%;background:#fff;font-size:19px;line-height:1;cursor:pointer;color:#626978}
+.aurum-profile-head{display:flex;align-items:center;gap:10px;padding:4px 34px 13px 2px}
+.aurum-profile-avatar{width:39px;height:39px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#fff1bd,#d6a932);border:1px solid #e2c36f;color:#79570f;font-weight:900}
+.aurum-profile-head strong,.aurum-profile-head small{display:block}
+.aurum-profile-head strong{font-size:13px}.aurum-profile-head small{font-size:9px;color:#828794;margin-top:3px}
+.aurum-settings-group{padding:8px 9px;border:1px solid #e4e5ea;border-radius:13px;background:#f4f4f6}
+.aurum-setting-row{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;color:#6d7280}
+.aurum-setting-row button,.aurum-language-options button{border:1px solid #e0e2e8;background:#fff;border-radius:20px;padding:6px 10px;font-size:9px;color:#4b5260}
+.aurum-language-options{display:flex;gap:3px;flex-wrap:wrap}
+.aurum-language-options button.active{background:#d9b43e;color:#fff;border-color:#d9b43e}
+.aurum-notice-card{margin-top:12px;padding:12px;border:1px solid #bde7ce;border-radius:12px;background:#edf8f1;text-align:center}
+.aurum-notice-card strong,.aurum-notice-card small{display:block}.aurum-notice-card strong{font-size:10px}.aurum-notice-card small{font-size:9px;color:#6d7880;margin:5px 0 9px}
+.aurum-notice-card button,.aurum-setup-guide{border:1px solid #dce1e7;border-radius:9px;background:#fff;padding:8px 12px;font-size:9px;color:#3e4654}
+.aurum-panel-promo{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding:11px;border:1px solid #eee2c5;border-radius:12px;background:#faf6eb}
+.aurum-panel-promo strong,.aurum-panel-promo small{display:block}.aurum-panel-promo strong{font-size:10px}.aurum-panel-promo small{font-size:8px;color:#7d8290;margin-top:4px}
+.aurum-panel-promo button{border:0;border-radius:18px;background:#d7b33d;padding:7px 12px;font-size:9px;font-weight:700;color:#3c3219}
+.aurum-muted-pill{font-size:8px;color:#777f8c;background:#fff;border-radius:15px;padding:6px 8px}
+.aurum-setup-guide{width:100%;margin-top:12px}
+.aurum-account-details{margin-top:12px;border:1px solid #e2e4e9;border-radius:10px;padding:10px;font-size:10px}
+.aurum-account-details p{font-size:9px;line-height:1.5;color:#747b88}
+.aurum-signout{width:100%;margin-top:12px;padding:9px;border:1px solid #e7d8d8;border-radius:9px;background:#fff;color:#d45e63;font-size:10px}
+.aurum-notifications-panel h2{font-size:15px;margin:2px 32px 12px 0}
+.aurum-notification-tabs{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:4px;padding:4px;border-radius:10px;background:#eff0f3}
+.aurum-notification-tabs button{border:0;border-radius:7px;background:transparent;padding:8px 3px;font-size:8px;color:#727887}
+.aurum-notification-tabs button.active{background:#d7b33d;color:#fff;font-weight:800}
+.aurum-notification-intro{font-size:9px;line-height:1.45;color:#777d89;margin:11px 0}
+.aurum-notification-content{display:flex;flex-direction:column;gap:7px}
+.aurum-journal-card{position:relative;border:1px solid #e4e7ec;border-left:4px solid #d6b23e;border-radius:11px;padding:9px 9px 8px;background:#fff;display:grid;grid-template-columns:1fr auto;gap:5px}
+.aurum-journal-card.buy{border-left-color:#36a6dc}.aurum-journal-card.sell{border-left-color:#e36a70}
+.aurum-journal-main strong{display:block;font-size:11px;color:#343b49}.aurum-journal-main small{display:block;font-size:8px;color:#858b97;margin-top:3px}
+.aurum-journal-direction{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:6px;font-size:8px;font-weight:800;color:#fff;background:#369bd5}
+.aurum-journal-card.sell .aurum-journal-direction{background:#e15e65}
+.aurum-journal-price{font-size:10px;font-weight:800;color:#4b5565;text-align:right}
+.aurum-journal-result{grid-column:1/-1;font-size:9px;font-weight:700;color:#3c9a70;padding-top:4px;border-top:1px solid #edf0f3}
+.aurum-empty-state{padding:22px 12px;text-align:center;border:1px dashed #dfe2e8;border-radius:10px;color:#858b97;font-size:10px;line-height:1.5}
+.aurum-alert-setting{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;font-size:10px}
+.aurum-alert-setting input{accent-color:#c9a334;width:17px;height:17px}
+.aurum-password-note{padding:13px;border:1px solid #eadfbf;border-radius:10px;background:#fbf7eb;font-size:10px;line-height:1.55;color:#6c624b}
+body.aurum-user-dark{background:#171a22!important;color:#e8eaf0!important}
+body.aurum-user-dark .app-page{background:transparent!important}
+@media(max-width:520px){.aurum-panel-backdrop{padding:6px}.aurum-side-panel{max-height:calc(100dvh - 12px)}}
+</style>
+
+
+<script id="aurum-account-notification-logic-v1">
+(function(){
+ const $=id=>document.getElementById(id);
+ const profile=$('aurumProfileBackdrop'), notifications=$('aurumNotificationsBackdrop');
+ const prefsKey='aurum.ui.preferences.v1';
+ const readPrefs=()=>{try{return Object.assign({sound:false,language:'ID',dark:false,alerts:{'XAU/USD':true,'BTC/USD':true,'WTI':true}},JSON.parse(localStorage.getItem(prefsKey)||'{}'));}catch(e){return {sound:false,language:'ID',dark:false,alerts:{'XAU/USD':true,'BTC/USD':true,'WTI':true}};}};
+ const savePrefs=p=>localStorage.setItem(prefsKey,JSON.stringify(p));
+ function show(panel){if(panel)panel.hidden=false;document.body.style.overflow='hidden';}
+ function hide(panel){if(panel)panel.hidden=true;if(profile.hidden&&notifications.hidden)document.body.style.overflow='';}
+ $('aurumOpenProfile')?.addEventListener('click',()=>{renderPrefs();show(profile);});
+ $('aurumOpenNotifications')?.addEventListener('click',()=>{renderRecent();show(notifications);});
+ document.querySelectorAll('[data-aurum-close]').forEach(b=>b.addEventListener('click',()=>{hide(profile);hide(notifications);}));
+ [profile,notifications].forEach(p=>p?.addEventListener('click',e=>{if(e.target===p)hide(p);}));
+ function renderPrefs(){
+  const p=readPrefs();$('aurumAppearanceToggle').textContent=p.dark?'Dark mode':'Light mode';
+  $('aurumSoundToggle').textContent=p.sound?'On':'Off';
+  document.body.classList.toggle('aurum-user-dark',!!p.dark);
+  document.querySelectorAll('[data-aurum-language]').forEach(b=>b.classList.toggle('active',b.dataset.aurumLanguage===p.language));
+  const enabled=typeof Notification==='undefined'||Notification.permission!=='denied';
+  $('aurumNotificationState').textContent=enabled?'are on':'are blocked in browser settings';
+ }
+ $('aurumAppearanceToggle')?.addEventListener('click',()=>{const p=readPrefs();p.dark=!p.dark;savePrefs(p);renderPrefs();});
+ $('aurumSoundToggle')?.addEventListener('click',()=>{const p=readPrefs();p.sound=!p.sound;savePrefs(p);renderPrefs();});
+ document.querySelectorAll('[data-aurum-language]').forEach(b=>b.addEventListener('click',()=>{const p=readPrefs();p.language=b.dataset.aurumLanguage;savePrefs(p);renderPrefs();}));
+ $('aurumTestNotification')?.addEventListener('click',async()=>{
+  if(!('Notification'in window)){alert('Browser ini belum mendukung notifikasi.');return;}
+  try{let permission=Notification.permission;if(permission==='default')permission=await Notification.requestPermission();if(permission==='granted')new Notification('AURUM Signals AI',{body:'Notifikasi uji berhasil.'});else alert('Izin notifikasi belum diberikan di browser.');renderPrefs();}catch(e){alert('Notifikasi tidak dapat dikirim dari browser ini.');}
+ });
+ $('aurumInviteButton')?.addEventListener('click',()=>{const url=location.href; if(navigator.clipboard?.writeText){navigator.clipboard.writeText(url).then(()=>alert('Tautan AURUM disalin.')).catch(()=>alert(url));}else alert(url);});
+ $('aurumSetupGuide')?.addEventListener('click',()=>{hide(profile);document.querySelector('.nav-item[data-page="guidePage"]')?.click();});
+ document.querySelectorAll('[data-aurum-password]').forEach(b=>b.addEventListener('click',()=>{hide(profile);show(notifications);selectTab('password');}));
+ function journal(){try{return typeof window.aurumJournalRead==='function'?window.aurumJournalRead():JSON.parse(localStorage.getItem('aurum.paper-journal.v1')||'[]');}catch(e){return [];}}
+ function dateLabel(v){const d=new Date(v);return Number.isNaN(d.getTime())?'Waktu tidak tersedia':d.toLocaleString();}
+ function resultLabel(r){if(r.status==='TP_HIT')return '✓ Target TP1 tercapai'+(Number.isFinite(Number(r.resultPoints))?' · '+Number(r.resultPoints).toFixed(2)+' poin':'');if(r.status==='SL_HIT')return '✕ Stop loss tersentuh';if(r.status==='OPEN')return '● Posisi paper terbuka';if(r.status==='PENDING_ENTRY')return 'Menunggu harga masuk area Entry';if(r.status==='AMBIGUOUS')return 'Hasil tidak dihitung · candle ambigu';return 'Status: '+String(r.status||'Tercatat');}
+ function renderRecent(){
+  const rows=journal().slice().sort((a,b)=>Date.parse(b.createdAt||0)-Date.parse(a.createdAt||0));
+  $('aurumNotificationIntro').textContent='Riwayat sinyal paper AURUM yang tersimpan di perangkat ini. Hasil tidak berasal dari akun broker.';
+  $('aurumNotificationContent').innerHTML=rows.length?rows.slice(0,40).map(r=>'<article class="aurum-journal-card '+(r.direction==='BUY'?'buy':'sell')+'"><div class="aurum-journal-main"><strong>'+String(r.symbol||'MARKET').replace(/[<>&"]/g,'')+' · '+String(r.timeframe||r.interval||'ICT')+'</strong><small>'+dateLabel(r.createdAt)+'</small><span class="aurum-journal-direction">'+String(r.direction||'WAIT')+'</span></div><div class="aurum-journal-price">'+(Number.isFinite(Number(r.entry))?Number(r.entry).toFixed(2):'--')+'<small style="display:block;color:#8a909b;font-size:8px">Entry</small></div><div class="aurum-journal-result">'+resultLabel(r)+' · SL '+(Number.isFinite(Number(r.sl))?Number(r.sl).toFixed(2):'--')+' · TP1 '+(Number.isFinite(Number(r.tp1))?Number(r.tp1).toFixed(2):'--')+'</div></article>').join(''):'<div class="aurum-empty-state">Belum ada riwayat sinyal AURUM.<br>Sinyal akan muncul di sini setelah tercatat oleh jurnal.</div>';
+ }
+ function renderAlerts(){
+  const p=readPrefs();
+  $('aurumNotificationIntro').textContent='Atur instrumen yang ingin dipantau. Pengaturan ini menyimpan preferensi pada perangkat ini; tidak mengubah sinyal atau menjamin notifikasi latar belakang.';
+  $('aurumNotificationContent').innerHTML=['XAU/USD','BTC/USD','WTI'].map(sym=>'<label class="aurum-alert-setting"><span>'+sym+' · Signal alerts</span><input type="checkbox" data-aurum-alert="'+sym+'" '+(p.alerts[sym]?'checked':'')+'></label>').join('');
+  $('aurumNotificationContent').querySelectorAll('[data-aurum-alert]').forEach(el=>el.addEventListener('change',()=>{const x=readPrefs();x.alerts[el.dataset.aurumAlert]=el.checked;savePrefs(x);}));
+ }
+ function renderPassword(){
+  $('aurumNotificationIntro').textContent='Keamanan akun';
+  $('aurumNotificationContent').innerHTML='<div class="aurum-password-note"><strong>Penggantian password belum tersedia.</strong><br>AURUM saat ini belum memiliki layanan akun dan autentikasi password di backend. Saya tidak menampilkan formulir palsu atau menyimpan password secara lokal. Fitur ini perlu dihubungkan ke sistem autentikasi yang aman terlebih dahulu.</div>';
+ }
+ function selectTab(tab){
+  document.querySelectorAll('[data-aurum-notif-tab]').forEach(b=>b.classList.toggle('active',b.dataset.aurumNotifTab===tab));
+  if(tab==='alerts')renderAlerts();else if(tab==='password')renderPassword();else renderRecent();
+ }
+ document.querySelectorAll('[data-aurum-notif-tab]').forEach(b=>b.addEventListener('click',()=>selectTab(b.dataset.aurumNotifTab)));
+ window.addEventListener('storage',e=>{if(e.key==='aurum.paper-journal.v1'&&!notifications.hidden)renderRecent();});
+ renderPrefs();
+})();
+</script>
 
 </body>
 </html>
