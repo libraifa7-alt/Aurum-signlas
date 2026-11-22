@@ -3038,6 +3038,31 @@ body {
         <p id="signalStatus">WAIT — Awaiting verified market data</p>
         <span id="signalDetail">Menunggu konfirmasi Market Structure dan Order Block MTF.</span>
       </div>
+      <div id="aurumSetupSnapshot" style="margin-top:12px;padding:13px;border:1px solid #e7ebf2;border-radius:13px;background:linear-gradient(135deg,#f7fbff,#fff)">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:11px">
+          <strong style="font-size:10px;letter-spacing:1px;color:#526174">RINGKASAN PASAR</strong>
+          <small id="setupTimeframe" style="font-size:9px;color:#8993a2">TIMEFRAME --</small>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+          <div style="padding:10px;border-radius:9px;background:#fff;border:1px solid #edf0f4">
+            <small style="display:block;font-size:8px;color:#8993a2;letter-spacing:.7px">ARAH PASAR</small>
+            <strong id="setupTrend" style="display:block;margin-top:6px;font-size:13px;color:#a17a22">MENUNGGU DATA</strong>
+          </div>
+          <div style="padding:10px;border-radius:9px;background:#fff;border:1px solid #edf0f4">
+            <small style="display:block;font-size:8px;color:#8993a2;letter-spacing:.7px">RENTANG CANDLE</small>
+            <strong id="setupRange" style="display:block;margin-top:6px;font-size:11px;color:#526174">-- / --</strong>
+          </div>
+          <div style="padding:10px;border-radius:9px;background:#fff;border:1px solid #edf0f4">
+            <small style="display:block;font-size:8px;color:#269bd2;letter-spacing:.7px">SUPPORT TERDEKAT</small>
+            <strong id="setupSupport" style="display:block;margin-top:6px;font-size:12px;color:#269bd2">--</strong>
+          </div>
+          <div style="padding:10px;border-radius:9px;background:#fff;border:1px solid #edf0f4">
+            <small style="display:block;font-size:8px;color:#ef535b;letter-spacing:.7px">RESISTANCE TERDEKAT</small>
+            <strong id="setupResistance" style="display:block;margin-top:6px;font-size:12px;color:#ef535b">--</strong>
+          </div>
+        </div>
+        <small style="display:block;margin-top:9px;font-size:8px;line-height:1.5;color:#9299a6">Level dihitung dari candle timeframe grafik aktif, bukan angka perkiraan.</small>
+      </div>
       <div id="aurumTradePlan" class="aurum-trade-plan" style="display:none">
         <div class="aurum-panel-heading"><span class="aurum-heading-icon">◎</span><div><strong>AURUM TRADE PLAN</strong><small>Rencana berdasarkan konfirmasi analisis</small></div></div>
         <p id="tradeDirection">WAIT</p>
@@ -5960,6 +5985,34 @@ chart.timeScale().fitContent();
 
 const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
+
+// RINGKASAN SETUP BERDASARKAN CANDLE TIMEFRAME AKTIF
+const setupTf = document.getElementById('tf')?.value || 'M15';
+const setupTfEl = document.getElementById('setupTimeframe');
+const setupTrendEl = document.getElementById('setupTrend');
+const setupRangeEl = document.getElementById('setupRange');
+const setupSupportEl = document.getElementById('setupSupport');
+const setupResistanceEl = document.getElementById('setupResistance');
+if (setupTfEl) setupTfEl.textContent = 'TIMEFRAME ' + setupTf;
+if (setupTrendEl) {
+  const setupDirection = structure.includes('BULLISH') ? 'BULLISH' :
+    structure.includes('BEARISH') ? 'BEARISH' :
+    structure.includes('RANGE') ? 'RANGE' : 'WAIT';
+  setupTrendEl.textContent = setupDirection;
+  setupTrendEl.style.color = setupDirection === 'BULLISH' ? '#269bd2' :
+    setupDirection === 'BEARISH' ? '#ef535b' : '#a17a22';
+}
+const setupWindow = candles.slice(-24);
+if (setupRangeEl && setupWindow.length) {
+  const setupHigh = Math.max(...setupWindow.map(c => Number(c.high)));
+  const setupLow = Math.min(...setupWindow.map(c => Number(c.low)));
+  setupRangeEl.textContent = setupHigh.toFixed(2) + ' / ' + setupLow.toFixed(2);
+}
+const setupLevels = detectSupportResistance(candles);
+if (setupSupportEl) setupSupportEl.textContent =
+  setupLevels && setupLevels.support != null ? setupLevels.support.toFixed(2) : '--';
+if (setupResistanceEl) setupResistanceEl.textContent =
+  setupLevels && setupLevels.resistance != null ? setupLevels.resistance.toFixed(2) : '--';
 // KONFIRMASI ORDER BLOCK H1 + M15
 const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
 
