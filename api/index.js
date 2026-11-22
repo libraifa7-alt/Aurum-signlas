@@ -146,10 +146,20 @@ module.exports = async function handler(req, res) {
         "https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF"
       );
 
+      const yahooRanges = {
+        M1: "5d",
+        M5: "1mo",
+        M15: "1mo",
+        M30: "1mo",
+        M45: "1mo",
+        H1: "1mo",
+        H4: "3mo",
+        D1: "1y"
+      };
+
       url.searchParams.set(
         "range",
-        selected === "D1" ? "1y" :
-        selected === "M45" ? "1mo" : "5d"
+        yahooRanges[selected] || "5d"
       );
 
       url.searchParams.set("interval", yahooInterval);
@@ -245,11 +255,28 @@ module.exports = async function handler(req, res) {
         candles = aggregated;
       }
 
-      // HASIL DATA WTI
+      // Urutkan berdasarkan waktu dan kirim hanya candle paling baru.
+      // Yahoo 1m membatasi riwayat intraday; range 5d menjaga jendela tetap valid.
+      candles.sort((a, b) => Date.parse(a.datetime) - Date.parse(b.datetime));
+
+      const targetBars = selected === "M45" ? 300 : 100;
+      candles = candles.slice(-targetBars);
+
+      if (!candles.length) {
+        return res.status(502).json({
+          status: "error",
+          message: "Yahoo Finance tidak mengirim candle WTI yang valid"
+        });
+      }
+
+      // HASIL DATA WTI + penanda waktu agar kesegaran data dapat diperiksa.
       const output = {
         status: "success",
         symbol: selectedSymbol,
         interval: selected,
+        source: "Yahoo Finance (CL=F)",
+        providerFetchedAt: new Date().toISOString(),
+        lastCandleAt: candles[candles.length - 1].datetime,
         candles
       };
 
