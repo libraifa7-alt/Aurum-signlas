@@ -55,6 +55,7 @@ module.exports = async function handler(req, res) {
   ).toUpperCase();
 
   const interval = allowedIntervals[selected] || "15min";
+  const debugRaw = req.query.debug === "raw" && selectedSymbol === "XAU/USD";
 
   const cacheKey = selectedSymbol + ":" + interval;
   const cached = globalThis.aurumCache.get(cacheKey);
@@ -73,7 +74,7 @@ module.exports = async function handler(req, res) {
         "1day": 1800000
       }[interval] || 180000);
 
-  if (cached && Date.now() - cached.time < cacheTTL) {
+  if (!debugRaw && cached && Date.now() - cached.time < cacheTTL) {
     return res.status(200).json(cached.data);
   }
 
@@ -108,7 +109,7 @@ module.exports = async function handler(req, res) {
         data: redisCached.data
       });
 
-      if (Date.now() - redisCached.time < cacheTTL) {
+      if (!debugRaw && Date.now() - redisCached.time < cacheTTL) {
         return res.status(200).json(redisCached.data);
       }
     }
@@ -342,6 +343,25 @@ if (
     message:
       twelveData.message ||
       "Gagal mengambil data Twelve Data"
+  });
+}
+
+// DIAGNOSTIK RAW TWELVE DATA XAU/USD — LEWATI CACHE, TANPA MEMBUKA API KEY
+if (debugRaw) {
+  const values = twelveData.values;
+  const opens = values.map(c => Number(c.open));
+  const uniqueOpens = new Set(opens.filter(Number.isFinite));
+  return res.status(200).json({
+    status: "success",
+    diagnostic: "raw_twelve_data",
+    symbol: selectedSymbol,
+    requestedInterval: selected,
+    providerInterval,
+    providerMeta: twelveData.meta || null,
+    totalCandles: values.length,
+    distinctOpenValues: uniqueOpens.size,
+    firstCandles: values.slice(0, 5),
+    lastCandles: values.slice(-5)
   });
 }
 
