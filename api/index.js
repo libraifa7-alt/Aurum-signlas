@@ -59,12 +59,12 @@ module.exports = async function handler(req, res) {
   const debugQuote = req.query.debug === "quote" && selectedSymbol === "XAU/USD";
 
   // Versioned provider cache prevents old MarketAPI candles being reused.
-  const cacheSource = selectedSymbol === "WTI" ? "yahoo" : selectedSymbol === "XAU/USD" ? "xaus-chart" : "twelvedata";
-  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + (selectedSymbol === "XAU/USD" ? ":v3" : ":v2");
+  const cacheSource = (selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? "yahoo" : selectedSymbol === "XAU/USD" ? "xaus-chart" : "twelvedata";
+  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + ((selectedSymbol === "XAU/USD" || selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? ":v3" : ":v2");
   const cached = globalThis.aurumCache.get(cacheKey);
 
   // AURUM SMART API CACHE OPTIMIZATION
-  const cacheTTL = selectedSymbol === "WTI"
+  const cacheTTL = (selectedSymbol === "WTI" || selectedSymbol === "BTC/USD")
     ? 60000
     : selectedSymbol === "XAU/USD"
       ? ({
@@ -438,11 +438,10 @@ module.exports = async function handler(req, res) {
       return res.status(200).json(output);
     }
 
-    // Cooldown global: satu kegagalan kuota Twelve Data menahan
-    // seluruh timeframe, bukan hanya interval yang sedang diminta.
+    // Cooldown Twelve Data hanya berlaku untuk simbol yang masih memakai provider tersebut.
     const providerErrorKey = "aurum:provider-error:" + cacheKey;
     const globalProviderErrorKey = "aurum:provider-error:twelvedata:global:v1";
-    if (!debugRaw) {
+    if (selectedSymbol === "XAU/USD" && !debugRaw) {
       try {
         const globalErrorRaw = await aurumRedis(["GET", globalProviderErrorKey]);
         const intervalErrorRaw = await aurumRedis(["GET", providerErrorKey]);
@@ -476,8 +475,10 @@ module.exports = async function handler(req, res) {
 
    
 
-    // JALUR KHUSUS WTI DARI YAHOO FINANCE
-    if (selectedSymbol === "WTI") {
+    // Jalur Yahoo Finance terpisah untuk BTC dan WTI agar keduanya tidak bergantung pada kuota Twelve Data.
+    if (selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") {
+      const yahooSymbol = selectedSymbol === "WTI" ? "CL=F" : "BTC-USD";
+      const assetLabel = selectedSymbol === "WTI" ? "WTI" : "BTC/USD";
       const yahooIntervals = {
         M1: "1m",
         M5: "5m",
@@ -494,7 +495,7 @@ module.exports = async function handler(req, res) {
       ] || "15m";
 
       const url = new URL(
-        "https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF"
+        `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}`
       );
 
       const yahooRanges = {
@@ -536,7 +537,7 @@ module.exports = async function handler(req, res) {
           status: "error",
           message:
             data.chart?.error?.description ||
-            "Gagal mengambil data WTI"
+            `Gagal mengambil data ${assetLabel} dari Yahoo Finance`
         });
       }
 
@@ -553,7 +554,7 @@ module.exports = async function handler(req, res) {
 
         return res.status(502).json({
           status: "error",
-          message: "Data candle WTI tidak tersedia"
+          message: `Data candle ${assetLabel} tidak tersedia`
         });
       }
 
@@ -616,7 +617,7 @@ module.exports = async function handler(req, res) {
       if (!candles.length) {
         return res.status(502).json({
           status: "error",
-          message: "Yahoo Finance tidak mengirim candle WTI yang valid"
+          message: `Yahoo Finance tidak mengirim candle ${assetLabel} yang valid`
         });
       }
 
@@ -625,7 +626,7 @@ module.exports = async function handler(req, res) {
         status: "success",
         symbol: selectedSymbol,
         interval: selected,
-        source: "Yahoo Finance (CL=F)",
+        source: `Yahoo Finance (${yahooSymbol})`,
         providerFetchedAt: new Date().toISOString(),
         lastCandleAt: candles[candles.length - 1].datetime,
         candles
