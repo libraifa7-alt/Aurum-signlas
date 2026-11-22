@@ -274,7 +274,12 @@ module.exports = async function handler(req, res) {
 
 // JALUR DATA XAU/USD DAN BTC/USD DARI MARKETAPI
 
-const symbol = selectedSymbol.replaceAll("/", "");
+
+
+const symbol =
+  selectedSymbol === "BTC/USD"
+    ? "BITCOIN"
+    : selectedSymbol.replaceAll("/", "");
 
 const apiKey = process.env.MARKETAPI_API_KEY;
 
@@ -291,6 +296,7 @@ if (!apiKey) {
     message: "MARKETAPI_API_KEY belum diatur"
   });
 }
+      
 
 // MARKETAPI TIDAK MENDUKUNG M45 LANGSUNG
 // M45 DIBENTUK DARI 3 CANDLE M15
