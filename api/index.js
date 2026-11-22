@@ -398,12 +398,25 @@ do {
   pageCount < maxPages
 );
 
+
 // GABUNGKAN SEMUA HALAMAN CANDLE
 if (allBars.length > 0) {
   data = {
     data: allBars
   };
+
+  // AURUM RAW CANDLE DIAGNOSTIC
+  console.log(
+    "AURUM FIRST RAW CANDLE:",
+    allBars[0]
+  );
+
+  console.log(
+    "AURUM LAST RAW CANDLE:",
+    allBars[allBars.length - 1]
+  );
 }
+      
 
 // AURUM TIMEFRAME DEBUG
 console.log(
