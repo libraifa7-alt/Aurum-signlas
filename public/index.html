@@ -4916,7 +4916,7 @@ const direction = signal =>
       const currentPrice = todayCandle && Number.isFinite(Number(todayCandle.close))
         ? Number(todayCandle.close)
         : (nearestSR && Number.isFinite(Number(nearestSR.currentPrice)) ? Number(nearestSR.currentPrice) : null);
-      const formatPrice = value => Number.isFinite(Number(value)) ? Number(value).toFixed(2) : '--';
+      const formatPrice = value => value === null || value === undefined || value === '' || !Number.isFinite(Number(value)) ? '--' : Number(value).toFixed(2);
       const support = nearestSR && nearestSR.support != null ? Number(nearestSR.support) : null;
       const resistance = nearestSR && nearestSR.resistance != null ? Number(nearestSR.resistance) : null;
       let positionPercent = null;
