@@ -2834,6 +2834,31 @@ body {
 .home-community-grid .community-icon{width:48px;height:48px}
 .home-tool-wide{min-height:58px}
 @media(max-width:380px){#homePage .aurum-home-hero-v2{min-height:370px}.aurum-session-clock{width:214px;height:214px}.aurum-clock-face{width:202px;height:202px}.home-market-card{padding:8px 5px}.home-market-price{font-size:11px}}
+
+/* MATCH TRAXA MARKET CARDS: ICON, PRICE AND COLORED SPARKLINES */
+#homePage .home-market-grid{gap:8px}
+#homePage .home-market-card{
+  min-height:96px;
+  padding:8px 7px 5px;
+  gap:3px;
+  border:1px solid #ececf0;
+  border-radius:13px;
+  background:linear-gradient(155deg,#fff 0%,#fdfdfd 100%);
+}
+#homePage .home-market-top{gap:6px;align-items:center}
+#homePage .home-market-card .home-asset-icon{
+  width:23px;height:23px;min-width:23px;
+  font-size:10px;font-weight:800;
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 2px 7px rgba(35,45,60,.12),inset 0 1px 3px rgba(255,255,255,.85);
+}
+#homePage .home-market-top>span:last-child{gap:1px}
+#homePage .home-market-top strong{font-size:10px;line-height:1.15;color:#252a34}
+#homePage .home-market-top small{font-size:7px;line-height:1.2}
+#homePage .home-market-price{font-size:13px;font-weight:750;line-height:1.2;letter-spacing:-.25px}
+#homePage .home-market-change{font-size:8px;line-height:1.2;min-height:10px}
+#homePage .home-market-spark{height:35px;margin-top:1px}
+#homePage .home-market-spark path{stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 </style>
 
 
@@ -6732,7 +6757,7 @@ if ('serviceWorker' in navigator) {
         const points=candles.slice(-24).map(x=>Number(x.close)).filter(Number.isFinite);
         const min=Math.min(...points),max=Math.max(...points),spread=max-min||1;
         path.setAttribute('d',points.map((v,i)=>(i?'L':'M')+(i*180/Math.max(1,points.length-1)).toFixed(1)+' '+(36-((v-min)/spread)*29).toFixed(1)).join(' '));
-        path.style.stroke=change>=0?'#25ad85':'#e45b63';
+        path.style.stroke=asset.symbol==='XAU/USD'?'#e45b63':asset.symbol==='BTC/USD'?'#3298dc':'#329f91';
       }
     }catch(error){
       if($(asset.price))$(asset.price).textContent='--';
