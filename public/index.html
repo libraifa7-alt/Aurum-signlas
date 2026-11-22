@@ -6855,14 +6855,19 @@ console.log('STATUS SERVER DIPERIKSA');
     setTimeout(function () { splash.style.display = 'none'; }, 750);
   }
 
-  // Start music immediately on the opening splash. Some mobile browsers
-  // may reject audible autoplay until the visitor performs a gesture.
-  splashMusic.play().catch(function (error) {
-    console.info('AURUM splash autoplay was blocked by the browser:', error);
-  });
+  // Try audible autoplay on opening. If the browser blocks it, unlock
+  // playback on the visitor's first real touch without showing a music button.
+  function startSplashMusic() {
+    if (!splashMusic.paused) return;
+    splashMusic.play().catch(function (error) {
+      console.info('AURUM splash music requires a browser-approved gesture:', error);
+    });
+  }
+  startSplashMusic();
 
   enterButton.addEventListener('click', enterDashboard);
   splash.addEventListener('touchstart', function (event) {
+    startSplashMusic();
     const touch = event.changedTouches[0];
     startX = touch.clientX;
     startY = touch.clientY;
@@ -6872,6 +6877,7 @@ console.log('STATUS SERVER DIPERIKSA');
     if ((touch.clientX - startX) > 70 && Math.abs(touch.clientY - startY) < 100) enterDashboard();
   }, { passive: true });
   splash.addEventListener('pointerdown', function (event) {
+    startSplashMusic();
     startX = event.clientX;
     startY = event.clientY;
   });
