@@ -57,7 +57,9 @@ module.exports = async function handler(req, res) {
   const interval = allowedIntervals[selected] || "15min";
   const debugRaw = req.query.debug === "raw" && selectedSymbol === "XAU/USD";
 
-  const cacheKey = selectedSymbol + ":" + interval;
+  // Versioned provider cache prevents old MarketAPI candles being reused.
+  const cacheSource = selectedSymbol === "WTI" ? "yahoo" : "twelvedata";
+  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + ":v2";
   const cached = globalThis.aurumCache.get(cacheKey);
 
   // AURUM SMART API CACHE OPTIMIZATION
@@ -298,12 +300,9 @@ if (!twelveApiKey) {
   });
 }
 
-// M45 DIBENTUK DARI 3 CANDLE M15
-const providerInterval =
-  selected === "M45" ? "15min" : interval;
-
-const outputsize =
-  selected === "M45" ? 300 : 100;
+// Twelve Data supports 45min directly; request the selected interval.
+const providerInterval = interval;
+const outputsize = selected === "M45" ? 300 : 100;
 
 // REQUEST TWELVE DATA
 const twelveUrl = new URL(
@@ -445,61 +444,22 @@ console.log(
   rawCandles[rawCandles.length - 1]?.time
 );
 
-// KONVERSI FORMAT MARKETAPI KE FORMAT AURUM
-let candles;
+// NORMALISASI CANDLE TWELVE DATA KE FORMAT AURUM
+// M45 sudah diminta langsung dari provider, tidak diagregasi ulang.
+const targetBars = selected === "M45" ? 300 : 100;
 
-if (selected === "M45") {
-  const groups = new Map();
-
-  rawCandles.forEach(c => {
-    const timestamp = Date.parse(c.time);
-    const bucket = Math.floor(timestamp / 2700000) * 2700000;
-
-    if (!groups.has(bucket)) {
-  groups.set(bucket, {
-    timestamp,
-    open: Number(c.open),
-    high: Number(c.high),
-    low: Number(c.low),
-    close: Number(c.close),
-    volume: Number(c.tick_volume || 0)
-  });
-} else {
-  const group = groups.get(bucket);
-
-  group.high = Math.max(group.high, Number(c.high));
-  group.low = Math.min(group.low, Number(c.low));
-  group.close = Number(c.close);
-  group.volume += Number(c.tick_volume || 0);
-}
-});
-
-candles = Array.from(groups.entries())
-  .sort((a, b) => a[0] - b[0])
-  .slice(-100)
-  .map(([time, c]) => ({
-    datetime: new Date(time).toISOString(),
-    open: c.open,
-    high: c.high,
-    low: c.low,
-    close: c.close,
-    volume: c.volume
-  }));
-
-} else {
-  candles = rawCandles.slice(-100).map(c => ({
-    datetime: c.time,
-    open: Number(c.open),
-    high: Number(c.high),
-    low: Number(c.low),
-    close: Number(c.close),
-    volume: Number(c.tick_volume || 0)
-  }));
-}
+const candles = rawCandles.slice(-targetBars).map(c => ({
+  datetime: c.time,
+  open: Number(c.open),
+  high: Number(c.high),
+  low: Number(c.low),
+  close: Number(c.close),
+  volume: Number(c.tick_volume || 0)
+}));
 if (!candles.length) {
   return res.status(502).json({
     status: "error",
-    message: "MarketAPI tidak mengirim candle untuk simbol ini"
+    message: "Twelve Data tidak mengirim candle valid untuk simbol ini"
   });
 }
 
@@ -507,6 +467,7 @@ const output = {
   status: "success",
   symbol: selectedSymbol,
   interval: selected,
+  source: "Twelve Data",
   candles
 };
       
