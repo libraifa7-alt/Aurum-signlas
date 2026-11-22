@@ -66,7 +66,7 @@ module.exports = async function handler(req, res) {
   const cacheTTL = selectedSymbol === "WTI"
     ? 60000
     : selectedSymbol === "XAU/USD" && interval === "1min"
-      ? 15000
+      ? 30000
       : ({
           "1min": 60000,
           "5min": 120000,
@@ -465,11 +465,43 @@ if (!candles.length) {
   });
 }
 
+// For Gold M1, request the latest quote separately from completed candles.
+// REST quote is still subject to the user's Twelve Data plan and provider latency.
+let livePrice = null;
+let livePriceUpdatedAt = null;
+let livePriceSource = "time_series";
+if (selectedSymbol === "XAU/USD" && interval === "1min") {
+  try {
+    const priceUrl = new URL("https://api.twelvedata.com/price");
+    priceUrl.searchParams.set("symbol", selectedSymbol);
+    priceUrl.searchParams.set("apikey", twelveApiKey);
+    const priceResponse = await fetch(priceUrl);
+    const priceData = await priceResponse.json();
+    const quote = Number(priceData.price);
+    if (priceResponse.ok && Number.isFinite(quote) && quote > 0) {
+      livePrice = quote;
+      livePriceUpdatedAt = new Date().toISOString();
+      livePriceSource = "Twelve Data /price";
+      const last = candles[candles.length - 1];
+      last.close = quote;
+      last.high = Math.max(Number(last.high), quote);
+      last.low = Math.min(Number(last.low), quote);
+    } else {
+      console.warn("AURUM XAU LIVE PRICE UNAVAILABLE:", priceData);
+    }
+  } catch (priceError) {
+    console.warn("AURUM XAU LIVE PRICE ERROR:", priceError.message);
+  }
+}
+
 const output = {
   status: "success",
   symbol: selectedSymbol,
   interval: selected,
   source: "Twelve Data",
+  livePrice,
+  livePriceUpdatedAt,
+  livePriceSource,
   candles
 };
       
