@@ -100,6 +100,7 @@ module.exports = async function handler(req, res) {
       );
     }
 
+    
     // GUNAKAN CACHE REDIS JIKA MASIH SEGAR
     if (redisCached && redisCached.data) {
       globalThis.aurumCache.set(cacheKey, {
@@ -111,6 +112,12 @@ module.exports = async function handler(req, res) {
         return res.status(200).json(redisCached.data);
       }
     }
+
+    
+      
+      
+
+   
 
     // JALUR KHUSUS WTI DARI YAHOO FINANCE
     if (selectedSymbol === "WTI") {
@@ -274,6 +281,39 @@ module.exports = async function handler(req, res) {
 
 // JALUR DATA XAU/USD DAN BTC/USD DARI MARKETAPI
 
+    // AURUM MARKETAPI COOLDOWN CHECK
+const marketApiCooldownKey =
+  "aurum:marketapi:cooldown";
+
+let marketApiCoolingDown = false;
+
+try {
+  const cooldown = await aurumRedis([
+    "GET",
+    marketApiCooldownKey
+  ]);
+
+  marketApiCoolingDown = Boolean(cooldown);
+} catch (cooldownError) {
+  console.error(
+    "MARKETAPI COOLDOWN CHECK ERROR:",
+    cooldownError.message
+  );
+}
+
+if (marketApiCoolingDown) {
+  if (redisCached && redisCached.data) {
+    return res.status(200).json({
+      ...redisCached.data,
+      cache: "stale"
+    });
+  }
+
+  return res.status(503).json({
+    status: "error",
+    message: "MarketAPI cooldown aktif"
+  });
+}
 
 
 const symbol =
@@ -475,6 +515,29 @@ if (
   !data ||
   !Array.isArray(data.data)
 ) {
+
+  // AKTIFKAN COOLDOWN JIKA MARKETAPI SALDONYA HABIS
+  if (response && response.status === 402) {
+    try {
+      await aurumRedis([
+        "SET",
+        marketApiCooldownKey,
+        "1",
+        "EX",
+        "300"
+      ]);
+
+      console.error(
+        "AURUM MARKETAPI COOLDOWN ACTIVATED: 300 SECONDS"
+      );
+    } catch (cooldownError) {
+      console.error(
+        "MARKETAPI COOLDOWN WRITE ERROR:",
+        cooldownError.message
+      );
+    }
+  }
+
   if (redisCached && redisCached.data) {
     return res.status(200).json({
       ...redisCached.data,
