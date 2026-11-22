@@ -2836,6 +2836,60 @@ body {
 @media(max-width:380px){#homePage .aurum-home-hero-v2{min-height:370px}.aurum-session-clock{width:214px;height:214px}.aurum-clock-face{width:202px;height:202px}.home-market-card{padding:8px 5px}.home-market-price{font-size:11px}}
 </style>
 
+
+<style id="aurum-traxa-glow-icons">
+/* TRAXA-STYLE LUMINOUS ICONS FOR TRADING, COMMUNITY AND TOOLS */
+#homePage .aurum-glow-icon{
+  position:relative;
+  isolation:isolate;
+  overflow:visible;
+  border:1px solid rgba(255,255,255,.92);
+  font-family:system-ui,sans-serif;
+  font-weight:800;
+  text-shadow:0 1px 1px rgba(255,255,255,.65);
+  box-shadow:0 0 0 3px rgba(255,255,255,.8),0 0 11px currentColor,inset 0 2px 5px rgba(255,255,255,.88),inset 0 -5px 9px rgba(38,45,67,.10);
+  animation:aurumIconBreath 3.6s ease-in-out infinite;
+}
+#homePage .aurum-glow-icon:before{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border-radius:50%;
+  border:1px dashed currentColor;
+  opacity:.38;
+  transform:rotate(-18deg);
+  z-index:-1;
+}
+#homePage .aurum-glow-icon:after{
+  content:"";
+  position:absolute;
+  inset:-3px;
+  border-radius:50%;
+  border:2px solid transparent;
+  border-top-color:currentColor;
+  border-bottom-color:currentColor;
+  opacity:.58;
+  transform:rotate(34deg);
+  z-index:-1;
+}
+#homePage .home-menu-icon.aurum-glow-icon{width:43px;height:43px;font-size:20px}
+#homePage .community-icon.aurum-glow-icon{width:57px;height:57px;font-size:24px}
+#homePage .aurum-glow-icon.purple{color:#7044db;background:radial-gradient(circle at 35% 28%,#fff 0%,#d9caff 24%,#9672f4 68%,#7044db 100%)}
+#homePage .aurum-glow-icon.teal{color:#079987;background:radial-gradient(circle at 35% 28%,#fff 0%,#c9f8ec 24%,#67d9c1 68%,#159f91 100%)}
+#homePage .aurum-glow-icon.coral{color:#e75e65;background:radial-gradient(circle at 35% 28%,#fff 0%,#ffe0d7 24%,#ff9a91 68%,#ed6a72 100%)}
+#homePage .aurum-glow-icon.blue{color:#2879d7;background:radial-gradient(circle at 35% 28%,#fff 0%,#d9edff 24%,#7dbaff 68%,#347fe0 100%)}
+#homePage .aurum-glow-icon.pink{color:#c52d83;background:radial-gradient(circle at 35% 28%,#fff 0%,#ffd8ee 24%,#f18ac4 68%,#d84a9c 100%)}
+#homePage .aurum-glow-icon.sky{color:#168dc5;background:radial-gradient(circle at 35% 28%,#fff 0%,#d4f3ff 24%,#78c9ee 68%,#2698d1 100%)}
+#homePage .aurum-glow-icon.amber{color:#b88b2b;background:radial-gradient(circle at 35% 28%,#fff 0%,#fff4c9 24%,#f4d77d 68%,#d4a83d 100%)}
+#homePage .aurum-glow-icon.green-icon{color:#459d35;background:radial-gradient(circle at 35% 28%,#fff 0%,#e1ffd2 24%,#9bdd72 68%,#69b946 100%)}
+#homePage .aurum-glow-icon.slate{color:#66758a;background:radial-gradient(circle at 35% 28%,#fff 0%,#e7edf5 24%,#aab7c9 68%,#7d899b 100%)}
+@keyframes aurumIconBreath{
+  0%,100%{filter:saturate(1);transform:translateY(0)}
+  50%{filter:saturate(1.12);transform:translateY(-1px)}
+}
+@media(prefers-reduced-motion:reduce){#homePage .aurum-glow-icon{animation:none}}
+</style>
+
 </head>
   
   
@@ -3034,25 +3088,25 @@ body {
     <div class="home-menu-grid">
       <a href="#marketPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=marketPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=setup]')?.click(),80);return false;">
-        <span class="home-menu-icon purple">ϟ</span>
+        <span class="home-menu-icon purple aurum-glow-icon">⚡</span>
         <span><strong>Sinyal</strong><small>Setup trading live</small></span>
       </a>
 
       <a href="#marketPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=marketPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=performance]')?.click(),80);return false;">
-        <span class="home-menu-icon teal">▥</span>
+        <span class="home-menu-icon teal aurum-glow-icon">▥</span>
         <span><strong>Performa</strong><small>Hasil dan win rate</small></span>
       </a>
 
       <a href="#marketPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=marketPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=analysis]')?.click(),80);return false;">
-        <span class="home-menu-icon coral">◉</span>
+        <span class="home-menu-icon coral aurum-glow-icon">◉</span>
         <span><strong>Analisis</strong><small>ICT dan Smart Money</small></span>
       </a>
 
       <a href="#newsPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=newsPage]').click();return false;">
-        <span class="home-menu-icon blue">▤</span>
+        <span class="home-menu-icon blue aurum-glow-icon">▣</span>
         <span><strong>Berita</strong><small>Market intelligence</small></span>
       </a>
     </div>
@@ -3067,19 +3121,19 @@ body {
     <div class="home-community-grid">
       <a href="#chatPage"
          onclick="document.querySelector('.nav-item[data-page=chatPage]').click();return false;">
-        <span class="community-icon pink">▢</span>
+        <span class="community-icon pink aurum-glow-icon">▱</span>
         <strong>Obrolan</strong>
       </a>
 
       <a href="#chatPage"
          onclick="document.querySelector('.nav-item[data-page=chatPage]').click();return false;">
-        <span class="community-icon sky">➤</span>
+        <span class="community-icon sky aurum-glow-icon">➤</span>
         <strong>Telegram</strong>
       </a>
 
       <a href="#guidePage"
          onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
-        <span class="community-icon amber">♧</span>
+        <span class="community-icon amber aurum-glow-icon">♧</span>
         <strong>Undang teman</strong>
       </a>
     </div>
@@ -3094,19 +3148,19 @@ body {
     <div class="home-tools-grid">
       <a href="#guidePage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
-        <span class="home-menu-icon green-icon">▷</span>
+        <span class="home-menu-icon green-icon aurum-glow-icon">▶</span>
         <span><strong>Panduan</strong><small>Cara kerja AURUM</small></span>
       </a>
 
       <a href="#newsPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=newsPage]').click();return false;">
-        <span class="home-menu-icon amber">♢</span>
+        <span class="home-menu-icon amber aurum-glow-icon">♟</span>
         <span><strong>Notifikasi</strong><small>Informasi pasar</small></span>
       </a>
 
       <a href="#guidePage" class="home-menu-card home-tool-wide"
          onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
-        <span class="home-menu-icon slate">⚙</span>
+        <span class="home-menu-icon slate aurum-glow-icon">⚙</span>
         <span><strong>Pengaturan</strong><small>Preferensi AURUM</small></span>
       </a>
     </div>
