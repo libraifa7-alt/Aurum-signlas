@@ -7478,8 +7478,11 @@ main {
 .aurum-bottom-nav .nav-item small { font-size: 8px; }
 body { padding-bottom: 70px; }
 @media (max-width: 479px) {
-  header, main, .aurum-bottom-nav { width: 100%; }
-  main { padding-left: 8px; padding-right: 8px; }
+  header, main, .aurum-bottom-nav { width: min(62vw, 460px); }
+  header { padding: 8px 7px; }
+  header .brand { font-size: 11px; letter-spacing: 0; }
+  header .status { font-size: 6px; padding: 5px 6px; }
+  main { padding-left: 0; padding-right: 0; }
   #homePage .aurum-home-hero-v2 { min-height: 300px; }
   .aurum-session-clock { width: 194px; height: 194px; }
   .aurum-clock-face { width: 182px; height: 182px; }
