@@ -3442,6 +3442,26 @@ body {
     if(chartLabel)chartLabel.textContent=name;
   }
   if(pair){pair.addEventListener('change',updateAssetLabels);updateAssetLabels();}
+  document.querySelectorAll('#marketPage .aurum-asset-switch [data-asset]').forEach(function(button){
+    button.addEventListener('click',function(){
+      if(!pair || pair.value===this.dataset.asset)return;
+      pair.value=this.dataset.asset;
+      pair.dispatchEvent(new Event('change',{bubbles:true}));
+      document.querySelectorAll('#marketPage .aurum-asset-switch [data-asset]').forEach(function(item){
+        item.classList.toggle('active',item===button);
+      });
+    });
+  });
+  if(pair){
+    document.querySelectorAll('#marketPage .aurum-asset-switch [data-asset]').forEach(function(button){
+      button.classList.toggle('active',button.dataset.asset===pair.value);
+    });
+    pair.addEventListener('change',function(){
+      document.querySelectorAll('#marketPage .aurum-asset-switch [data-asset]').forEach(function(button){
+        button.classList.toggle('active',button.dataset.asset===pair.value);
+      });
+    });
+  }
 })();
 </script>
 
@@ -6054,6 +6074,69 @@ if (setupSupportEl) setupSupportEl.textContent =
   setupLevels && setupLevels.support != null ? setupLevels.support.toFixed(2) : '--';
 if (setupResistanceEl) setupResistanceEl.textContent =
   setupLevels && setupLevels.resistance != null ? setupLevels.resistance.toFixed(2) : '--';
+
+// KARTU MARKET TRAXA-INSPIRED: SEMUA NILAI BERASAL DARI CANDLE AURUM
+const assetSymbol = document.getElementById('pair')?.value || 'XAU/USD';
+const assetMark = document.getElementById('marketAssetMark');
+if (assetMark) assetMark.textContent = assetSymbol === 'XAU/USD' ? 'Au' : assetSymbol === 'BTC/USD' ? '₿' : 'OIL';
+const headerTrend = document.getElementById('aurumHeaderTrend');
+const headerDirection = structure.includes('BULLISH') ? 'Bullish' :
+  structure.includes('BEARISH') ? 'Bearish' : 'Range';
+if (headerTrend) {
+  headerTrend.textContent = 'Trend ' + headerDirection;
+  headerTrend.style.color = headerDirection === 'Bullish' ? '#15976c' :
+    headerDirection === 'Bearish' ? '#e45c65' : '#687080';
+  headerTrend.style.background = headerDirection === 'Bullish' ? '#e7f7ef' :
+    headerDirection === 'Bearish' ? '#fff0f0' : '#f1f2f4';
+}
+const miniChart = document.getElementById('aurumMiniChart');
+if (miniChart && candles.length > 1) {
+  const points = candles.slice(-36).map(x => Number(x.close)).filter(Number.isFinite);
+  const min = Math.min(...points), max = Math.max(...points);
+  const spread = max - min || 1;
+  const path = points.map((v,i) => (i ? 'L' : 'M') +
+    (i * 420 / Math.max(1, points.length - 1)).toFixed(1) + ' ' +
+    (50 - ((v - min) / spread) * 42).toFixed(1)).join(' ');
+  const stroke = headerDirection === 'Bullish' ? '#22a879' :
+    headerDirection === 'Bearish' ? '#ef6269' : '#9aa3b1';
+  miniChart.innerHTML = '<path d="' + path + '" fill="none" stroke="' + stroke +
+    '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>';
+}
+try {
+  const [dailyCandles, m5Candles] = await Promise.all([
+    getSharedCandles('D1'),
+    getSharedCandles('M5')
+  ]);
+  const daily = dailyCandles[dailyCandles.length - 1];
+  const rangeLow = daily ? Number(daily.low) : null;
+  const rangeHigh = daily ? Number(daily.high) : null;
+  const rangeWidth = rangeHigh != null && rangeLow != null ? rangeHigh - rangeLow : null;
+  const current = Number(latestCandle.close);
+  const rangeLowEl = document.getElementById('aurumRangeLow');
+  const rangeHighEl = document.getElementById('aurumRangeHigh');
+  const rangePipsEl = document.getElementById('aurumRangePips');
+  const rangeMarker = document.getElementById('aurumRangeMarker');
+  if (rangeLowEl) rangeLowEl.textContent = 'L ' + (rangeLow != null ? rangeLow.toFixed(2) : '--');
+  if (rangeHighEl) rangeHighEl.textContent = 'H ' + (rangeHigh != null ? rangeHigh.toFixed(2) : '--');
+  if (rangePipsEl) rangePipsEl.textContent = rangeWidth != null ? rangeWidth.toFixed(2) + ' pts' : '--';
+  if (rangeMarker && rangeHigh > rangeLow) {
+    const position = Math.max(0, Math.min(100, ((current - rangeLow) / (rangeHigh - rangeLow)) * 100));
+    rangeMarker.style.left = position + '%';
+  }
+  const nearest = detectSupportResistance(m5Candles);
+  const nearSupport = nearest && nearest.support != null ? nearest.support : null;
+  const nearResistance = nearest && nearest.resistance != null ? nearest.resistance : null;
+  const supportEl = document.getElementById('aurumNearestSupport');
+  const resistanceEl = document.getElementById('aurumNearestResistance');
+  const supportDistanceEl = document.getElementById('aurumSupportDistance');
+  const resistanceDistanceEl = document.getElementById('aurumResistanceDistance');
+  if (supportEl) supportEl.textContent = nearSupport != null ? nearSupport.toFixed(2) : '--';
+  if (resistanceEl) resistanceEl.textContent = nearResistance != null ? nearResistance.toFixed(2) : '--';
+  if (supportDistanceEl) supportDistanceEl.textContent = nearSupport != null ? Math.abs(current-nearSupport).toFixed(2) + ' pts below' : 'Level belum tersedia';
+  if (resistanceDistanceEl) resistanceDistanceEl.textContent = nearResistance != null ? Math.abs(nearResistance-current).toFixed(2) + ' pts above' : 'Level belum tersedia';
+} catch (marketCardError) {
+  console.warn('Market overview update:', marketCardError);
+}
 // KONFIRMASI ORDER BLOCK H1 + M15
 const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
 
