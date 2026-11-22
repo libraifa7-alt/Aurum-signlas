@@ -379,10 +379,20 @@ do {
 
   const pageData = await pageResponse.json();
 
+
   if (
     !pageResponse.ok ||
     !Array.isArray(pageData.data)
   ) {
+    console.error(
+      "AURUM MARKETAPI FIRST PAGE ERROR:",
+      {
+        status: pageResponse.status,
+        statusText: pageResponse.statusText,
+        pageData: pageData
+      }
+    );
+
     if (allBars.length === 0) {
       response = pageResponse;
       data = pageData;
@@ -395,6 +405,7 @@ do {
 
     break;
   }
+  
 
   response = pageResponse;
 
