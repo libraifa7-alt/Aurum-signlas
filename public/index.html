@@ -3252,7 +3252,7 @@ body {
 
   <div class="brand"><img class="aurum-header-logo" src="/aurum-icon-192.png" alt="Logo AURUM"> <span>AURUM SIGNALS AI</span></div>
   <div class="header-actions">
-    <button type="button" class="aurum-header-action" id="aurumOpenNotifications" aria-label="Notifications">♧<i id="aurumNotificationDot"></i></button>
+    <button type="button" class="aurum-header-action aurum-notification-action" id="aurumOpenNotifications" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg><i id="aurumNotificationDot"></i></button>
     <button type="button" class="aurum-header-action aurum-profile-action" id="aurumOpenProfile" aria-label="Profile">A</button>
   </div>
   <div class="status">● CEK DEPLOY TERBARU</div>
@@ -7746,6 +7746,9 @@ header .status{margin-left:auto!important}
 .aurum-header-action{position:relative;width:34px;height:34px;border:1px solid #dfe3ea;border-radius:50%;background:#f7f8fb;color:#667085;font-size:17px;display:grid;place-items:center;cursor:pointer}
 .aurum-header-action i{position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:#e35d63;border:1px solid #fff}
 .aurum-profile-action{font-size:13px;font-weight:800;color:#987322;border-color:#d9bd72;background:#fffaf0}
+.aurum-notification-action{background:#eef8fc;border-color:#d8edf5;color:#6b9eaf}
+.aurum-notification-action svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.header-actions{flex:0 0 auto;gap:8px;margin-left:auto!important}
 .aurum-panel-backdrop{position:fixed;inset:0;z-index:30000;background:rgba(25,29,38,.62);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:flex-start;justify-content:flex-end;padding:8px;overflow:auto}
 .aurum-panel-backdrop[hidden]{display:none!important}
 .aurum-side-panel{position:relative;width:min(100%,330px);max-height:calc(100dvh - 16px);overflow:auto;background:#fbfaf8;border:1px solid #e5d7b5;border-radius:15px;padding:15px 13px;box-shadow:0 14px 40px rgba(0,0,0,.2);color:#333846}
