@@ -6895,18 +6895,20 @@ console.log('STATUS SERVER DIPERIKSA');
 
 <!-- AURUM PWA SERVICE WORKER -->
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('/sw.js')
-      .then(function () {
-        console.log('AURUM PWA SERVICE WORKER AKTIF');
-      })
-      .catch(function (error) {
-        console.error('AURUM PWA ERROR:', error);
-      });
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  // Register as soon as this end-of-page script runs; do not depend on a
+  // window load listener that may already have fired in embedded browsers.
+  navigator.serviceWorker.register('/sw.js', {
+    scope: '/',
+    updateViaCache: 'none'
+  }).then(function (registration) {
+    console.log('AURUM PWA SERVICE WORKER AKTIF', registration.scope);
+    return registration.update();
+  }).catch(function (error) {
+    console.error('AURUM PWA ERROR:', error);
   });
-}
-
+})();
 </script>
 <!-- END AURUM PWA SERVICE WORKER -->
 
