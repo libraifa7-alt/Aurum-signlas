@@ -1756,8 +1756,403 @@ body {
 
 /* END AURUM TRAXA-INSPIRED SPLASH LAYOUT */
 
+
+/* ==================================
+   AURUM PREMIUM HOME - TRAXA INSPIRED
+================================== */
+
+#homePage {
+  padding-bottom: 24px;
+}
+
+#homePage .aurum-home-hero {
+  position: relative;
+  min-height: 330px;
+  margin: -10px -4% 22px;
+  padding: 28px 18px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 57%, rgba(229,190,103,.17), transparent 43%),
+    linear-gradient(145deg,#fffdf8,#f4f2ef);
+  border-bottom: 1px solid #eee5d5;
+}
+
+.aurum-greeting span {
+  color: #a87922;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.aurum-greeting h1 {
+  margin: 8px 0 5px;
+  color: #333b4b;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.aurum-greeting p {
+  margin: 0;
+  color: #89909c;
+  font-size: 10px;
+}
+
+.aurum-home-orb {
+  position: relative;
+  width: 174px;
+  height: 174px;
+  margin: 12px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle,#fff9df 0%,#f4d98e 28%,#d6ad50 48%,rgba(212,174,86,.12) 68%,transparent 72%);
+  box-shadow: 0 0 25px rgba(211,171,76,.22),inset 0 0 20px rgba(255,255,255,.8);
+}
+
+.home-orb-core {
+  z-index: 2;
+  color: #b58a35;
+  font-size: 48px;
+  text-shadow: 0 3px 12px rgba(181,138,53,.3);
+}
+
+.home-orb-ring {
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(181,138,53,.45);
+  border-radius: 50%;
+}
+
+.home-ring-one {
+  transform: rotateX(65deg) rotate(-25deg) scale(1.2);
+}
+
+.home-ring-two {
+  transform: rotateY(65deg) rotate(35deg) scale(1.15);
+}
+
+.aurum-home-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.aurum-home-caption strong {
+  color: #9f792f;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.aurum-home-caption span {
+  color: #a0a0a0;
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+
+/* HOME SECTIONS */
+
+#homePage .home-section {
+  margin: 0 0 13px;
+  padding: 14px 12px;
+  border: 1px solid #eeeaf0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 5px 17px rgba(31,41,55,.045);
+}
+
+.home-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #f0ede7;
+}
+
+.home-section-heading h3 {
+  margin: 0;
+  color: #94732f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.home-live {
+  color: #21b98b;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.home-live i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background: #21c997;
+}
+
+/* MARKET CARDS */
+
+.home-market-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 8px;
+}
+
+.home-market-card {
+  min-width: 0;
+  padding: 11px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  color: #252c3a;
+  text-decoration: none;
+  border: 1px solid #eeeef0;
+  border-radius: 14px;
+  background: linear-gradient(145deg,#fff,#fcfbf8);
+}
+
+.home-asset-icon {
+  width: 31px;
+  height: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.gold-icon {
+  color: #946b19;
+  background: #f8e9bd;
+}
+
+.bitcoin-icon {
+  color: #fff;
+  background: #f39a36;
+}
+
+.oil-icon {
+  color: #087f79;
+  background: #c9f0e9;
+}
+
+.home-market-card strong {
+  font-size: 11px;
+}
+
+.home-market-card small {
+  color: #89909c;
+  font-size: 9px;
+}
+
+.home-market-action {
+  margin-top: 5px;
+  color: #a87922;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* TRADING AND TOOLS */
+
+.home-menu-grid,
+.home-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 8px;
+}
+
+.home-menu-card {
+  min-width: 0;
+  min-height: 62px;
+  padding: 9px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #252c3a;
+  text-decoration: none;
+  border: 1px solid #eeeef0;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.home-menu-card > span:last-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.home-menu-card strong {
+  font-size: 11px;
+}
+
+.home-menu-card small {
+  color: #89909c;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.home-menu-icon,
+.community-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 19px;
+  font-weight: 700;
+  box-shadow: 0 3px 12px rgba(0,0,0,.08);
+}
+
+.purple {
+  color: #7445ce;
+  background: #e8dcff;
+}
+
+.teal {
+  color: #078b83;
+  background: #d4f4ef;
+}
+
+.coral {
+  color: #e35b67;
+  background: #ffe0e3;
+}
+
+.blue,
+.sky {
+  color: #2777d6;
+  background: #dcecff;
+}
+
+.green-icon {
+  color: #398d39;
+  background: #e0f5d7;
+}
+
+.amber {
+  color: #a87922;
+  background: #f8ebc8;
+}
+
+.slate {
+  color: #566276;
+  background: #e5e9ef;
+}
+
+.home-tool-wide {
+  grid-column: 1 / -1;
+}
+
+/* COMMUNITY */
+
+.home-community-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 8px;
+}
+
+.home-community-grid a {
+  min-width: 0;
+  padding: 10px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #252c3a;
+  text-decoration: none;
+}
+
+.community-icon {
+  width: 48px;
+  height: 48px;
+  font-size: 21px;
+}
+
+.pink {
+  color: #c33c87;
+  background: #f9d9eb;
+}
+
+.home-community-grid strong {
+  font-size: 10px;
+  text-align: center;
+}
+
+/* FOOTER */
+
+.home-footer {
+  padding: 25px 10px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.home-footer span {
+  color: #a87922;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.home-footer small {
+  color: #9ba0a9;
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+
+/* MOBILE */
+
+@media(max-width:600px) {
+  #homePage .aurum-home-hero {
+    min-height: 325px;
+  }
+
+  .aurum-home-orb {
+    width: 165px;
+    height: 165px;
+  }
+
+  #homePage .home-section {
+    padding: 13px 10px;
+  }
+
+  .home-market-card {
+    padding: 10px 7px;
+  }
+
+  .home-menu-card {
+    min-height: 60px;
+    padding: 8px 7px;
+  }
+
+  .home-menu-icon {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* END AURUM PREMIUM HOME */
+
 </style>
 </head>
+  
   
   
   
@@ -1850,40 +2245,160 @@ body {
 
 <main>
 
-  <!-- HALAMAN BERANDA -->
-  <section id="homePage" class="app-page active">
+  
+<!-- HALAMAN BERANDA -->
+<section id="homePage" class="app-page active">
 
-
-  <div class="dashboard-heading">
-    <h1>Trading Dashboard</h1>
-    <p class="sub">ICT Smart Money Concepts · Forex Market Analysis</p>
-  </div>
-
-  <div class="cards">
-  <div class="card">
-    <small>MARKET</small>
-    <strong class="gold">FOREX</strong>
-  </div>
-
-  <div class="card">
-    <small>TIMEFRAME</small>
-    <strong id="dashboardTimeframe">M15</strong>
-  </div>
-    
-    <div class="card">
-      <small>ACTIVE SIGNALS</small>
-      <strong id="signals">0</strong>
+  <!-- AURUM HERO -->
+  <section class="aurum-home-hero">
+    <div class="aurum-greeting">
+      <span>✦ WELCOME TO AURUM</span>
+      <h1>Intelligent Trading</h1>
+      <p>ICT Smart Money Concepts · Market Intelligence</p>
     </div>
-    <div class="card">
-      <small>ENGINE</small>
-      <strong class="gold">READY</strong>
+
+    <div class="aurum-home-orb">
+      <div class="home-orb-core">✦</div>
+      <div class="home-orb-ring home-ring-one"></div>
+      <div class="home-orb-ring home-ring-two"></div>
     </div>
-  </div>
 
-  <!-- Penutup cards dashboard -->
-
+    <div class="aurum-home-caption">
+      <strong>AURUM SIGNALS AI</strong>
+      <span>PRECISION · STRUCTURE · INTELLIGENCE</span>
+    </div>
   </section>
-  <!-- END HALAMAN BERANDA -->
+
+  <!-- MARKET CARDS -->
+  <section class="home-section">
+    <div class="home-section-heading">
+      <h3>PASAR</h3>
+      <span class="home-live"><i></i> LIVE MARKET</span>
+    </div>
+
+    <div class="home-market-grid">
+      <a href="#marketPage" class="home-market-card"
+         onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
+        <span class="home-asset-icon gold-icon">Au</span>
+        <strong>Emas</strong>
+        <small>XAU/USD</small>
+        <span class="home-market-action">Lihat harga →</span>
+      </a>
+
+      <a href="#marketPage" class="home-market-card"
+         onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
+        <span class="home-asset-icon bitcoin-icon">₿</span>
+        <strong>Bitcoin</strong>
+        <small>BTC/USD</small>
+        <span class="home-market-action">Lihat harga →</span>
+      </a>
+
+      <a href="#marketPage" class="home-market-card"
+         onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
+        <span class="home-asset-icon oil-icon">◈</span>
+        <strong>Minyak</strong>
+        <small>WTI</small>
+        <span class="home-market-action">Lihat harga →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- TRADING MENU -->
+  <section class="home-section">
+    <div class="home-section-heading">
+      <h3>TRADING</h3>
+    </div>
+
+    <div class="home-menu-grid">
+      <a href="#marketPage" class="home-menu-card"
+         onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
+        <span class="home-menu-icon purple">ϟ</span>
+        <span><strong>Sinyal</strong><small>Setup trading live</small></span>
+      </a>
+
+      <a href="#marketPage" class="home-menu-card"
+         onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
+        <span class="home-menu-icon teal">▥</span>
+        <span><strong>Performa</strong><small>Hasil dan win rate</small></span>
+      </a>
+
+      <a href="#marketPage" class="home-menu-card"
+         onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
+        <span class="home-menu-icon coral">◉</span>
+        <span><strong>Analisis</strong><small>ICT dan Smart Money</small></span>
+      </a>
+
+      <a href="#newsPage" class="home-menu-card"
+         onclick="document.querySelector('.nav-item[data-page=newsPage]').click();return false;">
+        <span class="home-menu-icon blue">▤</span>
+        <span><strong>Berita</strong><small>Market intelligence</small></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- COMMUNITY MENU -->
+  <section class="home-section">
+    <div class="home-section-heading">
+      <h3>KOMUNITAS</h3>
+    </div>
+
+    <div class="home-community-grid">
+      <a href="#chatPage"
+         onclick="document.querySelector('.nav-item[data-page=chatPage]').click();return false;">
+        <span class="community-icon pink">▢</span>
+        <strong>Obrolan</strong>
+      </a>
+
+      <a href="#chatPage"
+         onclick="document.querySelector('.nav-item[data-page=chatPage]').click();return false;">
+        <span class="community-icon sky">➤</span>
+        <strong>Telegram</strong>
+      </a>
+
+      <a href="#guidePage"
+         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
+        <span class="community-icon amber">♧</span>
+        <strong>Undang teman</strong>
+      </a>
+    </div>
+  </section>
+
+  <!-- TOOLS MENU -->
+  <section class="home-section">
+    <div class="home-section-heading">
+      <h3>ALAT</h3>
+    </div>
+
+    <div class="home-tools-grid">
+      <a href="#guidePage" class="home-menu-card"
+         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
+        <span class="home-menu-icon green-icon">▷</span>
+        <span><strong>Panduan</strong><small>Cara kerja AURUM</small></span>
+      </a>
+
+      <a href="#newsPage" class="home-menu-card"
+         onclick="document.querySelector('.nav-item[data-page=newsPage]').click();return false;">
+        <span class="home-menu-icon amber">♢</span>
+        <span><strong>Notifikasi</strong><small>Informasi pasar</small></span>
+      </a>
+
+      <a href="#guidePage" class="home-menu-card home-tool-wide"
+         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
+        <span class="home-menu-icon slate">⚙</span>
+        <span><strong>Pengaturan</strong><small>Preferensi AURUM</small></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- AURUM FOOTER -->
+  <div class="home-footer">
+    <span>✦ AURUM SIGNALS AI</span>
+    <small>INTELLIGENT MARKET ANALYSIS</small>
+  </div>
+
+</section>
+<!-- END HALAMAN BERANDA -->
+  
 
   <!-- HALAMAN PASAR -->
   <section id="marketPage" class="app-page">
