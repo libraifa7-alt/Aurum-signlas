@@ -6970,14 +6970,34 @@ if ('serviceWorker' in navigator) {
       }
       setAssetFeedStatus(asset,feedStatus,feedDetail,feedTimestamp);
       if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('Data belum tersedia');
-      const latest=Number(data.livePrice ?? candles[candles.length-1].close),previous=Number(candles[candles.length-2].close);
+      const hasLiveGoldQuote=asset.symbol!=='XAU/USD' || (
+        data.livePriceStatus==='live_quote' &&
+        Number.isFinite(Number(data.livePrice)) && Number(data.livePrice)>0 &&
+        quoteAge>=0 && quoteAge<=120000
+      );
+      const latest=Number(hasLiveGoldQuote && asset.symbol==='XAU/USD' ? data.livePrice : candles[candles.length-1].close);
+      const previous=Number(candles[candles.length-2].close);
       if(!Number.isFinite(latest)||!Number.isFinite(previous)||previous===0)throw new Error('Harga tidak valid');
       const change=(latest-previous)/previous*100;
       const formattedPrice=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-      const formattedChange=(change>=0?'+':'')+change.toFixed(2)+'%';
+      const formattedChange=asset.symbol==='XAU/USD' && !hasLiveGoldQuote
+        ? 'DATA TERTUNDA'
+        : (change>=0?'+':'')+change.toFixed(2)+'%';
       const p=$(asset.price),c=$(asset.change),path=$(asset.path);
       if(p)p.textContent=formattedPrice;
-      if(c){c.textContent=formattedChange;c.style.color=change>=0?'#159b72':'#e45b63';}
+      if(c){
+        c.textContent=formattedChange;
+        c.style.color=asset.symbol==='XAU/USD' && !hasLiveGoldQuote?'#b7791f':change>=0?'#159b72':'#e45b63';
+        c.title=asset.symbol==='XAU/USD' && !hasLiveGoldQuote
+          ? 'Harga candle terakhir; kuotasi real-time tidak tersedia'
+          : 'Perubahan terhadap candle sebelumnya';
+      }
+      if(asset.symbol==='XAU/USD'){
+        const timeNode=$('goldTime');
+        if(timeNode)timeNode.textContent=hasLiveGoldQuote
+          ? 'XAU/USD · LIVE '+formatGoldTime(data.livePriceUpdatedAt)
+          : 'Harga candle terakhir · bukan harga real-time';
+      }
       // Keep the top ticker synchronized from this same response; do not fetch the same symbol twice.
       const tickerSuffix=asset.symbol==='XAU/USD'?'XAU':asset.symbol==='BTC/USD'?'BTC':'WTI';
       const tickerPrice=$('ticker'+tickerSuffix),tickerChange=$('change'+tickerSuffix);
