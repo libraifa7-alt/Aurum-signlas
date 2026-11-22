@@ -2386,142 +2386,73 @@ body {
 </style>
 
 <style id="aurum-analysis-premium-v2">
-/* AURUM ANALYSIS — PREMIUM FINTECH PRESENTATION */
+/* AURUM — TRAXA-INSPIRED LIGHT ANALYSIS */
+#marketPage .aurum-signal-summary{
+  padding:17px 15px 14px;border:1px solid #eee7d8;border-radius:17px;
+  background:linear-gradient(145deg,#fff 0%,#fffdf8 65%,#f5f8ff 100%);
+  box-shadow:0 12px 28px rgba(37,48,68,.12);
+}
+#marketPage .aurum-asset-mark{background:linear-gradient(145deg,#f9e8b6,#c69a39);color:#72531a;box-shadow:0 3px 9px #c69a3933}
+#marketPage .aurum-price-row strong{font-size:clamp(30px,8vw,38px);letter-spacing:-1.2px;color:#a47b24}
 #marketPage .aurum-signal-panel[data-signal-panel="analysis"]{
-  padding:14px;
-  background:linear-gradient(160deg,#101a2b 0%,#0b1220 100%);
-  border:1px solid rgba(198,157,75,.28);
-  border-radius:18px;
-  box-shadow:0 14px 34px rgba(8,15,29,.18);
-  color:#edf2fa;
+  padding:13px;background:#f7f8fb;border:0;border-radius:17px;color:#273247;
 }
 #marketPage .aurum-analysis-title{
-  display:flex;
-  align-items:center;
-  gap:11px;
-  margin:0 0 14px;
-  padding:4px 2px 13px;
-  border-bottom:1px solid rgba(220,185,112,.2);
+  display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:2px 1px 12px;
+  border-bottom:1px solid #e6eaf0;
 }
 #marketPage .aurum-analysis-title .aurum-heading-icon{
-  display:grid;
-  place-items:center;
-  width:38px;height:38px;
-  border-radius:12px;
-  color:#f2d28c;
-  background:linear-gradient(145deg,rgba(209,168,91,.24),rgba(209,168,91,.07));
-  border:1px solid rgba(220,185,112,.28);
-  font-size:19px;
+  display:grid;place-items:center;width:36px;height:36px;border-radius:11px;
+  color:#279cc4;background:#e3f3ff;border:1px solid #d3eafa;font-size:18px;
 }
-#marketPage .aurum-analysis-title strong{
-  display:block;
-  color:#f4d99e;
-  font-size:12px;
-  letter-spacing:1.5px;
-}
-#marketPage .aurum-analysis-title small{
-  display:block;
-  margin-top:4px;
-  color:#9eacc0;
-  font-size:9px;
-}
+#marketPage .aurum-analysis-title strong{display:block;color:#253247;font-size:12px;letter-spacing:1.35px}
+#marketPage .aurum-analysis-title small{display:block;margin-top:4px;color:#8792a2;font-size:9px}
 #marketPage .aurum-analysis-card{
-  overflow:hidden;
-  border:1px solid rgba(193,160,102,.2);
-  border-radius:14px;
-  background:linear-gradient(160deg,#172338,#111b2c);
-  box-shadow:inset 0 1px rgba(255,255,255,.035);
+  overflow:hidden;border:1px solid #e7eaf0;border-radius:14px;background:#fff;
+  box-shadow:0 8px 22px rgba(34,48,70,.07);
 }
-#marketPage .aurum-analysis-section{
-  padding:15px 13px;
-  border-bottom:1px solid rgba(178,192,211,.12);
-}
+#marketPage .aurum-analysis-section{padding:14px 12px;border-bottom:1px solid #e9edf2}
 #marketPage .aurum-analysis-section:last-child{border-bottom:0}
 #marketPage .aurum-section-kicker{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin:0 0 11px;
-  color:#d9b66d;
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:1.25px;
+  display:block;margin:0 0 10px;color:#536174;font-size:9px;font-weight:900;letter-spacing:1.15px;
 }
-#marketPage .aurum-section-kicker:before{
-  content:"";
-  display:block;
-  width:3px;height:12px;
-  border-radius:4px;
-  background:linear-gradient(#f1d18a,#a8792d);
+#marketPage .aurum-section-kicker:before{content:none}
+#marketPage .aurum-analysis-section p,#marketPage #trendMeter,#marketPage #supportResistanceMTF{
+  color:#596579;font-size:10px;line-height:1.75;overflow-wrap:anywhere;
 }
-#marketPage .aurum-analysis-section p,
-#marketPage #trendMeter,
-#marketPage #supportResistanceMTF{
-  color:#d5deeb;
-  font-size:11px;
-  line-height:1.8;
-  overflow-wrap:anywhere;
-}
-#marketPage #marketStructure{
-  margin:0;
-  padding:11px 12px;
-  border-radius:10px;
-  background:rgba(255,255,255,.045);
-  color:#dce5f2;
-}
-#marketPage #trendMeter > div:first-child{
-  margin:0!important;
-}
-#marketPage #trendMeter strong{font-size:11px}
+#marketPage #marketStructure{margin:0;padding:10px 11px;border-radius:9px;background:#f7f9fc;color:#48566a}
+#marketPage #trendMeter > div:first-child{margin:0!important}
+#marketPage #trendMeter strong{font-size:10px}
 #marketPage #trendMeter > div[style*="height:10px"]{
-  height:9px!important;
-  border:1px solid rgba(255,255,255,.08);
+  height:9px!important;border:1px solid #e5e9ef;background:#edf0f4!important;
 }
 #marketPage #trendMeter > div[style*="border-bottom"]{
-  padding:9px 10px!important;
-  margin:5px 0;
-  border:1px solid rgba(255,255,255,.07)!important;
-  border-radius:8px;
-  background:rgba(255,255,255,.035);
+  display:flex;align-items:center;padding:9px 10px!important;margin:5px 0;
+  border:1px solid #e8edf3!important;border-radius:9px;background:#fbfcfe;
+  color:#526074!important;font-size:10px!important;
 }
 #marketPage #supportResistanceMTF > div{
-  padding:10px 11px!important;
-  margin:6px 0;
-  border:1px solid rgba(255,255,255,.075);
-  border-radius:9px;
-  background:rgba(255,255,255,.035);
+  padding:10px 11px!important;margin:6px 0;border:1px solid #e8edf3;
+  border-radius:9px;background:#fbfcfe;color:#526074;
 }
-#marketPage #liquidityAnalysis,
-#marketPage #liquidityConfirmation,
-#marketPage #fvgAnalysis,
-#marketPage #orderBlockAnalysis,
-#marketPage #orderBlockMTF,
-#marketPage #orderBlockZone{
-  margin:7px 0 0;
-  padding:10px 11px;
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:9px;
-  background:rgba(255,255,255,.035);
-  color:#d2dceb;
-  line-height:1.75;
+#marketPage #liquidityAnalysis,#marketPage #liquidityConfirmation,
+#marketPage #fvgAnalysis,#marketPage #orderBlockAnalysis,
+#marketPage #orderBlockMTF,#marketPage #orderBlockZone{
+  margin:7px 0 0;padding:10px 11px;border:1px solid #e8edf3;border-radius:9px;
+  background:#fbfcfe;color:#596579;line-height:1.75;
 }
-#marketPage .aurum-analysis-section .aurum-section-kicker:not(:first-child){
-  margin-top:15px;
-}
+#marketPage .aurum-analysis-section .aurum-section-kicker:not(:first-child){margin-top:15px}
+#marketPage .aurum-disclaimer{color:#8993a2}
 @media(max-width:600px){
-  #marketPage .aurum-signal-panel[data-signal-panel="analysis"]{padding:11px}
-  #marketPage .aurum-analysis-section{padding:13px 10px}
-  #marketPage .aurum-analysis-section p,
-  #marketPage #trendMeter,
-  #marketPage #supportResistanceMTF{font-size:10px}
+ #marketPage .aurum-signal-summary{padding:15px 13px}
+ #marketPage .aurum-signal-panel[data-signal-panel="analysis"]{padding:10px}
+ #marketPage .aurum-analysis-section{padding:12px 10px}
+ #marketPage .aurum-analysis-section p,#marketPage #trendMeter,#marketPage #supportResistanceMTF{font-size:10px}
 }
 @media(prefers-reduced-motion:no-preference){
-  #marketPage .aurum-analysis-card{animation:aurumAnalysisIn .35s ease-out both}
+ #marketPage .aurum-analysis-card{animation:aurumAnalysisIn .3s ease-out both}
 }
-@keyframes aurumAnalysisIn{
-  from{opacity:.75;transform:translateY(5px)}
-  to{opacity:1;transform:translateY(0)}
-}
+@keyframes aurumAnalysisIn{from{opacity:.75;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 </style>
 
 </head>
@@ -2869,11 +2800,11 @@ body {
     <section class="aurum-signal-panel" data-signal-panel="analysis" role="tabpanel" hidden>
       <div class="aurum-analysis-title"><span class="aurum-heading-icon">▥</span><div><strong>DATA TEKNIKAL</strong><small>Support · Resistance · Level kunci · Rentang harian</small></div></div>
       <div class="aurum-analysis-card">
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">MARKET STRUCTURE</small><p id="marketStructure">Menunggu analisis candle...</p></div>
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">TREND METER — 7 TIMEFRAMES</small><div id="trendMeter"><p>Menunggu analisis tujuh timeframe...</p></div></div>
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">SUPPORT & RESISTANCE — 7 TIMEFRAMES</small><div id="supportResistanceMTF"><p>Menunggu analisis Support & Resistance...</p></div></div>
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">LIQUIDITY</small><p id="liquidityAnalysis">Menunggu analisis liquidity...</p><small class="aurum-section-kicker">LIQUIDITY CONFIRMATION</small><p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p></div>
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">FAIR VALUE GAP</small><p id="fvgAnalysis">Menunggu analisis FVG...</p></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">BIAS PASAR · MARKET STRUCTURE</small><p id="marketStructure">Menunggu analisis candle...</p></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">METER TREN · 7 TIMEFRAME</small><div id="trendMeter"><p>Menunggu analisis tujuh timeframe...</p></div></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">LEVEL SUPPORT & RESISTANCE</small><div id="supportResistanceMTF"><p>Menunggu analisis Support & Resistance...</p></div></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">LIQUIDITY</small><p id="liquidityAnalysis">Menunggu analisis liquidity...</p><small class="aurum-section-kicker">KONFIRMASI LIQUIDITY</small><p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">FAIR VALUE GAP · FVG</small><p id="fvgAnalysis">Menunggu analisis FVG...</p></div>
         <div class="aurum-analysis-section"><small class="aurum-section-kicker">ORDER BLOCK</small><p id="orderBlockAnalysis">Menunggu analisis Order Block...</p><p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p><p id="orderBlockZone">Menunggu deteksi zona harga OB...</p></div>
       </div>
     </section>
