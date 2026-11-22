@@ -4609,7 +4609,7 @@ const direction = signal =>
         <div class="aurum-trend-dashboard">
           <div class="aurum-trend-hero">
             <div class="aurum-trend-hero-copy">
-              <small>EMAS · XAU/USD</small>
+              <small>${document.getElementById('signalAssetName')?.textContent || 'INSTRUMEN AKTIF'}</small>
               <strong style="color:${overallColor}">${overall}</strong>
               <span>${bullish + bearish} DARI ${total} TIMEFRAME MEMILIKI ARAH</span>
             </div>
