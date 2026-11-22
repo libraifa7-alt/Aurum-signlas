@@ -1891,6 +1891,15 @@ body {
   font-weight: 700;
 }
 
+.home-live.delayed {
+  color: #c58a32;
+}
+
+.home-live.delayed i {
+  background: #d59a3b;
+  animation: none;
+}
+
 .home-live i {
   display: inline-block;
   width: 6px;
@@ -3107,7 +3116,7 @@ body {
   <section class="home-section">
     <div class="home-section-heading">
       <h3>MARKETS</h3>
-      <span class="home-live"><i></i> Live</span>
+      <span class="home-live" id="homeLiveStatus" role="status" aria-live="polite"><i></i> Memeriksa data...</span>
     </div>
 
     <div class="home-market-grid">
@@ -6802,11 +6811,23 @@ if ('serviceWorker' in navigator) {
     {symbol:'BTC/USD',price:'homePriceBTC',change:'homeChangeBTC',path:'homeSparkBTC'},
     {symbol:'WTI',price:'homePriceWTI',change:'homeChangeWTI',path:'homeSparkWTI'}
   ];
+  function setGoldFeedStatus(isLive){
+    const badge=$('homeLiveStatus');
+    if(!badge)return;
+    badge.classList.toggle('delayed',!isLive);
+    badge.innerHTML='<i></i> '+(isLive?'Live':'Data tertunda');
+    badge.title=isLive?'Kuotasi Gold terbaru berhasil diterima':'Kuotasi Gold belum berhasil diperbarui dari provider';
+  }
   async function updateAsset(asset){
     try{
       const response=await fetch('/api?interval=M1&symbol='+encodeURIComponent(asset.symbol),{cache:'no-store'});
       if(!response.ok)throw new Error('HTTP '+response.status);
       const data=await response.json(),candles=data.candles;
+      if(asset.symbol==='XAU/USD'){
+        const quoteTime=Date.parse(data.livePriceUpdatedAt||'');
+        const quoteAge=Number.isFinite(quoteTime)?Date.now()-quoteTime:Infinity;
+        setGoldFeedStatus(data.livePriceStatus==='live_quote' && quoteAge>=0 && quoteAge<=120000);
+      }
       if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('Data belum tersedia');
       const latest=Number(data.livePrice ?? candles[candles.length-1].close),previous=Number(candles[candles.length-2].close);
       if(!Number.isFinite(latest)||!Number.isFinite(previous)||previous===0)throw new Error('Harga tidak valid');
@@ -6853,6 +6874,7 @@ if ('serviceWorker' in navigator) {
         area.style.opacity='0.9';
       }
     }catch(error){
+      if(asset.symbol==='XAU/USD')setGoldFeedStatus(false);
       if($(asset.price))$(asset.price).textContent='--';
       if($(asset.change))$(asset.change).textContent='Data tidak tersedia';
       console.warn('AURUM home market card:',asset.symbol,error);
