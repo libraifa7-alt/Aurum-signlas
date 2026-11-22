@@ -1928,8 +1928,14 @@ body {
 <section id="tradingSignals" class="panel" style="margin-top:16px">
   <h3>Trading Signals</h3>
   <p class="sub">Signal status</p>
-  <p class="gold">WAIT — Awaiting verified market data</p>
-  <p class="sub">No live BUY or SELL recommendation is currently available.</p>
+
+  <p id="signalStatus" class="gold">
+    WAIT — Awaiting verified market data
+  </p>
+
+  <p id="signalDetail" class="sub">
+    Menunggu konfirmasi Market Structure dan Order Block MTF.
+  </p>
 </section>
 
 </section>
@@ -4702,6 +4708,49 @@ chart.timeScale().fitContent();
 
 const structure = await analyzeMarketStructure();
 document.getElementById('marketStructure').textContent = structure;
+// KONFIRMASI ORDER BLOCK H1 + M15
+const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
+
+document.getElementById('orderBlockMTF').innerText =
+  orderBlockMTF;
+
+// TENTUKAN MARKET BIAS
+const marketBias =
+  structure.startsWith('BUY BIAS') ? 'BUY' :
+  structure.startsWith('SELL BIAS') ? 'SELL' :
+  'WAIT';
+
+// TENTUKAN KONFIRMASI MTF
+const mtfBias =
+  orderBlockMTF.startsWith('BUY ALIGNMENT') ? 'BUY' :
+  orderBlockMTF.startsWith('SELL ALIGNMENT') ? 'SELL' :
+  'WAIT';
+
+// PERBARUI TRADING SIGNALS
+const signalStatus = document.getElementById('signalStatus');
+const signalDetail = document.getElementById('signalDetail');
+
+let finalSignal = 'WAIT';
+
+if (marketBias === 'BUY' && mtfBias === 'BUY') {
+  finalSignal = 'BUY';
+} else if (marketBias === 'SELL' && mtfBias === 'SELL') {
+  finalSignal = 'SELL';
+}
+
+if (signalStatus && signalDetail) {
+  signalStatus.textContent = finalSignal;
+
+  signalStatus.style.color =
+    finalSignal === 'BUY' ? '#20c997' :
+    finalSignal === 'SELL' ? '#ef5350' :
+    '#d6b36a';
+
+  signalDetail.textContent =
+    finalSignal === 'WAIT'
+      ? 'Market Structure dan konfirmasi MTF belum searah.'
+      : 'Market Structure dan Order Block MTF sudah searah.';
+}      
 
 const liquidity = await analyzeLiquidityMultiTimeframe();
 document.getElementById('liquidityAnalysis').innerText = liquidity;
@@ -4755,8 +4804,15 @@ if (
 const tradePlan = calculateTradePlan(obZone);
 const tradeCard = document.getElementById('aurumTradePlan');
 
+const planDirection =
+  tradePlan && tradePlan.type === 'BULLISH' ? 'BUY' :
+  tradePlan && tradePlan.type === 'BEARISH' ? 'SELL' :
+  'WAIT';
+
 const validTradePlan =
   tradePlan &&
+  finalSignal !== 'WAIT' &&
+  planDirection === finalSignal &&
   orderBlock.includes(tradePlan.type + ' ORDER BLOCK')
     ? tradePlan
     : null;
@@ -4798,11 +4854,7 @@ if (tradeCard && validTradePlan) {
 }
       
 
-// KONFIRMASI ORDER BLOCK H1 + M15
-const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
 
-document.getElementById('orderBlockMTF').innerText =
-  orderBlockMTF;
 
 console.log('ORDER BLOCK:', orderBlock);
 console.log('ORDER BLOCK MTF:', orderBlockMTF);
