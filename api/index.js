@@ -318,22 +318,37 @@ const minutes = timeframeMinutes[selected] || 15;
 const limit = selected === "M45" ? 400 : 120;
 
 
-const lookbackMs = Math.max(
-  minutes * 60 * 1000 * limit * 1.2,
-  7 * 24 * 60 * 60 * 1000
-);
+
+
+// AURUM SMART HISTORICAL RANGE
+// Hanya mengambil data yang dibutuhkan chart
+
+
+const targetBars = selected === "M45"
+  ? 300
+  : 100;
+
+const sourceMinutes =
+  timeframeMinutes[marketTimeframe] || minutes;
+
+const lookbackMs =
+  sourceMinutes *
+  60 *
+  1000 *
+  targetBars *
+  1.2;
 
 const fromDate = new Date(
   Date.now() - lookbackMs
 );
-      
 
 const toDate = new Date();
-
 
 const marketUrl = new URL(
   "https://api.marketapi.app/v1/bars"
 );
+      
+      
 
 marketUrl.searchParams.set("symbol", symbol);
 marketUrl.searchParams.set("timeframe", marketTimeframe);
