@@ -2312,6 +2312,147 @@ body {
 
 /* END AURUM LIVE MARKET TICKER */
 
+
+/* TRAXA-INSPIRED SIGNAL SCREEN — FULL CIRCLED AREA */
+#marketPage{
+  padding:0 12px 104px;
+  background:linear-gradient(180deg,#f1f2f5 0%,#f7f8fa 55%,#eef0f4 100%);
+}
+#marketPage .aurum-signal-tabs{
+  max-width:480px;
+  margin:16px auto 14px;
+  padding:5px;
+  gap:5px;
+  border:1px solid #e5e9f0;
+  border-radius:13px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 5px 16px rgba(34,48,68,.06);
+}
+#marketPage .aurum-signal-tabs button{
+  min-height:42px;
+  border-radius:9px;
+  color:#626c7c;
+  font-size:11px;
+  font-weight:800;
+}
+#marketPage .aurum-signal-tabs button.active{
+  color:#fff;
+  background:linear-gradient(100deg,#13a6c8 0%,#6844df 100%);
+  box-shadow:0 3px 9px rgba(48,126,202,.24);
+}
+#marketPage .aurum-signal-panel{
+  max-width:480px;
+  margin:0 auto 18px;
+  padding:14px;
+  border:1px solid #e7eaf0;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 12px 28px rgba(34,44,62,.12);
+}
+#marketPage .aurum-analysis-title{
+  margin:-2px -2px 12px;
+  padding:0 0 12px;
+  border-bottom:1px solid #e8ebf1;
+}
+#marketPage .aurum-analysis-title .aurum-heading-icon{
+  width:36px;height:36px;border-radius:11px;
+  color:#279bd0;background:#e8f5fc;
+  border:1px solid #d7edf8;
+}
+#marketPage .aurum-analysis-title strong{
+  color:#202b3b;font-size:12px;letter-spacing:1.15px;
+}
+#marketPage .aurum-analysis-card{
+  overflow:hidden;
+  border:1px solid #e5e9f0;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 4px 14px rgba(36,49,68,.045);
+}
+#marketPage .aurum-analysis-section{
+  padding:13px 12px;
+  border-bottom:1px solid #e8ebf0;
+}
+#marketPage .aurum-section-kicker{
+  color:#586579;
+  font-size:8px;
+  letter-spacing:1.15px;
+}
+#marketPage .aurum-analysis-section p{
+  color:#586477;
+}
+#marketPage #trendMeter{
+  padding:0;
+}
+#marketPage #trendMeter .aurum-trend-dashboard{
+  position:relative;
+  padding:10px;
+  border:1px solid #f0dfe2;
+  border-radius:13px;
+  background-color:#fff;
+  background-image:
+    linear-gradient(rgba(226,91,108,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(226,91,108,.045) 1px,transparent 1px);
+  background-size:14px 14px;
+}
+#marketPage #trendMeter .aurum-trend-hero{
+  border-radius:10px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);
+}
+#marketPage #trendMeter .aurum-trend-meter-box{
+  background:rgba(250,251,253,.94);
+  border-color:#e5e8ee;
+}
+#marketPage #trendMeter .aurum-tf-card{
+  min-height:104px;
+  border-radius:10px;
+  box-shadow:0 2px 6px rgba(36,49,68,.045);
+}
+#marketPage #trendMeter .aurum-trend-table-head,
+#marketPage #trendMeter .aurum-trend-table-row{
+  background:rgba(255,255,255,.88);
+}
+#marketPage .aurum-disclaimer{
+  color:#8b94a2;
+  font-size:9px;
+  line-height:1.55;
+  text-align:center;
+  margin:13px 4px 2px;
+}
+.aurum-bottom-nav{
+  left:50%;
+  transform:translateX(-50%);
+  bottom:8px;
+  width:calc(100% - 28px);
+  max-width:440px;
+  min-height:66px;
+  padding:6px 8px;
+  border:1px solid #e8ebf1;
+  border-radius:22px;
+  background:rgba(255,255,255,.97);
+  box-shadow:0 8px 28px rgba(28,40,58,.15);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.aurum-bottom-nav .nav-item{
+  min-height:52px;
+  border-radius:15px;
+}
+.aurum-bottom-nav .nav-item.active{
+  color:#202d42;
+  background:linear-gradient(180deg,#fff7e7,#f7f0df);
+}
+.aurum-bottom-nav .nav-item.active span{
+  color:#239bd0;
+  background:#e9f5fc;
+}
+@media(max-width:390px){
+  #marketPage{padding-left:9px;padding-right:9px}
+  #marketPage .aurum-signal-panel{padding:11px}
+  #marketPage #trendMeter .aurum-trend-dashboard{padding:8px}
+  #marketPage #trendMeter .aurum-tf-card{min-height:98px}
+  .aurum-bottom-nav{width:calc(100% - 18px);bottom:6px}
+}
 </style>
 
 <style id="aurum-traxa-signal-theme">
