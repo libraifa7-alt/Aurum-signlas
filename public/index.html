@@ -3336,7 +3336,7 @@ body {
   <!-- HALAMAN GRAFIK -->
   <section id="chartPage" class="app-page">
     <section class="aurum-chart-shell">
-      <div class="aurum-chart-heading"><div><strong>Grafik Pasar</strong><small id="chartMarketLabel">EMAS · XAU/USD</small></div><span>● LIVE DATA</span></div>
+      <div class="aurum-chart-heading"><div><strong>Grafik Pasar</strong><small id="chartMarketLabel">EMAS · XAU/USD</small></div><span id="chartFeedStatus" role="status" aria-live="polite">● MEMERIKSA DATA</span></div>
       <div class="market-controls">
         <select id="pair" aria-label="Pilih instrumen">
           <option value="XAU/USD">Emas · XAU/USD</option>
@@ -4174,10 +4174,12 @@ if (response) {
 }
 
 let candles;
+let chartFeedMeta = null;
 
 if (cached && Date.now() - cached.time < 60000) {
-  // AMBIL DATA DARI CACHE
+  // Cache candles do not prove a fresh live quote; never label cached Gold as LIVE.
   candles = cached.data;
+  chartFeedMeta = { fromCache: true };
 
   document.querySelector('.status').textContent =
     'CACHE AKTIF | CANDLES: ' + candles.length;
@@ -4185,6 +4187,13 @@ if (cached && Date.now() - cached.time < 60000) {
 } else {
   // AMBIL DATA DARI API
   const data = await response.json();
+  chartFeedMeta = {
+    fromCache: false,
+    livePriceStatus: data.livePriceStatus,
+    livePriceUpdatedAt: data.livePriceUpdatedAt,
+    lastCandleAt: data.lastCandleAt || (data.candles && data.candles.length ? data.candles[data.candles.length - 1].datetime : null),
+    marketStatus: data.marketStatus
+  };
 
   document.querySelector('.status').textContent =
     'API STATUS: ' + data.status +
@@ -4217,6 +4226,31 @@ if (cached && Date.now() - cached.time < 60000) {
     time: Date.now(),
     data: candles
   });
+}
+
+// Status grafik harus mengikuti timestamp/provider, bukan label LIVE statis.
+const chartStatus = document.getElementById('chartFeedStatus');
+if (chartStatus) {
+  const candleStamp = chartFeedMeta && chartFeedMeta.lastCandleAt;
+  const candleAge = candleStamp ? Date.now() - Date.parse(candleStamp) : Infinity;
+  let state = 'TERTUNDA';
+  if (symbol === 'XAU/USD') {
+    const quoteAge = chartFeedMeta && chartFeedMeta.livePriceUpdatedAt
+      ? Date.now() - Date.parse(chartFeedMeta.livePriceUpdatedAt) : Infinity;
+    if (!chartFeedMeta?.fromCache && chartFeedMeta?.livePriceStatus === 'live_quote' && quoteAge >= 0 && quoteAge <= 120000) {
+      state = 'LIVE DATA';
+    }
+  } else if (candleAge >= 0 && candleAge <= 120000) {
+    state = 'LIVE DATA';
+  } else if (symbol === 'WTI' && (new Date().getUTCDay() === 0 || new Date().getUTCDay() === 6)) {
+    state = 'PASAR TUTUP';
+  }
+  chartStatus.textContent = '● ' + state;
+  chartStatus.title = chartFeedMeta?.fromCache
+    ? 'Data berasal dari cache; kesegaran live belum diverifikasi'
+    : state === 'LIVE DATA'
+      ? 'Timestamp sumber data masih dalam batas 2 menit'
+      : 'Data terbaru belum memenuhi syarat status LIVE';
 }
       
       
