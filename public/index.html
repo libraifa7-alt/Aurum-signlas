@@ -5047,8 +5047,8 @@ function getStructureSignal(data, timeframe = 'UNKNOWN') {
 
 
 
-async function getSharedCandles(interval) {
-  const symbol = document.getElementById('pair').value;
+async function getSharedCandles(interval, requestedSymbol) {
+  const symbol = requestedSymbol || document.getElementById('pair').value;
   const cacheKey = symbol + ':' + interval;
   const cached = aurumCandleCache.get(cacheKey);
 
@@ -5121,6 +5121,12 @@ async function getSharedCandles(interval) {
     );
 
     const result = await response.json();
+
+    // Tolak respons yang tidak cocok dengan instrumen yang diminta.
+    if (result.symbol && String(result.symbol).toUpperCase() !== String(symbol).toUpperCase()) {
+      console.warn('SIMBOL CANDLE TIDAK COCOK:', { requested: symbol, received: result.symbol, interval });
+      return [];
+    }
 
     if (result.status !== 'success' || !result.candles?.length) {
       return [];
@@ -5365,7 +5371,8 @@ function detectSupportResistance(data) {
 }
       
 
-async function analyzeMarketStructure() {
+async function analyzeMarketStructure(requestedSymbol) {
+  const analysisSymbol = requestedSymbol || document.getElementById('pair')?.value;
   
   try {
     const timeframes = [
@@ -5381,7 +5388,7 @@ async function analyzeMarketStructure() {
     
 const results = await Promise.all(
   timeframes.map(async timeframe => {
-    const candles = await getSharedCandles(timeframe);
+    const candles = await getSharedCandles(timeframe, analysisSymbol);
 
     const sr = detectSupportResistance(candles);
 const fvgZone = detectFVGZone(candles);
@@ -5454,6 +5461,11 @@ const fvgZone = detectFVGZone(candles);
 };
   })
 );
+
+// Hasil analisis lama tidak boleh menimpa instrumen yang baru dipilih.
+if (document.getElementById('pair')?.value !== analysisSymbol) {
+  return 'WAIT — Instrumen berubah; analisis lama dibatalkan';
+}
 
 const direction = signal =>
   signal.includes('BULLISH') ? 'BULLISH' :
@@ -6620,12 +6632,13 @@ function calculateTradePlan(obZone) {
 }
       
   
-async function analyzeOrderBlockMultiTimeframe() {
+async function analyzeOrderBlockMultiTimeframe(requestedSymbol) {
+  const analysisSymbol = requestedSymbol || document.getElementById('pair')?.value;
   try {
     const [h4, h1, m15] = await Promise.all([
-      getSharedCandles('H4'),
-      getSharedCandles('H1'),
-      getSharedCandles('M15')
+      getSharedCandles('H4', analysisSymbol),
+      getSharedCandles('H1', analysisSymbol),
+      getSharedCandles('M15', analysisSymbol)
     ]);
 
     if (!h4.length || !h1.length || !m15.length) {
@@ -6769,7 +6782,7 @@ if(goldTimeNode) goldTimeNode.textContent = symbol==='XAU/USD'
 
 chart.timeScale().fitContent();
 
-const structure = await analyzeMarketStructure();
+const structure = await analyzeMarketStructure(symbol);
 if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 document.getElementById('marketStructure').textContent = structure;
 
@@ -6874,9 +6887,11 @@ if(priceEl){
 }
 try {
   const [dailyCandles, m5Candles] = await Promise.all([
-    getSharedCandles('D1'),
-    getSharedCandles('M5')
+    getSharedCandles('D1', symbol),
+    getSharedCandles('M5', symbol)
   ]);
+  // Permintaan Gold yang selesai terlambat tidak boleh menimpa kartu BTC/WTI.
+  if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
   const daily = dailyCandles[dailyCandles.length - 1];
   const rangeLow = daily ? Number(daily.low) : null;
   const rangeHigh = daily ? Number(daily.high) : null;
@@ -6908,7 +6923,7 @@ try {
   console.warn('Market overview update:', marketCardError);
 }
 // KONFIRMASI ORDER BLOCK H1 + M15
-const orderBlockMTF = await analyzeOrderBlockMultiTimeframe();
+const orderBlockMTF = await analyzeOrderBlockMultiTimeframe(symbol);
 if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 
 document.getElementById('orderBlockMTF').innerText =
