@@ -6840,8 +6840,33 @@ console.log('STATUS SERVER DIPERIKSA');
   let startX = 0;
   let startY = 0;
 
-  function enterDashboard() {
+  // Bunyi klik digital singkat saat swipe berhasil (tanpa file/API eksternal)
+  function playSwipeClick() {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audio = new AudioContextClass();
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audio.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(620, audio.currentTime + 0.055);
+      gain.gain.setValueAtTime(0.0001, audio.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.075, audio.currentTime + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.075);
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start();
+      oscillator.stop(audio.currentTime + 0.08);
+      oscillator.onended = function () { audio.close(); };
+    } catch (error) {
+      // Audio tidak boleh menghambat proses masuk dashboard
+    }
+  }
+
+  function enterDashboard(fromSwipe) {
     if (splash.classList.contains('hidden')) return;
+    if (fromSwipe) playSwipeClick();
 
     // SIMPAN STATUS SUDAH MASUK
     localStorage.setItem('aurumSplashSeen', 'true');
@@ -6853,7 +6878,7 @@ console.log('STATUS SERVER DIPERIKSA');
     }, 750);
   }
 
-  enterButton.addEventListener('click', enterDashboard);
+  enterButton.addEventListener('click', function () { enterDashboard(false); });
 
   // DETEKSI SENTUHAN HP ANDROID
   splash.addEventListener('touchstart', function (event) {
@@ -6868,7 +6893,7 @@ console.log('STATUS SERVER DIPERIKSA');
     const moveY = Math.abs(touch.clientY - startY);
 
     if (moveX > 70 && moveY < 100) {
-      enterDashboard();
+      enterDashboard(true);
     }
   }, { passive: true });
 
@@ -6883,7 +6908,7 @@ console.log('STATUS SERVER DIPERIKSA');
     const moveY = Math.abs(event.clientY - startY);
 
     if (moveX > 70 && moveY < 100) {
-      enterDashboard();
+      enterDashboard(true);
     }
   });
 
