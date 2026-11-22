@@ -3761,6 +3761,29 @@ if (el && window.LightweightCharts) {
     wickDownColor: '#ef5350'
   });
 
+  // Separate live spot trace: never rewrite old OHLC candles with a spot quote.
+  const liveQuoteSeries = chart.addLineSeries({
+    color: '#159b72',
+    lineWidth: 2,
+    priceLineVisible: false,
+    lastValueVisible: true,
+    crosshairMarkerVisible: true,
+    title: 'LIVE XAU/USD'
+  });
+  let lastLiveQuoteTime = 0;
+  function updateLiveQuoteTrace(payload) {
+    if (!payload || payload.livePriceStatus !== 'live_quote') return;
+    const quoteTimeMs = Date.parse(payload.livePriceUpdatedAt || '');
+    const price = Number(payload.livePrice);
+    if (!Number.isFinite(quoteTimeMs) || !Number.isFinite(price) || price <= 0) return;
+    const ageMs = Date.now() - quoteTimeMs;
+    if (ageMs < 0 || ageMs > 120000) return;
+    const quoteTime = Math.floor(quoteTimeMs / 1000);
+    if (quoteTime < lastLiveQuoteTime) return;
+    liveQuoteSeries.update({ time: quoteTime, value: price });
+    lastLiveQuoteTime = quoteTime;
+  }
+
 let orderBlockPriceLines = [];
 let orderBlockZoneSeries = null;
 let orderBlockZoneOverlay = null;
@@ -4258,6 +4281,7 @@ if (cached && Date.now() - cached.time < 60000) {
     lastCandleAt: data.lastCandleAt || (data.candles && data.candles.length ? data.candles[data.candles.length - 1].datetime : null),
     marketStatus: data.marketStatus
   };
+  if (symbol === 'XAU/USD') updateLiveQuoteTrace(chartFeedMeta);
 
   document.querySelector('.status').textContent =
     'API STATUS: ' + data.status +
@@ -6730,6 +6754,26 @@ timeframe.addEventListener('change', function() {
 pairSelect.addEventListener('change', function() {
   loadChart(timeframe.value || 'M15');
 });
+
+// Poll only the shared XAUS spot quote while the chart page is visible.
+// This draws a separate live trace; historical candlesticks remain untouched.
+let aurumLiveQuotePollBusy = false;
+setInterval(async function() {
+  if (document.hidden || aurumLiveQuotePollBusy ||
+      !document.getElementById('chartPage')?.classList.contains('active') ||
+      pairSelect.value !== 'XAU/USD') return;
+  aurumLiveQuotePollBusy = true;
+  try {
+    const response = await fetch('/api?interval=M1&symbol=' + encodeURIComponent('XAU/USD'), { cache: 'no-store' });
+    if (!response.ok) return;
+    const payload = await response.json();
+    updateLiveQuoteTrace(payload);
+  } catch (error) {
+    console.warn('AURUM live Gold trace:', error);
+  } finally {
+    aurumLiveQuotePollBusy = false;
+  }
+}, 60000);
 
 } // Penutup blok IF
 
