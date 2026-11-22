@@ -6693,7 +6693,7 @@ if ('serviceWorker' in navigator) {
         throw new Error('Data candle belum tersedia');
       }
 
-      const latest = Number(candles[candles.length - 1].close);
+      const latest = Number(data.livePrice ?? candles[candles.length - 1].close);
       const previous = Number(candles[candles.length - 2].close);
 
       if (
@@ -6808,7 +6808,7 @@ if ('serviceWorker' in navigator) {
       if(!response.ok)throw new Error('HTTP '+response.status);
       const data=await response.json(),candles=data.candles;
       if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('Data belum tersedia');
-      const latest=Number(candles[candles.length-1].close),previous=Number(candles[candles.length-2].close);
+      const latest=Number(data.livePrice ?? candles[candles.length-1].close),previous=Number(candles[candles.length-2].close);
       if(!Number.isFinite(latest)||!Number.isFinite(previous)||previous===0)throw new Error('Harga tidak valid');
       const change=(latest-previous)/previous*100;
       const p=$(asset.price),c=$(asset.change),path=$(asset.path);
@@ -6899,7 +6899,7 @@ if ('serviceWorker' in navigator) {
       if(!res.ok)throw new Error('HTTP '+res.status);
       const data=await res.json(),candles=data.candles;
       if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('No candles');
-      const latest=Number(candles[candles.length-1].close),prev=Number(candles[candles.length-2].close);
+      const latest=Number(data.livePrice ?? candles[candles.length-1].close),prev=Number(candles[candles.length-2].close);
       if(!Number.isFinite(latest)||!Number.isFinite(prev))throw new Error('Invalid price');
       const old=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
       const direction=latest>=prev?'up':'down';
