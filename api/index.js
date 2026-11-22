@@ -119,6 +119,117 @@ module.exports = async function handler(req, res) {
       }
     }
 
+
+    // GOLD LIVE QUOTE: XAUS (tanpa API key Twelve Data).
+    // XAUS menyediakan spot indikatif dengan cache sekitar 60 detik.
+    // Candle OHLC lama tidak pernah dipalsukan menjadi candle live.
+    if (selectedSymbol === "XAU/USD") {
+      const quoteKey = "aurum:quote:XAUUSD:xaus:v1";
+      let savedQuote = null;
+      try {
+        const rawQuote = await aurumRedis(["GET", quoteKey]);
+        if (rawQuote) savedQuote = JSON.parse(rawQuote);
+      } catch (error) {
+        console.warn("XAUS QUOTE CACHE READ:", error.message);
+      }
+
+      const savedAge = savedQuote?.receivedAt
+        ? Date.now() - Date.parse(savedQuote.receivedAt)
+        : Infinity;
+
+      let quote = savedQuote && Number.isFinite(Number(savedQuote.price)) &&
+        savedAge >= 0 && savedAge < 60000
+        ? { ...savedQuote, cache: "redis_quote" }
+        : null;
+
+      if (!quote) {
+        try {
+          const xausResponse = await fetch("https://xaus.com/api/v1/spot?compact=1", {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(8000)
+          });
+          const xausData = await xausResponse.json();
+          const price = Number(xausData.spot_usd_oz);
+          const asOf = xausData.price_as_of || xausData.updated_at || null;
+          const asOfAge = asOf ? Date.now() - Date.parse(asOf) : Infinity;
+          const isFresh = xausResponse.ok && Number.isFinite(price) && price > 0 &&
+            asOfAge >= -60000 && asOfAge <= 180000 && xausData.stale !== true;
+
+          if (isFresh) {
+            quote = {
+              price,
+              receivedAt: asOf || new Date().toISOString(),
+              fetchedAt: new Date().toISOString(),
+              source: "XAUS spot API",
+              status: "live_quote",
+              cache: "provider",
+              error: null
+            };
+            try {
+              await aurumRedis(["SET", quoteKey, JSON.stringify(quote), "EX", "86400"]);
+            } catch (error) {
+              console.warn("XAUS QUOTE CACHE WRITE:", error.message);
+            }
+          } else {
+            const reason = xausData.error || (xausData.stale ? "XAUS mengembalikan harga stale" : "Timestamp harga XAUS tidak cukup baru");
+            quote = savedQuote && Number.isFinite(Number(savedQuote.price))
+              ? { ...savedQuote, status: "stale_quote", cache: "redis_stale_quote", error: reason }
+              : { price: null, receivedAt: null, source: "XAUS spot API", status: "quote_unavailable", cache: "provider_error", error: reason };
+          }
+        } catch (error) {
+          quote = savedQuote && Number.isFinite(Number(savedQuote.price))
+            ? { ...savedQuote, status: "stale_quote", cache: "redis_stale_quote", error: String(error.message || "XAUS tidak dapat dihubungi").slice(0, 180) }
+            : { price: null, receivedAt: null, source: "XAUS spot API", status: "quote_unavailable", cache: "provider_error", error: String(error.message || "XAUS tidak dapat dihubungi").slice(0, 180) };
+        }
+      }
+
+      const candleData = redisCached?.data || cached?.data || null;
+      if (!candleData) {
+        return res.status(503).json({
+          status: "provider_error",
+          symbol: selectedSymbol,
+          interval: selected,
+          source: "XAUS spot API",
+          livePrice: quote?.price ?? null,
+          livePriceUpdatedAt: quote?.receivedAt ?? null,
+          livePriceSource: quote?.source || "XAUS spot API",
+          livePriceStatus: quote?.status || "quote_unavailable",
+          livePriceError: quote?.error || "Candle historis belum tersedia di cache",
+          candles: [],
+          message: "Harga spot diperiksa terpisah; candle OHLC belum tersedia. Tidak ada candle buatan."
+        });
+      }
+
+      const goldOutput = {
+        ...candleData,
+        status: "success",
+        symbol: selectedSymbol,
+        interval: selected,
+        source: "Cached OHLC + XAUS spot",
+        providerFetchedAt: quote?.fetchedAt || new Date().toISOString(),
+        livePrice: quote?.price ?? null,
+        livePriceUpdatedAt: quote?.receivedAt ?? null,
+        livePriceSource: quote?.source || "XAUS spot API",
+        livePriceStatus: quote?.status || "quote_unavailable",
+        livePriceError: quote?.error || null,
+        cache: quote?.status === "live_quote" ? "cached_candles_xaus_quote" : "stale_candles"
+      };
+
+      // Hanya M1 yang boleh memperbarui close candle berjalan; OHLC historis
+      // tidak diubah untuk timeframe lain. Harga spot tetap ditampilkan terpisah.
+      if (goldOutput.livePriceStatus === "live_quote" && interval === "1min") {
+        const last = goldOutput.candles?.[goldOutput.candles.length - 1];
+        if (last) {
+          last.close = Number(goldOutput.livePrice);
+          last.high = Math.max(Number(last.high), Number(goldOutput.livePrice));
+          last.low = Math.min(Number(last.low), Number(goldOutput.livePrice));
+        }
+      }
+
+      globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: goldOutput });
+      return res.status(200).json(goldOutput);
+    }
+
     // Cooldown global: satu kegagalan kuota Twelve Data menahan
     // seluruh timeframe, bukan hanya interval yang sedang diminta.
     const providerErrorKey = "aurum:provider-error:" + cacheKey;
