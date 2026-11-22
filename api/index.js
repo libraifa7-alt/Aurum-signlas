@@ -360,9 +360,9 @@ const limit = selected === "M45" ? 400 : 120;
 
 
 
+
 // AURUM SMART HISTORICAL RANGE
 // Hanya mengambil data yang dibutuhkan chart
-
 
 const targetBars = selected === "M45"
   ? 300
@@ -387,14 +387,13 @@ const toDate = new Date();
 const marketUrl = new URL(
   "https://api.marketapi.app/v1/bars"
 );
-      
-      
 
 marketUrl.searchParams.set("symbol", symbol);
 marketUrl.searchParams.set("timeframe", marketTimeframe);
 marketUrl.searchParams.set("from", fromDate.toISOString());
 marketUrl.searchParams.set("to", toDate.toISOString());
 marketUrl.searchParams.set("limit", String(limit));
+      
 
 // AURUM MARKETAPI PAGINATION
 let allBars = [];
