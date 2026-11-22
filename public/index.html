@@ -2455,7 +2455,35 @@ body {
 }
 </style>
 
-<style id="aurum-traxa-market-card">
+<style id="aurum-traxa-performance">
+#marketPage .aurum-performance-panel{padding:14px;background:linear-gradient(135deg,#f1fbff 0%,#f6f0ff 100%);border:1px solid #dce7f6;border-radius:15px}
+#marketPage .aurum-performance-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+#marketPage .aurum-performance-head strong{font-size:15px;letter-spacing:1.5px;font-style:italic;color:#258bb5}
+#marketPage .aurum-performance-filters{display:flex;gap:4px;flex-wrap:wrap}
+#marketPage .aurum-performance-filters button{border:1px solid #d9dce5;background:#fff;border-radius:15px;padding:5px 7px;font-size:7px;letter-spacing:.3px;color:#586174}
+#marketPage .aurum-performance-filters button.active{color:#172638;background:linear-gradient(100deg,#18b2c8,#7244db);border-color:transparent;font-weight:900}
+#marketPage .aurum-performance-main{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:8px;margin-top:12px;align-items:stretch}
+#marketPage .aurum-pips-card{min-height:74px;padding:12px;border-left:3px solid #5375e7;border-radius:9px;background:linear-gradient(120deg,#e8f8ff,#f0f2ff);display:flex;flex-direction:column;justify-content:center}
+#marketPage .aurum-pips-card small{font-size:8px;letter-spacing:1px;color:#59677d}
+#marketPage .aurum-pips-card strong{font-size:28px;line-height:1.25;color:#202b3b}
+#marketPage .aurum-pips-card span{font-size:8px;color:#8791a1}
+#marketPage .aurum-winrate-card{display:grid;place-items:center;background:#fff;border-radius:12px}
+#marketPage .aurum-winrate-ring{width:64px;height:64px;border:7px solid #e9edf3;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff}
+#marketPage .aurum-winrate-ring strong{font-size:17px;color:#18a8bd;line-height:1}
+#marketPage .aurum-winrate-ring small{font-size:6px;letter-spacing:.5px;color:#606b7b;margin-top:4px}
+#marketPage .aurum-performance-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:9px}
+#marketPage .aurum-stat-tile{min-width:0;padding:8px 3px 9px;border-radius:9px;background:#fff;border:1px solid #e5e9f0;display:flex;flex-direction:column;align-items:center;gap:4px}
+#marketPage .aurum-stat-tile>strong{font-size:16px;line-height:1}
+#marketPage .aurum-stat-tile>span{font-size:12px;font-weight:900}
+#marketPage .aurum-stat-tile small{font-size:7px;letter-spacing:.4px;color:#687183;white-space:nowrap}
+#marketPage .aurum-stat-tile.signals{background:#f1f4ff;border-color:#d4dcfa;color:#536ee1}
+#marketPage .aurum-stat-tile.tp{background:#edfbf3;border-color:#c7efd7;color:#30bd6a}
+#marketPage .aurum-stat-tile.sl{background:#fff0f1;border-color:#f4d1d4;color:#e75d68}
+#marketPage .aurum-stat-tile.be{background:#fff9e9;border-color:#f1e3b7;color:#b28a19}
+#marketPage .aurum-performance-hint{text-align:center;font-size:8px;color:#818b9a;margin:8px 0 10px}
+#marketPage .aurum-share-performance{width:100%;padding:10px;border:1px solid #8e9be8;border-radius:9px;background:linear-gradient(100deg,#8ad7e5,#c49bea);font-size:9px;font-weight:900;letter-spacing:.7px;color:#26314a}
+@media(max-width:360px){#marketPage .aurum-performance-filters button{padding:5px 5px;font-size:6px}#marketPage .aurum-performance-panel{padding:11px}}
+</style><style id="aurum-traxa-market-card">
 #marketPage .aurum-asset-switch{display:flex;gap:7px;overflow-x:auto;margin:0 auto 12px;max-width:480px;scrollbar-width:none}
 #marketPage .aurum-asset-switch button{flex:0 0 auto;border:1px solid #e2e5eb;border-radius:22px;background:#f3f4f6;color:#5e6572;padding:7px 12px;font-size:11px;font-weight:800}
 #marketPage .aurum-asset-switch button.active{background:#e7f6fb;border-color:#a9ddea;color:#177f9d}
@@ -3094,20 +3122,28 @@ body {
       <p class="aurum-disclaimer">Sinyal dan analisis hanya untuk informasi dan bukan saran keuangan. Trading dengan risiko Anda sendiri.</p>
     </section>
 
-    <section class="aurum-signal-panel" data-signal-panel="performance" role="tabpanel" hidden>
-      <div class="aurum-performance-head"><strong>PERFORMA</strong><span>RIWAYAT AURUM</span></div>
-      <div class="aurum-performance-empty">
-        <span class="aurum-performance-symbol">▧</span>
-        <strong>Riwayat performa belum tersedia</strong>
-        <p>Statistik pip, rasio menang, TP, SL, dan impas akan ditampilkan setelah hasil sinyal AURUM tercatat dan tervalidasi.</p>
+    <section class="aurum-signal-panel aurum-performance-panel" data-signal-panel="performance" role="tabpanel" hidden>
+      <div class="aurum-performance-top">
+        <div class="aurum-performance-head"><strong>PERFORMANCE</strong></div>
+        <div class="aurum-performance-filters" role="group" aria-label="Periode performa">
+          <button type="button" class="active" data-performance-period="today">TODAY</button>
+          <button type="button" data-performance-period="yesterday">YESTERDAY</button>
+          <button type="button" data-performance-period="7days">7 DAYS</button>
+          <button type="button" data-performance-period="30days">30 DAYS</button>
+        </div>
       </div>
-      <div class="aurum-performance-grid">
-        <div><small>PIP DIDAPAT</small><strong>—</strong></div>
-        <div><small>RASIO MENANG</small><strong>—</strong></div>
-        <div><small>TP TERCAPAI</small><strong>—</strong></div>
-        <div><small>SL KENA</small><strong>—</strong></div>
+      <div class="aurum-performance-main">
+        <div class="aurum-pips-card"><small id="aurumPipsLabel">PIPS WON · TODAY</small><strong id="aurumPipsValue">—</strong><span id="aurumPerformanceNote">Belum ada hasil sinyal terverifikasi</span></div>
+        <div class="aurum-winrate-card"><div class="aurum-winrate-ring"><strong id="aurumWinRate">—</strong><small>WIN RATE</small></div></div>
       </div>
-      <p class="aurum-disclaimer">AURUM tidak akan menampilkan statistik performa contoh seolah-olah merupakan hasil trading nyata.</p>
+      <div class="aurum-performance-stats">
+        <button type="button" class="aurum-stat-tile signals" data-performance-stat="signals"><strong>▧</strong><span>—</span><small>SIGNALS</small></button>
+        <button type="button" class="aurum-stat-tile tp" data-performance-stat="tp"><strong>▧</strong><span>—</span><small>TP HIT</small></button>
+        <button type="button" class="aurum-stat-tile sl" data-performance-stat="sl"><strong>▧</strong><span>—</span><small>SL HIT</small></button>
+        <button type="button" class="aurum-stat-tile be" data-performance-stat="be"><strong>▧</strong><span>—</span><small>BREAK EVEN</small></button>
+      </div>
+      <p class="aurum-performance-hint">Statistik akan terisi setelah hasil sinyal tercatat dan tervalidasi.</p>
+      <button type="button" class="aurum-share-performance" id="aurumSharePerformance">♧ &nbsp; SHARE PERFORMANCE</button>
     </section>
 
     <section class="aurum-signal-panel" data-signal-panel="analysis" role="tabpanel" hidden>
@@ -6500,7 +6536,39 @@ if ('serviceWorker' in navigator) {
 </script>
 <!-- END AURUM TICKER DATA ENGINE -->
 
-</body>
+<script id="aurum-performance-interactions">
+(function(){
+  const panel=document.querySelector('#marketPage [data-signal-panel="performance"]');
+  if(!panel || panel.dataset.bound==='1') return;
+  panel.dataset.bound='1';
+  const labels={today:'TODAY',yesterday:'YESTERDAY','7days':'7 DAYS','30days':'30 DAYS'};
+  panel.querySelectorAll('[data-performance-period]').forEach(function(button){
+    button.addEventListener('click',function(){
+      panel.querySelectorAll('[data-performance-period]').forEach(function(item){item.classList.toggle('active',item===button);});
+      const label=labels[button.dataset.performancePeriod]||'TODAY';
+      const pipsLabel=panel.querySelector('#aurumPipsLabel');
+      if(pipsLabel)pipsLabel.textContent='PIPS WON · '+label;
+      const note=panel.querySelector('#aurumPerformanceNote');
+      if(note)note.textContent='Belum ada hasil sinyal terverifikasi untuk periode ini';
+    });
+  });
+  panel.querySelectorAll('[data-performance-stat]').forEach(function(button){
+    button.addEventListener('click',function(){
+      const note=panel.querySelector('#aurumPerformanceNote');
+      if(note)note.textContent='Riwayat '+button.querySelector('small').textContent+' belum tersedia';
+    });
+  });
+  const share=panel.querySelector('#aurumSharePerformance');
+  if(share)share.addEventListener('click',async function(){
+    const message='AURUM Signals AI — Riwayat performa belum tersedia. Statistik akan ditampilkan setelah hasil sinyal tercatat dan tervalidasi.';
+    try{
+      if(navigator.share) await navigator.share({title:'AURUM Signals Performance',text:message});
+      else if(navigator.clipboard && navigator.clipboard.writeText){await navigator.clipboard.writeText(message);share.textContent='✓ PERFORMANCE COPIED';}
+      else {share.textContent='SHARE BELUM DIDUKUNG PERANGKAT';}
+    }catch(error){if(error && error.name!=='AbortError')share.textContent='SHARE TIDAK TERSEDIA';}
+  });
+})();
+</script></body>
 </html>
 
   
