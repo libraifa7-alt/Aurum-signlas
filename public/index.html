@@ -7362,7 +7362,15 @@ console.log('STATUS SERVER DIPERIKSA');
       if(!res.ok)throw new Error('HTTP '+res.status);
       const data=await res.json(),candles=data.candles;
       if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('No candles');
-      const latest=Number(data.livePrice ?? candles[candles.length-1].close),prev=Number(candles[candles.length-2].close);
+      const quoteTime=Date.parse(data.livePriceUpdatedAt||'');
+      const quoteAge=Number.isFinite(quoteTime)?Date.now()-quoteTime:Infinity;
+      const hasFreshGoldQuote=symbol==='XAU/USD' &&
+        data.livePriceStatus==='live_quote' &&
+        Number.isFinite(Number(data.livePrice)) && Number(data.livePrice)>0 &&
+        quoteAge>=0 && quoteAge<=120000;
+      // Never present a stale/unverified spot quote as the current live price.
+      const latest=Number(hasFreshGoldQuote?data.livePrice:candles[candles.length-1].close);
+      const prev=Number(candles[candles.length-2].close);
       if(!Number.isFinite(latest)||!Number.isFinite(prev))throw new Error('Invalid price');
       const old=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
       const direction=latest>=prev?'up':'down';
@@ -7382,7 +7390,7 @@ console.log('STATUS SERVER DIPERIKSA');
         priceEl.textContent=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       }
       const displayCandles=candles.slice();
-      if(symbol==="XAU/USD" && Number.isFinite(Number(data.livePrice)) && Number(data.livePrice)>0){
+      if(hasFreshGoldQuote){
         const last=displayCandles[displayCandles.length-1];
         displayCandles[displayCandles.length-1]={...last,close:Number(data.livePrice),high:Math.max(Number(last.high),Number(data.livePrice)),low:Math.min(Number(last.low),Number(data.livePrice))};
       }
