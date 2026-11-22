@@ -2453,6 +2453,82 @@ body {
  #marketPage .aurum-analysis-card{animation:aurumAnalysisIn .3s ease-out both}
 }
 @keyframes aurumAnalysisIn{from{opacity:.75;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* TRAXA-LIKE MULTI-TIMEFRAME TREND DASHBOARD */
+#marketPage #trendMeter .aurum-trend-dashboard{color:#273247}
+#marketPage #trendMeter .aurum-trend-hero{
+ display:flex;justify-content:space-between;align-items:center;gap:10px;
+ padding:13px 12px;border:1px solid #f1dada;border-radius:12px;
+ background:linear-gradient(135deg,#fff1f1,#fff 58%,#f2f8ff);
+}
+#marketPage #trendMeter .aurum-trend-hero-copy{display:flex;flex-direction:column;gap:4px}
+#marketPage #trendMeter .aurum-trend-hero-copy small,
+#marketPage #trendMeter .aurum-trend-price small{
+ color:#8993a2;font-size:8px;font-weight:800;letter-spacing:1.1px
+}
+#marketPage #trendMeter .aurum-trend-hero-copy strong{
+ font-size:27px;line-height:1.1;letter-spacing:.5px
+}
+#marketPage #trendMeter .aurum-trend-hero-copy span{font-size:8px;color:#788497;font-weight:700}
+#marketPage #trendMeter .aurum-trend-price{text-align:right;display:flex;flex-direction:column;gap:6px}
+#marketPage #trendMeter .aurum-trend-price b{font-size:18px;color:#b18a35}
+#marketPage #trendMeter .aurum-trend-meter-box{
+ margin-top:10px;padding:12px;border:1px solid #e8ebf1;border-radius:12px;background:#fbfcfe
+}
+#marketPage #trendMeter .aurum-trend-meter-label{
+ display:flex;justify-content:space-between;align-items:center;gap:4px;
+ color:#758195;font-size:8px;font-weight:900;letter-spacing:.5px
+}
+#marketPage #trendMeter .aurum-trend-meter-label b{color:#37465b;font-size:9px;text-align:center}
+#marketPage #trendMeter .aurum-trend-segments{
+ display:grid;grid-template-columns:repeat(21,minmax(0,1fr));gap:3px;margin:10px 0 8px
+}
+#marketPage #trendMeter .aurum-meter-segment{height:12px;border-radius:3px}
+#marketPage #trendMeter .aurum-trend-percentages{
+ display:flex;justify-content:space-between;gap:4px;color:#8993a2;font-size:8px
+}
+#marketPage #trendMeter .aurum-tf-grid{
+ display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:10px
+}
+#marketPage #trendMeter .aurum-tf-card{
+ min-width:0;padding:7px 3px 8px;border:1px solid #e5e9ef;border-radius:10px;
+ background:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px
+}
+#marketPage #trendMeter .aurum-tf-card-head{
+ width:100%;display:flex;justify-content:space-between;align-items:center;
+ font-size:8px;color:#344256
+}
+#marketPage #trendMeter .aurum-tf-card-head span{color:var(--tf-color);font-size:9px}
+#marketPage #trendMeter .aurum-tf-card>small{font-size:7px;color:var(--tf-color);font-weight:800}
+#marketPage #trendMeter .aurum-tf-ring{
+ width:34px;height:34px;border:3px solid var(--tf-color);border-radius:50%;
+ display:grid;place-items:center;color:var(--tf-color);font-size:13px;font-weight:900;
+ background:linear-gradient(145deg,#fff,#f5f7fa)
+}
+#marketPage #trendMeter .aurum-tf-card>b{
+ font-size:6px;letter-spacing:.15px;color:var(--tf-color);white-space:nowrap
+}
+#marketPage #trendMeter .aurum-trend-table{margin-top:13px}
+#marketPage #trendMeter .aurum-trend-table-head,
+#marketPage #trendMeter .aurum-trend-table-row{
+ display:grid;grid-template-columns:.55fr 1fr 1fr 1fr;gap:5px;align-items:center;
+ padding:8px 3px;border-bottom:1px solid #e9edf2;font-size:8px
+}
+#marketPage #trendMeter .aurum-trend-table-head{
+ color:#778397;font-weight:900;letter-spacing:.45px;font-size:7px
+}
+#marketPage #trendMeter .aurum-trend-table-row strong{color:#344256}
+#marketPage #trendMeter .aurum-table-support{color:#3296ca}
+#marketPage #trendMeter .aurum-table-resistance{color:#e26770}
+#marketPage #trendMeter .aurum-trend-footnote{
+ display:block;margin-top:10px;color:#98a1ae;font-size:8px;line-height:1.5
+}
+@media(max-width:390px){
+ #marketPage #trendMeter .aurum-tf-grid{gap:3px}
+ #marketPage #trendMeter .aurum-tf-card{padding-left:1px;padding-right:1px}
+ #marketPage #trendMeter .aurum-tf-ring{width:29px;height:29px}
+ #marketPage #trendMeter .aurum-tf-card>b{font-size:5px}
+}
 </style>
 
 </head>
@@ -4455,77 +4531,118 @@ const direction = signal =>
       bias = 'SELL BIAS';
     }
 
-    // UPDATE TREND METER 7 TIMEFRAMES
+    // AURUM TREND METER — TRAXA-INSPIRED, SOURCE-DATA ONLY
     const trendMeter = document.getElementById('trendMeter');
 
     if (trendMeter) {
-      const bullishPercent = (bullish / 7) * 100;
-      const bearishPercent = (bearish / 7) * 100;
-      const neutral = 7 - bullish - bearish;
-      const neutralPercent = (neutral / 7) * 100;
+      const total = results.length || 7;
+      const bullishPercent = total ? (bullish / total) * 100 : 0;
+      const bearishPercent = total ? (bearish / total) * 100 : 0;
+      const rangeCount = results.filter(item => trends[item.timeframe] === 'RANGE').length;
+      const unknownCount = total - bullish - bearish - rangeCount;
+      const neutralCount = rangeCount + unknownCount;
+      const neutralPercent = total ? (neutralCount / total) * 100 : 0;
+      const netScore = bullish - bearish;
+      const scoreLabel = (netScore > 0 ? '+' : '') + netScore + ' / ' + total;
 
-      const trendRows = results.map(item => {
-        const trend = trends[item.timeframe];
+      const overall = bullish > bearish
+        ? 'BULLISH'
+        : bearish > bullish
+          ? 'BEARISH'
+          : 'MIXED';
+      const overallColor = overall === 'BULLISH'
+        ? '#279f83'
+        : overall === 'BEARISH'
+          ? '#e45b65'
+          : '#8994a5';
 
-        const color =
-          trend === 'BULLISH' ? '#20c997' :
-          trend === 'BEARISH' ? '#ef5350' :
-          '#94a3b8';
+      const latestPrice = document.getElementById('goldPrice')?.textContent || '--';
 
+      const segments = Array.from({length:21}, (_, index) => {
+        const bullishBlocks = Math.round((bullish / total) * 21);
+        const bearishBlocks = Math.round((bearish / total) * 21);
+        const neutralBlocks = Math.max(0, 21 - bullishBlocks - bearishBlocks);
+        const color = index < bullishBlocks
+          ? '#329bd6'
+          : index < bullishBlocks + bearishBlocks
+            ? '#ed5b65'
+            : '#e5e8ed';
+        return '<span class="aurum-meter-segment" style="background:' + color + '"></span>';
+      }).join('');
+
+      const timeframeCards = results.map(item => {
+        const state = trends[item.timeframe];
+        const color = state === 'BULLISH'
+          ? '#299dce'
+          : state === 'BEARISH'
+            ? '#e65d68'
+            : '#9aa3b1';
+        const shortLabel = state === 'UNKNOWN' ? 'N/A' : state;
+        const symbol = state === 'BULLISH' ? '▲' : state === 'BEARISH' ? '▼' : '—';
         return `
-          <div style="
-            display:flex;
-            justify-content:space-between;
-            gap:8px;
-            padding:7px 0;
-            border-bottom:1px solid #263247;
-            font-size:13px;
-          ">
-            <span>${item.timeframe}</span>
-            <span style="color:${color};font-weight:600;text-align:right">
-              ${item.signal}
-            </span>
+          <div class="aurum-tf-card" style="--tf-color:${color}">
+            <div class="aurum-tf-card-head"><strong>${item.timeframe}</strong><span>${symbol}</span></div>
+            <small>${shortLabel}</small>
+            <div class="aurum-tf-ring"><span>${symbol}</span></div>
+            <b>${state === 'UNKNOWN' ? 'DATA' : state}</b>
+          </div>
+        `;
+      }).join('');
+
+      const detailRows = results.map(item => {
+        const sr = item.supportResistance;
+        const support = sr && sr.support != null ? sr.support.toFixed(2) : '--';
+        const resistance = sr && sr.resistance != null ? sr.resistance.toFixed(2) : '--';
+        const state = trends[item.timeframe];
+        const color = state === 'BULLISH' ? '#299dce' : state === 'BEARISH' ? '#e65d68' : '#8994a5';
+        return `
+          <div class="aurum-trend-table-row">
+            <strong>${item.timeframe}</strong>
+            <span style="color:${color}">${state === 'UNKNOWN' ? '—' : state}</span>
+            <span class="aurum-table-support">${support}</span>
+            <span class="aurum-table-resistance">${resistance}</span>
           </div>
         `;
       }).join('');
 
       trendMeter.innerHTML = `
-        <div style="margin:10px 0">
-          <div style="
-            display:flex;
-            justify-content:space-between;
-            margin-bottom:8px;
-            font-size:13px;
-          ">
-            <strong style="color:#20c997">BULLISH ${bullish}/7</strong>
-            <strong style="color:#ef5350">BEARISH ${bearish}/7</strong>
+        <div class="aurum-trend-dashboard">
+          <div class="aurum-trend-hero">
+            <div class="aurum-trend-hero-copy">
+              <small>EMAS · XAU/USD</small>
+              <strong style="color:${overallColor}">${overall}</strong>
+              <span>${bullish + bearish} DARI ${total} TIMEFRAME MEMILIKI ARAH</span>
+            </div>
+            <div class="aurum-trend-price">
+              <small>HARGA TERKINI</small>
+              <b>${latestPrice}</b>
+            </div>
           </div>
 
-          <div style="
-            display:flex;
-            height:10px;
-            overflow:hidden;
-            border-radius:10px;
-            background:#263247;
-          ">
-            <div style="width:${bullishPercent}%;background:#20c997"></div>
-            <div style="width:${bearishPercent}%;background:#ef5350"></div>
-            <div style="width:${neutralPercent}%;background:#94a3b8"></div>
+          <div class="aurum-trend-meter-box">
+            <div class="aurum-trend-meter-label">
+              <span>BEARISH</span>
+              <b>SKOR TREN ${scoreLabel}</b>
+              <span>BULLISH</span>
+            </div>
+            <div class="aurum-trend-segments">${segments}</div>
+            <div class="aurum-trend-percentages">
+              <span>Bullish ${bullishPercent.toFixed(0)}%</span>
+              <span>Range ${neutralPercent.toFixed(0)}%</span>
+              <span>Bearish ${bearishPercent.toFixed(0)}%</span>
+            </div>
           </div>
 
-          <div style="
-            display:flex;
-            justify-content:space-between;
-            margin-top:8px;
-            font-size:12px;
-            color:#cbd5e1;
-          ">
-            <span>Bullish ${bullishPercent.toFixed(1)}%</span>
-            <span>Bearish ${bearishPercent.toFixed(1)}%</span>
+          <div class="aurum-tf-grid">${timeframeCards}</div>
+
+          <div class="aurum-trend-table">
+            <div class="aurum-trend-table-head">
+              <span>TF</span><span>TREN</span><span>SUPPORT</span><span>RESIST.</span>
+            </div>
+            ${detailRows}
           </div>
+          <small class="aurum-trend-footnote">Ringkasan dihitung dari klasifikasi struktur candle AURUM. Volume pembeli/penjual tidak ditampilkan karena belum tersedia dari sumber analisis.</small>
         </div>
-
-        ${trendRows}
       `;
     }
 
