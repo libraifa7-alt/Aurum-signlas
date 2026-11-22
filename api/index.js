@@ -65,16 +65,18 @@ module.exports = async function handler(req, res) {
   // AURUM SMART API CACHE OPTIMIZATION
   const cacheTTL = selectedSymbol === "WTI"
     ? 60000
-    : ({
-        "1min": 60000,
-        "5min": 120000,
-        "15min": 180000,
-        "30min": 300000,
-        "45min": 300000,
-        "1h": 600000,
-        "4h": 900000,
-        "1day": 1800000
-      }[interval] || 180000);
+    : selectedSymbol === "XAU/USD" && interval === "1min"
+      ? 15000
+      : ({
+          "1min": 60000,
+          "5min": 120000,
+          "15min": 180000,
+          "30min": 300000,
+          "45min": 300000,
+          "1h": 600000,
+          "4h": 900000,
+          "1day": 1800000
+        }[interval] || 180000);
 
   if (!debugRaw && cached && Date.now() - cached.time < cacheTTL) {
     return res.status(200).json(cached.data);
