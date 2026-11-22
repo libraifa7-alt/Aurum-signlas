@@ -2490,6 +2490,17 @@ body {
 #marketPage .aurum-traxa-market-card{padding:15px 14px 13px;background:linear-gradient(145deg,#fffdf7,#fff);border-color:#eadfc7}
 #marketPage .aurum-mini-chart{height:58px;margin:0 0 5px;overflow:hidden}
 #marketPage .aurum-mini-chart svg{width:100%;height:100%;display:block}
+#marketPage #goldPrice{display:inline-block;position:relative;transition:color .25s ease}
+#marketPage #goldPrice::after{content:attr(data-arrow);display:inline-block;margin-left:7px;font-size:.42em;vertical-align:middle;color:var(--price-arrow,#e56d76);animation:aurum-price-arrow .9s ease-in-out infinite alternate}
+#marketPage #goldPrice.price-up{--price-arrow:#319bd0}
+#marketPage #goldPrice.price-down{--price-arrow:#e56d76}
+#marketPage #goldPrice.price-flash{animation:aurum-price-flash .65s ease-out}
+#marketPage #aurumMiniChart .aurum-setup-area{opacity:.75}
+#marketPage #aurumMiniChart .aurum-setup-line{stroke-dasharray:700;stroke-dashoffset:700;animation:aurum-chart-draw 1.15s ease-out forwards;transition:d .5s ease}
+@keyframes aurum-chart-draw{to{stroke-dashoffset:0}}
+@keyframes aurum-price-flash{0%{filter:brightness(1.35);transform:translateY(1px)}100%{filter:none;transform:translateY(0)}}
+@keyframes aurum-price-arrow{from{transform:translateY(-1px)}to{transform:translateY(2px)}}
+@media(prefers-reduced-motion:reduce){#marketPage #goldPrice::after,#marketPage #goldPrice.price-flash,#marketPage #aurumMiniChart .aurum-setup-line{animation:none!important;stroke-dashoffset:0!important}}
 #marketPage .aurum-trend-pill{display:inline-block;padding:4px 9px;border-radius:20px;background:#f1f2f4;color:#687080;font-size:9px;font-weight:800;margin:0 0 12px}
 #marketPage .aurum-range-head,#marketPage .aurum-range-values{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#737b88}
 #marketPage .aurum-range-head{margin-bottom:7px}
@@ -6198,8 +6209,11 @@ if (candles.length === 0) {
 
 const latestCandle = candles[candles.length - 1];
 
-document.getElementById('goldPrice').textContent =
-  latestCandle.close.toFixed(2);
+// Initial value is formatted here; subsequent refreshes animate the live tick above.
+const priceNode=document.getElementById('goldPrice');
+if(priceNode && !Number.isFinite(Number(String(priceNode.textContent).replace(/[^0-9.]/g,'')))){
+  priceNode.textContent=latestCandle.close.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
 
 document.getElementById('goldTime').textContent =
   document.getElementById('pair').value + ' · Market Data';
@@ -6253,16 +6267,52 @@ if (headerTrend) {
 }
 const miniChart = document.getElementById('aurumMiniChart');
 if (miniChart && candles.length > 1) {
-  const points = candles.slice(-36).map(x => Number(x.close)).filter(Number.isFinite);
-  const min = Math.min(...points), max = Math.max(...points);
-  const spread = max - min || 1;
-  const path = points.map((v,i) => (i ? 'L' : 'M') +
-    (i * 420 / Math.max(1, points.length - 1)).toFixed(1) + ' ' +
-    (50 - ((v - min) / spread) * 42).toFixed(1)).join(' ');
-  const stroke = headerDirection === 'Bullish' ? '#22a879' :
-    headerDirection === 'Bearish' ? '#ef6269' : '#9aa3b1';
-  miniChart.innerHTML = '<path d="' + path + '" fill="none" stroke="' + stroke +
-    '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>';
+  const points = candles.slice(-30).map(x => Number(x.close)).filter(Number.isFinite);
+  const min = Math.min(...points), max = Math.max(...points), spread = max - min || 1;
+  const coords = points.map((value,index) => ({
+    x:index * 420 / Math.max(1,points.length - 1),
+    y:7 + ((max - value) / spread) * 39
+  }));
+  let curve = 'M ' + coords[0].x.toFixed(1) + ' ' + coords[0].y.toFixed(1);
+  for(let i=0;i<coords.length-1;i++){
+    const p0=coords[Math.max(0,i-1)],p1=coords[i],p2=coords[i+1],p3=coords[Math.min(coords.length-1,i+2)];
+    const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+    const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+    curve+=' C '+c1x.toFixed(1)+' '+c1y.toFixed(1)+', '+c2x.toFixed(1)+' '+c2y.toFixed(1)+', '+p2.x.toFixed(1)+' '+p2.y.toFixed(1);
+  }
+  const lastClose=Number(candles[candles.length-1].close);
+  const firstClose=Number(candles[Math.max(0,candles.length-30)].close);
+  const rising=lastClose>=firstClose;
+  const stroke=assetSymbol==='XAU/USD'?(rising?'#d96f79':'#e16b75'):(rising?'#399bd0':'#e16b75');
+  const fill=assetSymbol==='XAU/USD'?'rgba(226,112,124,.18)':(rising?'rgba(91,166,218,.20)':'rgba(226,112,124,.16)');
+  miniChart.innerHTML='<defs><linearGradient id="aurumSetupFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+stroke+'" stop-opacity=".25"/><stop offset="100%" stop-color="'+stroke+'" stop-opacity=".015"/></linearGradient></defs>'+
+    '<path class="aurum-setup-area" d="'+curve+' L 420 58 L 0 58 Z" fill="url(#aurumSetupFill)"/>'+
+    '<path class="aurum-setup-line" d="'+curve+'" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+}
+const priceEl=document.getElementById('goldPrice');
+if(priceEl){
+  const oldPrice=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
+  const newPrice=Number(latestCandle.close);
+  const previousClose=Number(candles[Math.max(0,candles.length-2)].close);
+  const direction=newPrice>=previousClose?'up':'down';
+  priceEl.classList.remove('price-up','price-down','price-flash');
+  priceEl.classList.add('price-'+direction);
+  priceEl.dataset.arrow=direction==='up'?'▲':'▼';
+  if(Number.isFinite(oldPrice)&&oldPrice>0&&Number.isFinite(newPrice)&&oldPrice!==newPrice){
+    const start=performance.now(),duration=650;
+    const formatter=new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    function tickPrice(now){
+      const progress=Math.min(1,(now-start)/duration);
+      const eased=1-Math.pow(1-progress,3);
+      priceEl.textContent=formatter.format(oldPrice+(newPrice-oldPrice)*eased);
+      if(progress<1)requestAnimationFrame(tickPrice);
+    }
+    requestAnimationFrame(tickPrice);
+    void priceEl.offsetWidth;
+    priceEl.classList.add('price-flash');
+  }else{
+    priceEl.textContent=newPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
 }
 try {
   const [dailyCandles, m5Candles] = await Promise.all([
