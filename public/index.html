@@ -6731,8 +6731,15 @@ if ('serviceWorker' in navigator) {
     );
   }
 
-  refreshAurumTicker();
-  setInterval(refreshAurumTicker, 60000);
+  // Gold is refreshed on the 15s API cache cadence; BTC and WTI stay at 60s.
+  updateTicker(tickerAssets[0]);
+  Promise.all(tickerAssets.slice(1).map(updateTicker));
+  setInterval(function () {
+    updateTicker(tickerAssets[0]);
+  }, 15000);
+  setInterval(function () {
+    Promise.all(tickerAssets.slice(1).map(updateTicker));
+  }, 60000);
 })();
 </script>
 <!-- END AURUM TICKER DATA ENGINE -->
@@ -6851,8 +6858,11 @@ if ('serviceWorker' in navigator) {
       console.warn('AURUM home market card:',asset.symbol,error);
     }
   }
-  function refresh(){assets.forEach(updateAsset);}
-  refresh();setInterval(refresh,60000);
+  // Refresh Gold every 15s; keep BTC and WTI at 60s.
+  updateAsset(assets[0]);
+  assets.slice(1).forEach(updateAsset);
+  setInterval(function(){updateAsset(assets[0]);},15000);
+  setInterval(function(){assets.slice(1).forEach(updateAsset);},60000);
 })();
 </script>
 
