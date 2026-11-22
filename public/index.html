@@ -6840,44 +6840,22 @@ console.log('STATUS SERVER DIPERIKSA');
   let startX = 0;
   let startY = 0;
 
-  // Siapkan audio saat sentuhan pertama agar Android mengizinkan pemutaran suara.
-  let swipeAudioContext = null;
-  function unlockSwipeAudio() {
-    try {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-      if (!swipeAudioContext) swipeAudioContext = new AudioContextClass();
-      if (swipeAudioContext.state === 'suspended') swipeAudioContext.resume();
-    } catch (error) {
-      // Audio opsional; jangan menghambat navigasi.
-    }
-  }
+  // Sampel klik dari efek suara pada video referensi TRAXA.
+  // Audio diputar langsung saat gesture swipe agar kompatibel dengan Android.
+  const swipeClickAudio = new Audio('data:audio/mpeg;base64,SU5DTFVERSU5H');
+  swipeClickAudio.preload = 'auto';
+  swipeClickAudio.volume = 0.9;
+  swipeClickAudio.setAttribute('playsinline', '');
 
-  // Klik elektronik singkat, memakai AudioContext yang sudah dibuka oleh gesture pengguna.
   function playSwipeClick() {
     try {
-      unlockSwipeAudio();
-      if (!swipeAudioContext) return;
-      const audio = swipeAudioContext;
-      const playTone = function () {
-        const oscillator = audio.createOscillator();
-        const gain = audio.createGain();
-        const now = audio.currentTime;
-        oscillator.type = 'triangle';
-        oscillator.frequency.setValueAtTime(1050, now);
-        oscillator.frequency.exponentialRampToValueAtTime(560, now + 0.09);
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.12, now + 0.008);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
-        oscillator.connect(gain);
-        gain.connect(audio.destination);
-        oscillator.start(now);
-        oscillator.stop(now + 0.125);
-      };
-      if (audio.state === 'suspended') {
-        audio.resume().then(playTone).catch(function () {});
-      } else {
-        playTone();
+      swipeClickAudio.pause();
+      swipeClickAudio.currentTime = 0;
+      const playback = swipeClickAudio.play();
+      if (playback && typeof playback.catch === 'function') {
+        playback.catch(function () {
+          // Audio opsional; jangan menghambat proses masuk dashboard.
+        });
       }
     } catch (error) {
       // Audio tidak boleh menghambat proses masuk dashboard.
