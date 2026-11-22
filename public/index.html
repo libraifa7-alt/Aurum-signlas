@@ -6822,15 +6822,12 @@ console.log('STATUS SERVER DIPERIKSA');
 
 
 <!-- AURUM SPLASH SCREEN INTERACTION -->
-
 <script>
 (function () {
   const splash = document.getElementById('aurumSplash');
   const enterButton = document.getElementById('aurumEnterButton');
-
   if (!splash || !enterButton) return;
 
-  // CEK APAKAH PENGGUNA SUDAH PERNAH MASUK
   if (localStorage.getItem('aurumSplashSeen') === 'true') {
     splash.classList.add('hidden');
     splash.style.display = 'none';
@@ -6839,82 +6836,53 @@ console.log('STATUS SERVER DIPERIKSA');
 
   let startX = 0;
   let startY = 0;
+  const splashMusic = new Audio('/aurum-splash-music.mp3');
+  splashMusic.preload = 'auto';
+  splashMusic.loop = true;
+  splashMusic.volume = 0.55;
+  splashMusic.setAttribute('playsinline', '');
 
-  // Sampel klik dari efek suara pada video referensi TRAXA.
-  // Audio diputar langsung saat gesture swipe agar kompatibel dengan Android.
-  const swipeClickAudio = new Audio('data:audio/mpeg;base64,SU5DTFVERSU5H');
-  swipeClickAudio.preload = 'auto';
-  swipeClickAudio.volume = 0.9;
-  swipeClickAudio.setAttribute('playsinline', '');
-
-  function playSwipeClick() {
-    try {
-      swipeClickAudio.pause();
-      swipeClickAudio.currentTime = 0;
-      const playback = swipeClickAudio.play();
-      if (playback && typeof playback.catch === 'function') {
-        playback.catch(function () {
-          // Audio opsional; jangan menghambat proses masuk dashboard.
-        });
-      }
-    } catch (error) {
-      // Audio tidak boleh menghambat proses masuk dashboard.
+  function startSplashMusic() {
+    if (splashMusic.paused) {
+      const playback = splashMusic.play();
+      if (playback && typeof playback.catch === 'function') playback.catch(function () {});
     }
   }
 
-  function enterDashboard(fromSwipe) {
-    if (splash.classList.contains('hidden')) return;
-    if (fromSwipe) playSwipeClick();
-
-    // SIMPAN STATUS SUDAH MASUK
-    localStorage.setItem('aurumSplashSeen', 'true');
-
-    splash.classList.add('hidden');
-
-    setTimeout(function () {
-      splash.style.display = 'none';
-    }, 750);
+  function stopSplashMusic() {
+    splashMusic.pause();
+    splashMusic.currentTime = 0;
   }
 
-  enterButton.addEventListener('click', function () { enterDashboard(false); });
+  function enterDashboard() {
+    if (splash.classList.contains('hidden')) return;
+    stopSplashMusic();
+    localStorage.setItem('aurumSplashSeen', 'true');
+    splash.classList.add('hidden');
+    setTimeout(function () { splash.style.display = 'none'; }, 750);
+  }
 
-  // DETEKSI SENTUHAN HP ANDROID
+  enterButton.addEventListener('click', enterDashboard);
   splash.addEventListener('touchstart', function (event) {
-    unlockSwipeAudio();
+    startSplashMusic();
     const touch = event.changedTouches[0];
     startX = touch.clientX;
     startY = touch.clientY;
   }, { passive: true });
-
   splash.addEventListener('touchend', function (event) {
     const touch = event.changedTouches[0];
-    const moveX = touch.clientX - startX;
-    const moveY = Math.abs(touch.clientY - startY);
-
-    if (moveX > 70 && moveY < 100) {
-      enterDashboard(true);
-    }
+    if ((touch.clientX - startX) > 70 && Math.abs(touch.clientY - startY) < 100) enterDashboard();
   }, { passive: true });
-
-  // DETEKSI POINTER
   splash.addEventListener('pointerdown', function (event) {
-    unlockSwipeAudio();
+    startSplashMusic();
     startX = event.clientX;
     startY = event.clientY;
   });
-
   splash.addEventListener('pointerup', function (event) {
-    const moveX = event.clientX - startX;
-    const moveY = Math.abs(event.clientY - startY);
-
-    if (moveX > 70 && moveY < 100) {
-      enterDashboard(true);
-    }
+    if ((event.clientX - startX) > 70 && Math.abs(event.clientY - startY) < 100) enterDashboard();
   });
-
 })();
 </script>
-
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
   
 
