@@ -2686,6 +2686,28 @@ body {
 #marketPage #trendMeter .aurum-tf-card[style*="239, 83, 91"]{border-color:#f6d0d2}
 </style>
 
+<style id="aurum-traxa-meter-final">
+/* Seven-timeframe trend meter: TRAXA-inspired layout */
+#marketPage #trendMeter .aurum-trend-dashboard{padding:10px;border:1px solid #f0d9dc;border-radius:14px;background-color:#fff;background-image:linear-gradient(rgba(239,83,91,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(239,83,91,.045) 1px,transparent 1px);background-size:14px 14px}
+#marketPage #trendMeter .aurum-trend-hero{min-height:82px;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #e7eaf0;background:linear-gradient(110deg,#fff0f0 0%,#fff 50%,#edf7ff 100%)}
+#marketPage #trendMeter .aurum-trend-hero-copy strong{font-size:27px;letter-spacing:.3px}
+#marketPage #trendMeter .aurum-trend-price b{font-size:18px;color:#b18a35}
+#marketPage #trendMeter .aurum-trend-meter-box{margin-top:10px;padding:12px;border:1px solid #e6eaf0;border-radius:12px;background:rgba(250,251,253,.96)}
+#marketPage #trendMeter .aurum-trend-meter-label span:first-child{color:#ef535b}
+#marketPage #trendMeter .aurum-trend-meter-label span:last-child{color:#269bd2}
+#marketPage #trendMeter .aurum-trend-meter-label b{color:#344256}
+#marketPage #trendMeter .aurum-trend-segments{display:grid;grid-template-columns:repeat(21,minmax(0,1fr));gap:3px;margin:10px 0 8px}
+#marketPage #trendMeter .aurum-meter-segment{height:12px;border-radius:3px}
+#marketPage #trendMeter .aurum-trend-percentages span:first-child{color:#ef535b}
+#marketPage #trendMeter .aurum-trend-percentages span:last-child{color:#269bd2}
+#marketPage #trendMeter .aurum-tf-grid{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+#marketPage #trendMeter .aurum-tf-card{min-height:104px;padding:7px 3px 8px;border-radius:10px;background:linear-gradient(180deg,#fff,#f7faff)}
+#marketPage #trendMeter .aurum-tf-ring{width:36px;height:36px;border-width:3px;font-size:14px;box-shadow:0 2px 5px rgba(40,60,85,.08)}
+#marketPage #trendMeter .aurum-trend-table-head,#marketPage #trendMeter .aurum-trend-table-row{grid-template-columns:.55fr .95fr 1fr 1fr;padding:9px 3px;font-size:8px}
+#marketPage #trendMeter .aurum-table-support{color:#269bd2}
+#marketPage #trendMeter .aurum-table-resistance{color:#ef535b}
+@media(max-width:390px){#marketPage #trendMeter .aurum-tf-grid{gap:3px}#marketPage #trendMeter .aurum-tf-card{min-height:98px}#marketPage #trendMeter .aurum-tf-ring{width:30px;height:30px}}
+</style>
 </head>
   
   
@@ -4713,15 +4735,15 @@ const direction = signal =>
 
       const latestPrice = document.getElementById('goldPrice')?.textContent || '--';
 
+      const bullishBlocks = Math.round((bullish / total) * 21);
+      const bearishBlocks = Math.round((bearish / total) * 21);
+      const neutralBlocks = Math.max(0, 21 - bullishBlocks - bearishBlocks);
       const segments = Array.from({length:21}, (_, index) => {
-        const bullishBlocks = Math.round((bullish / total) * 21);
-        const bearishBlocks = Math.round((bearish / total) * 21);
-        const neutralBlocks = Math.max(0, 21 - bullishBlocks - bearishBlocks);
-        const color = index < bullishBlocks
-          ? '#269bd2'
-          : index < bullishBlocks + bearishBlocks
-            ? '#ef535b'
-            : '#e5e8ed';
+        const color = index < bearishBlocks
+          ? '#ef535b'
+          : index < bearishBlocks + neutralBlocks
+            ? '#e5e7eb'
+            : '#269bd2';
         return '<span class="aurum-meter-segment" style="background:' + color + '"></span>';
       }).join('');
 
@@ -4782,9 +4804,9 @@ const direction = signal =>
             </div>
             <div class="aurum-trend-segments">${segments}</div>
             <div class="aurum-trend-percentages">
-              <span>Bullish ${bullishPercent.toFixed(0)}%</span>
-              <span>Range ${neutralPercent.toFixed(0)}%</span>
               <span>Bearish ${bearishPercent.toFixed(0)}%</span>
+              <span>Range ${neutralPercent.toFixed(0)}%</span>
+              <span>Bullish ${bullishPercent.toFixed(0)}%</span>
             </div>
           </div>
 
