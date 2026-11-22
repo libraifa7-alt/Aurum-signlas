@@ -4232,7 +4232,8 @@ if (cached && Date.now() - cached.time < 60000) {
 const chartStatus = document.getElementById('chartFeedStatus');
 if (chartStatus) {
   const candleStamp = chartFeedMeta && chartFeedMeta.lastCandleAt;
-  const candleAge = candleStamp ? Date.now() - Date.parse(candleStamp) : Infinity;
+  const candleTimeMs = candleStamp ? Date.parse(candleStamp) : (candles && candles.length ? Number(candles[candles.length - 1].time) * 1000 : NaN);
+  const candleAge = Number.isFinite(candleTimeMs) ? Date.now() - candleTimeMs : Infinity;
   let state = 'TERTUNDA';
   if (symbol === 'XAU/USD') {
     const quoteAge = chartFeedMeta && chartFeedMeta.livePriceUpdatedAt
