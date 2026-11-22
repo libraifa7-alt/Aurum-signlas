@@ -3122,7 +3122,7 @@ body {
 
     <div class="home-market-grid">
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Gold</strong><small>XAU/USD · ●</small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Gold</strong><small>XAU/USD · ● <em id="homeStatusXAU">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceXAU">--</b>
         <small class="home-market-change" id="homeChangeXAU">Memuat data...</small>
         <small id="homeGoldUpdatedAt" class="home-market-updated" aria-live="polite">Waktu pembaruan: memeriksa...</small>
@@ -6747,7 +6747,7 @@ if ('serviceWorker' in navigator) {
   Promise.all(tickerAssets.slice(1).map(updateTicker));
   setInterval(function () {
     updateTicker(tickerAssets[0]);
-  }, 15000);
+  }, 60000);
   setInterval(function () {
     Promise.all(tickerAssets.slice(1).map(updateTicker));
   }, 60000);
