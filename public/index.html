@@ -6493,7 +6493,13 @@ if (marketBias === 'BUY' && mtfBias === 'BUY') {
 }
 
 const noSignalsPanel = document.getElementById('aurumNoSignals');
-if (noSignalsPanel) noSignalsPanel.style.display = finalSignal === 'WAIT' ? 'block' : 'none';
+if (noSignalsPanel) {
+  noSignalsPanel.style.display = finalSignal === 'WAIT' ? 'block' : 'none';
+  noSignalsPanel.textContent = finalSignal === 'WAIT'
+    ? 'Belum ada sinyal terkonfirmasi. Market Structure: ' + marketBias +
+      ' · Konfirmasi MTF: ' + mtfBias + '. ' + orderBlockMTF
+    : 'Sinyal ' + finalSignal + ' terkonfirmasi berdasarkan Market Structure dan MTF.';
+}
 const tradePlanPanel = document.getElementById('aurumTradePlan');
 if (tradePlanPanel && finalSignal === 'WAIT') tradePlanPanel.style.display = 'none';
 
