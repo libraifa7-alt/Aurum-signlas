@@ -204,11 +204,14 @@ module.exports = async function handler(req, res) {
       };
       const config = chartConfig[selected] || chartConfig.M15;
       const cachedGold = redisCached?.data || cached?.data || null;
-      const cachedGoldAge = redisCached?.time
-        ? Date.now() - Number(redisCached.time)
-        : cached?.time
-          ? Date.now() - Number(cached.time)
-          : Infinity;
+      // Gunakan waktu fetch provider, bukan waktu cache ditulis ulang.
+      // Fallback candle lama tidak boleh memperpanjang umur data.
+      const cachedGoldFetchedAt = cachedGold?.providerFetchedAt
+        ? Date.parse(cachedGold.providerFetchedAt)
+        : Number(redisCached?.time || cached?.time || NaN);
+      const cachedGoldAge = Number.isFinite(cachedGoldFetchedAt)
+        ? Date.now() - cachedGoldFetchedAt
+        : Infinity;
 
       let candleData = cachedGold &&
         Array.isArray(cachedGold.candles) &&
@@ -377,17 +380,8 @@ module.exports = async function handler(req, res) {
               candleError: chartError,
               cache: "stale_candle_fallback"
             };
-            try {
-              await aurumRedis([
-                "SET",
-                redisKey,
-                JSON.stringify({ time: Date.now(), data: candleData }),
-                "EX",
-                "604800"
-              ]);
-            } catch (cacheError) {
-              console.warn("XAUS STALE CHART CACHE WRITE:", cacheError.message);
-            }
+            // Jangan menulis ulang timestamp cache saat fallback.
+            // Waktu provider asli tetap dipakai agar candle stale tidak dianggap segar.
           }
         }
       }
