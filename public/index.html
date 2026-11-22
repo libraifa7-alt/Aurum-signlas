@@ -5114,11 +5114,24 @@ const direction = signal =>
       const netScore = bullish - bearish;
       const scoreLabel = (netScore > 0 ? '+' : '') + netScore + ' / ' + total;
 
-      const overall = bullish > bearish
+      // Ringkasan arah utama harus mencerminkan mayoritas timeframe,
+      // bukan sekadar selisih bullish vs bearish saat mayoritas masih RANGE.
+      const overall = bullish >= 4 && bullish > bearish
         ? 'BULLISH'
-        : bearish > bullish
+        : bearish >= 4 && bearish > bullish
           ? 'BEARISH'
-          : 'MIXED';
+          : (bullish > 0 && bearish > 0)
+            ? 'MIXED'
+            : 'RANGE';
+
+      window.aurumMultiTimeframeTrend = {
+        direction: overall,
+        bullish,
+        bearish,
+        range: rangeCount,
+        unknown: unknownCount,
+        total
+      };
       const overallColor = overall === 'BULLISH'
         ? '#269bd2'
         : overall === 'BEARISH'
@@ -6369,14 +6382,22 @@ const assetSymbol = document.getElementById('pair')?.value || 'XAU/USD';
 const assetMark = document.getElementById('marketAssetMark');
 if (assetMark) assetMark.textContent = assetSymbol === 'XAU/USD' ? 'Au' : assetSymbol === 'BTC/USD' ? '₿' : 'OIL';
 const headerTrend = document.getElementById('aurumHeaderTrend');
-const headerDirection = structure.includes('BULLISH') ? 'Bullish' :
-  structure.includes('BEARISH') ? 'Bearish' : 'Range';
+const mtfTrend = window.aurumMultiTimeframeTrend;
+const headerDirection = mtfTrend?.direction === 'BULLISH' ? 'Bullish' :
+  mtfTrend?.direction === 'BEARISH' ? 'Bearish' :
+  mtfTrend?.direction === 'MIXED' ? 'Mixed' : 'Range';
 if (headerTrend) {
   headerTrend.textContent = 'Trend ' + headerDirection;
+  headerTrend.title = mtfTrend
+    ? 'MTF: ' + mtfTrend.bullish + ' bullish, ' + mtfTrend.bearish +
+      ' bearish, ' + mtfTrend.range + ' range dari ' + mtfTrend.total + ' timeframe'
+    : 'Ringkasan multi-timeframe belum tersedia';
   headerTrend.style.color = headerDirection === 'Bullish' ? '#15976c' :
-    headerDirection === 'Bearish' ? '#e45c65' : '#687080';
+    headerDirection === 'Bearish' ? '#e45c65' :
+    headerDirection === 'Mixed' ? '#a17a22' : '#687080';
   headerTrend.style.background = headerDirection === 'Bullish' ? '#e7f7ef' :
-    headerDirection === 'Bearish' ? '#fff0f0' : '#f1f2f4';
+    headerDirection === 'Bearish' ? '#fff0f0' :
+    headerDirection === 'Mixed' ? '#fff7e6' : '#f1f2f4';
 }
 const miniChart = document.getElementById('aurumMiniChart');
 if (miniChart && candles.length > 1) {
