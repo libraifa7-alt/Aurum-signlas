@@ -3129,13 +3129,13 @@ body {
         <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Gold"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon bitcoin-icon">₿</span><span><strong>Bitcoin</strong><small>BTC/USD · ●</small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon bitcoin-icon">₿</span><span><strong>Bitcoin</strong><small>BTC/USD · ● <em id="homeStatusBTC">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceBTC">--</b>
         <small class="home-market-change" id="homeChangeBTC">Memuat data...</small>
         <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Bitcoin"><path id="homeSparkBTC" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Oil</strong><small>WTI · ●</small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Oil</strong><small>WTI · ● <em id="homeStatusWTI">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceWTI">--</b>
         <small class="home-market-change" id="homeChangeWTI">Memuat data...</small>
         <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Oil"><path id="homeSparkWTI" d="M0 21 L180 21"/></svg>
@@ -6742,7 +6742,7 @@ if ('serviceWorker' in navigator) {
     );
   }
 
-  // Gold is refreshed on the 15s API cache cadence; BTC and WTI stay at 60s.
+  // All instruments follow the 60s API cache cadence.
   updateTicker(tickerAssets[0]);
   Promise.all(tickerAssets.slice(1).map(updateTicker));
   setInterval(function () {
@@ -6809,9 +6809,9 @@ if ('serviceWorker' in navigator) {
   }
   updateClock();setInterval(updateClock,1000);
   const assets=[
-    {symbol:'XAU/USD',price:'homePriceXAU',change:'homeChangeXAU',path:'homeSparkXAU'},
-    {symbol:'BTC/USD',price:'homePriceBTC',change:'homeChangeBTC',path:'homeSparkBTC'},
-    {symbol:'WTI',price:'homePriceWTI',change:'homeChangeWTI',path:'homeSparkWTI'}
+    {symbol:'XAU/USD',price:'homePriceXAU',change:'homeChangeXAU',path:'homeSparkXAU',status:'homeStatusXAU'},
+    {symbol:'BTC/USD',price:'homePriceBTC',change:'homeChangeBTC',path:'homeSparkBTC',status:'homeStatusBTC'},
+    {symbol:'WTI',price:'homePriceWTI',change:'homeChangeWTI',path:'homeSparkWTI',status:'homeStatusWTI'}
   ];
   function formatGoldTime(value){
     const time=Date.parse(value||'');
@@ -6820,26 +6820,30 @@ if ('serviceWorker' in navigator) {
       timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
     })+' WIB';
   }
-  function setGoldFeedStatus(isLive, timestamp, isQuoteTime, candleAgeMs){
-    const session=$('aurumMarketSession');
-    if(session)session.textContent=isLive?'MARKET SESSION · LIVE DATA':'MARKET SESSION · DATA TERTUNDA';
-    const badge=$('homeLiveStatus');
-    if(badge){
-      badge.classList.toggle('delayed',!isLive);
-      badge.textContent=isLive?'Live':'Data tertunda';
-      const dot=document.createElement('i');
-      badge.prepend(dot);
-      badge.title=isLive?'Kuotasi Gold terbaru berhasil diterima':'Harga yang tampil bukan kuotasi Gold live yang baru terverifikasi';
+  function setAssetFeedStatus(asset, status, detail, timestamp){
+    const statusNode=$(asset.status);
+    if(statusNode){
+      statusNode.textContent=status;
+      statusNode.dataset.state=status==='LIVE'?'live':status==='TERTUNDA'?'delayed':'closed';
+      statusNode.title=detail||status;
     }
-    const updated=$('homeGoldUpdatedAt');
-    if(updated){
-      const formatted=formatGoldTime(timestamp);
-      const age=Number.isFinite(candleAgeMs)&&candleAgeMs>=0
-        ? Math.floor(candleAgeMs/60000) : null;
-      const ageLabel=age===null?'':' · umur candle '+age+' menit';
-      updated.textContent=formatted
-        ? (isQuoteTime?'Kuotasi terakhir: ':'Candle terakhir: ')+formatted+(!isQuoteTime?ageLabel:'')
-        : 'Waktu pembaruan belum tersedia';
+    if(asset.symbol==='XAU/USD'){
+      const session=$('aurumMarketSession');
+      if(session)session.textContent='MARKET SESSION · '+(status==='LIVE'?'LIVE DATA':status==='PASAR TUTUP'?'PASAR TUTUP':'DATA TERTUNDA');
+      const badge=$('homeLiveStatus');
+      if(badge){
+        const live=status==='LIVE';
+        badge.classList.toggle('delayed',!live);
+        badge.textContent=live?'Gold Live':status;
+        const dot=document.createElement('i');
+        badge.prepend(dot);
+        badge.title=detail||status;
+      }
+      const updated=$('homeGoldUpdatedAt');
+      if(updated){
+        const formatted=formatGoldTime(timestamp);
+        updated.textContent=formatted?'Pembaruan terakhir: '+formatted+' · '+(detail||status):'Waktu pembaruan belum tersedia';
+      }
     }
   }
   async function updateAsset(asset){
@@ -6847,16 +6851,30 @@ if ('serviceWorker' in navigator) {
       const response=await fetch('/api?interval=M1&symbol='+encodeURIComponent(asset.symbol),{cache:'no-store'});
       if(!response.ok)throw new Error('HTTP '+response.status);
       const data=await response.json(),candles=data.candles;
+      const lastCandleTime=data.lastCandleAt||(candles&&candles.length?candles[candles.length-1].datetime:null);
+      const candleTime=Date.parse(lastCandleTime||'');
+      const candleAgeMs=Number.isFinite(candleTime)?Date.now()-candleTime:Infinity;
+      const quoteTime=Date.parse(data.livePriceUpdatedAt||'');
+      const quoteAge=Number.isFinite(quoteTime)?Date.now()-quoteTime:Infinity;
+      let feedStatus='TERTUNDA';
+      let feedDetail='Timestamp data belum cukup untuk menyatakan live';
+      let feedTimestamp=lastCandleTime;
       if(asset.symbol==='XAU/USD'){
-        const quoteTime=Date.parse(data.livePriceUpdatedAt||'');
-        const quoteAge=Number.isFinite(quoteTime)?Date.now()-quoteTime:Infinity;
-        const isLive=data.livePriceStatus==='live_quote' && quoteAge>=0 && quoteAge<=120000;
-        const quoteTimestamp=Number.isFinite(quoteTime)?data.livePriceUpdatedAt:null;
-        const lastCandleTime=data.lastCandleAt||(candles&&candles.length?candles[candles.length-1].datetime:null);
-        const candleTime=Date.parse(lastCandleTime||'');
-        const candleAgeMs=Number.isFinite(candleTime)?Date.now()-candleTime:Infinity;
-        setGoldFeedStatus(isLive,quoteTimestamp||lastCandleTime,!!quoteTimestamp,candleAgeMs);
+        if(data.livePriceStatus==='live_quote' && quoteAge>=0 && quoteAge<=120000){
+          feedStatus='LIVE'; feedDetail='Kuotasi Twelve Data diterima '+Math.floor(quoteAge/1000)+' detik lalu'; feedTimestamp=data.livePriceUpdatedAt;
+        }else if(data.livePriceStatus==='quote_unavailable' || data.livePriceStatus==='stale_quote'){
+          feedStatus='TERTUNDA'; feedDetail=data.livePriceError||'Kuotasi Gold belum terverifikasi';
+        }
+      }else if(Number.isFinite(candleAgeMs) && candleAgeMs>=0 && candleAgeMs<=120000){
+        feedStatus='LIVE'; feedDetail='Candle terbaru berumur '+Math.floor(candleAgeMs/1000)+' detik';
+      }else if(asset.symbol==='WTI' && Number.isFinite(candleTime)){
+        const day=new Date().getUTCDay();
+        if(day===0 || day===6){feedStatus='PASAR TUTUP';feedDetail='Akhir pekan; menampilkan candle sesi terakhir';}
+        else{feedStatus='TERTUNDA';feedDetail='Candle terakhir berumur '+Math.floor(candleAgeMs/60000)+' menit';}
+      }else if(Number.isFinite(candleAgeMs)){
+        feedDetail='Candle terakhir berumur '+Math.floor(candleAgeMs/60000)+' menit';
       }
+      setAssetFeedStatus(asset,feedStatus,feedDetail,feedTimestamp);
       if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('Data belum tersedia');
       const latest=Number(data.livePrice ?? candles[candles.length-1].close),previous=Number(candles[candles.length-2].close);
       if(!Number.isFinite(latest)||!Number.isFinite(previous)||previous===0)throw new Error('Harga tidak valid');
@@ -6903,16 +6921,16 @@ if ('serviceWorker' in navigator) {
         area.style.opacity='0.9';
       }
     }catch(error){
-      if(asset.symbol==='XAU/USD')setGoldFeedStatus(false);
+      setAssetFeedStatus(asset,'TERTUNDA','Permintaan data gagal; periksa koneksi/API',null);
       if($(asset.price))$(asset.price).textContent='--';
       if($(asset.change))$(asset.change).textContent='Data tidak tersedia';
       console.warn('AURUM home market card:',asset.symbol,error);
     }
   }
-  // Refresh Gold every 15s; keep BTC and WTI at 60s.
+  // Refresh at the API cache cadence to avoid redundant requests.
   updateAsset(assets[0]);
   assets.slice(1).forEach(updateAsset);
-  setInterval(function(){updateAsset(assets[0]);},15000);
+  setInterval(function(){updateAsset(assets[0]);},60000);
   setInterval(function(){assets.slice(1).forEach(updateAsset);},60000);
 })();
 </script>
