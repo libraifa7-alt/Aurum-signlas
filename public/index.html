@@ -4247,11 +4247,15 @@ document.querySelector('.status').textContent =
 const cacheKey = symbol + ':' + interval;
 const cached = aurumCandleCache.get(cacheKey);
 
-const response = cached && Date.now() - cached.time < 60000
+// Gold harus meminta kuotasi terbaru dari backend; backend tetap memakai Redis
+// untuk menahan pemanggilan provider candle/spot agar tidak boros kuota.
+const useBrowserCache = symbol !== 'XAU/USD' && cached && Date.now() - cached.time < 60000;
+const response = useBrowserCache
   ? null
   : await fetch(
       '/api?interval=' + interval +
-      '&symbol=' + encodeURIComponent(symbol)
+      '&symbol=' + encodeURIComponent(symbol),
+      { cache: 'no-store' }
     );
 
 if (response) {
@@ -4262,8 +4266,7 @@ if (response) {
 let candles;
 let chartFeedMeta = null;
 
-if (cached && Date.now() - cached.time < 60000) {
-  // Cache candles do not prove a fresh live quote; never label cached Gold as LIVE.
+if (useBrowserCache) {
   candles = cached.data;
   chartFeedMeta = { fromCache: true };
 
@@ -7027,7 +7030,7 @@ if ('serviceWorker' in navigator) {
       let feedTimestamp=lastCandleTime;
       if(asset.symbol==='XAU/USD'){
         if(data.livePriceStatus==='live_quote' && quoteAge>=0 && quoteAge<=120000){
-          feedStatus='LIVE'; feedDetail='Kuotasi Twelve Data diterima '+Math.floor(quoteAge/1000)+' detik lalu'; feedTimestamp=data.livePriceUpdatedAt;
+          feedStatus='LIVE'; feedDetail='Kuotasi XAUS diterima '+Math.floor(quoteAge/1000)+' detik lalu'; feedTimestamp=data.livePriceUpdatedAt;
         }else if(data.livePriceStatus==='quote_unavailable' || data.livePriceStatus==='stale_quote'){
           feedStatus='TERTUNDA'; feedDetail=data.livePriceError||'Kuotasi Gold belum terverifikasi';
         }
