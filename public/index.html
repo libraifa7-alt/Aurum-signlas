@@ -2836,6 +2836,9 @@ body {
 @media(max-width:380px){#homePage .aurum-home-hero-v2{min-height:370px}.aurum-session-clock{width:214px;height:214px}.aurum-clock-face{width:202px;height:202px}.home-market-card{padding:8px 5px}.home-market-price{font-size:11px}}
 
 /* MATCH TRAXA MARKET CARDS: ICON, PRICE AND COLORED SPARKLINES */
+#homePage .home-market-spark .market-spark-area{stroke:none!important;stroke-width:0!important;opacity:1}
+#homePage .home-market-spark .market-spark-line{fill:none!important}
+
 #homePage .home-market-grid{gap:8px}
 #homePage .home-market-card{
   min-height:96px;
@@ -6778,7 +6781,18 @@ if ('serviceWorker' in navigator) {
           curve+=' C '+c1x.toFixed(1)+' '+c1y.toFixed(1)+', '+c2x.toFixed(1)+' '+c2y.toFixed(1)+', '+next.x.toFixed(1)+' '+next.y.toFixed(1);
         }
         path.setAttribute('d',curve);
-        path.style.stroke=asset.symbol==='XAU/USD'?'#e45b63':asset.symbol==='BTC/USD'?'#3298dc':'#329f91';
+        path.classList.add('market-spark-line');
+        const strokeColor=asset.symbol==='XAU/USD'?'#d96b75':asset.symbol==='BTC/USD'?'#3995c9':'#3995c9';
+        const fillColor=asset.symbol==='XAU/USD'?'rgba(226,112,124,.20)':'rgba(91,166,218,.22)';
+        path.style.stroke=strokeColor;
+        let area=path.parentElement.querySelector('.market-spark-area');
+        if(!area){
+          area=document.createElementNS('http://www.w3.org/2000/svg','path');
+          area.setAttribute('class','market-spark-area');
+          path.parentElement.insertBefore(area,path);
+        }
+        area.setAttribute('d',curve+' L 180 42 L 0 42 Z');
+        area.style.fill=fillColor;
       }
     }catch(error){
       if($(asset.price))$(asset.price).textContent='--';
