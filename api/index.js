@@ -79,7 +79,7 @@ module.exports = async function handler(req, res) {
           "1day": 1800000
         }[interval] || 180000);
 
-  if (!debugRaw && !debugQuote && cached && Date.now() - cached.time < cacheTTL) {
+  if (selectedSymbol !== "XAU/USD" && !debugRaw && !debugQuote && cached && Date.now() - cached.time < cacheTTL) {
     return res.status(200).json(cached.data);
   }
 
@@ -114,7 +114,7 @@ module.exports = async function handler(req, res) {
         data: redisCached.data
       });
 
-      if (!debugRaw && !debugQuote && Date.now() - redisCached.time < cacheTTL) {
+      if (selectedSymbol !== "XAU/USD" && !debugRaw && !debugQuote && Date.now() - redisCached.time < cacheTTL) {
         return res.status(200).json(redisCached.data);
       }
     }
@@ -123,7 +123,7 @@ module.exports = async function handler(req, res) {
     // GOLD LIVE QUOTE: XAUS (tanpa API key Twelve Data).
     // XAUS menyediakan spot indikatif dengan cache sekitar 60 detik.
     // Candle OHLC lama tidak pernah dipalsukan menjadi candle live.
-    if (selectedSymbol === "XAU/USD") {
+    if (selectedSymbol === "XAU/USD" && !debugRaw && !debugQuote) {
       const quoteKey = "aurum:quote:XAUUSD:xaus:v1";
       let savedQuote = null;
       try {
