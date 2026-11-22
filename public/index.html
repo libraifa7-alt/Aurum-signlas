@@ -3199,7 +3199,8 @@ body {
 #aurumMarketDirectory .aurum-directory-arrow{margin-left:2px;color:#4c9eaa;font-size:23px;font-weight:400;line-height:1}
 #aurumMarketDirectory .aurum-directory-running{padding:4px 9px;border-radius:20px;background:#e7f8fa;color:#3195a1;font-size:9px;font-weight:700;white-space:nowrap}
 #aurumMarketDirectory .aurum-directory-disclaimer{margin:13px 5px 0;color:#8b929e;font-size:9px;line-height:1.5;text-align:center}
-#marketPage>.aurum-asset-switch{display:none!important}
+#marketDirectoryPage{max-width:100%;}
+#marketPage>.aurum-asset-switch{display:flex!important;}
 @media(max-width:420px){#aurumMarketDirectory .aurum-market-row{min-height:68px;padding:9px 12px}}
 </style>
 </head>
@@ -3503,9 +3504,7 @@ body {
 <!-- END HALAMAN BERANDA -->
   
 
-  <!-- HALAMAN SINYAL -->
-  <section id="marketPage" class="app-page">
-    <section class="aurum-market-directory" id="aurumMarketDirectory" aria-label="Markets">
+<section id="marketDirectoryPage" class="app-page active">    <section class="aurum-market-directory" id="aurumMarketDirectory" aria-label="Markets">
       <h2>Markets</h2>
       <div class="aurum-market-list">
         <button type="button" class="aurum-market-row" data-asset="XAU/USD">
@@ -3527,6 +3526,10 @@ body {
       </div>
       <p class="aurum-directory-disclaimer">Sinyal dan analisis hanya untuk informasi dan bukan nasihat keuangan. Trading dengan risiko Anda sendiri.</p>
     </section>
+  </section>
+
+    <!-- HALAMAN SINYAL -->
+  <section id="marketPage" class="app-page">
     <div class="aurum-asset-switch" aria-label="Pilih instrumen pasar">
       <button type="button" class="active" data-asset="XAU/USD">🟡 Gold</button>
       <button type="button" data-asset="BTC/USD">₿ Bitcoin</button>
@@ -3619,15 +3622,18 @@ body {
   <!-- END HALAMAN SINYAL -->
 <script id="aurum-market-directory-actions">
 (function(){
+  function openInstrument(row){
+    var asset=row.getAttribute('data-asset');
+    var source=document.querySelector('#marketPage .aurum-asset-switch [data-asset="'+asset+'"]');
+    if(source) source.click();
+    document.querySelectorAll('.app-page').forEach(function(page){page.classList.toggle('active',page.id==='marketPage');});
+    document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(function(item){item.classList.toggle('active',item.dataset.page==='marketDirectoryPage');});
+    window.scrollTo({top:0,behavior:'auto'});
+    requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));});
+  }
   function bindAurumMarketDirectory(){
     document.querySelectorAll('#aurumMarketDirectory [data-asset]').forEach(function(row){
-      row.addEventListener('click',function(){
-        var asset=this.getAttribute('data-asset');
-        var source=document.querySelector('#marketPage .aurum-asset-switch [data-asset="'+asset+'"]');
-        if(source) source.click();
-        var detail=document.querySelector('#marketPage .aurum-signal-summary');
-        if(detail) detail.scrollIntoView({behavior:'smooth',block:'start'});
-      });
+      row.addEventListener('click',function(){openInstrument(this);});
     });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindAurumMarketDirectory);
@@ -3892,7 +3898,7 @@ body {
 
 <nav class="aurum-bottom-nav" aria-label="Navigasi Aurum">
   <a href="#homePage" class="nav-item active" data-page="homePage"><span>⌂</span><small>Beranda</small></a>
-  <a href="#marketPage" class="nav-item" data-page="marketPage"><span>ϟ</span><small>Sinyal</small></a>
+  <a href="#marketDirectoryPage" class="nav-item" data-page="marketDirectoryPage"><span>ϟ</span><small>Sinyal</small></a>
   <a href="#chartPage" class="nav-item" data-page="chartPage"><span>▥</span><small>Grafik</small></a>
   <a href="#newsPage" class="nav-item" data-page="newsPage"><span>▤</span><small>Berita</small></a>
   <a href="#chatPage" class="nav-item" data-page="chatPage"><span>◉</span><small>Obrolan</small></a>
