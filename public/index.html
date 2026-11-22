@@ -6912,7 +6912,9 @@ if ('serviceWorker' in navigator) {
     }catch(e){console.warn('AURUM setup live tick:',e);}
     finally{busy=false;}
   }
-  setInterval(refresh,60000);
+  // Refresh the market live panel on the same cadence as the 15s XAU API cache.
+  refresh();
+  setInterval(refresh,15000);
 })();
 </script>
 </body>
