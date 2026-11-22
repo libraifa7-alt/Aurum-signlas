@@ -3264,28 +3264,25 @@ body {
   <!-- AURUM LIVE MARKET TICKER -->
 <div class="aurum-live-ticker">
   <div class="ticker-track">
-
-    <div class="ticker-item">
+    <div class="ticker-live-mark"><i></i> LIVE</div>
+    <div class="ticker-item ticker-gold">
+      <span class="ticker-coin-logo" aria-label="Gold">Au</span>
       <strong>XAU</strong>
-      <span>GOLD</span>
       <b id="tickerXAU">Memuat...</b>
       <small id="changeXAU">--</small>
     </div>
-
-    <div class="ticker-item">
+    <div class="ticker-item ticker-bitcoin">
+      <span class="ticker-coin-logo" aria-label="Bitcoin">₿</span>
       <strong>BTC</strong>
-      <span>BITCOIN</span>
       <b id="tickerBTC">Memuat...</b>
       <small id="changeBTC">--</small>
     </div>
-
-    <div class="ticker-item">
+    <div class="ticker-item ticker-oil">
+      <span class="ticker-coin-logo" aria-label="WTI Oil">W</span>
       <strong>WTI</strong>
-      <span>OIL</span>
       <b id="tickerWTI">Memuat...</b>
       <small id="changeWTI">--</small>
     </div>
-
   </div>
 </div>
 <!-- END AURUM LIVE MARKET TICKER -->
@@ -7622,6 +7619,83 @@ header .status {
 }
 #homePage .aurum-home-hero-v2 {
   background: linear-gradient(180deg,#f1f2f6 0%,#f4f5f8 52%,#eef0f4 100%) !important;
+}
+</style>
+
+
+<style id="aurum-traxa-market-ticker-v2">
+/* TRAXA-like compact market ribbon with distinct asset marks */
+#homePage .aurum-live-ticker{
+  min-height:31px !important;
+  padding:5px 7px !important;
+  margin:0 0 8px !important;
+  background:#f1f2f6 !important;
+  border-top:1px solid #e5e7ed !important;
+  border-bottom:1px solid #e5e7ed !important;
+}
+#homePage .aurum-live-ticker .ticker-track{
+  align-items:center !important;
+  gap:15px !important;
+}
+#homePage .ticker-live-mark{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  flex:0 0 auto;
+  color:#159b72;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.35px;
+}
+#homePage .ticker-live-mark i{
+  width:5px;height:5px;border-radius:50%;
+  background:#19b987;
+  box-shadow:0 0 5px rgba(25,185,135,.55);
+  animation:aurumLivePulse 1.5s ease-in-out infinite;
+}
+#homePage .ticker-item{
+  display:flex !important;
+  align-items:center !important;
+  flex:0 0 auto !important;
+  gap:4px !important;
+  font-size:9px !important;
+}
+#homePage .ticker-coin-logo{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:14px;height:14px;
+  flex:0 0 14px;
+  border-radius:50%;
+  font-size:8px;
+  font-weight:900;
+  line-height:1;
+}
+#homePage .ticker-gold .ticker-coin-logo{
+  color:#805b13;background:linear-gradient(145deg,#fff0bd,#d5a43c);
+  border:1px solid #d9b65e;
+}
+#homePage .ticker-bitcoin .ticker-coin-logo{
+  color:#fff;background:linear-gradient(145deg,#ffbd62,#e98518);
+  border:1px solid #e99a3b;font-size:9px;
+}
+#homePage .ticker-oil .ticker-coin-logo{
+  color:#fff;background:linear-gradient(145deg,#69d8d1,#159b91);
+  border:1px solid #42bdb4;
+}
+#homePage .ticker-item strong{
+  color:#697181 !important;
+  font-size:8px !important;
+  font-weight:800 !important;
+}
+#homePage .ticker-item b{
+  color:#343b49 !important;
+  font-size:9px !important;
+  font-weight:700 !important;
+}
+#homePage .ticker-item small{
+  font-size:8px !important;
+  font-weight:700 !important;
 }
 </style>
 
