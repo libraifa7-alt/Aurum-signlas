@@ -4548,6 +4548,54 @@ const chartElement = document.getElementById('candleChart');
 async function loadChart(interval) {
     const requestId = window.aurumChartLoadSequence = (window.aurumChartLoadSequence || 0) + 1;
     const symbol = document.getElementById('pair').value;
+
+    // Jangan pernah mempertahankan visual/data instrumen sebelumnya saat pasangan berganti
+    // atau provider mengembalikan data kosong.
+    function clearSelectedInstrumentView(message) {
+      try { series.setData([]); } catch (_) {}
+      try { liveQuoteSeries.setData([]); } catch (_) {}
+      const priceNode = document.getElementById('goldPrice');
+      const timeNode = document.getElementById('goldTime');
+      if (priceNode) priceNode.textContent = '--';
+      if (timeNode) timeNode.textContent = message || (symbol + ' · Menunggu data provider');
+      const mini = document.getElementById('aurumMiniChart');
+      if (mini) mini.innerHTML = '<path d="M0 29 L420 29" fill="none" stroke="#d9dee7" stroke-width="1.5" stroke-dasharray="5 5"/>';
+      const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+      setText('aurumHeaderTrend', 'Trend belum tersedia');
+      setText('aurumRangeLow', 'L --');
+      setText('aurumRangeHigh', 'H --');
+      setText('aurumRangePips', '--');
+      setText('aurumNearestSupport', '--');
+      setText('aurumNearestResistance', '--');
+      setText('aurumSupportDistance', 'Level belum tersedia');
+      setText('aurumResistanceDistance', 'Level belum tersedia');
+      setText('marketStructure', 'Data candle ' + symbol + ' belum tersedia dari provider. Analisis ditunda.');
+      setText('setupTrend', 'WAIT');
+      setText('setupRange', '--');
+      setText('setupSupport', '--');
+      setText('setupResistance', '--');
+      setText('aurumNoSignals', 'Belum ada sinyal: data candle ' + symbol + ' belum tersedia. Menunggu data provider yang valid.');
+      const plan = document.getElementById('aurumTradePlan');
+      if (plan) plan.style.display = 'none';
+      const trendMeter = document.getElementById('trendMeter');
+      if (trendMeter) trendMeter.innerHTML = '<p>Analisis multi-timeframe menunggu data ' + symbol + ' yang valid.</p>';
+      const dailyRange = document.getElementById('aurumDailyRange');
+      if (dailyRange) dailyRange.innerHTML = '<p>Rentang harian ' + symbol + ' belum tersedia.</p>';
+      const status = document.getElementById('chartFeedStatus');
+      if (status) {
+        status.textContent = '● DATA BELUM TERSEDIA';
+        status.classList.remove('is-live','is-closed');
+        status.classList.add('is-delayed');
+        status.title = 'Provider belum mengirim candle untuk instrumen ini; tidak memakai data instrumen lain.';
+      }
+      window.aurumMultiTimeframeTrend = null;
+      try { chart.timeScale().fitContent(); } catch (_) {}
+    }
+
+    if (window.aurumDisplayedSignalSymbol !== symbol) {
+      clearSelectedInstrumentView(symbol + ' · Memuat data instrumen…');
+      window.aurumDisplayedSignalSymbol = symbol;
+    }
     try {
       document.querySelector('.status').textContent =
         'LOADCHART BERJALAN: ' + interval;
@@ -4608,10 +4656,8 @@ if (useBrowserCache) {
 
   if (data.status !== 'success' || !data.candles?.length) {
     console.log('Data grafik belum tersedia untuk', symbol, data);
-    const priceNode = document.getElementById('goldPrice');
-    const timeNode = document.getElementById('goldTime');
-    if (priceNode) priceNode.textContent = '--';
-    if (timeNode) timeNode.textContent = symbol + ' · Data belum tersedia dari provider';
+    clearSelectedInstrumentView(symbol + ' · Data belum tersedia dari provider');
+    document.querySelector('.status').textContent = 'DATA ' + symbol + ' BELUM TERSEDIA';
     return;
   }
 
