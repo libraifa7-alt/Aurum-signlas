@@ -2848,7 +2848,7 @@ body {
   font-weight:800;
   text-shadow:0 1px 1px rgba(255,255,255,.65);
   box-shadow:0 0 0 3px rgba(255,255,255,.8),0 0 11px currentColor,inset 0 2px 5px rgba(255,255,255,.88),inset 0 -5px 9px rgba(38,45,67,.10);
-  animation:aurumIconBreath 3.6s ease-in-out infinite;
+  animation:aurumIconFloat 3.2s ease-in-out infinite;
 }
 #homePage .aurum-glow-icon:before{
   content:"";
@@ -2856,9 +2856,10 @@ body {
   inset:-5px;
   border-radius:50%;
   border:1px dashed currentColor;
-  opacity:.38;
+  opacity:.48;
   transform:rotate(-18deg);
   z-index:-1;
+  animation:aurumIconOrbit 8s linear infinite;
 }
 #homePage .aurum-glow-icon:after{
   content:"";
@@ -2868,9 +2869,10 @@ body {
   border:2px solid transparent;
   border-top-color:currentColor;
   border-bottom-color:currentColor;
-  opacity:.58;
+  opacity:.68;
   transform:rotate(34deg);
   z-index:-1;
+  animation:aurumIconOrbitReverse 5.5s linear infinite;
 }
 #homePage .home-menu-icon.aurum-glow-icon{width:43px;height:43px;font-size:20px}
 #homePage .community-icon.aurum-glow-icon{width:57px;height:57px;font-size:24px}
@@ -2883,11 +2885,22 @@ body {
 #homePage .aurum-glow-icon.amber{color:#b88b2b;background:radial-gradient(circle at 35% 28%,#fff 0%,#fff4c9 24%,#f4d77d 68%,#d4a83d 100%)}
 #homePage .aurum-glow-icon.green-icon{color:#459d35;background:radial-gradient(circle at 35% 28%,#fff 0%,#e1ffd2 24%,#9bdd72 68%,#69b946 100%)}
 #homePage .aurum-glow-icon.slate{color:#66758a;background:radial-gradient(circle at 35% 28%,#fff 0%,#e7edf5 24%,#aab7c9 68%,#7d899b 100%)}
-@keyframes aurumIconBreath{
-  0%,100%{filter:saturate(1);transform:translateY(0)}
-  50%{filter:saturate(1.12);transform:translateY(-1px)}
+@keyframes aurumIconFloat{
+  0%,100%{filter:saturate(1);transform:translateY(0) scale(1)}
+  50%{filter:saturate(1.22) brightness(1.04);transform:translateY(-3px) scale(1.035)}
 }
-@media(prefers-reduced-motion:reduce){#homePage .aurum-glow-icon{animation:none}}
+@keyframes aurumIconOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes aurumIconOrbitReverse{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
+#homePage .home-menu-grid .home-menu-card:nth-child(2) .aurum-glow-icon{animation-delay:.25s}
+#homePage .home-menu-grid .home-menu-card:nth-child(3) .aurum-glow-icon{animation-delay:.5s}
+#homePage .home-menu-grid .home-menu-card:nth-child(4) .aurum-glow-icon{animation-delay:.75s}
+#homePage .home-community-grid a:nth-child(2) .aurum-glow-icon{animation-delay:.3s}
+#homePage .home-community-grid a:nth-child(3) .aurum-glow-icon{animation-delay:.6s}
+#homePage .home-tools-grid .home-menu-card:nth-child(2) .aurum-glow-icon{animation-delay:.3s}
+#homePage .home-tools-grid .home-menu-card:nth-child(3) .aurum-glow-icon{animation-delay:.6s}
+@media(prefers-reduced-motion:reduce){
+  #homePage .aurum-glow-icon,#homePage .aurum-glow-icon:before,#homePage .aurum-glow-icon:after{animation:none}
+}
 </style>
 
 </head>
