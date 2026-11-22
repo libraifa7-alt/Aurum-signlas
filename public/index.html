@@ -7397,6 +7397,19 @@ console.log('STATUS SERVER DIPERIKSA');
       statusNode.dataset.state=status==='LIVE'?'live':status==='TERTUNDA'?'delayed':'closed';
       statusNode.title=detail||status;
     }
+    // Header instrumen aktif harus menunjukkan kesegaran feed, bukan label hijau statis.
+    const activeAsset=document.querySelector('.aurum-asset-switch button.active')?.dataset.asset
+      || document.getElementById('pair')?.value;
+    if(asset.symbol===activeAsset){
+      const marketState=document.querySelector('.aurum-market-state');
+      if(marketState){
+        const labels={LIVE:'● DATA LIVE',TERTUNDA:'● DATA TERTUNDA','PASAR TUTUP':'● PASAR TUTUP'};
+        marketState.textContent=labels[status]||'● DATA BELUM TERVERIFIKASI';
+        marketState.dataset.state=status==='LIVE'?'live':status==='TERTUNDA'?'delayed':'closed';
+        marketState.title=detail||status;
+        marketState.style.color=status==='LIVE'?'#1ca77d':status==='TERTUNDA'?'#b7791f':'#8b9099';
+      }
+    }
     if(asset.symbol==='XAU/USD'){
       const session=$('aurumMarketSession');
       if(session)session.textContent='MARKET SESSION · '+(status==='LIVE'?'LIVE DATA':status==='PASAR TUTUP'?'PASAR TUTUP':'DATA TERTUNDA');
