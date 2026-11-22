@@ -4299,13 +4299,30 @@ if (chartStatus) {
   const candleTimeMs = candleStamp ? Date.parse(candleStamp) : (candles && candles.length ? Number(candles[candles.length - 1].time) * 1000 : NaN);
   const candleAge = Number.isFinite(candleTimeMs) ? Date.now() - candleTimeMs : Infinity;
   let state = 'TERTUNDA';
+  const intervalFreshnessMs = ({
+    M1: 180000,
+    M5: 600000,
+    M15: 1800000,
+    M30: 3600000,
+    M45: 5400000,
+    H1: 7200000,
+    H4: 28800000,
+    D1: 172800000
+  }[interval] || 1800000);
   if (symbol === 'XAU/USD') {
     const quoteAge = chartFeedMeta && chartFeedMeta.livePriceUpdatedAt
       ? Date.now() - Date.parse(chartFeedMeta.livePriceUpdatedAt) : Infinity;
-    if (!chartFeedMeta?.fromCache && chartFeedMeta?.livePriceStatus === 'live_quote' && quoteAge >= 0 && quoteAge <= 120000) {
+    const quoteIsFresh = !chartFeedMeta?.fromCache &&
+      chartFeedMeta?.livePriceStatus === 'live_quote' &&
+      quoteAge >= 0 && quoteAge <= 120000;
+    const candleIsFresh = candleAge >= 0 && candleAge <= intervalFreshnessMs;
+    if (quoteIsFresh && candleIsFresh) {
       state = 'LIVE DATA';
+    } else if (chartFeedMeta?.marketStatus === 'closed' ||
+      (new Date().getUTCDay() === 0 || new Date().getUTCDay() === 6)) {
+      state = 'PASAR TUTUP';
     }
-  } else if (candleAge >= 0 && candleAge <= 120000) {
+  } else if (candleAge >= 0 && candleAge <= intervalFreshnessMs) {
     state = 'LIVE DATA';
   } else if (symbol === 'WTI' && (new Date().getUTCDay() === 0 || new Date().getUTCDay() === 6)) {
     state = 'PASAR TUTUP';
