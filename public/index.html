@@ -4591,7 +4591,7 @@ if (useBrowserCache) {
   // AMBIL DATA DARI API
   const data = await response.json();
   if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
-  if (data.symbol && data.symbol !== symbol) throw new Error('Simbol API tidak cocok: diminta ' + symbol + ', diterima ' + data.symbol);
+  if (data.status === 'success' && data.symbol !== symbol) throw new Error('Simbol API tidak cocok: diminta ' + symbol + ', diterima ' + (data.symbol || 'kosong'));
   chartFeedMeta = {
     fromCache: false,
     livePrice: data.livePrice,
@@ -7360,6 +7360,7 @@ console.log('STATUS SERVER DIPERIKSA');
       const response=await fetch('/api?interval=M1&symbol='+encodeURIComponent(asset.symbol),{cache:'no-store'});
       if(!response.ok)throw new Error('HTTP '+response.status);
       const data=await response.json(),candles=data.candles;
+      if(data.status==='success' && data.symbol!==asset.symbol) throw new Error('Simbol API tidak cocok: '+asset.symbol);
       const lastCandleTime=data.lastCandleAt||(candles&&candles.length?candles[candles.length-1].datetime:null);
       const candleTime=Date.parse(lastCandleTime||'');
       const candleAgeMs=Number.isFinite(candleTime)?Date.now()-candleTime:Infinity;
