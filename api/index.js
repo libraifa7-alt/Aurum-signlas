@@ -444,11 +444,15 @@ async function respondWithStaleCache() {
     fallback.livePriceStatus = quote.status;
     fallback.livePriceError = quote.error;
     if (quote.price !== null) {
-      const last = fallback.candles?.[fallback.candles.length - 1];
-      if (last) {
-        last.close = quote.price;
-        last.high = Math.max(Number(last.high), quote.price);
-        last.low = Math.min(Number(last.low), quote.price);
+      // Only M1 may absorb the quote into its forming candle.
+      // Higher timeframes preserve historical OHLC and expose a separate live quote.
+      if (interval === "1min") {
+        const last = fallback.candles?.[fallback.candles.length - 1];
+        if (last) {
+          last.close = quote.price;
+          last.high = Math.max(Number(last.high), quote.price);
+          last.low = Math.min(Number(last.low), quote.price);
+        }
       }
       fallback.cache = "stale_candles_" + quote.cache;
     }
