@@ -2997,6 +2997,12 @@ body {
 @media(max-height:700px){.splash-content{padding-top:62px}.aurum-orb.aurum-network-globe{width:190px;height:190px;margin-top:4px}.splash-stats{margin-bottom:12px}.splash-footer{margin-top:16px}}
 @media(min-width:700px){.splash-content{max-width:560px}.aurum-orb.aurum-network-globe{width:300px;height:300px}}
 @media(prefers-reduced-motion:reduce){.network-globe-svg,.globe-link,.globe-dots circle,.swipe-handle{animation:none!important}}
+
+/* Center the AURUM identity block like the TRAXA reference */
+#aurumSplash .splash-content{position:relative}
+#aurumSplash .splash-brand-block{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:calc(100% - 36px);margin:0;text-align:center;z-index:6}
+#aurumSplash .splash-bottom-block{margin-top:auto}
+@media(max-height:700px){#aurumSplash .splash-brand-block{top:49%}}
 </style>
 </head>
   
