@@ -217,7 +217,26 @@ module.exports = async function handler(req, res) {
         : null;
 
       let chartError = null;
+      const chartErrorKey = "aurum:provider-error:xaus-chart:" + selected + ":v1";
+      let chartCoolingDown = false;
       if (!candleData) {
+        try {
+          const rawChartError = await aurumRedis(["GET", chartErrorKey]);
+          if (rawChartError) {
+            const savedChartError = JSON.parse(rawChartError);
+            const errorAge = savedChartError?.receivedAt
+              ? Date.now() - Date.parse(savedChartError.receivedAt)
+              : Infinity;
+            if (errorAge >= 0 && errorAge < 30000) {
+              chartError = savedChartError.message || "XAUS Chart sedang jeda setelah kegagalan";
+              chartCoolingDown = true;
+            }
+          }
+        } catch (error) {
+          console.warn("XAUS CHART COOLDOWN READ:", error.message);
+        }
+      }
+      if (!candleData && !chartCoolingDown) {
         try {
           const chartUrl = new URL("https://xaus.com/api/v1/chart");
           chartUrl.searchParams.set("symbol", "xau");
@@ -323,6 +342,11 @@ module.exports = async function handler(req, res) {
 
           globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: candleData });
           try {
+            await aurumRedis(["DEL", chartErrorKey]);
+          } catch (error) {
+            console.warn("XAUS CHART COOLDOWN CLEAR:", error.message);
+          }
+          try {
             await aurumRedis([
               "SET",
               redisKey,
@@ -335,6 +359,17 @@ module.exports = async function handler(req, res) {
           }
         } catch (error) {
           chartError = String(error.message || "XAUS Chart tidak dapat dihubungi").slice(0, 180);
+          try {
+            await aurumRedis([
+              "SET",
+              chartErrorKey,
+              JSON.stringify({ message: chartError, receivedAt: new Date().toISOString() }),
+              "EX",
+              "30"
+            ]);
+          } catch (cacheError) {
+            console.warn("XAUS CHART COOLDOWN WRITE:", cacheError.message);
+          }
           if (cachedGold && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
             candleData = {
               ...cachedGold,
@@ -342,6 +377,17 @@ module.exports = async function handler(req, res) {
               candleError: chartError,
               cache: "stale_candle_fallback"
             };
+            try {
+              await aurumRedis([
+                "SET",
+                redisKey,
+                JSON.stringify({ time: Date.now(), data: candleData }),
+                "EX",
+                "604800"
+              ]);
+            } catch (cacheError) {
+              console.warn("XAUS STALE CHART CACHE WRITE:", cacheError.message);
+            }
           }
         }
       }
