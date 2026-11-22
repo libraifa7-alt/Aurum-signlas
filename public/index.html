@@ -6882,6 +6882,16 @@ console.log('STATUS SERVER DIPERIKSA');
     setTimeout(function () { splash.style.display = 'none'; }, 750);
   }
 
+  // Try to start music as soon as the splash opens. Browsers may block
+  // audible autoplay until the visitor interacts with the page.
+  splashMusic.play().then(function () {
+    updateMusicButton(true);
+  }).catch(function (error) {
+    updateMusicButton(false);
+    musicButton.textContent = '♫ SENTUH UNTUK NYALAKAN MUSIK';
+    console.info('AURUM autoplay was blocked by the browser; tap the music control:', error);
+  });
+
   musicButton.addEventListener('click', toggleSplashMusic);
   enterButton.addEventListener('click', enterDashboard);
   splash.addEventListener('touchstart', function (event) {
