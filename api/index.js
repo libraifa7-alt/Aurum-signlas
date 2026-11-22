@@ -59,15 +59,24 @@ module.exports = async function handler(req, res) {
   const debugQuote = req.query.debug === "quote" && selectedSymbol === "XAU/USD";
 
   // Versioned provider cache prevents old MarketAPI candles being reused.
-  const cacheSource = selectedSymbol === "WTI" ? "yahoo" : "twelvedata";
-  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + ":v2";
+  const cacheSource = selectedSymbol === "WTI" ? "yahoo" : selectedSymbol === "XAU/USD" ? "xaus-chart" : "twelvedata";
+  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + (selectedSymbol === "XAU/USD" ? ":v3" : ":v2");
   const cached = globalThis.aurumCache.get(cacheKey);
 
   // AURUM SMART API CACHE OPTIMIZATION
   const cacheTTL = selectedSymbol === "WTI"
     ? 60000
-    : selectedSymbol === "XAU/USD" && interval === "1min"
-      ? 60000
+    : selectedSymbol === "XAU/USD"
+      ? ({
+          "1min": 60000,
+          "5min": 60000,
+          "15min": 60000,
+          "30min": 120000,
+          "45min": 120000,
+          "1h": 180000,
+          "4h": 300000,
+          "1day": 900000
+        }[interval] || 60000)
       : ({
           "1min": 60000,
           "5min": 120000,
@@ -120,9 +129,8 @@ module.exports = async function handler(req, res) {
     }
 
 
-    // GOLD LIVE QUOTE: XAUS (tanpa API key Twelve Data).
-    // XAUS menyediakan spot indikatif dengan cache sekitar 60 detik.
-    // Candle OHLC lama tidak pernah dipalsukan menjadi candle live.
+    // GOLD DATA: XAUS spot quote + XAUS OHLCV chart (tanpa API key Twelve Data).
+    // Candle hanya berasal dari endpoint OHLCV; harga spot tidak disisipkan ke candle historis.
     if (selectedSymbol === "XAU/USD" && !debugRaw && !debugQuote) {
       const quoteKey = "aurum:quote:XAUUSD:xaus:v1";
       let savedQuote = null;
@@ -150,10 +158,11 @@ module.exports = async function handler(req, res) {
           });
           const xausData = await xausResponse.json();
           const price = Number(xausData.spot_usd_oz);
-          const asOf = xausData.price_as_of || xausData.updated_at || null;
+          const asOf = xausData.price_as_of || xausData.updated_at || xausData.data_state?.as_of || null;
           const asOfAge = asOf ? Date.now() - Date.parse(asOf) : Infinity;
           const isFresh = xausResponse.ok && Number.isFinite(price) && price > 0 &&
-            asOfAge >= -60000 && asOfAge <= 180000 && xausData.stale !== true;
+            asOfAge >= -60000 && asOfAge <= 180000 &&
+            xausData.stale !== true && xausData.data_state?.status !== "stale";
 
           if (isFresh) {
             quote = {
@@ -183,51 +192,201 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      const candleData = redisCached?.data || cached?.data || null;
+      const chartConfig = {
+        M1: { interval: "1m", range: "1d" },
+        M5: { interval: "5m", range: "5d" },
+        M15: { interval: "15m", range: "5d" },
+        M30: { interval: "30m", range: "1mo" },
+        M45: { interval: "15m", range: "5d", aggregateSeconds: 2700, sourceSeconds: 900, groupSize: 3 },
+        H1: { interval: "60m", range: "3mo" },
+        H4: { interval: "60m", range: "3mo", aggregateSeconds: 14400, sourceSeconds: 3600, groupSize: 4 },
+        D1: { interval: "1d", range: "2y" }
+      };
+      const config = chartConfig[selected] || chartConfig.M15;
+      const cachedGold = redisCached?.data || cached?.data || null;
+      const cachedGoldAge = redisCached?.time
+        ? Date.now() - Number(redisCached.time)
+        : cached?.time
+          ? Date.now() - Number(cached.time)
+          : Infinity;
+
+      let candleData = cachedGold &&
+        Array.isArray(cachedGold.candles) &&
+        cachedGoldAge >= 0 && cachedGoldAge < cacheTTL
+        ? cachedGold
+        : null;
+
+      let chartError = null;
       if (!candleData) {
+        try {
+          const chartUrl = new URL("https://xaus.com/api/v1/chart");
+          chartUrl.searchParams.set("symbol", "xau");
+          chartUrl.searchParams.set("range", config.range);
+          chartUrl.searchParams.set("interval", config.interval);
+
+          const chartResponse = await fetch(chartUrl, {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(12000)
+          });
+          const chartPayload = await chartResponse.json();
+
+          if (!chartResponse.ok) {
+            throw new Error(chartPayload?.error || "XAUS Chart HTTP " + chartResponse.status);
+          }
+
+          const rawPoints = Array.isArray(chartPayload.points)
+            ? chartPayload.points
+            : Array.isArray(chartPayload.data)
+              ? chartPayload.data
+              : Array.isArray(chartPayload.candles)
+                ? chartPayload.candles
+                : [];
+
+          let candles = rawPoints.map(point => {
+            let timestamp = Number(point.t ?? point.timestamp ?? point.time);
+            if (!Number.isFinite(timestamp) && typeof point.t === "string") {
+              timestamp = Date.parse(point.t) / 1000;
+            }
+            if (timestamp > 1000000000000) timestamp = timestamp / 1000;
+
+            const open = Number(point.o ?? point.open);
+            const high = Number(point.h ?? point.high);
+            const low = Number(point.l ?? point.low);
+            const close = Number(point.c ?? point.close);
+            const volume = Number(point.v ?? point.volume ?? 0);
+
+            if (!Number.isFinite(timestamp) || timestamp <= 0 ||
+                !Number.isFinite(open) || !Number.isFinite(high) ||
+                !Number.isFinite(low) || !Number.isFinite(close) ||
+                open <= 0 || high <= 0 || low <= 0 || close <= 0 ||
+                high < Math.max(open, close, low) ||
+                low > Math.min(open, close, high)) return null;
+
+            return {
+              timestamp: Math.floor(timestamp),
+              datetime: new Date(timestamp * 1000).toISOString(),
+              open, high, low, close,
+              volume: Number.isFinite(volume) ? volume : 0
+            };
+          }).filter(Boolean).sort((a, b) => a.timestamp - b.timestamp);
+
+          if (config.aggregateSeconds) {
+            const buckets = new Map();
+            for (const candle of candles) {
+              const bucket = Math.floor(candle.timestamp / config.aggregateSeconds) * config.aggregateSeconds;
+              if (!buckets.has(bucket)) buckets.set(bucket, []);
+              buckets.get(bucket).push(candle);
+            }
+
+            candles = Array.from(buckets.entries())
+              .filter(([, group]) => group.length === config.groupSize)
+              .map(([bucket, group]) => {
+                group.sort((a, b) => a.timestamp - b.timestamp);
+                return {
+                  timestamp: bucket,
+                  datetime: new Date(bucket * 1000).toISOString(),
+                  open: group[0].open,
+                  high: Math.max(...group.map(item => item.high)),
+                  low: Math.min(...group.map(item => item.low)),
+                  close: group[group.length - 1].close,
+                  volume: group.reduce((sum, item) => sum + item.volume, 0)
+                };
+              });
+          }
+
+          const targetBars = selected === "M45" ? 300 : 500;
+          candles = candles.slice(-targetBars);
+
+          if (!candles.length) {
+            throw new Error("XAUS Chart tidak mengirim candle OHLC yang valid");
+          }
+
+          const lastCandleAt = candles[candles.length - 1].datetime;
+          const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
+          const freshnessLimit = ({
+            M1: 300, M5: 900, M15: 2700, M30: 5400,
+            M45: 8100, H1: 10800, H4: 43200, D1: 259200
+          }[selected] || 2700);
+
+          candleData = {
+            status: "success",
+            symbol: selectedSymbol,
+            interval: selected,
+            source: "XAUS Chart API (OHLCV)",
+            candleSource: "XAUS Chart API",
+            providerFetchedAt: new Date().toISOString(),
+            lastCandleAt,
+            candleAgeSeconds,
+            candleStatus: candleAgeSeconds <= freshnessLimit ? "fresh_candles" : "stale_candles",
+            candles
+          };
+
+          globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: candleData });
+          try {
+            await aurumRedis([
+              "SET",
+              redisKey,
+              JSON.stringify({ time: Date.now(), data: candleData }),
+              "EX",
+              "604800"
+            ]);
+          } catch (error) {
+            console.warn("XAUS CHART CACHE WRITE:", error.message);
+          }
+        } catch (error) {
+          chartError = String(error.message || "XAUS Chart tidak dapat dihubungi").slice(0, 180);
+          if (cachedGold && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
+            candleData = {
+              ...cachedGold,
+              candleStatus: "stale_candles",
+              candleError: chartError,
+              cache: "stale_candle_fallback"
+            };
+          }
+        }
+      }
+
+      if (!candleData || !Array.isArray(candleData.candles) || !candleData.candles.length) {
         return res.status(503).json({
           status: "provider_error",
           symbol: selectedSymbol,
           interval: selected,
-          source: "XAUS spot API",
+          source: "XAUS spot + XAUS Chart API",
           livePrice: quote?.price ?? null,
           livePriceUpdatedAt: quote?.receivedAt ?? null,
           livePriceSource: quote?.source || "XAUS spot API",
           livePriceStatus: quote?.status || "quote_unavailable",
-          livePriceError: quote?.error || "Candle historis belum tersedia di cache",
+          livePriceError: quote?.error || null,
+          candleStatus: "unavailable",
+          candleError: chartError || "Candle OHLC belum tersedia dari provider",
           candles: [],
-          message: "Harga spot diperiksa terpisah; candle OHLC belum tersedia. Tidak ada candle buatan."
+          message: "Tidak ada candle valid yang dapat ditampilkan. AURUM tidak membuat candle palsu."
         });
       }
 
-      const goldOutput = {
+      const lastCandleAt = candleData.lastCandleAt || candleData.candles[candleData.candles.length - 1].datetime;
+      const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
+      const output = {
         ...candleData,
         status: "success",
         symbol: selectedSymbol,
         interval: selected,
-        source: "Cached OHLC + XAUS spot",
-        providerFetchedAt: quote?.fetchedAt || new Date().toISOString(),
+        source: candleData.source || "XAUS Chart API (OHLCV)",
+        providerFetchedAt: candleData.providerFetchedAt || null,
+        lastCandleAt,
+        candleAgeSeconds,
+        candleStatus: candleData.candleStatus || "stale_candles",
         livePrice: quote?.price ?? null,
         livePriceUpdatedAt: quote?.receivedAt ?? null,
         livePriceSource: quote?.source || "XAUS spot API",
         livePriceStatus: quote?.status || "quote_unavailable",
         livePriceError: quote?.error || null,
-        cache: quote?.status === "live_quote" ? "cached_candles_xaus_quote" : "stale_candles"
+        cache: candleData.cache || (candleData === cachedGold ? "cached_ohlcv" : "xaus_chart_ohlcv"),
+        candleError: candleData.candleError || chartError || null
       };
 
-      // Hanya M1 yang boleh memperbarui close candle berjalan; OHLC historis
-      // tidak diubah untuk timeframe lain. Harga spot tetap ditampilkan terpisah.
-      if (goldOutput.livePriceStatus === "live_quote" && interval === "1min") {
-        const last = goldOutput.candles?.[goldOutput.candles.length - 1];
-        if (last) {
-          last.close = Number(goldOutput.livePrice);
-          last.high = Math.max(Number(last.high), Number(goldOutput.livePrice));
-          last.low = Math.min(Number(last.low), Number(goldOutput.livePrice));
-        }
-      }
-
-      globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: goldOutput });
-      return res.status(200).json(goldOutput);
+      globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: output });
+      return res.status(200).json(output);
     }
 
     // Cooldown global: satu kegagalan kuota Twelve Data menahan
