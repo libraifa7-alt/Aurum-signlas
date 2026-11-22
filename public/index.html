@@ -2988,8 +2988,6 @@ body {
 .swipe-copy{font-size:8px;letter-spacing:3px;color:#a99a7c}
 .swipe-handle{position:absolute;left:4px;top:4px;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff0b8,#e0b64e 65%,#986b1d);color:#211604;font-size:22px;box-shadow:0 0 0 4px rgba(230,188,91,.12),0 0 18px rgba(226,181,75,.4);animation:swipeNudge 1.7s ease-in-out infinite}
 .splash-hint{font-size:9px;color:#89838a;margin:12px 0 0}
-#aurumMusicButton{margin-top:14px;padding:10px 20px;min-width:142px;border:1px solid rgba(214,162,59,.75);border-radius:25px;background:rgba(18,15,10,.88);color:#edc86e;font-size:9px;font-weight:700;letter-spacing:1.2px}
-#aurumMusicButton[aria-pressed="true"]{background:linear-gradient(135deg,rgba(229,189,104,.22),rgba(141,100,30,.2));box-shadow:0 0 14px rgba(226,181,75,.22)}
 #aurumEnterButton{margin-top:12px;padding:12px 24px;font-size:9px;letter-spacing:1.5px;min-width:142px}
 .splash-footer{margin:clamp(24px,5vh,48px) 0 0;font-size:7px;letter-spacing:2.5px;color:#786744}
 @keyframes globeTurn{to{transform:rotate(360deg)}}
@@ -3065,7 +3063,6 @@ body {
         <span class="swipe-handle">➜</span><span class="swipe-copy">SWIPE TO ENTER</span>
       </div>
       <p class="splash-hint">Slide right to enter AURUM Signals AI</p>
-      <button id="aurumMusicButton" type="button" aria-pressed="false">♫ NYALAKAN MUSIK</button>
       <button id="aurumEnterButton">MASUK KE DASHBOARD</button>
       
     </div>
@@ -6829,8 +6826,7 @@ console.log('STATUS SERVER DIPERIKSA');
 (function () {
   const splash = document.getElementById('aurumSplash');
   const enterButton = document.getElementById('aurumEnterButton');
-  const musicButton = document.getElementById('aurumMusicButton');
-  if (!splash || !enterButton || !musicButton) return;
+  if (!splash || !enterButton) return;
 
   if (localStorage.getItem('aurumSplashSeen') === 'true') {
     splash.classList.add('hidden');
@@ -6846,32 +6842,9 @@ console.log('STATUS SERVER DIPERIKSA');
   splashMusic.volume = 0.55;
   splashMusic.setAttribute('playsinline', '');
 
-  function updateMusicButton(isPlaying) {
-    musicButton.textContent = isPlaying ? '♫ MUSIK AKTIF · MATIKAN' : '♫ NYALAKAN MUSIK';
-    musicButton.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
-  }
-
-  async function toggleSplashMusic(event) {
-    if (event) { event.preventDefault(); event.stopPropagation(); }
-    if (!splashMusic.paused) {
-      splashMusic.pause();
-      updateMusicButton(false);
-      return;
-    }
-    try {
-      await splashMusic.play();
-      updateMusicButton(true);
-    } catch (error) {
-      updateMusicButton(false);
-      console.warn('AURUM splash music could not start:', error);
-      musicButton.textContent = '♫ SENTUH UNTUK COBA LAGI';
-    }
-  }
-
   function stopSplashMusic() {
     splashMusic.pause();
     splashMusic.currentTime = 0;
-    updateMusicButton(false);
   }
 
   function enterDashboard() {
@@ -6882,17 +6855,12 @@ console.log('STATUS SERVER DIPERIKSA');
     setTimeout(function () { splash.style.display = 'none'; }, 750);
   }
 
-  // Try to start music as soon as the splash opens. Browsers may block
-  // audible autoplay until the visitor interacts with the page.
-  splashMusic.play().then(function () {
-    updateMusicButton(true);
-  }).catch(function (error) {
-    updateMusicButton(false);
-    musicButton.textContent = '♫ SENTUH UNTUK NYALAKAN MUSIK';
-    console.info('AURUM autoplay was blocked by the browser; tap the music control:', error);
+  // Start music immediately on the opening splash. Some mobile browsers
+  // may reject audible autoplay until the visitor performs a gesture.
+  splashMusic.play().catch(function (error) {
+    console.info('AURUM splash autoplay was blocked by the browser:', error);
   });
 
-  musicButton.addEventListener('click', toggleSplashMusic);
   enterButton.addEventListener('click', enterDashboard);
   splash.addEventListener('touchstart', function (event) {
     const touch = event.changedTouches[0];
