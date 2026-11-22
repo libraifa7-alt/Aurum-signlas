@@ -2957,6 +2957,47 @@ body {
 }
 </style>
 
+
+<style id="aurum-traxa-inspired-splash">
+.aurum-splash{background:radial-gradient(ellipse at 50% 44%,rgba(91,61,15,.22),transparent 37%),radial-gradient(circle at 50% 50%,#100d07 0,#070707 53%,#030303 100%);color:#f4d78d}
+.aurum-splash:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,211,117,.025) 50%,transparent 80%);pointer-events:none}
+.splash-live-pill{position:absolute;top:max(18px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);padding:6px 13px;border:1px solid rgba(44,202,137,.3);border-radius:30px;background:rgba(4,37,27,.48);color:#55e5a8;font-size:9px;font-weight:800;letter-spacing:2px;white-space:nowrap}
+.splash-live-pill i{display:inline-block;width:6px;height:6px;margin-right:6px;border-radius:50%;background:#36df9c;box-shadow:0 0 9px #36df9c}
+.splash-content{position:relative;width:100%;height:100%;max-width:520px;min-height:100svh;padding:78px 28px max(22px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:10px}
+.aurum-orb.aurum-network-globe{width:min( min(70vw,300px),300px);height:min(70vw,300px);max-height:300px;flex:0 0 auto;margin:clamp(14px,7vh,62px) 0 0;background:transparent;box-shadow:none;isolation:isolate}
+.network-globe-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:globeTurn 42s linear infinite}
+.globe-outline,.globe-lat,.globe-lon{fill:none;stroke:rgba(226,183,91,.32);stroke-width:.8}
+.globe-lat,.globe-lon{stroke:rgba(226,183,91,.18)}
+.globe-link{fill:none;stroke:rgba(238,194,105,.3);stroke-width:.8;stroke-dasharray:2 5;animation:linkShimmer 5s ease-in-out infinite}
+.globe-dots circle{fill:#ffe3a0;filter:drop-shadow(0 0 3px #d7a64e);animation:nodePulse 2.6s ease-in-out infinite}
+.globe-dots circle:nth-child(3n){animation-delay:.7s}.globe-dots circle:nth-child(3n + 1){animation-delay:1.3s}
+.aurum-network-globe .orb-core{width:76px;height:76px;top:calc(50% - 38px);left:calc(50% - 38px);border:1px solid rgba(255,225,160,.5);background:radial-gradient(circle at 35% 28%,#fff2c6 0,#e4b64f 24%,#9b6b1d 58%,#1b1205 100%);box-shadow:0 0 22px #c18d32,0 0 65px rgba(218,165,55,.48),inset -8px -8px 18px #080603;display:grid;place-items:center;z-index:4}
+.aurum-core-mark{font-size:48px;font-weight:900;line-height:1;color:#fff0c3;text-shadow:0 2px 12px #6b430c}
+.aurum-network-globe .orb-particle{z-index:5}
+.splash-brand-block{text-align:center;margin-top:0}
+.splash-content h1{font-size:30px;letter-spacing:8px;margin:0;color:#f4f1e9;text-shadow:0 0 18px rgba(218,165,55,.25)}
+.splash-content h2{font-size:10px;letter-spacing:6px;margin:7px 0 0;color:#e4bd65}
+.splash-subtitle{margin:13px 0 0;color:#9b8658;font-size:8px;letter-spacing:3px}
+.splash-bottom-block{width:100%;display:flex;flex-direction:column;align-items:center;margin-top:auto}
+.splash-stats{width:min(100%,330px);display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(20,20,20,.72);overflow:hidden;margin:0 0 22px}
+.splash-stats div{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;gap:3px}
+.splash-stats div+div{border-left:1px solid rgba(255,255,255,.08)}
+.splash-stats strong{font-size:19px;color:#edc86e;line-height:1}
+.splash-stats span{font-size:8px;color:#a6a1a0;letter-spacing:.5px;font-weight:700}
+.splash-swipe{position:relative;justify-content:center;width:min(100%,310px);height:50px;min-height:50px;border:1px solid rgba(218,165,55,.42);border-radius:30px;background:linear-gradient(180deg,rgba(35,32,27,.9),rgba(9,9,9,.95));box-shadow:inset 0 1px 8px rgba(255,255,255,.04),0 0 18px rgba(190,140,48,.08);touch-action:pan-y}
+.swipe-copy{font-size:8px;letter-spacing:3px;color:#a99a7c}
+.swipe-handle{position:absolute;left:4px;top:4px;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff0b8,#e0b64e 65%,#986b1d);color:#211604;font-size:22px;box-shadow:0 0 0 4px rgba(230,188,91,.12),0 0 18px rgba(226,181,75,.4);animation:swipeNudge 1.7s ease-in-out infinite}
+.splash-hint{font-size:9px;color:#89838a;margin:12px 0 0}
+#aurumEnterButton{margin-top:18px;padding:12px 24px;font-size:9px;letter-spacing:1.5px;min-width:142px}
+.splash-footer{margin:clamp(24px,5vh,48px) 0 0;font-size:7px;letter-spacing:2.5px;color:#786744}
+@keyframes globeTurn{to{transform:rotate(360deg)}}
+@keyframes nodePulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes linkShimmer{0%,100%{opacity:.35}50%{opacity:.9}}
+@keyframes swipeNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(8px)}}
+@media(max-height:700px){.splash-content{padding-top:62px}.aurum-orb.aurum-network-globe{width:190px;height:190px;margin-top:4px}.splash-stats{margin-bottom:12px}.splash-footer{margin-top:16px}}
+@media(min-width:700px){.splash-content{max-width:560px}.aurum-orb.aurum-network-globe{width:300px;height:300px}}
+@media(prefers-reduced-motion:reduce){.network-globe-svg,.globe-link,.globe-dots circle,.swipe-handle{animation:none!important}}
+</style>
 </head>
   
   
@@ -2984,63 +3025,41 @@ body {
 
 <!-- AURUM PREMIUM SPLASH SCREEN -->
 <div id="aurumSplash" class="aurum-splash">
-
+  <div class="splash-live-pill"><i></i> AURUM NETWORK · LIVE</div>
   <div class="splash-content">
-
-    <div class="aurum-orb">
-  <div class="orb-core"></div>
-  <div class="orb-ring ring-one"></div>
-  <div class="orb-ring ring-two"></div>
-
-<!-- AURUM GOLDEN LIGHT SWEEP -->
-<div class="gold-light-sweep"></div>
-
-<!-- AURUM GOLDEN ENERGY PARTICLES -->
-<div class="energy-particle energy-one"></div>
-<div class="energy-particle energy-two"></div>
-<div class="energy-particle energy-three"></div>
-<div class="energy-particle energy-four"></div>
-<div class="energy-particle energy-five"></div>
-<div class="energy-particle energy-six"></div>
-<!-- END AURUM GOLDEN ENERGY PARTICLES -->
-<!-- AURUM GOLDEN PARTICLE BURST -->
-<div class="burst-particle burst-one"></div>
-<div class="burst-particle burst-two"></div>
-<div class="burst-particle burst-three"></div>
-<div class="burst-particle burst-four"></div>
-<div class="burst-particle burst-five"></div>
-<div class="burst-particle burst-six"></div>
-<div class="burst-particle burst-seven"></div>
-<div class="burst-particle burst-eight"></div>
-<!-- END AURUM GOLDEN PARTICLE BURST -->      
-
-      <div class="orb-particle particle-one"></div>
-      <div class="orb-particle particle-two"></div>
-      <div class="orb-particle particle-three"></div>
-      <div class="orb-particle particle-four"></div>
-      <div class="orb-particle particle-five"></div>
+    <div class="aurum-orb aurum-network-globe" aria-label="Animasi jaringan digital AURUM">
+      <svg class="network-globe-svg" viewBox="0 0 300 300" role="img" aria-hidden="true">
+        <defs><radialGradient id="aurumGlobeGlow"><stop offset="0" stop-color="#f7d77e" stop-opacity=".28"/><stop offset=".68" stop-color="#b9862c" stop-opacity=".07"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>
+        <circle cx="150" cy="150" r="145" fill="url(#aurumGlobeGlow)"/>
+        <circle class="globe-outline" cx="150" cy="150" r="125"/>
+        <ellipse class="globe-lat" cx="150" cy="150" rx="125" ry="48"/>
+        <ellipse class="globe-lat" cx="150" cy="150" rx="125" ry="88"/>
+        <ellipse class="globe-lon" cx="150" cy="150" rx="48" ry="125"/>
+        <ellipse class="globe-lon" cx="150" cy="150" rx="88" ry="125"/>
+        <path class="globe-link" d="M39 105 83 75 119 98 151 51 194 81 244 111 218 157 258 194 207 222 171 194 127 239 91 201 47 177 67 139 39 105Z"/>
+        <path class="globe-link" d="M83 75 67 139 119 98 127 239 171 194 194 81 218 157 151 51 91 201 47 177 119 98 207 222 258 194"/>
+        <g class="globe-dots"><circle cx="39" cy="105" r="2.5"/><circle cx="83" cy="75" r="2"/><circle cx="119" cy="98" r="2.6"/><circle cx="151" cy="51" r="2"/><circle cx="194" cy="81" r="2.8"/><circle cx="244" cy="111" r="2"/><circle cx="218" cy="157" r="2.5"/><circle cx="258" cy="194" r="2"/><circle cx="207" cy="222" r="2.5"/><circle cx="171" cy="194" r="2"/><circle cx="127" cy="239" r="2.6"/><circle cx="91" cy="201" r="2"/><circle cx="47" cy="177" r="2.5"/><circle cx="67" cy="139" r="2"/><circle cx="150" cy="150" r="3"/></g>
+      </svg>
+      <div class="orb-core"><span class="aurum-core-mark">A</span></div>
+      <div class="orb-particle particle-one"></div><div class="orb-particle particle-two"></div><div class="orb-particle particle-three"></div><div class="orb-particle particle-four"></div><div class="orb-particle particle-five"></div>
     </div>
-
-    <h1>✦ AURUM</h1>
-    <h2>SIGNALS AI</h2>
-
-    <p class="splash-subtitle">
-      INTELLIGENT MARKET ANALYSIS
-    </p>
-
-    <div class="splash-swipe">
-      <span class="swipe-arrow">➜</span>
-      <span>GESER KE KANAN UNTUK MASUK</span>
+    <div class="splash-brand-block">
+      <h1>✦ AURUM</h1><h2>SIGNALS AI</h2>
+      <p class="splash-subtitle">INTELLIGENT MARKET ANALYSIS</p>
     </div>
-
-    <button id="aurumEnterButton">
-      MASUK KE DASHBOARD
-    </button>
-
-    <p class="splash-footer">
-      ICT SMART MONEY CONCEPTS
-    </p>
-
+    <div class="splash-bottom-block">
+      <div class="splash-stats" aria-label="Fitur AURUM">
+        <div><strong>7</strong><span>TIMEFRAMES</span></div>
+        <div><strong>3</strong><span>MARKETS</span></div>
+        <div><strong>AI</strong><span>ANALYSIS</span></div>
+      </div>
+      <div class="splash-swipe" aria-label="Geser ke kanan untuk masuk">
+        <span class="swipe-handle">➜</span><span class="swipe-copy">SWIPE TO ENTER</span>
+      </div>
+      <p class="splash-hint">Slide right to enter AURUM Signals AI</p>
+      <button id="aurumEnterButton">MASUK KE DASHBOARD</button>
+      <p class="splash-footer">ICT SMART MONEY CONCEPTS</p>
+    </div>
   </div>
 </div>
 <!-- END AURUM PREMIUM SPLASH SCREEN -->
