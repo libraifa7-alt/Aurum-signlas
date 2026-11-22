@@ -2313,6 +2313,77 @@ body {
 /* END AURUM LIVE MARKET TICKER */
 
 </style>
+
+<style id="aurum-traxa-signal-theme">
+#marketPage,#chartPage{max-width:560px;margin:0 auto;padding:12px 4% 28px}
+.aurum-signal-summary,.aurum-chart-shell{padding:16px;border:1px solid #e9eaf0;border-radius:18px;background:linear-gradient(145deg,#fff,#fffdf7);box-shadow:0 12px 28px rgba(30,38,55,.10);margin-bottom:16px}
+.aurum-asset-row{display:flex;align-items:center;gap:9px}
+.aurum-asset-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#fff0b7,#c18d24);color:#795513;font-weight:900;font-size:12px;box-shadow:0 3px 9px #b58a3533}
+.aurum-asset-row div{display:flex;flex-direction:column;gap:3px}
+.aurum-asset-row div small,.aurum-summary-foot,.aurum-market-state{font-size:8px;letter-spacing:1.1px;color:#8d8067;font-weight:800}
+.aurum-asset-row div strong{font-size:13px;letter-spacing:1.2px;color:#242a38}
+.aurum-market-state{margin-left:auto;color:#1ca77d}
+.aurum-price-row{padding:15px 0 12px;display:flex;flex-direction:column;gap:5px}
+.aurum-price-row strong{font-size:clamp(29px,8vw,39px);letter-spacing:-1.2px;color:#a17a22;font-weight:900}
+.aurum-price-row small{font-size:10px;color:#8a91a0}
+.aurum-summary-foot{display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid #f0ece3}
+.aurum-signal-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:4px;border:1px solid #eceef3;border-radius:13px;background:#fff;margin:16px 0}
+.aurum-signal-tabs button{min-height:42px;padding:8px 4px;border-radius:9px;background:transparent;color:#687080;font-size:12px;font-weight:800}
+.aurum-signal-tabs button.active{color:#fff;background:linear-gradient(100deg,#13a5c8,#6844df);box-shadow:0 3px 10px #6047c533}
+.aurum-signal-panel{display:none;padding:15px;border:1px solid #e8eaf0;border-radius:17px;background:#fff;box-shadow:0 10px 25px rgba(31,41,55,.09);animation:aurumPanelIn .24s ease}
+.aurum-signal-panel.active{display:block}
+@keyframes aurumPanelIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.aurum-panel-heading,.aurum-analysis-title{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid #eceef2}
+.aurum-heading-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#e9f8f1;color:#20ae7e;font-size:17px}
+.aurum-panel-heading div,.aurum-analysis-title div{display:flex;flex-direction:column;gap:3px}
+.aurum-panel-heading strong,.aurum-analysis-title strong{font-size:12px;letter-spacing:1.1px;color:#242a38}
+.aurum-panel-heading small,.aurum-analysis-title small{font-size:9px;color:#9299a6}
+.aurum-signal-status-card{margin-top:14px;padding:16px;border:1px solid #e7f0ea;border-radius:13px;background:linear-gradient(130deg,#f2fff8,#fff)}
+.aurum-signal-status-card>small,.aurum-plan-grid small,.aurum-performance-grid small{font-size:8px;letter-spacing:1px;font-weight:800;color:#8b929e}
+#signalStatus{margin:9px 0 5px;padding:0;background:none;border:0;font-size:23px;font-weight:900;color:#a17a22;overflow-wrap:anywhere}
+#signalDetail{font-size:11px;line-height:1.6;color:#7c8492}
+.aurum-trade-plan{margin-top:14px;padding:14px;border-radius:13px;background:#172033;color:#fff}
+.aurum-trade-plan .aurum-panel-heading{border-color:#354157}
+.aurum-trade-plan .aurum-panel-heading strong{color:#f5d58a}
+#tradeDirection{font-size:22px;font-weight:900;color:#25c997;margin:14px 0}
+.aurum-plan-grid,.aurum-performance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.aurum-plan-grid>div,.aurum-performance-grid>div{padding:10px;border:1px solid #ffffff20;border-radius:10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.aurum-plan-grid strong{font-size:12px;overflow-wrap:anywhere;color:#fff}
+.aurum-disclaimer{margin:14px 2px 0;text-align:center;font-size:9px;line-height:1.6;color:#9399a4}
+.aurum-performance-head{display:flex;align-items:center;justify-content:space-between;color:#247eaa}
+.aurum-performance-head strong{font-size:15px;letter-spacing:1.5px;font-style:italic}
+.aurum-performance-head span{font-size:8px;letter-spacing:1px;color:#858d9a}
+.aurum-performance-empty{margin:15px 0;padding:20px 12px;text-align:center;border:1px solid #e8edf5;border-radius:13px;background:linear-gradient(135deg,#f2fbff,#f8f3ff)}
+.aurum-performance-symbol{display:block;font-size:27px;color:#694bda;margin-bottom:8px}
+.aurum-performance-empty strong{font-size:13px;color:#293245}
+.aurum-performance-empty p{font-size:10px;line-height:1.6;color:#818999}
+.aurum-performance-grid>div{border-color:#e8eaf0;background:#fafbfe}
+.aurum-performance-grid strong{font-size:21px;color:#9b7a2d}
+.aurum-analysis-title{margin-bottom:12px}
+.aurum-analysis-card{border:1px solid #eceef2;border-radius:13px;background:#fff}
+.aurum-analysis-section{padding:13px;border-bottom:1px solid #eceef2}
+.aurum-analysis-section:last-child{border-bottom:0}
+.aurum-section-kicker{display:block;margin-bottom:8px;font-size:9px;font-weight:900;letter-spacing:1px;color:#a17a32}
+.aurum-analysis-section p,.aurum-analysis-section div{font-size:11px;line-height:1.65;color:#424b5b;overflow-wrap:anywhere}
+.aurum-chart-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.aurum-chart-heading div{display:flex;flex-direction:column;gap:4px}
+.aurum-chart-heading strong{font-size:16px;color:#252c3a}
+.aurum-chart-heading small,.aurum-chart-heading>span{font-size:9px;color:#8b929e;letter-spacing:.8px}
+.aurum-chart-heading>span{color:#1ba77e;font-weight:800}
+#chartPage .market-controls{display:grid;grid-template-columns:1.3fr 1fr;gap:8px;margin:0 0 10px}
+#chartPage .market-controls select{min-width:0;width:100%;border:1px solid #e6eaf1;border-radius:10px;background:#f8faff;font-size:11px;font-weight:700}
+.aurum-chart-timeframes{display:flex;gap:5px;margin-bottom:10px;overflow:hidden}
+.aurum-chart-timeframes span{flex:1;text-align:center;padding:7px 2px;border-radius:7px;background:#f1f5fc;color:#68748a;font-size:8px;font-weight:800}
+.aurum-chart-timeframes span.active{background:#e9c96f;color:#594313}
+#chartPage .chart{height:390px;padding:6px;border-radius:12px;border:1px solid #e7eaf0;box-shadow:none}
+#chartPage #candleChart{height:370px!important}
+.aurum-bottom-nav{grid-template-columns:repeat(6,minmax(0,1fr));min-height:66px;padding:6px 5px;gap:2px;border:1px solid #eeeaf0;border-radius:19px 19px 0 0;background:rgba(255,255,255,.97);box-shadow:0 -5px 22px rgba(31,41,55,.10)}
+.aurum-bottom-nav .nav-item{gap:3px;min-height:50px;padding:4px 1px}
+.aurum-bottom-nav .nav-item span{width:27px;height:25px;font-size:19px}
+.aurum-bottom-nav .nav-item small{font-size:8px}
+@media(max-width:380px){#marketPage,#chartPage{padding-left:3%;padding-right:3%}.aurum-signal-panel{padding:11px}.aurum-bottom-nav .nav-item small{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.aurum-signal-panel{animation:none}}
+</style>
 </head>
   
   
@@ -2594,127 +2665,101 @@ body {
 <!-- END HALAMAN BERANDA -->
   
 
-  <!-- HALAMAN PASAR -->
+  <!-- HALAMAN SINYAL -->
   <section id="marketPage" class="app-page">
-
-  <div class="layout">
-    
-    <section class="panel">
-      <h3>Market Overview</h3>
-
-      <div class="card price-card">
-        <small>GOLD PRICE (XAU/USD)</small>
-        <strong class="gold" id="goldPrice">Memuat harga...</strong>
+    <section class="aurum-signal-summary">
+      <div class="aurum-asset-row">
+        <span class="aurum-asset-mark">Au</span>
+        <div><small>INSTRUMEN AKTIF</small><strong id="signalAssetName">EMAS · XAU/USD</strong></div>
+        <span class="aurum-market-state">● DATA PASAR</span>
+      </div>
+      <div class="aurum-price-row">
+        <strong id="goldPrice">Memuat harga...</strong>
         <small id="goldTime">Menunggu data pasar</small>
       </div>
-
-      <div class="market-controls">
-        <select id="pair">
-          <option value="XAU/USD">XAU/USD</option>
-          <option value="BTC/USD">BTC/USD</option>
-          <option value="WTI">WTI</option>
-        </select>
-
-        <select id="tf">
-          <option>M1</option>
-          <option>M5</option>
-          <option selected>M15</option>
-          <option>M30</option>
-          <option>M45</option>
-          <option>H1</option>
-          <option>H4</option>
-          <option>D1</option>
-        </select>
-      </div>
-
-<div class="chart" id="goldChart">
-        <div id="candleChart" style="width:100%;height:340px;position:relative"></div>
+      <div class="aurum-summary-foot">
+        <span>ANALISIS AURUM</span><span>ICT · SMART MONEY</span>
       </div>
     </section>
 
-    <section class="panel">
-      <h3>ICT AI Analysis</h3>
+    <div class="aurum-signal-tabs" role="tablist" aria-label="Bagian sinyal">
+      <button class="active" type="button" data-signal-tab="setup" role="tab" aria-selected="true">Setup</button>
+      <button type="button" data-signal-tab="performance" role="tab" aria-selected="false">Performa</button>
+      <button type="button" data-signal-tab="analysis" role="tab" aria-selected="false">Analisis</button>
+    </div>
 
-      <div class="signal">
-        <small class="sub">MARKET STRUCTURE</small>
-        <p id="marketStructure">Menunggu analisis candle...</p>
+    <section class="aurum-signal-panel active" data-signal-panel="setup" role="tabpanel">
+      <div class="aurum-panel-heading"><span class="aurum-heading-icon">✦</span><div><strong>SINYAL HARI INI</strong><small>Konfirmasi Market Structure dan Order Block</small></div></div>
+      <div class="aurum-signal-status-card">
+        <small>STATUS SINYAL AURUM</small>
+        <p id="signalStatus">WAIT — Awaiting verified market data</p>
+        <span id="signalDetail">Menunggu konfirmasi Market Structure dan Order Block MTF.</span>
       </div>
-
-      <div class="signal">
-        <small class="sub">TREND METER — 7 TIMEFRAMES</small>
-        <div id="trendMeter">
-          <p>Menunggu analisis tujuh timeframe...</p>
+      <div id="aurumTradePlan" class="aurum-trade-plan" style="display:none">
+        <div class="aurum-panel-heading"><span class="aurum-heading-icon">◎</span><div><strong>AURUM TRADE PLAN</strong><small>Rencana berdasarkan konfirmasi analisis</small></div></div>
+        <p id="tradeDirection">WAIT</p>
+        <div class="aurum-plan-grid">
+          <div><small>ENTRY</small><strong id="tradeEntry">--</strong></div>
+          <div><small>STOP LOSS</small><strong id="tradeSL">--</strong></div>
+          <div><small>TAKE PROFIT 1</small><strong id="tradeTP1">--</strong></div>
+          <div><small>TAKE PROFIT 2</small><strong id="tradeTP2">--</strong></div>
+          <div><small>TAKE PROFIT 3</small><strong id="tradeTP3">--</strong></div>
+          <div><small>RISK / REWARD</small><strong id="tradeRiskReward">--</strong></div>
         </div>
       </div>
+      <p class="aurum-disclaimer">Sinyal dan analisis hanya untuk informasi dan bukan saran keuangan. Trading dengan risiko Anda sendiri.</p>
+    </section>
 
-      <div class="signal">
-        <small class="sub">SUPPORT & RESISTANCE — 7 TIMEFRAMES</small>
-        <div id="supportResistanceMTF">
-          <p>Menunggu analisis Support & Resistance...</p>
-        </div>
+    <section class="aurum-signal-panel" data-signal-panel="performance" role="tabpanel" hidden>
+      <div class="aurum-performance-head"><strong>PERFORMA</strong><span>RIWAYAT AURUM</span></div>
+      <div class="aurum-performance-empty">
+        <span class="aurum-performance-symbol">▧</span>
+        <strong>Riwayat performa belum tersedia</strong>
+        <p>Statistik pip, rasio menang, TP, SL, dan impas akan ditampilkan setelah hasil sinyal AURUM tercatat dan tervalidasi.</p>
       </div>
-
-      <div class="signal">
-        <small class="sub">LIQUIDITY</small>
-        <p id="liquidityAnalysis">Menunggu analisis liquidity...</p>
-
-        <small class="sub">LIQUIDITY CONFIRMATION</small>
-        <p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p>
+      <div class="aurum-performance-grid">
+        <div><small>PIP DIDAPAT</small><strong>—</strong></div>
+        <div><small>RASIO MENANG</small><strong>—</strong></div>
+        <div><small>TP TERCAPAI</small><strong>—</strong></div>
+        <div><small>SL KENA</small><strong>—</strong></div>
       </div>
+      <p class="aurum-disclaimer">AURUM tidak akan menampilkan statistik performa contoh seolah-olah merupakan hasil trading nyata.</p>
+    </section>
 
-      <div class="signal">
-        <small class="sub">FAIR VALUE GAP</small>
-        <p id="fvgAnalysis">Menunggu analisis FVG...</p>
+    <section class="aurum-signal-panel" data-signal-panel="analysis" role="tabpanel" hidden>
+      <div class="aurum-analysis-title"><span class="aurum-heading-icon">▥</span><div><strong>DATA TEKNIKAL</strong><small>Support · Resistance · Level kunci · Rentang harian</small></div></div>
+      <div class="aurum-analysis-card">
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">MARKET STRUCTURE</small><p id="marketStructure">Menunggu analisis candle...</p></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">TREND METER — 7 TIMEFRAMES</small><div id="trendMeter"><p>Menunggu analisis tujuh timeframe...</p></div></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">SUPPORT & RESISTANCE — 7 TIMEFRAMES</small><div id="supportResistanceMTF"><p>Menunggu analisis Support & Resistance...</p></div></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">LIQUIDITY</small><p id="liquidityAnalysis">Menunggu analisis liquidity...</p><small class="aurum-section-kicker">LIQUIDITY CONFIRMATION</small><p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">FAIR VALUE GAP</small><p id="fvgAnalysis">Menunggu analisis FVG...</p></div>
+        <div class="aurum-analysis-section"><small class="aurum-section-kicker">ORDER BLOCK</small><p id="orderBlockAnalysis">Menunggu analisis Order Block...</p><p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p><p id="orderBlockZone">Menunggu deteksi zona harga OB...</p></div>
       </div>
+    </section>
+  </section>
+  <!-- END HALAMAN SINYAL -->
 
-      
-<div class="signal">
-  <small class="sub">ORDER BLOCK</small>
-  <p id="orderBlockAnalysis">Menunggu analisis Order Block...</p>
-  <p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p>
-  <p id="orderBlockZone">Menunggu deteksi zona harga OB...</p>
-
-  <div id="aurumTradePlan" style="
-  margin-top:12px;
-  padding:16px;
-  border-radius:12px;
-  background:#151c2b;
-  color:#ffffff;
-  display:none;
-  border:1px solid #344158;
-">
-  <strong style="color:#d6b36a;">AURUM TRADE PLAN</strong>
-
-  <p id="tradeDirection" style="color:#20c997;font-size:20px;font-weight:bold;">WAIT</p>
-  <p style="color:#64b5f6;">ENTRY: <span id="tradeEntry" style="color:#ffffff;">--</span></p>
-  <p style="color:#ef5350;">STOP LOSS: <span id="tradeSL" style="color:#ffffff;">--</span></p>
-  <p style="color:#20c997;">TP1: <span id="tradeTP1" style="color:#ffffff;">--</span></p>
-  <p style="color:#20c997;">TP2: <span id="tradeTP2" style="color:#ffffff;">--</span></p>
-  <p style="color:#20c997;">TP3: <span id="tradeTP3" style="color:#ffffff;">--</span></p>
-  <p id="tradeRiskReward" style="color:#d6b36a;font-weight:bold;">Risk/Reward: --</p>
-</div>
-</div>
-</section>
-  </div>
-    
-
-  
-
-<section id="tradingSignals" class="panel" style="margin-top:16px">
-  <h3>Trading Signals</h3>
-  <p class="sub">Signal status</p>
-
-  <p id="signalStatus" class="gold">
-    WAIT — Awaiting verified market data
-  </p>
-
-  <p id="signalDetail" class="sub">
-    Menunggu konfirmasi Market Structure dan Order Block MTF.
-  </p>
-</section>
-
-</section>
-<!-- END HALAMAN PASAR -->
+  <!-- HALAMAN GRAFIK -->
+  <section id="chartPage" class="app-page">
+    <section class="aurum-chart-shell">
+      <div class="aurum-chart-heading"><div><strong>Grafik Pasar</strong><small id="chartMarketLabel">EMAS · XAU/USD</small></div><span>● LIVE DATA</span></div>
+      <div class="market-controls">
+        <select id="pair" aria-label="Pilih instrumen">
+          <option value="XAU/USD">Emas · XAU/USD</option>
+          <option value="BTC/USD">Bitcoin · BTC/USD</option>
+          <option value="WTI">Minyak · WTI</option>
+        </select>
+        <select id="tf" aria-label="Pilih timeframe">
+          <option>M1</option><option>M5</option><option selected>M15</option><option>M30</option><option>M45</option><option>H1</option><option>H4</option><option>D1</option>
+        </select>
+      </div>
+      <div class="aurum-chart-timeframes" aria-hidden="true"><span>M1</span><span class="active">M15</span><span>M30</span><span>H1</span><span>H4</span><span>D1</span></div>
+      <div class="chart" id="goldChart"><div id="candleChart" style="width:100%;height:340px;position:relative"></div></div>
+      <p class="aurum-disclaimer">Grafik menggunakan data pasar yang diterima AURUM. Periksa status data sebelum mengambil keputusan.</p>
+    </section>
+  </section>
+  <!-- END HALAMAN GRAFIK -->
 
 <!-- HALAMAN BERITA -->
 <section id="newsPage" class="app-page">
@@ -2951,32 +2996,46 @@ body {
 </footer>
 
 <nav class="aurum-bottom-nav" aria-label="Navigasi Aurum">
-  <a href="#homePage" class="nav-item active" data-page="homePage">
-    <span>⌂</span>
-    <small>Beranda</small>
-  </a>
-
-  <a href="#marketPage" class="nav-item" data-page="marketPage">
-    <span>▥</span>
-    <small>Pasar</small>
-  </a>
-
-  <a href="#newsPage" class="nav-item" data-page="newsPage">
-    <span>▤</span>
-    <small>Berita</small>
-  </a>
-
-  <a href="#chatPage" class="nav-item" data-page="chatPage">
-    <span>◉</span>
-    <small>Obrolan</small>
-  </a>
-
-
-  <a href="#guidePage" class="nav-item" data-page="guidePage">
-    <span>◇</span>
-    <small>Panduan</small>
-  </a>
+  <a href="#homePage" class="nav-item active" data-page="homePage"><span>⌂</span><small>Beranda</small></a>
+  <a href="#marketPage" class="nav-item" data-page="marketPage"><span>ϟ</span><small>Sinyal</small></a>
+  <a href="#chartPage" class="nav-item" data-page="chartPage"><span>▥</span><small>Grafik</small></a>
+  <a href="#newsPage" class="nav-item" data-page="newsPage"><span>▤</span><small>Berita</small></a>
+  <a href="#chatPage" class="nav-item" data-page="chatPage"><span>◉</span><small>Obrolan</small></a>
+  <a href="#guidePage" class="nav-item" data-page="guidePage"><span>◇</span><small>Panduan</small></a>
 </nav>
+<script>
+(function(){
+  const tabs=document.querySelectorAll('[data-signal-tab]');
+  const panels=document.querySelectorAll('[data-signal-panel]');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click',function(){
+      const selected=this.dataset.signalTab;
+      tabs.forEach(function(item){
+        const active=item===tab;
+        item.classList.toggle('active',active);
+        item.setAttribute('aria-selected',active?'true':'false');
+      });
+      panels.forEach(function(panel){
+        const active=panel.dataset.signalPanel===selected;
+        panel.classList.toggle('active',active);
+        panel.hidden=!active;
+      });
+    });
+  });
+  const pair=document.getElementById('pair');
+  const label=document.getElementById('signalAssetName');
+  const chartLabel=document.getElementById('chartMarketLabel');
+  function updateAssetLabels(){
+    if(!pair)return;
+    const value=pair.value;
+    const name=value==='XAU/USD'?'EMAS · XAU/USD':value==='BTC/USD'?'BITCOIN · BTC/USD':'MINYAK · WTI';
+    if(label)label.textContent=name;
+    if(chartLabel)chartLabel.textContent=name;
+  }
+  if(pair){pair.addEventListener('change',updateAssetLabels);updateAssetLabels();}
+})();
+</script>
+
 
 <script>
 (function () {
@@ -3007,7 +3066,7 @@ body {
         behavior: 'auto'
       });
 
-      if (pageId === 'marketPage') {
+      if (pageId === 'marketPage' || pageId === 'chartPage') {
         requestAnimationFrame(function () {
           window.dispatchEvent(new Event('resize'));
         });
