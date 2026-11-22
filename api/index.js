@@ -119,19 +119,31 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Cooldown agar kegagalan/kuota Twelve Data tidak dipanggil ulang
-    // pada setiap refresh atau permintaan timeframe.
+    // Cooldown global: satu kegagalan kuota Twelve Data menahan
+    // seluruh timeframe, bukan hanya interval yang sedang diminta.
     const providerErrorKey = "aurum:provider-error:" + cacheKey;
-    if (!debugRaw && redisCached && redisCached.data) {
+    const globalProviderErrorKey = "aurum:provider-error:twelvedata:global:v1";
+    if (!debugRaw) {
       try {
-        const errorRaw = await aurumRedis(["GET", providerErrorKey]);
+        const globalErrorRaw = await aurumRedis(["GET", globalProviderErrorKey]);
+        const intervalErrorRaw = await aurumRedis(["GET", providerErrorKey]);
+        const errorRaw = globalErrorRaw || intervalErrorRaw;
         if (errorRaw) {
           const providerError = JSON.parse(errorRaw);
           const errorAge = providerError?.receivedAt
             ? Date.now() - Date.parse(providerError.receivedAt)
             : Infinity;
           if (errorAge >= 0 && errorAge < 300000) {
-            return await respondWithStaleCache();
+            if (redisCached && redisCached.data) {
+              return await respondWithStaleCache();
+            }
+            return res.status(503).json({
+              status: "provider_cooldown",
+              symbol: selectedSymbol,
+              interval: selected,
+              message: "Twelve Data sedang dalam masa jeda setelah kegagalan provider. Coba kembali setelah 5 menit.",
+              providerError: providerError.message || "Provider sementara tidak tersedia"
+            });
           }
         }
       } catch (error) {
@@ -527,16 +539,12 @@ if (
   );
 
   try {
-    await aurumRedis([
-      "SET",
-      providerErrorKey,
-      JSON.stringify({
-        message: String(twelveData.message || twelveData.code || "Twelve Data request failed").slice(0, 180),
-        receivedAt: new Date().toISOString()
-      }),
-      "EX",
-      "300"
-    ]);
+    const providerErrorRecord = JSON.stringify({
+      message: String(twelveData.message || twelveData.code || "Twelve Data request failed").slice(0, 180),
+      receivedAt: new Date().toISOString()
+    });
+    await aurumRedis(["SET", providerErrorKey, providerErrorRecord, "EX", "300"]);
+    await aurumRedis(["SET", globalProviderErrorKey, providerErrorRecord, "EX", "300"]);
   } catch (error) {
     console.warn("AURUM PROVIDER COOLDOWN WRITE:", error.message);
   }
