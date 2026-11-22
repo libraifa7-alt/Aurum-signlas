@@ -2843,6 +2843,7 @@ body {
 .home-market-top small{font-size:8px;color:#89909c;white-space:nowrap}
 .home-market-card .home-asset-icon{width:27px;height:27px;flex-shrink:0}
 .home-market-price{font-size:12px;color:#20283a;letter-spacing:-.2px;white-space:nowrap}
+.home-market-updated{display:block;margin-top:2px;font-size:8px;line-height:1.35;color:#8a93a3;min-height:11px}
 .home-market-change{font-size:9px;color:#159b72;min-height:12px}
 .home-market-spark{width:100%;height:30px;display:block;margin-top:2px;overflow:visible}
 .home-market-spark path{fill:none;stroke:#25ad85;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -3124,6 +3125,7 @@ body {
         <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Gold</strong><small>XAU/USD · ●</small></span></span>
         <b class="home-market-price" id="homePriceXAU">--</b>
         <small class="home-market-change" id="homeChangeXAU">Memuat data...</small>
+        <small id="homeGoldUpdatedAt" class="home-market-updated" aria-live="polite">Waktu pembaruan: memeriksa...</small>
         <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Gold"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketPage]').click();return false;">
@@ -6811,12 +6813,29 @@ if ('serviceWorker' in navigator) {
     {symbol:'BTC/USD',price:'homePriceBTC',change:'homeChangeBTC',path:'homeSparkBTC'},
     {symbol:'WTI',price:'homePriceWTI',change:'homeChangeWTI',path:'homeSparkWTI'}
   ];
-  function setGoldFeedStatus(isLive){
+  function formatGoldTime(value){
+    const time=Date.parse(value||'');
+    if(!Number.isFinite(time))return '';
+    return new Date(time).toLocaleTimeString('id-ID',{
+      timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+    })+' WIB';
+  }
+  function setGoldFeedStatus(isLive, timestamp, isQuoteTime){
     const badge=$('homeLiveStatus');
-    if(!badge)return;
-    badge.classList.toggle('delayed',!isLive);
-    badge.innerHTML='<i></i> '+(isLive?'Live':'Data tertunda');
-    badge.title=isLive?'Kuotasi Gold terbaru berhasil diterima':'Kuotasi Gold belum berhasil diperbarui dari provider';
+    if(badge){
+      badge.classList.toggle('delayed',!isLive);
+      badge.textContent=isLive?'Live':'Data tertunda';
+      const dot=document.createElement('i');
+      badge.prepend(dot);
+      badge.title=isLive?'Kuotasi Gold terbaru berhasil diterima':'Harga yang tampil bukan kuotasi Gold live yang baru terverifikasi';
+    }
+    const updated=$('homeGoldUpdatedAt');
+    if(updated){
+      const formatted=formatGoldTime(timestamp);
+      updated.textContent=formatted
+        ? (isQuoteTime?'Kuotasi terakhir: ':'Candle terakhir: ')+formatted
+        : 'Waktu pembaruan belum tersedia';
+    }
   }
   async function updateAsset(asset){
     try{
@@ -6826,7 +6845,10 @@ if ('serviceWorker' in navigator) {
       if(asset.symbol==='XAU/USD'){
         const quoteTime=Date.parse(data.livePriceUpdatedAt||'');
         const quoteAge=Number.isFinite(quoteTime)?Date.now()-quoteTime:Infinity;
-        setGoldFeedStatus(data.livePriceStatus==='live_quote' && quoteAge>=0 && quoteAge<=120000);
+        const isLive=data.livePriceStatus==='live_quote' && quoteAge>=0 && quoteAge<=120000;
+        const quoteTimestamp=Number.isFinite(quoteTime)?data.livePriceUpdatedAt:null;
+        const lastCandleTime=candles&&candles.length?candles[candles.length-1].datetime:null;
+        setGoldFeedStatus(isLive,quoteTimestamp||lastCandleTime,!!quoteTimestamp);
       }
       if(data.status!=='success'||!Array.isArray(candles)||candles.length<2)throw new Error('Data belum tersedia');
       const latest=Number(data.livePrice ?? candles[candles.length-1].close),previous=Number(candles[candles.length-2].close);
