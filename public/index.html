@@ -2384,6 +2384,146 @@ body {
 @media(max-width:380px){#marketPage,#chartPage{padding-left:3%;padding-right:3%}.aurum-signal-panel{padding:11px}.aurum-bottom-nav .nav-item small{font-size:7px}}
 @media(prefers-reduced-motion:reduce){.aurum-signal-panel{animation:none}}
 </style>
+
+<style id="aurum-analysis-premium-v2">
+/* AURUM ANALYSIS — PREMIUM FINTECH PRESENTATION */
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"]{
+  padding:14px;
+  background:linear-gradient(160deg,#101a2b 0%,#0b1220 100%);
+  border:1px solid rgba(198,157,75,.28);
+  border-radius:18px;
+  box-shadow:0 14px 34px rgba(8,15,29,.18);
+  color:#edf2fa;
+}
+#marketPage .aurum-analysis-title{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  margin:0 0 14px;
+  padding:4px 2px 13px;
+  border-bottom:1px solid rgba(220,185,112,.2);
+}
+#marketPage .aurum-analysis-title .aurum-heading-icon{
+  display:grid;
+  place-items:center;
+  width:38px;height:38px;
+  border-radius:12px;
+  color:#f2d28c;
+  background:linear-gradient(145deg,rgba(209,168,91,.24),rgba(209,168,91,.07));
+  border:1px solid rgba(220,185,112,.28);
+  font-size:19px;
+}
+#marketPage .aurum-analysis-title strong{
+  display:block;
+  color:#f4d99e;
+  font-size:12px;
+  letter-spacing:1.5px;
+}
+#marketPage .aurum-analysis-title small{
+  display:block;
+  margin-top:4px;
+  color:#9eacc0;
+  font-size:9px;
+}
+#marketPage .aurum-analysis-card{
+  overflow:hidden;
+  border:1px solid rgba(193,160,102,.2);
+  border-radius:14px;
+  background:linear-gradient(160deg,#172338,#111b2c);
+  box-shadow:inset 0 1px rgba(255,255,255,.035);
+}
+#marketPage .aurum-analysis-section{
+  padding:15px 13px;
+  border-bottom:1px solid rgba(178,192,211,.12);
+}
+#marketPage .aurum-analysis-section:last-child{border-bottom:0}
+#marketPage .aurum-section-kicker{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 11px;
+  color:#d9b66d;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:1.25px;
+}
+#marketPage .aurum-section-kicker:before{
+  content:"";
+  display:block;
+  width:3px;height:12px;
+  border-radius:4px;
+  background:linear-gradient(#f1d18a,#a8792d);
+}
+#marketPage .aurum-analysis-section p,
+#marketPage #trendMeter,
+#marketPage #supportResistanceMTF{
+  color:#d5deeb;
+  font-size:11px;
+  line-height:1.8;
+  overflow-wrap:anywhere;
+}
+#marketPage #marketStructure{
+  margin:0;
+  padding:11px 12px;
+  border-radius:10px;
+  background:rgba(255,255,255,.045);
+  color:#dce5f2;
+}
+#marketPage #trendMeter > div:first-child{
+  margin:0!important;
+}
+#marketPage #trendMeter strong{font-size:11px}
+#marketPage #trendMeter > div[style*="height:10px"]{
+  height:9px!important;
+  border:1px solid rgba(255,255,255,.08);
+}
+#marketPage #trendMeter > div[style*="border-bottom"]{
+  padding:9px 10px!important;
+  margin:5px 0;
+  border:1px solid rgba(255,255,255,.07)!important;
+  border-radius:8px;
+  background:rgba(255,255,255,.035);
+}
+#marketPage #supportResistanceMTF > div{
+  padding:10px 11px!important;
+  margin:6px 0;
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:9px;
+  background:rgba(255,255,255,.035);
+}
+#marketPage #liquidityAnalysis,
+#marketPage #liquidityConfirmation,
+#marketPage #fvgAnalysis,
+#marketPage #orderBlockAnalysis,
+#marketPage #orderBlockMTF,
+#marketPage #orderBlockZone{
+  margin:7px 0 0;
+  padding:10px 11px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:9px;
+  background:rgba(255,255,255,.035);
+  color:#d2dceb;
+  line-height:1.75;
+}
+#marketPage .aurum-analysis-section .aurum-section-kicker:not(:first-child){
+  margin-top:15px;
+}
+@media(max-width:600px){
+  #marketPage .aurum-signal-panel[data-signal-panel="analysis"]{padding:11px}
+  #marketPage .aurum-analysis-section{padding:13px 10px}
+  #marketPage .aurum-analysis-section p,
+  #marketPage #trendMeter,
+  #marketPage #supportResistanceMTF{font-size:10px}
+}
+@media(prefers-reduced-motion:no-preference){
+  #marketPage .aurum-analysis-card{animation:aurumAnalysisIn .35s ease-out both}
+}
+@keyframes aurumAnalysisIn{
+  from{opacity:.75;transform:translateY(5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+
 </head>
   
   
