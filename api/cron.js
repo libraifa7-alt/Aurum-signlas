@@ -28,6 +28,11 @@ async function updateSignalOutcomes(symbol, candles) {
   const candleAt = Number(candle.time);
   if (!Number.isFinite(candleAt) || !Number.isFinite(candle.high) || !Number.isFinite(candle.low)) return;
 
+  const currentKey = 'aurum:server-signal:' + encodeURIComponent(symbol);
+  const currentRaw = await redis(['GET', currentKey]);
+  let currentRecord = null;
+  try { currentRecord = currentRaw ? JSON.parse(currentRaw) : null; } catch {}
+
   for (let index = 0; index < rows.length; index++) {
     let record;
     try { record = typeof rows[index] === 'string' ? JSON.parse(rows[index]) : rows[index]; }
@@ -46,9 +51,12 @@ async function updateSignalOutcomes(symbol, candles) {
 
       const entryTouched = candle.low <= Number(next.entryHigh) && candle.high >= Number(next.entryLow);
       let nextState = state;
-      if (state === 'WAITING_FOR_ENTRY' && entryTouched) nextState = 'OPEN';
-
-      if (['OPEN','TP1','TP2'].includes(nextState)) {
+      if (state === 'WAITING_FOR_ENTRY' && entryTouched) {
+        // Entry and exit targets touched in one candle have unknown intrabar order.
+        // Mark OPEN only; a stop touched in that same candle is treated conservatively.
+        const stopTouchedAtEntry = bullish ? candle.low <= Number(next.sl) : candle.high >= Number(next.sl);
+        nextState = stopTouchedAtEntry ? 'SL' : 'OPEN';
+      } else if (['OPEN','TP1','TP2'].includes(state)) {
         // If SL and a target are both inside one OHLC candle, count SL first:
         // candle data cannot prove the intrabar sequence, so this is conservative.
         const stopTouched = bullish ? candle.low <= Number(next.sl) : candle.high >= Number(next.sl);
@@ -85,6 +93,13 @@ async function updateSignalOutcomes(symbol, candles) {
         outcomeCheckedAt: new Date().toISOString()
       };
       await redis(['LSET','aurum:server-signal-history:'+encodeURIComponent(symbol),String(index),JSON.stringify(updated)]);
+      // Keep the live monitor in sync with its matching history record.
+      if (currentRecord && currentRecord.status === 'SIGNAL' &&
+          ((currentRecord.generatedAt && currentRecord.generatedAt === updated.generatedAt) ||
+           (currentRecord.fingerprint && currentRecord.fingerprint === updated.fingerprint))) {
+        currentRecord = updated;
+        await redis(['SET',currentKey,JSON.stringify(currentRecord),'EX','604800']);
+      }
     }
   }
 }
