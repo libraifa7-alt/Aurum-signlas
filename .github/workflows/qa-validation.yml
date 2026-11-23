@@ -16,6 +16,8 @@ jobs:
           node-version: 22
       - name: Check API syntax
         run: node --check api/index.js
+      - name: Run Gold fallback regression tests
+        run: npm test
       - name: Check inline browser JavaScript syntax
         run: |
           node <<'NODE'
