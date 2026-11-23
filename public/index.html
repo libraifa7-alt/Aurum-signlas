@@ -3579,6 +3579,12 @@ body {
           <div><small>TAKE PROFIT 3</small><strong id="tradeTP3">--</strong></div>
           <div><small>RISK / REWARD</small><strong id="tradeRiskReward">--</strong></div>
         </div>
+        <div id="aurumRiskProfiles" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px"></div>
+        <div id="aurumPriceMap" style="margin-top:14px;padding:12px;border:1px solid rgba(148,163,184,.22);border-radius:10px">
+          <strong style="display:block;margin-bottom:8px">PRICE MAP · PILIH PROFIL RISIKO</strong>
+          <div id="aurumPriceMapLevels" style="font-size:12px;line-height:1.9;color:inherit">Pilih profil untuk melihat level harga</div>
+        </div>
+        <p style="font-size:11px;opacity:.7;margin:10px 0 0">High/Medium/Low adalah variasi lebar zona entry dari Order Block yang sama; bukan tingkat keamanan atau probabilitas profit.</p>
       </div>
       <p class="aurum-disclaimer">Sinyal dan analisis hanya untuk informasi dan bukan saran keuangan. Trading dengan risiko Anda sendiri.</p>
     </section>
@@ -6682,6 +6688,38 @@ function calculateTradePlan(obZone) {
     riskReward: '1:1 / 1:2 / 1:3'
   };
 }
+
+  
+// Tiga profil risiko dihitung dari Order Block valid yang sama.
+// Profil adalah pilihan eksekusi, bukan tiga sinyal independen.
+function calculateRiskProfiles(obZone) {
+  if (!obZone || obZone.status !== 'VALID') return [];
+  const high = Number(obZone.high), low = Number(obZone.low);
+  if (!Number.isFinite(high) || !Number.isFinite(low) || high <= low) return [];
+  const bullish = obZone.type === 'BULLISH';
+  if (!bullish && obZone.type !== 'BEARISH') return [];
+  const width = high - low;
+  return [
+    { key:'HIGH', label:'HIGH RISK', width:1, buffer:0.10, note:'Zona entry lebih lebar' },
+    { key:'MEDIUM', label:'MEDIUM RISK', width:0.60, buffer:0.12, note:'Zona entry menengah' },
+    { key:'LOW', label:'LOW RISK', width:0.30, buffer:0.15, note:'Zona entry lebih selektif' }
+  ].map(profile => {
+    const entryWidth = width * profile.width;
+    const entryLow = (high + low - entryWidth) / 2;
+    const entryHigh = entryLow + entryWidth;
+    const entry = (entryLow + entryHigh) / 2;
+    const stopBuffer = width * profile.buffer;
+    const sl = bullish ? low - stopBuffer : high + stopBuffer;
+    const risk = Math.abs(entry - sl);
+    return {
+      ...profile, entryLow, entryHigh, entry, sl,
+      tp1: bullish ? entry + risk : entry - risk,
+      tp2: bullish ? entry + risk * 2 : entry - risk * 2,
+      tp3: bullish ? entry + risk * 3 : entry - risk * 3,
+      riskReward:'1:1 / 1:2 / 1:3'
+    };
+  });
+}
       
   
 async function analyzeOrderBlockMultiTimeframe(requestedSymbol) {
@@ -7106,6 +7144,39 @@ const validTradePlan =
   orderBlock.includes(tradePlan.type + ' ORDER BLOCK')
     ? tradePlan
     : null;
+
+const riskProfiles = validTradePlan ? calculateRiskProfiles(obZone) : [];
+const riskProfilesNode = document.getElementById('aurumRiskProfiles');
+const priceMapNode = document.getElementById('aurumPriceMapLevels');
+if (riskProfilesNode) {
+  riskProfilesNode.innerHTML = riskProfiles.map(profile =>
+    '<button type="button" data-aurum-risk="' + profile.key + '" ' +
+    'style="min-width:0;padding:10px 5px;border:1px solid rgba(148,163,184,.35);border-radius:9px;background:transparent;color:inherit;text-align:center;cursor:pointer">' +
+    '<strong style="display:block;font-size:11px">' + profile.label + '</strong>' +
+    '<small style="display:block;font-size:10px;opacity:.75;margin-top:4px">' + profile.note + '</small></button>'
+  ).join('');
+  riskProfilesNode.querySelectorAll('[data-aurum-risk]').forEach(button => {
+    button.addEventListener('click', () => {
+      const selected = riskProfiles.find(p => p.key === button.dataset.aurumRisk);
+      if (!selected || !priceMapNode) return;
+      riskProfilesNode.querySelectorAll('button').forEach(b => {
+        b.style.borderColor = b === button ? '#20c997' : 'rgba(148,163,184,.35)';
+        b.style.background = b === button ? 'rgba(32,201,151,.10)' : 'transparent';
+      });
+      priceMapNode.innerHTML =
+        '<div><b>ENTRY:</b> ' + selected.entryLow.toFixed(2) + ' – ' + selected.entryHigh.toFixed(2) + '</div>' +
+        '<div><b>STOP LOSS:</b> ' + selected.sl.toFixed(2) + '</div>' +
+        '<div><b>TAKE PROFIT 1:</b> ' + selected.tp1.toFixed(2) + '</div>' +
+        '<div><b>TAKE PROFIT 2:</b> ' + selected.tp2.toFixed(2) + '</div>' +
+        '<div><b>TAKE PROFIT 3:</b> ' + selected.tp3.toFixed(2) + '</div>' +
+        '<div style="opacity:.7;margin-top:5px">Risk/Reward ' + selected.riskReward + '</div>';
+    });
+  });
+  const mediumButton = riskProfilesNode.querySelector('[data-aurum-risk="MEDIUM"]');
+  if (mediumButton) mediumButton.click();
+}
+if (riskProfilesNode && !validTradePlan) riskProfilesNode.innerHTML = '';
+if (priceMapNode && !validTradePlan) priceMapNode.textContent = 'Menunggu sinyal valid dan data candle terbaru';
 
 // Catat sinyal yang lolos seluruh konfirmasi sebagai simulasi/paper tracking.
 if (validTradePlan && window.aurumJournalCapture) {
