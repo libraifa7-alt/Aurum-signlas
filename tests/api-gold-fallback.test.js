@@ -111,3 +111,99 @@ test("stale XAUS Gold candles fall back to fresh BiQuote MT5 bars", async () => 
     globalThis.aurumCache = new Map();
   }
 });
+
+
+test("stale BiQuote response falls through to Twelve Data instead of being marked live", async () => {
+  const originalFetch = global.fetch;
+  const originalRedisUrl = process.env.KV_REST_API_URL;
+  const originalRedisToken = process.env.KV_REST_API_TOKEN;
+  const originalTwelveKey = process.env.TWELVE_DATA_API_KEY;
+  const now = Date.now();
+  const lastClosed = new Date(Math.floor(now / 60000) * 60000 - 60000).toISOString();
+  const calls = [];
+
+  delete process.env.KV_REST_API_URL;
+  delete process.env.KV_REST_API_TOKEN;
+  process.env.TWELVE_DATA_API_KEY = "test-key";
+  globalThis.aurumCache = new Map();
+
+  global.fetch = async (input) => {
+    const url = new URL(String(input));
+    calls.push(url.hostname + url.pathname);
+
+    if (url.hostname === "xaus.com" && url.pathname === "/api/v1/spot") {
+      return makeResponse(200, {
+        spot_usd_oz: 4200,
+        updated_at: new Date(now).toISOString(),
+        stale: false,
+        data_state: { status: "fresh" }
+      });
+    }
+
+    if (url.hostname === "xaus.com" && url.pathname === "/api/v1/chart") {
+      return makeResponse(200, {
+        points: [{
+          t: Math.floor((now - 10 * 60 * 1000) / 1000),
+          o: 4190, h: 4192, l: 4189, c: 4191, v: 10
+        }]
+      });
+    }
+
+    if (url.hostname === "biquote.io" && url.pathname === "/api/XAUUSD/ohlc") {
+      return makeResponse(503, { message: "BiQuote temporarily unavailable" });
+    }
+
+    if (url.hostname === "biquote.io" && url.pathname === "/api/XAUUSD") {
+      return makeResponse(404, { message: "No fresh tick" });
+    }
+
+    if (url.hostname === "api.twelvedata.com" && url.pathname === "/time_series") {
+      return makeResponse(200, {
+        status: "ok",
+        values: [{
+          datetime: lastClosed,
+          open: "4200.00",
+          high: "4202.00",
+          low: "4199.00",
+          close: "4201.00",
+          volume: "0"
+        }]
+      });
+    }
+
+    if (url.hostname === "api.twelvedata.com" && url.pathname === "/price") {
+      return makeResponse(200, { price: "4201.25" });
+    }
+
+    throw new Error("Unexpected provider request: " + url.toString());
+  };
+
+  try {
+    const res = {
+      statusCode: null,
+      payload: null,
+      status(code) { this.statusCode = code; return this; },
+      json(payload) { this.payload = payload; return this; }
+    };
+
+    await handler({ query: { symbol: "XAU/USD", interval: "M1" } }, res);
+
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.payload.status, "success");
+    assert.equal(res.payload.candleSource, "Twelve Data");
+    assert.equal(res.payload.candleStatus, "fresh_candles");
+    assert.equal(res.payload.livePrice, 4201.25);
+    assert.equal(res.payload.livePriceStatus, "live_quote");
+    assert.ok(calls.includes("biquote.io/api/XAUUSD/ohlc"));
+    assert.ok(calls.includes("api.twelvedata.com/time_series"));
+  } finally {
+    global.fetch = originalFetch;
+    if (originalRedisUrl === undefined) delete process.env.KV_REST_API_URL;
+    else process.env.KV_REST_API_URL = originalRedisUrl;
+    if (originalRedisToken === undefined) delete process.env.KV_REST_API_TOKEN;
+    else process.env.KV_REST_API_TOKEN = originalRedisToken;
+    if (originalTwelveKey === undefined) delete process.env.TWELVE_DATA_API_KEY;
+    else process.env.TWELVE_DATA_API_KEY = originalTwelveKey;
+    globalThis.aurumCache = new Map();
+  }
+});
