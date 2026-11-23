@@ -1,13 +1,20 @@
-
 services:
   - type: web
-    name: aurum-signals
+    name: aurum-signals-fallback
     runtime: node
     plan: free
+    region: singapore
+    branch: render-fallback
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/health
+    autoDeployTrigger: commit
     envVars:
       - key: NODE_VERSION
         value: 22.14.0
-        
+      - key: KV_REST_API_URL
+        sync: false
+      - key: KV_REST_API_TOKEN
+        sync: false
+      - key: TWELVE_DATA_API_KEY
+        sync: false
