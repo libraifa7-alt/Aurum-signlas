@@ -28,7 +28,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.get("*", (req, res, next) => {
+app.get("/{*splat}", (req, res, next) => {
   if (req.path.startsWith("/api/")) {
     return res.status(404).json({ status: "error", message: "API route tidak ditemukan" });
   }
