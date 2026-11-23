@@ -264,6 +264,11 @@ module.exports = async function handler(req, res) {
                 ? chartPayload.candles
                 : [];
 
+          // Reject provider candles timestamped materially in the future.
+          // A future timestamp must never be clamped to age zero and labeled fresh.
+          const serverNowMs = Date.now();
+          const futureToleranceMs = 60000;
+
           let candles = rawPoints.map(point => {
             let timestamp = Number(point.t ?? point.timestamp ?? point.time);
             if (!Number.isFinite(timestamp) && typeof point.t === "string") {
@@ -278,6 +283,7 @@ module.exports = async function handler(req, res) {
             const volume = Number(point.v ?? point.volume ?? 0);
 
             if (!Number.isFinite(timestamp) || timestamp <= 0 ||
+                timestamp * 1000 > serverNowMs + futureToleranceMs ||
                 !Number.isFinite(open) || !Number.isFinite(high) ||
                 !Number.isFinite(low) || !Number.isFinite(close) ||
                 open <= 0 || high <= 0 || low <= 0 || close <= 0 ||
@@ -324,7 +330,11 @@ module.exports = async function handler(req, res) {
           }
 
           const lastCandleAt = candles[candles.length - 1].datetime;
-          const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
+          const rawCandleAgeSeconds = Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000);
+          if (!Number.isFinite(rawCandleAgeSeconds) || rawCandleAgeSeconds < -60) {
+            throw new Error("Timestamp candle XAUS berada di masa depan; data ditolak agar harga tidak dianggap live");
+          }
+          const candleAgeSeconds = Math.max(0, rawCandleAgeSeconds);
           const freshnessLimit = ({
             M1: 300, M5: 900, M15: 2700, M30: 5400,
             M45: 8100, H1: 10800, H4: 43200, D1: 259200
