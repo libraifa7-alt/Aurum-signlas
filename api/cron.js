@@ -67,18 +67,23 @@ module.exports=async function handler(req,res){
         const limits={M5:900,M15:2700,M30:5400,M45:8100,H1:10800,H4:43200,D1:259200};
         return !last||age< -60||age>limits[tf];
       });
-      if(stale.length){
-        // Replace any previous signal with an explicit WAIT state so an old
-        // BUY/SELL cannot remain visible when one or more candle feeds go stale.
+      // Only H4/H1/M15 are execution gates in the dashboard's ICT strategy.
+      // Other timeframes contribute context/strength only; stale context must
+      // be excluded from scoring, but must not block a valid execution setup.
+      const executionTimeframes=new Set(['M15','H1','H4']);
+      const blockingStale=stale.filter(tf=>executionTimeframes.has(tf));
+      const contextualStale=stale.filter(tf=>!executionTimeframes.has(tf));
+      if(blockingStale.length){
+        // Never leave an old BUY/SELL visible when an execution feed is stale.
         const stateKey='aurum:server-signal:'+encodeURIComponent(symbol);
-        const fingerprint='WAIT:STALE_OR_MISSING_CANDLES:'+stale.join(',');
-        const staleDetails=feedDiagnostics;
+        const fingerprint='WAIT:STALE_EXECUTION_CANDLES:'+blockingStale.join(',');
         const record={
           status:'WAIT',
           symbol,
           reason:'STALE_OR_MISSING_CANDLES',
-          timeframes:stale,
-          feedDiagnostics:staleDetails,
+          timeframes:blockingStale,
+          contextualTimeframesStale:contextualStale,
+          feedDiagnostics,
           checkedAt:new Date().toISOString(),
           fingerprint
         };
@@ -86,9 +91,13 @@ module.exports=async function handler(req,res){
         const prior=priorRaw?JSON.parse(priorRaw):null;
         record.changed=!prior||prior.fingerprint!==fingerprint;
         await redis(['SET',stateKey,JSON.stringify(record),'EX','604800']);
-        results.push({symbol,status:'WAIT',reason:record.reason,timeframes:stale,feedDiagnostics:staleDetails,changed:record.changed});
+        results.push({symbol,status:'WAIT',reason:record.reason,timeframes:blockingStale,
+          contextualTimeframesStale:contextualStale,feedDiagnostics,changed:record.changed});
         continue;
       }
+
+      // Do not calculate multi-timeframe strength from stale context candles.
+      for(const tf of contextualStale) candleSets[tf]=[];
 
       const evaluation=evaluateMarket(symbol,candleSets);
       const stateKey='aurum:server-signal:'+encodeURIComponent(symbol);
@@ -139,7 +148,8 @@ module.exports=async function handler(req,res){
         pushResult='vapid_not_configured';
       }
       results.push({symbol,status:evaluation.status,reason:evaluation.reason||null,changed,push:pushResult,
-        direction:evaluation.direction||null,feedDiagnostics,latestCandleAt:Object.fromEntries(TIMEFRAMES.map(tf=>[tf,new Date((candleSets[tf].at(-1).time)*1000).toISOString()]))});
+        direction:evaluation.direction||null,contextualTimeframesStale:contextualStale,feedDiagnostics,
+        latestCandleAt:Object.fromEntries(TIMEFRAMES.map(tf=>[tf,feedDiagnostics[tf].lastCandleAt]))});
     }
 
     return res.status(200).json({status:'success',engine:'server-side-ict',checkedAt:new Date().toISOString(),results});
