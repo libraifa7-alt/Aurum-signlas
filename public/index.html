@@ -4569,7 +4569,16 @@ async function loadChart(interval) {
       setText('aurumNearestResistance', '--');
       setText('aurumSupportDistance', 'Level belum tersedia');
       setText('aurumResistanceDistance', 'Level belum tersedia');
-      setText('marketStructure', 'Data candle ' + symbol + ' belum tersedia dari provider. Analisis ditunda.');
+      setText('marketStructure', 'Data candle ' + symbol + ' belum tersedia atau stale. Analisis ditahan.');
+      setText('signalStatus', 'WAIT');
+      setText('signalDetail', 'Sinyal ditahan karena data candle belum valid dan segar.');
+      const noSignals = document.getElementById('aurumNoSignals');
+      if (noSignals) {
+        noSignals.style.display = 'block';
+        noSignals.textContent = 'Belum ada sinyal: data candle ' + symbol + ' belum valid atau stale. Menunggu data provider terbaru.';
+      }
+      activeTradePlan = null;
+      try { drawTradePlanLines(null); } catch (_) {}
       setText('setupTrend', 'WAIT');
       setText('setupRange', '--');
       setText('setupSupport', '--');
@@ -6762,10 +6771,45 @@ console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
 
 if (!candles || candles.length === 0) {
+  clearSelectedInstrumentView(symbol + ' · Candle belum tersedia dari provider');
   document.querySelector('.status').textContent =
-    'CANDLE KOSONG';
+    'DATA CANDLE TIDAK TERSEDIA — SINYAL DITAHAN';
 
   console.warn('TIDAK ADA DATA CANDLE');
+  return;
+}
+
+// Pemeriksaan terakhir sebelum candle masuk ke grafik dan mesin ICT.
+// Status API saja tidak cukup: umur candle dihitung ulang dari timestamp aslinya.
+const candleFreshnessLimits = {
+  M1: 180, M5: 600, M15: 1800, M30: 3600,
+  M45: 5400, H1: 7200, H4: 28800, D1: 172800
+};
+const lastCandle = candles[candles.length - 1];
+const lastCandleTime = Number(lastCandle?.time);
+const candleAgeSeconds = Math.floor(Date.now() / 1000) - lastCandleTime;
+const candlesHaveValidOhlc = candles.every(c => {
+  const o = Number(c.open), h = Number(c.high), l = Number(c.low), cl = Number(c.close);
+  return [o, h, l, cl].every(Number.isFinite) &&
+    h >= Math.max(o, cl) && l <= Math.min(o, cl) && h >= l;
+});
+const candleIsFresh = Number.isFinite(lastCandleTime) &&
+  candleAgeSeconds >= 0 &&
+  candleAgeSeconds <= (candleFreshnessLimits[interval] || 1800);
+
+if (!candlesHaveValidOhlc || !candleIsFresh) {
+  aurumCandleCache.delete(cacheKey);
+  const reason = !candlesHaveValidOhlc
+    ? 'OHLC tidak valid'
+    : candleAgeSeconds < 0
+      ? 'timestamp candle berada di masa depan'
+      : 'candle terakhir berumur ' + candleAgeSeconds + ' detik';
+  clearSelectedInstrumentView(symbol + ' · DATA STALE/INVALID — ' + reason);
+  document.querySelector('.status').textContent =
+    'DATA CANDLE STALE/INVALID — ANALISIS ICT DITAHAN';
+  console.warn('ANALISIS DITAHAN — DATA CANDLE TIDAK LAYAK:', {
+    symbol, interval, candleAgeSeconds, lastCandle, candlesHaveValidOhlc
+  });
   return;
 }
 
