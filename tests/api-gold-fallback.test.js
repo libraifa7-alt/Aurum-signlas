@@ -207,3 +207,83 @@ test("stale BiQuote response falls through to Twelve Data instead of being marke
     globalThis.aurumCache = new Map();
   }
 });
+
+
+test("XAUS chart outage still tries BiQuote before returning an error", async () => {
+  const originalFetch = global.fetch;
+  const originalRedisUrl = process.env.KV_REST_API_URL;
+  const originalRedisToken = process.env.KV_REST_API_TOKEN;
+  const originalTwelveKey = process.env.TWELVE_DATA_API_KEY;
+  const now = Date.now();
+  const lastClosed = new Date(Math.floor(now / 60000) * 60000 - 60000).toISOString();
+  const calls = [];
+
+  delete process.env.KV_REST_API_URL;
+  delete process.env.KV_REST_API_TOKEN;
+  delete process.env.TWELVE_DATA_API_KEY;
+  globalThis.aurumCache = new Map();
+
+  global.fetch = async (input) => {
+    const url = new URL(String(input));
+    calls.push(url.hostname + url.pathname);
+
+    if (url.hostname === "xaus.com" && url.pathname === "/api/v1/spot") {
+      return makeResponse(200, {
+        spot_usd_oz: 4200,
+        updated_at: new Date(now).toISOString(),
+        stale: false,
+        data_state: { status: "fresh" }
+      });
+    }
+    if (url.hostname === "xaus.com" && url.pathname === "/api/v1/chart") {
+      return makeResponse(503, { error: "XAUS chart offline" });
+    }
+    if (url.hostname === "biquote.io" && url.pathname === "/api/XAUUSD/ohlc") {
+      return makeResponse(200, {
+        bars: [{
+          openTime: lastClosed,
+          open: 4200, high: 4202, low: 4199, close: 4201,
+          tickVolume: 20, isOpen: false
+        }]
+      });
+    }
+    if (url.hostname === "biquote.io" && url.pathname === "/api/XAUUSD") {
+      return makeResponse(200, {
+        mid: 4201.5,
+        timestamp: new Date(now).toISOString(),
+        source: "MetaTrader 5 (Broker 1)",
+        marketState: "open",
+        stale: false
+      });
+    }
+    throw new Error("Unexpected provider request: " + url.toString());
+  };
+
+  try {
+    const res = {
+      statusCode: null,
+      payload: null,
+      status(code) { this.statusCode = code; return this; },
+      json(payload) { this.payload = payload; return this; }
+    };
+
+    await handler({ query: { symbol: "XAU/USD", interval: "M1" } }, res);
+
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.payload.candleSource, "BiQuote MT5");
+    assert.equal(res.payload.candleStatus, "fresh_candles");
+    assert.equal(res.payload.livePriceStatus, "live_quote");
+    assert.ok(calls.includes("xaus.com/api/v1/chart"));
+    assert.ok(calls.includes("biquote.io/api/XAUUSD/ohlc"));
+    assert.ok(!calls.some(call => call.includes("twelvedata.com")));
+  } finally {
+    global.fetch = originalFetch;
+    if (originalRedisUrl === undefined) delete process.env.KV_REST_API_URL;
+    else process.env.KV_REST_API_URL = originalRedisUrl;
+    if (originalRedisToken === undefined) delete process.env.KV_REST_API_TOKEN;
+    else process.env.KV_REST_API_TOKEN = originalRedisToken;
+    if (originalTwelveKey === undefined) delete process.env.TWELVE_DATA_API_KEY;
+    else process.env.TWELVE_DATA_API_KEY = originalTwelveKey;
+    globalThis.aurumCache = new Map();
+  }
+});
