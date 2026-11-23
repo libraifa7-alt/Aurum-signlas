@@ -14,6 +14,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Install application dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
       - name: Check API and alternate-host syntax
         run: |
           node --check api/index.js
