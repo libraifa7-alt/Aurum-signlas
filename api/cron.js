@@ -39,20 +39,20 @@ async function updateSignalOutcomes(symbol, candles) {
     const profiles = record.riskProfiles.map(profile => {
       const next = { ...profile };
       const state = next.outcomeStatus || 'WAITING_FOR_ENTRY';
-      if (['TP1','TP2','TP3','SL'].includes(state)) return next;
+      if (['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2'].includes(state)) return next;
 
       const entryTouched = candle.low <= Number(next.entryHigh) && candle.high >= Number(next.entryLow);
       let nextState = state;
       if (state === 'WAITING_FOR_ENTRY' && entryTouched) nextState = 'OPEN';
 
-      if (nextState === 'OPEN') {
+      if (['OPEN','TP1','TP2'].includes(nextState)) {
         // If SL and a target are both inside one OHLC candle, count SL first:
         // candle data cannot prove the intrabar sequence, so this is conservative.
         const stopTouched = bullish ? candle.low <= Number(next.sl) : candle.high >= Number(next.sl);
         const tp3Touched = bullish ? candle.high >= Number(next.tp3) : candle.low <= Number(next.tp3);
         const tp2Touched = bullish ? candle.high >= Number(next.tp2) : candle.low <= Number(next.tp2);
         const tp1Touched = bullish ? candle.high >= Number(next.tp1) : candle.low <= Number(next.tp1);
-        if (stopTouched) nextState = 'SL';
+        if (stopTouched) nextState = state === 'TP1' ? 'SL_AFTER_TP1' : state === 'TP2' ? 'SL_AFTER_TP2' : 'SL';
         else if (tp3Touched) nextState = 'TP3';
         else if (tp2Touched) nextState = 'TP2';
         else if (tp1Touched) nextState = 'TP1';
@@ -72,7 +72,7 @@ async function updateSignalOutcomes(symbol, candles) {
       const updated = {
         ...record,
         riskProfiles: profiles,
-        outcomeStatus: profiles.every(p => ['TP1','TP2','TP3','SL'].includes(p.outcomeStatus))
+        outcomeStatus: profiles.every(p => ['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2'].includes(p.outcomeStatus))
           ? 'COMPLETED'
           : profiles.some(p => p.outcomeStatus === 'OPEN') ? 'OPEN'
           : profiles.some(p => p.outcomeStatus === 'TP1' || p.outcomeStatus === 'TP2' || p.outcomeStatus === 'TP3') ? 'TARGET_HIT'
