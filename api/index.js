@@ -466,60 +466,53 @@ module.exports = async function handler(req, res) {
         };
       }
 
-      if (!candleData || !Array.isArray(candleData.candles) || !candleData.candles.length) {
-        return res.status(503).json({
-          status: "provider_error",
+      // A fresh primary XAUS candle set may be returned directly. If it is stale
+      // OR unavailable, continue to the independent BiQuote and Twelve Data fallbacks.
+      let lastCandleAt = null;
+      let candleAgeSeconds = null;
+      if (candleData && Array.isArray(candleData.candles) && candleData.candles.length) {
+        lastCandleAt = candleData.lastCandleAt || candleData.candles[candleData.candles.length - 1].datetime;
+        const rawCandleAgeSeconds = (Date.now() - Date.parse(lastCandleAt)) / 1000;
+        candleAgeSeconds = Number.isFinite(rawCandleAgeSeconds) && rawCandleAgeSeconds >= 0
+          ? Math.floor(rawCandleAgeSeconds)
+          : null;
+        const candleFreshnessLimitSeconds = ({
+          M1: 180, M5: 600, M15: 1800, M30: 3600,
+          M45: 5400, H1: 7200, H4: 28800, D1: 172800
+        }[selected] || 1800);
+        const candleStatus = candleAgeSeconds !== null &&
+          candleAgeSeconds <= candleFreshnessLimitSeconds
+          ? "fresh_candles"
+          : "stale_candles";
+        const output = {
+          ...candleData,
+          status: "success",
           symbol: selectedSymbol,
           interval: selected,
-          source: "XAUS spot + XAUS Chart API",
+          source: candleData.source || "XAUS Chart API (OHLCV)",
+          candleSource: candleData.candleSource || "XAUS Chart API",
+          providerFetchedAt: candleData.providerFetchedAt || null,
+          lastCandleAt,
+          candleAgeSeconds,
+          candleStatus,
           livePrice: quote?.price ?? null,
           livePriceUpdatedAt: quote?.receivedAt ?? null,
           livePriceSource: quote?.source || "XAUS spot API",
           livePriceStatus: quote?.status || "quote_unavailable",
           livePriceError: quote?.error || null,
-          candleStatus: "unavailable",
-          candleError: chartError || "Candle OHLC belum tersedia dari provider",
-          candles: [],
-          message: "Tidak ada candle valid yang dapat ditampilkan. AURUM tidak membuat candle palsu."
-        });
-      }
+          cache: candleData.cache || (candleData === cachedGold ? "cached_ohlcv" : "xaus_chart_ohlcv"),
+          candleError: candleData.candleError || chartError || null
+        };
 
-      const lastCandleAt = candleData.lastCandleAt || candleData.candles[candleData.candles.length - 1].datetime;
-      const rawCandleAgeSeconds = (Date.now() - Date.parse(lastCandleAt)) / 1000;
-      const candleAgeSeconds = Number.isFinite(rawCandleAgeSeconds) && rawCandleAgeSeconds >= 0
-        ? Math.floor(rawCandleAgeSeconds)
-        : null;
-      const candleFreshnessLimitSeconds = ({
-        M1: 180, M5: 600, M15: 1800, M30: 3600,
-        M45: 5400, H1: 7200, H4: 28800, D1: 172800
-      }[selected] || 1800);
-      const candleStatus = candleAgeSeconds !== null &&
-        candleAgeSeconds <= candleFreshnessLimitSeconds
-        ? "fresh_candles"
-        : "stale_candles";
-      const output = {
-        ...candleData,
-        status: "success",
-        symbol: selectedSymbol,
-        interval: selected,
-        source: candleData.source || "XAUS Chart API (OHLCV)",
-        candleSource: candleData.candleSource || "XAUS Chart API",
-        providerFetchedAt: candleData.providerFetchedAt || null,
-        lastCandleAt,
-        candleAgeSeconds,
-        candleStatus,
-        livePrice: quote?.price ?? null,
-        livePriceUpdatedAt: quote?.receivedAt ?? null,
-        livePriceSource: quote?.source || "XAUS spot API",
-        livePriceStatus: quote?.status || "quote_unavailable",
-        livePriceError: quote?.error || null,
-        cache: candleData.cache || (candleData === cachedGold ? "cached_ohlcv" : "xaus_chart_ohlcv"),
-        candleError: candleData.candleError || chartError || null
-      };
+        if (candleStatus === "fresh_candles") {
+          globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: output });
+          return res.status(200).json(output);
+        }
 
-      if (candleStatus === "fresh_candles") {
-        globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: output });
-        return res.status(200).json(output);
+        chartError = chartError || ("XAUS Chart candle stale: " +
+          (candleAgeSeconds === null ? "timestamp invalid/future" : candleAgeSeconds + " seconds old"));
+      } else {
+        chartError = chartError || "XAUS Chart tidak mengirim candle valid";
       }
 
       // XAUS Chart is a Yahoo Finance proxy. Try an independent MT5 tick/OHLC feed
