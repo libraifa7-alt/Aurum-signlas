@@ -72,7 +72,7 @@ module.exports=async function handler(req,res){
         // BUY/SELL cannot remain visible when one or more candle feeds go stale.
         const stateKey='aurum:server-signal:'+encodeURIComponent(symbol);
         const fingerprint='WAIT:STALE_OR_MISSING_CANDLES:'+stale.join(',');
-        const staleDetails=Object.fromEntries(stale.map(tf=>[tf,feedDiagnostics[tf]]));
+        const staleDetails=feedDiagnostics;
         const record={
           status:'WAIT',
           symbol,
@@ -100,6 +100,7 @@ module.exports=async function handler(req,res){
       const changed=!prior||prior.fingerprint!==fingerprint;
       const record={
         ...evaluation,
+        feedDiagnostics,
         checkedAt:new Date().toISOString(),
         fingerprint,
         changed
