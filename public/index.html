@@ -3580,6 +3580,16 @@ body {
           <div><small>RISK / REWARD</small><strong id="tradeRiskReward">--</strong></div>
         </div>
         <div id="aurumRiskProfiles" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px"></div>
+        <div id="aurumSignalStrength" style="margin-top:14px;padding:12px;border:1px solid rgba(148,163,184,.22);border-radius:10px">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+            <strong>SIGNAL STRENGTH</strong><strong id="aurumSignalStrengthValue">--/100</strong>
+          </div>
+          <div style="height:7px;border-radius:8px;background:rgba(148,163,184,.2);overflow:hidden;margin:9px 0">
+            <div id="aurumSignalStrengthBar" style="height:100%;width:0%;background:#20c997;border-radius:8px"></div>
+          </div>
+          <div id="aurumSignalStrengthReasons" style="font-size:11px;line-height:1.8;opacity:.85"></div>
+          <small style="display:block;margin-top:7px;opacity:.65">Skor kesesuaian teknikal, bukan probabilitas profit.</small>
+        </div>
         <div id="aurumPriceMap" style="margin-top:14px;padding:12px;border:1px solid rgba(148,163,184,.22);border-radius:10px">
           <strong style="display:block;margin-bottom:8px">PRICE MAP · PILIH PROFIL RISIKO</strong>
           <div id="aurumPriceMapLevels" style="font-size:12px;line-height:1.9;color:inherit">Pilih profil untuk melihat level harga</div>
@@ -6690,6 +6700,47 @@ function calculateTradePlan(obZone) {
 }
 
   
+// Skor transparan dari data yang tersedia; tidak ditafsirkan sebagai peluang profit.
+function calculateSignalStrength(direction, activeTimeframe, obZone) {
+  const trend = window.aurumMultiTimeframeTrend || {};
+  const diag = window.aurumStructureDiagnostics || {};
+  const wanted = direction === 'BUY' ? 'BULLISH' : 'BEARISH';
+  const reasons = [];
+  let score = 0;
+
+  const higher = [trend.direction === wanted, diag.H4?.latestBreak?.includes(wanted) ||
+    diag.H4?.latestBreak === 'NONE' && diag.H4?.latestBreak !== null];
+  const h4Bias = diag.H4?.latestBreak || '';
+  const htfTrend = (trend.direction === wanted);
+  if (htfTrend) { score += 25; reasons.push('Arah mayoritas M5–D1 sejalan: +25'); }
+  else { reasons.push('Arah mayoritas timeframe belum sejalan: +0'); }
+
+  const total = Number(trend.total) || 7;
+  const aligned = Number(direction === 'BUY' ? trend.bullish : trend.bearish) || 0;
+  const mtfPoints = Math.round(25 * Math.min(1, aligned / total));
+  score += mtfPoints;
+  reasons.push('Keselarasan timeframe: ' + aligned + '/' + total + ' (+ ' + mtfPoints + ')');
+
+  const structure = diag[activeTimeframe] || {};
+  const latestBreak = String(structure.latestBreak || '');
+  const breakAligned = latestBreak.includes(wanted);
+  const breakRecent = Number(structure.candlesSinceBreak) <= 5;
+  const breakPoints = breakAligned ? (breakRecent ? 25 : 15) : 0;
+  score += breakPoints;
+  reasons.push(breakAligned
+    ? 'BOS/CHOCH searah' + (breakRecent ? ' dan masih baru' : '') + ' (+ ' + breakPoints + ')'
+    : 'Belum ada BOS/CHOCH terbaru yang searah (+0)');
+
+  const obAligned = obZone && obZone.status === 'VALID' &&
+    ((direction === 'BUY' && obZone.type === 'BULLISH') ||
+     (direction === 'SELL' && obZone.type === 'BEARISH'));
+  const obPoints = obAligned ? 25 : 0;
+  score += obPoints;
+  reasons.push(obAligned ? 'Order Block valid searah (+25)' : 'Order Block belum valid/searah (+0)');
+
+  return { score: Math.max(0, Math.min(100, score)), reasons };
+}
+
 // Tiga profil risiko dihitung dari Order Block valid yang sama.
 // Profil adalah pilihan eksekusi, bukan tiga sinyal independen.
 function calculateRiskProfiles(obZone) {
@@ -7146,6 +7197,20 @@ const validTradePlan =
     : null;
 
 const riskProfiles = validTradePlan ? calculateRiskProfiles(obZone) : [];
+const strengthPanel = document.getElementById('aurumSignalStrength');
+const strengthValue = document.getElementById('aurumSignalStrengthValue');
+const strengthBar = document.getElementById('aurumSignalStrengthBar');
+const strengthReasons = document.getElementById('aurumSignalStrengthReasons');
+const strength = validTradePlan ? calculateSignalStrength(finalSignal, setupTf, obZone) : null;
+if (strengthPanel && strength) {
+  strengthPanel.style.display = 'block';
+  if (strengthValue) strengthValue.textContent = strength.score + '/100';
+  if (strengthBar) strengthBar.style.width = strength.score + '%';
+  if (strengthBar) strengthBar.style.background = strength.score >= 75 ? '#20c997' : strength.score >= 50 ? '#d6b36a' : '#ef8b50';
+  if (strengthReasons) strengthReasons.innerHTML = strength.reasons.map(reason => '<div>• ' + reason + '</div>').join('');
+} else if (strengthPanel) {
+  strengthPanel.style.display = 'none';
+}
 const riskProfilesNode = document.getElementById('aurumRiskProfiles');
 const priceMapNode = document.getElementById('aurumPriceMapLevels');
 if (riskProfilesNode) {
