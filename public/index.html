@@ -6700,24 +6700,24 @@ async function analyzeOrderBlockMultiTimeframe(requestedSymbol) {
 
     // KONFIRMASI BULLISH
     if (
+      trendH4 === 'BULLISH' &&
       trendH1 === 'BULLISH' &&
       trendM15 === 'BULLISH' &&
       obH1 === 'BULLISH' &&
       obM15 === 'BULLISH'
     ) {
-      return 'BUY ALIGNMENT — Struktur dan Order Block H1/M15 bullish' +
-        ' | H4: ' + trendH4;
+      return 'BUY ALIGNMENT — Struktur H4/H1/M15 dan Order Block H1/M15 bullish';
     }
 
-    // KONFIRMASI BEARISH
+    // KONFIRMASI BEARISH — H4 wajib searah sebagai filter tren utama
     if (
+      trendH4 === 'BEARISH' &&
       trendH1 === 'BEARISH' &&
       trendM15 === 'BEARISH' &&
       obH1 === 'BEARISH' &&
       obM15 === 'BEARISH'
     ) {
-      return 'SELL ALIGNMENT — Struktur dan Order Block H1/M15 bearish' +
-        ' | H4: ' + trendH4;
+      return 'SELL ALIGNMENT — Struktur H4/H1/M15 dan Order Block H1/M15 bearish';
     }
 
     return 'WAIT — Struktur atau Order Block belum searah' +
