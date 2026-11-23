@@ -347,10 +347,11 @@ module.exports = async function handler(req, res) {
 
           const lastCandleAt = candles[candles.length - 1].datetime;
           const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
+          // Keep backend candle freshness thresholds aligned with the chart UI.
           const freshnessLimit = ({
-            M1: 300, M5: 900, M15: 2700, M30: 5400,
-            M45: 8100, H1: 10800, H4: 43200, D1: 259200
-          }[selected] || 2700);
+            M1: 180, M5: 600, M15: 1800, M30: 3600,
+            M45: 5400, H1: 7200, H4: 28800, D1: 172800
+          }[selected] || 1800);
 
           candleData = {
             status: "success",
