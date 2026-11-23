@@ -164,7 +164,10 @@ module.exports=async function handler(req,res){
         continue;
       }
 
-      // Update stored signal outcomes only when the execution feed is fresh.\n      await updateSignalOutcomes(symbol, candleSets.M15);\n\n      // Do not calculate multi-timeframe strength from stale context candles.
+      // Update stored signal outcomes only when the execution feed is fresh.
+      await updateSignalOutcomes(symbol, candleSets.M15);
+
+      // Do not calculate multi-timeframe strength from stale context candles.
       for(const tf of contextualStale) candleSets[tf]=[];
 
       const evaluation=evaluateMarket(symbol,candleSets);
