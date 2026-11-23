@@ -212,8 +212,13 @@ module.exports = async function handler(req, res) {
       const cachedGoldAge = Number.isFinite(cachedGoldFetchedAt)
         ? Date.now() - cachedGoldFetchedAt
         : Infinity;
-      const cachedGoldLastTime = Date.parse(cachedGold?.lastCandleAt || cachedGold?.candles?.[cachedGold?.candles?.length - 1]?.datetime || "");
-      const cachedGoldHasFutureCandles = Number.isFinite(cachedGoldLastTime) && cachedGoldLastTime > Date.now() + 60000;
+      const cachedGoldHasFutureCandles = Array.isArray(cachedGold?.candles) &&
+        cachedGold.candles.some(candle => {
+          const candleTime = Date.parse(candle?.datetime || "");
+          return Number.isFinite(candleTime) && candleTime > Date.now() + 60000;
+        }) ||
+        (Number.isFinite(Date.parse(cachedGold?.lastCandleAt || "")) &&
+          Date.parse(cachedGold.lastCandleAt) > Date.now() + 60000);
 
       let candleData = cachedGold &&
         Array.isArray(cachedGold.candles) &&
@@ -399,7 +404,7 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      if (!candleData && chartCoolingDown && cachedGold && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
+      if (!candleData && chartCoolingDown && cachedGold && !cachedGoldHasFutureCandles && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
         candleData = {
           ...cachedGold,
           candleStatus: "stale_candles",
