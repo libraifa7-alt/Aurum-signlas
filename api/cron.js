@@ -37,6 +37,7 @@ module.exports=async function handler(req,res){
 
     for(const symbol of symbols){
       const candleSets={};
+      const feedDiagnostics={};
       const fetchResults=await Promise.all(TIMEFRAMES.map(async tf=>{
         const url=new URL('/api',baseUrl);
         url.searchParams.set('symbol',symbol);
@@ -45,9 +46,19 @@ module.exports=async function handler(req,res){
         if(!response.ok) throw new Error(symbol+' '+tf+' API HTTP '+response.status);
         const payload=await response.json();
         if(payload.status!=='success') throw new Error(symbol+' '+tf+' data tidak tersedia');
-        return [tf,normalizeCandles(payload.candles)];
+        const candles=normalizeCandles(payload.candles);
+        const last=candles.at(-1)?.time||0;
+        return [tf,candles,{
+          source:payload.candleSource||payload.source||null,
+          candleStatus:payload.candleStatus||null,
+          providerFetchedAt:payload.providerFetchedAt||null,
+          lastCandleAt:last?new Date(last*1000).toISOString():null,
+          candleAgeSeconds:last?Math.floor(Date.now()/1000-last):null,
+          candleError:payload.candleError||null,
+          candleCount:candles.length
+        }];
       }));
-      for(const [tf,candles] of fetchResults) candleSets[tf]=candles;
+      for(const [tf,candles,diagnostic] of fetchResults){candleSets[tf]=candles;feedDiagnostics[tf]=diagnostic;}
 
       const latestTimes=TIMEFRAMES.map(tf=>candleSets[tf].at(-1)?.time||0);
       const stale=TIMEFRAMES.filter(tf=>{
@@ -61,11 +72,13 @@ module.exports=async function handler(req,res){
         // BUY/SELL cannot remain visible when one or more candle feeds go stale.
         const stateKey='aurum:server-signal:'+encodeURIComponent(symbol);
         const fingerprint='WAIT:STALE_OR_MISSING_CANDLES:'+stale.join(',');
+        const staleDetails=Object.fromEntries(stale.map(tf=>[tf,feedDiagnostics[tf]]));
         const record={
           status:'WAIT',
           symbol,
           reason:'STALE_OR_MISSING_CANDLES',
           timeframes:stale,
+          feedDiagnostics:staleDetails,
           checkedAt:new Date().toISOString(),
           fingerprint
         };
@@ -73,7 +86,7 @@ module.exports=async function handler(req,res){
         const prior=priorRaw?JSON.parse(priorRaw):null;
         record.changed=!prior||prior.fingerprint!==fingerprint;
         await redis(['SET',stateKey,JSON.stringify(record),'EX','604800']);
-        results.push({symbol,status:'WAIT',reason:record.reason,timeframes:stale,changed:record.changed});
+        results.push({symbol,status:'WAIT',reason:record.reason,timeframes:stale,feedDiagnostics:staleDetails,changed:record.changed});
         continue;
       }
 
@@ -125,7 +138,7 @@ module.exports=async function handler(req,res){
         pushResult='vapid_not_configured';
       }
       results.push({symbol,status:evaluation.status,reason:evaluation.reason||null,changed,push:pushResult,
-        direction:evaluation.direction||null,latestCandleAt:Object.fromEntries(TIMEFRAMES.map(tf=>[tf,new Date((candleSets[tf].at(-1).time)*1000).toISOString()]))});
+        direction:evaluation.direction||null,feedDiagnostics,latestCandleAt:Object.fromEntries(TIMEFRAMES.map(tf=>[tf,new Date((candleSets[tf].at(-1).time)*1000).toISOString()]))});
     }
 
     return res.status(200).json({status:'success',engine:'server-side-ict',checkedAt:new Date().toISOString(),results});
