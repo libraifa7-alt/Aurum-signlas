@@ -20,13 +20,16 @@ async function redis(command) {
 
 async function updateSignalOutcomes(symbol, candles) {
   const rows = await redis(['LRANGE','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','99']);
-  if (!Array.isArray(rows) || !rows.length || !Array.isArray(candles) || !candles.length) return;
-  // Match the strategy engine: never finalize outcomes from a still-forming M15 candle.
-  // The newest array element may be incomplete, so use the preceding closed candle.
-  if (candles.length < 2) return;
-  const candle = candles[candles.length - 2];
-  const candleAt = Number(candle.time);
-  if (!Number.isFinite(candleAt) || !Number.isFinite(candle.high) || !Number.isFinite(candle.low)) return;
+  // The final candle may still be forming. Process every closed candle after
+  // each signal's last checkpoint so missed scanner cycles cannot skip outcomes.
+  if (!Array.isArray(rows) || !rows.length || !Array.isArray(candles) || candles.length < 2) return;
+  const closedCandles = candles.slice(0, -1).filter(c =>
+    Number.isFinite(Number(c.time)) &&
+    Number.isFinite(Number(c.high)) &&
+    Number.isFinite(Number(c.low)) &&
+    Number.isFinite(Number(c.close))
+  );
+  if (!closedCandles.length) return;
 
   const currentKey = 'aurum:server-signal:' + encodeURIComponent(symbol);
   const currentRaw = await redis(['GET', currentKey]);
@@ -38,62 +41,83 @@ async function updateSignalOutcomes(symbol, candles) {
     try { record = typeof rows[index] === 'string' ? JSON.parse(rows[index]) : rows[index]; }
     catch { continue; }
     if (!record || record.status !== 'SIGNAL' || !Array.isArray(record.riskProfiles) || !record.riskProfiles.length) continue;
+
     const generatedAt = Date.parse(record.generatedAt || '');
-    if (!Number.isFinite(generatedAt) || candleAt * 1000 <= generatedAt) continue;
-    if (Number(record.lastOutcomeCandleAt || 0) >= candleAt) continue;
-
+    if (!Number.isFinite(generatedAt)) continue;
+    let checkpoint = Number(record.lastOutcomeCandleAt || 0);
     let changed = false;
-    const bullish = record.direction === 'BUY';
-    const profiles = record.riskProfiles.map(profile => {
-      const next = { ...profile };
-      const state = next.outcomeStatus || 'WAITING_FOR_ENTRY';
-      if (['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2'].includes(state)) return next;
+    const profiles = record.riskProfiles.map(profile => ({ ...profile }));
 
-      const entryTouched = candle.low <= Number(next.entryHigh) && candle.high >= Number(next.entryLow);
-      let nextState = state;
-      if (state === 'WAITING_FOR_ENTRY' && entryTouched) {
-        // Entry and exit targets touched in one candle have unknown intrabar order.
-        // Mark OPEN only; a stop touched in that same candle is treated conservatively.
-        const stopTouchedAtEntry = bullish ? candle.low <= Number(next.sl) : candle.high >= Number(next.sl);
-        nextState = stopTouchedAtEntry ? 'SL' : 'OPEN';
-      } else if (['OPEN','TP1','TP2'].includes(state)) {
-        // If SL and a target are both inside one OHLC candle, count SL first:
-        // candle data cannot prove the intrabar sequence, so this is conservative.
-        const stopTouched = bullish ? candle.low <= Number(next.sl) : candle.high >= Number(next.sl);
-        const tp3Touched = bullish ? candle.high >= Number(next.tp3) : candle.low <= Number(next.tp3);
-        const tp2Touched = bullish ? candle.high >= Number(next.tp2) : candle.low <= Number(next.tp2);
-        const tp1Touched = bullish ? candle.high >= Number(next.tp1) : candle.low <= Number(next.tp1);
-        if (stopTouched) nextState = state === 'TP1' ? 'SL_AFTER_TP1' : state === 'TP2' ? 'SL_AFTER_TP2' : 'SL';
-        else if (tp3Touched) nextState = 'TP3';
-        else if (tp2Touched) nextState = 'TP2';
-        else if (tp1Touched) nextState = 'TP1';
-      }
-      if (nextState !== state) {
-        next.outcomeStatus = nextState;
-        next.outcomeUpdatedAt = new Date().toISOString();
-        changed = true;
-      } else if (!next.outcomeStatus) {
-        next.outcomeStatus = 'WAITING_FOR_ENTRY';
-        changed = true;
-      }
-      return next;
-    });
+    for (const candle of closedCandles) {
+      const candleAt = Number(candle.time);
+      if (candleAt * 1000 <= generatedAt || candleAt <= checkpoint) continue;
+      const bullish = record.direction === 'BUY';
 
-    if (changed || Number(record.lastOutcomeCandleAt || 0) < candleAt) {
+      for (const profile of profiles) {
+        const state = profile.outcomeStatus || 'WAITING_FOR_ENTRY';
+        if (['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2'].includes(state)) continue;
+
+        const entryTouched = Number(candle.low) <= Number(profile.entryHigh) &&
+          Number(candle.high) >= Number(profile.entryLow);
+        let nextState = state;
+
+        if (state === 'WAITING_FOR_ENTRY' && entryTouched) {
+          // OHLC cannot prove whether entry or stop happened first in this bar.
+          const stopTouchedAtEntry = bullish
+            ? Number(candle.low) <= Number(profile.sl)
+            : Number(candle.high) >= Number(profile.sl);
+          nextState = stopTouchedAtEntry ? 'SL' : 'OPEN';
+        } else if (['OPEN','TP1','TP2'].includes(state)) {
+          // If stop and target occur in one OHLC bar, conservatively count the stop first.
+          const stopTouched = bullish
+            ? Number(candle.low) <= Number(profile.sl)
+            : Number(candle.high) >= Number(profile.sl);
+          const tp3Touched = bullish
+            ? Number(candle.high) >= Number(profile.tp3)
+            : Number(candle.low) <= Number(profile.tp3);
+          const tp2Touched = bullish
+            ? Number(candle.high) >= Number(profile.tp2)
+            : Number(candle.low) <= Number(profile.tp2);
+          const tp1Touched = bullish
+            ? Number(candle.high) >= Number(profile.tp1)
+            : Number(candle.low) <= Number(profile.tp1);
+
+          if (stopTouched) nextState = state === 'TP1' ? 'SL_AFTER_TP1' : state === 'TP2' ? 'SL_AFTER_TP2' : 'SL';
+          else if (tp3Touched) nextState = 'TP3';
+          else if (tp2Touched) nextState = 'TP2';
+          else if (tp1Touched) nextState = 'TP1';
+        }
+
+        if (nextState !== state) {
+          profile.outcomeStatus = nextState;
+          profile.outcomeUpdatedAt = new Date().toISOString();
+          changed = true;
+        } else if (!profile.outcomeStatus) {
+          profile.outcomeStatus = 'WAITING_FOR_ENTRY';
+          changed = true;
+        }
+      }
+
+      checkpoint = candleAt;
+    }
+
+    if (checkpoint > Number(record.lastOutcomeCandleAt || 0) || changed) {
+      const terminal = ['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2'];
       const updated = {
         ...record,
         riskProfiles: profiles,
-        outcomeStatus: profiles.every(p => ['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2'].includes(p.outcomeStatus))
+        outcomeStatus: profiles.every(p => terminal.includes(p.outcomeStatus))
           ? 'COMPLETED'
           : profiles.some(p => p.outcomeStatus === 'OPEN') ? 'OPEN'
-          : profiles.some(p => p.outcomeStatus === 'TP1' || p.outcomeStatus === 'TP2' || p.outcomeStatus === 'TP3') ? 'TARGET_HIT'
+          : profiles.some(p => ['TP1','TP2','TP3'].includes(p.outcomeStatus)) ? 'TARGET_HIT'
           : 'WAITING_FOR_ENTRY',
-        lastOutcomeCandleAt: candleAt,
-        lastOutcomePrice: Number(candle.close),
+        lastOutcomeCandleAt: checkpoint,
+        lastOutcomePrice: Number(closedCandles.find(c => Number(c.time) === checkpoint)?.close),
         outcomeCheckedAt: new Date().toISOString()
       };
       await redis(['LSET','aurum:server-signal-history:'+encodeURIComponent(symbol),String(index),JSON.stringify(updated)]);
-      // Keep the live monitor in sync with its matching history record.
+
+      // Keep the live monitor synchronized with the matching history record.
       if (currentRecord && currentRecord.status === 'SIGNAL' &&
           ((currentRecord.generatedAt && currentRecord.generatedAt === updated.generatedAt) ||
            (currentRecord.fingerprint && currentRecord.fingerprint === updated.fingerprint))) {
