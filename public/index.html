@@ -6708,9 +6708,6 @@ function calculateSignalStrength(direction, activeTimeframe, obZone) {
   const reasons = [];
   let score = 0;
 
-  const higher = [trend.direction === wanted, diag.H4?.latestBreak?.includes(wanted) ||
-    diag.H4?.latestBreak === 'NONE' && diag.H4?.latestBreak !== null];
-  const h4Bias = diag.H4?.latestBreak || '';
   const htfTrend = (trend.direction === wanted);
   if (htfTrend) { score += 25; reasons.push('Arah mayoritas M5–D1 sejalan: +25'); }
   else { reasons.push('Arah mayoritas timeframe belum sejalan: +0'); }
