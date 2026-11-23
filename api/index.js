@@ -451,7 +451,18 @@ module.exports = async function handler(req, res) {
       }
 
       const lastCandleAt = candleData.lastCandleAt || candleData.candles[candleData.candles.length - 1].datetime;
-      const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
+      const rawCandleAgeSeconds = (Date.now() - Date.parse(lastCandleAt)) / 1000;
+      const candleAgeSeconds = Number.isFinite(rawCandleAgeSeconds) && rawCandleAgeSeconds >= 0
+        ? Math.floor(rawCandleAgeSeconds)
+        : null;
+      const candleFreshnessLimitSeconds = ({
+        M1: 180, M5: 600, M15: 1800, M30: 3600,
+        M45: 5400, H1: 7200, H4: 28800, D1: 172800
+      }[selected] || 1800);
+      const candleStatus = candleAgeSeconds !== null &&
+        candleAgeSeconds <= candleFreshnessLimitSeconds
+        ? "fresh_candles"
+        : "stale_candles";
       const output = {
         ...candleData,
         status: "success",
@@ -461,7 +472,7 @@ module.exports = async function handler(req, res) {
         providerFetchedAt: candleData.providerFetchedAt || null,
         lastCandleAt,
         candleAgeSeconds,
-        candleStatus: candleData.candleStatus || "stale_candles",
+        candleStatus,
         livePrice: quote?.price ?? null,
         livePriceUpdatedAt: quote?.receivedAt ?? null,
         livePriceSource: quote?.source || "XAUS spot API",
