@@ -225,6 +225,34 @@ module.exports = async function handler(req, res) {
         }
       }
 
+      // Reuse a fresh Twelve Data fallback for at most the normal API cache window.
+      // This prevents repeated quota-consuming calls while keeping timestamp checks strict.
+      const cachedTwelveGold = redisCached?.data?.candleSource === "Twelve Data"
+        ? redisCached.data
+        : null;
+      if (cachedTwelveGold && Date.now() - Number(redisCached.time || 0) < cacheTTL) {
+        const fallbackLastAt = cachedTwelveGold.lastCandleAt || cachedTwelveGold.candles?.[cachedTwelveGold.candles.length - 1]?.datetime || null;
+        const fallbackAgeMs = fallbackLastAt ? Date.now() - Date.parse(fallbackLastAt) : NaN;
+        const fallbackAgeSeconds = Number.isFinite(fallbackAgeMs) && fallbackAgeMs >= 0
+          ? Math.floor(fallbackAgeMs / 1000)
+          : null;
+        const fallbackLimit = ({ M1: 180, M5: 600, M15: 1800, M30: 3600, M45: 5400, H1: 7200, H4: 28800, D1: 172800 }[selected] || 1800);
+        if (fallbackAgeSeconds !== null && fallbackAgeSeconds <= fallbackLimit) {
+          return res.status(200).json({
+            ...cachedTwelveGold,
+            lastCandleAt: fallbackLastAt,
+            candleAgeSeconds: fallbackAgeSeconds,
+            candleStatus: "fresh_candles",
+            livePrice: quote?.price ?? null,
+            livePriceUpdatedAt: quote?.receivedAt ?? null,
+            livePriceSource: quote?.source || "XAUS spot API",
+            livePriceStatus: quote?.status || "quote_unavailable",
+            livePriceError: quote?.error || null,
+            cache: "twelvedata_fallback_cache"
+          });
+        }
+      }
+
       const chartConfig = {
         M1: { interval: "1m", range: "1d" },
         M5: { interval: "5m", range: "5d" },
@@ -764,10 +792,7 @@ const twelveApiKey = process.env.TWELVE_DATA_API_KEY;
 
 if (!twelveApiKey) {
   if (redisCached && redisCached.data) {
-    return res.status(200).json({
-      ...redisCached.data,
-      cache: "stale"
-    });
+    return await respondWithStaleCache();
   }
 
   return res.status(500).json({
