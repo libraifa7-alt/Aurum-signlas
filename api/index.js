@@ -54,13 +54,22 @@ module.exports = async function handler(req, res) {
     req.query.interval || "M15"
   ).toUpperCase();
 
-  const interval = allowedIntervals[selected] || "15min";
+  if (!Object.prototype.hasOwnProperty.call(allowedIntervals, selected)) {
+    return res.status(400).json({
+      status: "error",
+      code: "INVALID_INTERVAL",
+      message: "Interval tidak valid",
+      receivedInterval: selected
+    });
+  }
+
+  const interval = allowedIntervals[selected];
   const debugRaw = req.query.debug === "raw" && selectedSymbol === "XAU/USD";
   const debugQuote = req.query.debug === "quote" && selectedSymbol === "XAU/USD";
 
   // Versioned provider cache prevents old MarketAPI candles being reused.
   const cacheSource = (selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? "yahoo" : selectedSymbol === "XAU/USD" ? "xaus-chart" : "twelvedata";
-  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + ((selectedSymbol === "XAU/USD" || selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? ":v3" : ":v2");
+  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + ((selectedSymbol === "XAU/USD" || selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? ":v4" : ":v2");
   const cached = globalThis.aurumCache.get(cacheKey);
 
   // AURUM SMART API CACHE OPTIMIZATION
@@ -88,8 +97,32 @@ module.exports = async function handler(req, res) {
           "1day": 1800000
         }[interval] || 180000);
 
+  // Recalculate candle age whenever Yahoo cache is served; cache age is not candle age.
+  function withYahooCandleFreshness(payload) {
+    if (selectedSymbol !== "WTI" && selectedSymbol !== "BTC/USD") return payload;
+    const lastCandleAt = payload?.lastCandleAt || payload?.candles?.[payload.candles.length - 1]?.datetime || null;
+    const timestamp = lastCandleAt ? Date.parse(lastCandleAt) : NaN;
+    const ageMs = Number.isFinite(timestamp) ? Date.now() - timestamp : NaN;
+    // Timestamp masa depan/invalid tidak boleh dianggap candle baru.
+    const candleAgeSeconds = Number.isFinite(ageMs) && ageMs >= 0
+      ? Math.floor(ageMs / 1000)
+      : null;
+    const freshnessLimitSeconds = ({
+      M1: 180, M5: 600, M15: 1800, M30: 3600,
+      M45: 5400, H1: 7200, H4: 28800, D1: 172800
+    }[selected] || 1800);
+    return {
+      ...payload,
+      lastCandleAt,
+      candleAgeSeconds,
+      candleStatus: candleAgeSeconds !== null && candleAgeSeconds <= freshnessLimitSeconds
+        ? "fresh_candles"
+        : "stale_candles"
+    };
+  }
+
   if (selectedSymbol !== "XAU/USD" && !debugRaw && !debugQuote && cached && Date.now() - cached.time < cacheTTL) {
-    return res.status(200).json(cached.data);
+    return res.status(200).json(withYahooCandleFreshness(cached.data));
   }
 
     try {
@@ -124,7 +157,7 @@ module.exports = async function handler(req, res) {
       });
 
       if (selectedSymbol !== "XAU/USD" && !debugRaw && !debugQuote && Date.now() - redisCached.time < cacheTTL) {
-        return res.status(200).json(redisCached.data);
+        return res.status(200).json(withYahooCandleFreshness(redisCached.data));
       }
     }
 
@@ -192,6 +225,34 @@ module.exports = async function handler(req, res) {
         }
       }
 
+      // Reuse a fresh Twelve Data fallback for at most the normal API cache window.
+      // This prevents repeated quota-consuming calls while keeping timestamp checks strict.
+      const cachedTwelveGold = redisCached?.data?.candleSource === "Twelve Data"
+        ? redisCached.data
+        : null;
+      if (cachedTwelveGold && Date.now() - Number(redisCached.time || 0) < cacheTTL) {
+        const fallbackLastAt = cachedTwelveGold.lastCandleAt || cachedTwelveGold.candles?.[cachedTwelveGold.candles.length - 1]?.datetime || null;
+        const fallbackAgeMs = fallbackLastAt ? Date.now() - Date.parse(fallbackLastAt) : NaN;
+        const fallbackAgeSeconds = Number.isFinite(fallbackAgeMs) && fallbackAgeMs >= 0
+          ? Math.floor(fallbackAgeMs / 1000)
+          : null;
+        const fallbackLimit = ({ M1: 180, M5: 600, M15: 1800, M30: 3600, M45: 5400, H1: 7200, H4: 28800, D1: 172800 }[selected] || 1800);
+        if (fallbackAgeSeconds !== null && fallbackAgeSeconds <= fallbackLimit) {
+          return res.status(200).json({
+            ...cachedTwelveGold,
+            lastCandleAt: fallbackLastAt,
+            candleAgeSeconds: fallbackAgeSeconds,
+            candleStatus: "fresh_candles",
+            livePrice: quote?.price ?? null,
+            livePriceUpdatedAt: quote?.receivedAt ?? null,
+            livePriceSource: quote?.source || "XAUS spot API",
+            livePriceStatus: quote?.status || "quote_unavailable",
+            livePriceError: quote?.error || null,
+            cache: "twelvedata_fallback_cache"
+          });
+        }
+      }
+
       const chartConfig = {
         M1: { interval: "1m", range: "1d" },
         M5: { interval: "5m", range: "5d" },
@@ -203,7 +264,13 @@ module.exports = async function handler(req, res) {
         D1: { interval: "1d", range: "2y" }
       };
       const config = chartConfig[selected] || chartConfig.M15;
-      const cachedGold = redisCached?.data || cached?.data || null;
+      const cachedGoldCandidate = redisCached?.data || cached?.data || null;
+      // Cache key versions are isolated, but verify provenance before reusing Gold candles.
+      // Twelve Data fallback candles must never be mislabeled as XAUS Chart data.
+      const cachedGold = cachedGoldCandidate && (
+        cachedGoldCandidate.candleSource === "XAUS Chart API" ||
+        cachedGoldCandidate.source === "XAUS Chart API (OHLCV)"
+      ) ? cachedGoldCandidate : null;
       // Gunakan waktu fetch provider, bukan waktu cache ditulis ulang.
       // Fallback candle lama tidak boleh memperpanjang umur data.
       const cachedGoldFetchedAt = cachedGold?.providerFetchedAt
@@ -324,11 +391,15 @@ module.exports = async function handler(req, res) {
           }
 
           const lastCandleAt = candles[candles.length - 1].datetime;
-          const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
+          const rawCandleAgeSeconds = (Date.now() - Date.parse(lastCandleAt)) / 1000;
+          const candleAgeSeconds = Number.isFinite(rawCandleAgeSeconds) && rawCandleAgeSeconds >= 0
+            ? Math.floor(rawCandleAgeSeconds)
+            : null;
+          // Keep backend candle freshness thresholds aligned with the chart UI.
           const freshnessLimit = ({
-            M1: 300, M5: 900, M15: 2700, M30: 5400,
-            M45: 8100, H1: 10800, H4: 43200, D1: 259200
-          }[selected] || 2700);
+            M1: 180, M5: 600, M15: 1800, M30: 3600,
+            M45: 5400, H1: 7200, H4: 28800, D1: 172800
+          }[selected] || 1800);
 
           candleData = {
             status: "success",
@@ -339,7 +410,7 @@ module.exports = async function handler(req, res) {
             providerFetchedAt: new Date().toISOString(),
             lastCandleAt,
             candleAgeSeconds,
-            candleStatus: candleAgeSeconds <= freshnessLimit ? "fresh_candles" : "stale_candles",
+            candleStatus: candleAgeSeconds !== null && candleAgeSeconds <= freshnessLimit ? "fresh_candles" : "stale_candles",
             candles
           };
 
@@ -395,47 +466,212 @@ module.exports = async function handler(req, res) {
         };
       }
 
-      if (!candleData || !Array.isArray(candleData.candles) || !candleData.candles.length) {
-        return res.status(503).json({
-          status: "provider_error",
+      // A fresh primary XAUS candle set may be returned directly. If it is stale
+      // OR unavailable, continue to the independent BiQuote and Twelve Data fallbacks.
+      let lastCandleAt = null;
+      let candleAgeSeconds = null;
+      if (candleData && Array.isArray(candleData.candles) && candleData.candles.length) {
+        lastCandleAt = candleData.lastCandleAt || candleData.candles[candleData.candles.length - 1].datetime;
+        const rawCandleAgeSeconds = (Date.now() - Date.parse(lastCandleAt)) / 1000;
+        candleAgeSeconds = Number.isFinite(rawCandleAgeSeconds) && rawCandleAgeSeconds >= 0
+          ? Math.floor(rawCandleAgeSeconds)
+          : null;
+        const candleFreshnessLimitSeconds = ({
+          M1: 180, M5: 600, M15: 1800, M30: 3600,
+          M45: 5400, H1: 7200, H4: 28800, D1: 172800
+        }[selected] || 1800);
+        const candleStatus = candleAgeSeconds !== null &&
+          candleAgeSeconds <= candleFreshnessLimitSeconds
+          ? "fresh_candles"
+          : "stale_candles";
+        const output = {
+          ...candleData,
+          status: "success",
           symbol: selectedSymbol,
           interval: selected,
-          source: "XAUS spot + XAUS Chart API",
+          source: candleData.source || "XAUS Chart API (OHLCV)",
+          candleSource: candleData.candleSource || "XAUS Chart API",
+          providerFetchedAt: candleData.providerFetchedAt || null,
+          lastCandleAt,
+          candleAgeSeconds,
+          candleStatus,
           livePrice: quote?.price ?? null,
           livePriceUpdatedAt: quote?.receivedAt ?? null,
           livePriceSource: quote?.source || "XAUS spot API",
           livePriceStatus: quote?.status || "quote_unavailable",
           livePriceError: quote?.error || null,
-          candleStatus: "unavailable",
-          candleError: chartError || "Candle OHLC belum tersedia dari provider",
-          candles: [],
-          message: "Tidak ada candle valid yang dapat ditampilkan. AURUM tidak membuat candle palsu."
-        });
+          cache: candleData.cache || (candleData === cachedGold ? "cached_ohlcv" : "xaus_chart_ohlcv"),
+          candleError: candleData.candleError || chartError || null
+        };
+
+        if (candleStatus === "fresh_candles") {
+          globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: output });
+          return res.status(200).json(output);
+        }
+
+        chartError = chartError || ("XAUS Chart candle stale: " +
+          (candleAgeSeconds === null ? "timestamp invalid/future" : candleAgeSeconds + " seconds old"));
+      } else {
+        chartError = chartError || "XAUS Chart tidak mengirim candle valid";
       }
 
-      const lastCandleAt = candleData.lastCandleAt || candleData.candles[candleData.candles.length - 1].datetime;
-      const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
-      const output = {
-        ...candleData,
-        status: "success",
-        symbol: selectedSymbol,
+      // XAUS Chart is a Yahoo Finance proxy. Try an independent MT5 tick/OHLC feed
+      // before Twelve Data when the primary Gold candle is stale.
+      chartError = chartError || ("XAUS Chart candle stale: " + (candleAgeSeconds === null ? "timestamp invalid/future" : candleAgeSeconds + " seconds old"));
+      console.warn("AURUM GOLD PRIMARY CANDLE SOURCE STALE; TRYING BIQUOTE MT5:", {
         interval: selected,
-        source: candleData.source || "XAUS Chart API (OHLCV)",
-        providerFetchedAt: candleData.providerFetchedAt || null,
         lastCandleAt,
-        candleAgeSeconds,
-        candleStatus: candleData.candleStatus || "stale_candles",
-        livePrice: quote?.price ?? null,
-        livePriceUpdatedAt: quote?.receivedAt ?? null,
-        livePriceSource: quote?.source || "XAUS spot API",
-        livePriceStatus: quote?.status || "quote_unavailable",
-        livePriceError: quote?.error || null,
-        cache: candleData.cache || (candleData === cachedGold ? "cached_ohlcv" : "xaus_chart_ohlcv"),
-        candleError: candleData.candleError || chartError || null
-      };
+        candleAgeSeconds
+      });
 
-      globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: output });
-      return res.status(200).json(output);
+      try {
+        const biquoteIntervals = {
+          M1: "1m", M5: "5m", M15: "15m", M30: "30m",
+          M45: "15m", H1: "1h", H4: "4h", D1: "1d"
+        };
+        const biquoteInterval = biquoteIntervals[selected];
+        const biquoteLimits = {
+          M1: 300, M5: 288, M15: 192, M30: 192,
+          M45: 300, H1: 168, H4: 180, D1: 500
+        };
+        const biquoteUrl = new URL("https://biquote.io/api/XAUUSD/ohlc");
+        biquoteUrl.searchParams.set("interval", biquoteInterval);
+        biquoteUrl.searchParams.set("limit", String(biquoteLimits[selected] || 100));
+
+        const [barsResponse, tickResponse] = await Promise.all([
+          fetch(biquoteUrl, {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(10000)
+          }),
+          fetch("https://biquote.io/api/XAUUSD?allowStale=false", {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(8000)
+          })
+        ]);
+        const [biquotePayload, biquoteTick] = await Promise.all([
+          barsResponse.json(),
+          tickResponse.json()
+        ]);
+        if (!barsResponse.ok) {
+          throw new Error(biquotePayload?.message || "BiQuote OHLC HTTP " + barsResponse.status);
+        }
+
+        let biquoteBars = (Array.isArray(biquotePayload.bars) ? biquotePayload.bars : [])
+          .filter(bar => bar && bar.isOpen !== true)
+          .map(bar => {
+            const timestamp = Date.parse(bar.openTime);
+            const open = Number(bar.open);
+            const high = Number(bar.high);
+            const low = Number(bar.low);
+            const close = Number(bar.close);
+            const volume = Number(bar.tickVolume ?? bar.volume ?? 0);
+            if (!Number.isFinite(timestamp) || timestamp <= 0 ||
+                ![open, high, low, close].every(Number.isFinite) ||
+                open <= 0 || high <= 0 || low <= 0 || close <= 0 ||
+                high < Math.max(open, close, low) ||
+                low > Math.min(open, close, high)) return null;
+            return {
+              timestamp: Math.floor(timestamp / 1000),
+              datetime: new Date(timestamp).toISOString(),
+              open, high, low, close,
+              volume: Number.isFinite(volume) ? volume : 0
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.timestamp - b.timestamp);
+
+        if (selected === "M45") {
+          const buckets = new Map();
+          for (const bar of biquoteBars) {
+            const bucket = Math.floor(bar.timestamp / 2700) * 2700;
+            if (!buckets.has(bucket)) buckets.set(bucket, []);
+            buckets.get(bucket).push(bar);
+          }
+          biquoteBars = Array.from(buckets.entries())
+            .filter(([bucket, group]) =>
+              group.length === 3 &&
+              group.some(bar => bar.timestamp === bucket) &&
+              group.some(bar => bar.timestamp === bucket + 900) &&
+              group.some(bar => bar.timestamp === bucket + 1800)
+            )
+            .map(([bucket, group]) => {
+              group.sort((a, b) => a.timestamp - b.timestamp);
+              return {
+                timestamp: bucket,
+                datetime: new Date(bucket * 1000).toISOString(),
+                open: group[0].open,
+                high: Math.max(...group.map(bar => bar.high)),
+                low: Math.min(...group.map(bar => bar.low)),
+                close: group[2].close,
+                volume: group.reduce((sum, bar) => sum + bar.volume, 0)
+              };
+            });
+        }
+
+        const biquoteLast = biquoteBars[biquoteBars.length - 1];
+        const biquoteAgeMs = biquoteLast ? Date.now() - Date.parse(biquoteLast.datetime) : NaN;
+        const biquoteAgeSeconds = Number.isFinite(biquoteAgeMs) && biquoteAgeMs >= 0
+          ? Math.floor(biquoteAgeMs / 1000)
+          : null;
+        const biquoteFreshnessLimit = ({
+          M1: 180, M5: 600, M15: 1800, M30: 3600,
+          M45: 5400, H1: 7200, H4: 28800, D1: 172800
+        }[selected] || 1800);
+
+        if (!biquoteLast || biquoteAgeSeconds === null || biquoteAgeSeconds > biquoteFreshnessLimit) {
+          throw new Error("BiQuote candle stale/invalid: " + (biquoteAgeSeconds === null ? "timestamp invalid" : biquoteAgeSeconds + " seconds old"));
+        }
+
+        const tickMid = Number(biquoteTick?.mid);
+        const tickUpdatedAt = biquoteTick?.timestamp || biquoteTick?.lastQuoteAt || null;
+        const tickAgeMs = tickUpdatedAt ? Date.now() - Date.parse(tickUpdatedAt) : NaN;
+        const tickAgeSeconds = Number.isFinite(tickAgeMs) && tickAgeMs >= 0
+          ? Math.floor(tickAgeMs / 1000)
+          : null;
+        const tickIsFresh = Number.isFinite(tickMid) && tickMid > 0 &&
+          tickAgeSeconds !== null && tickAgeSeconds <= 120 &&
+          biquoteTick?.stale !== true && biquoteTick?.marketState !== "closed";
+
+        const biquoteOutput = {
+          status: "success",
+          symbol: selectedSymbol,
+          interval: selected,
+          source: "BiQuote OHLC (XAUUSD CFD)",
+          candleSource: "BiQuote OHLC",
+          providerFetchedAt: new Date().toISOString(),
+          lastCandleAt: biquoteLast.datetime,
+          candleAgeSeconds: biquoteAgeSeconds,
+          candleStatus: "fresh_candles",
+          livePrice: Number.isFinite(tickMid) && tickMid > 0 ? tickMid : null,
+          livePriceUpdatedAt: tickUpdatedAt,
+          livePriceSource: biquoteTick?.source || "BiQuote live tick",
+          livePriceStatus: tickIsFresh ? "live_quote" : "stale_quote",
+          livePriceError: tickIsFresh ? null : (biquoteTick?.message || "Kuotasi BiQuote belum memenuhi batas kesegaran"),
+          marketStatus: biquoteTick?.marketState || null,
+          candles: biquoteBars.slice(-500)
+        };
+
+        console.log("AURUM GOLD USING BIQUOTE MT5 FALLBACK:", {
+          interval: selected,
+          lastCandleAt: biquoteOutput.lastCandleAt,
+          candleAgeSeconds: biquoteOutput.candleAgeSeconds,
+          livePriceStatus: biquoteOutput.livePriceStatus,
+          bars: biquoteOutput.candles.length
+        });
+        globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: biquoteOutput });
+        try {
+          await aurumRedis([
+            "SET", redisKey,
+            JSON.stringify({ time: Date.now(), data: biquoteOutput }),
+            "EX", "604800"
+          ]);
+        } catch (error) {
+          console.warn("BIQUOTE GOLD CACHE WRITE:", error.message);
+        }
+        return res.status(200).json(biquoteOutput);
+      } catch (biquoteError) {
+        console.warn("AURUM BIQUOTE GOLD FALLBACK FAILED; TRYING TWELVE DATA:", String(biquoteError.message || biquoteError).slice(0, 180));
+      }
     }
 
     // Cooldown Twelve Data hanya berlaku untuk simbol yang masih memakai provider tersebut.
@@ -528,7 +764,7 @@ module.exports = async function handler(req, res) {
       if (!response.ok || !result) {
         if (redisCached && redisCached.data) {
           return res.status(200).json({
-            ...redisCached.data,
+            ...withYahooCandleFreshness(redisCached.data),
             cache: "stale"
           });
         }
@@ -547,7 +783,7 @@ module.exports = async function handler(req, res) {
       if (!quote) {
         if (redisCached && redisCached.data) {
           return res.status(200).json({
-            ...redisCached.data,
+            ...withYahooCandleFreshness(redisCached.data),
             cache: "stale"
           });
         }
@@ -621,6 +857,32 @@ module.exports = async function handler(req, res) {
         });
       }
 
+      // Status kesegaran candle Yahoo dihitung dari waktu candle terakhir,
+      // bukan hanya waktu respons provider. Ini mencegah data lama terlihat live.
+      const lastCandleAt = candles[candles.length - 1].datetime;
+      const lastCandleMs = Date.parse(lastCandleAt);
+      const candleAgeMs = Number.isFinite(lastCandleMs)
+        ? Date.now() - lastCandleMs
+        : NaN;
+      // Tolak timestamp masa depan agar tidak pernah lolos sebagai fresh.
+      const candleAgeSeconds = Number.isFinite(candleAgeMs) && candleAgeMs >= 0
+        ? Math.floor(candleAgeMs / 1000)
+        : null;
+      const freshnessLimitSeconds = ({
+        M1: 180,
+        M5: 600,
+        M15: 1800,
+        M30: 3600,
+        M45: 5400,
+        H1: 7200,
+        H4: 28800,
+        D1: 172800
+      }[selected] || 1800);
+      const candleStatus = candleAgeSeconds !== null &&
+        candleAgeSeconds <= freshnessLimitSeconds
+        ? "fresh_candles"
+        : "stale_candles";
+
       // HASIL DATA WTI + penanda waktu agar kesegaran data dapat diperiksa.
       const output = {
         status: "success",
@@ -628,7 +890,9 @@ module.exports = async function handler(req, res) {
         interval: selected,
         source: `Yahoo Finance (${yahooSymbol})`,
         providerFetchedAt: new Date().toISOString(),
-        lastCandleAt: candles[candles.length - 1].datetime,
+        lastCandleAt,
+        candleAgeSeconds,
+        candleStatus,
         candles
       };
 
@@ -670,10 +934,7 @@ const twelveApiKey = process.env.TWELVE_DATA_API_KEY;
 
 if (!twelveApiKey) {
   if (redisCached && redisCached.data) {
-    return res.status(200).json({
-      ...redisCached.data,
-      cache: "stale"
-    });
+    return await respondWithStaleCache();
   }
 
   return res.status(500).json({
@@ -783,8 +1044,16 @@ async function getCachedGoldQuote() {
 }
 
 async function respondWithStaleCache() {
+  const cachedPayload = redisCached.data;
+  const cachedLastCandleAt = cachedPayload?.lastCandleAt || cachedPayload?.candles?.[cachedPayload.candles.length - 1]?.datetime || null;
+  const cachedTimestamp = cachedLastCandleAt ? Date.parse(cachedLastCandleAt) : NaN;
+  const cachedAgeMs = Number.isFinite(cachedTimestamp) ? Date.now() - cachedTimestamp : NaN;
+  const cachedAgeSeconds = Number.isFinite(cachedAgeMs) && cachedAgeMs >= 0 ? Math.floor(cachedAgeMs / 1000) : null;
   const fallback = {
-    ...redisCached.data,
+    ...cachedPayload,
+    lastCandleAt: cachedLastCandleAt,
+    candleAgeSeconds: cachedAgeSeconds,
+    candleStatus: "stale_candles",
     cache: "stale_candles"
   };
 
@@ -916,7 +1185,10 @@ const convertedCandles = twelveData.values
     Number.isFinite(c.open) &&
     Number.isFinite(c.high) &&
     Number.isFinite(c.low) &&
-    Number.isFinite(c.close)
+    Number.isFinite(c.close) &&
+    c.open > 0 && c.high > 0 && c.low > 0 && c.close > 0 &&
+    c.high >= Math.max(c.open, c.close, c.low) &&
+    c.low <= Math.min(c.open, c.close, c.high)
   );
 
 if (convertedCandles.length === 0) {
@@ -1005,13 +1277,27 @@ if (selectedSymbol === "XAU/USD") {
 
 const providerFetchedAt = new Date().toISOString();
 const lastCandleAt = candles[candles.length - 1]?.datetime || null;
+const candleAgeMs = lastCandleAt ? Date.now() - Date.parse(lastCandleAt) : NaN;
+const candleAgeSeconds = Number.isFinite(candleAgeMs) && candleAgeMs >= 0
+  ? Math.floor(candleAgeMs / 1000)
+  : null;
+const candleFreshnessLimitSeconds = ({
+  M1: 180, M5: 600, M15: 1800, M30: 3600,
+  M45: 5400, H1: 7200, H4: 28800, D1: 172800
+}[selected] || 1800);
+const candleStatus = candleAgeSeconds !== null && candleAgeSeconds <= candleFreshnessLimitSeconds
+  ? "fresh_candles"
+  : "stale_candles";
 const output = {
   status: "success",
   symbol: selectedSymbol,
   interval: selected,
   source: "Twelve Data",
+  candleSource: "Twelve Data",
   providerFetchedAt,
   lastCandleAt,
+  candleAgeSeconds,
+  candleStatus,
   livePrice,
   livePriceUpdatedAt,
   livePriceSource,

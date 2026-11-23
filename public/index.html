@@ -4569,7 +4569,16 @@ async function loadChart(interval) {
       setText('aurumNearestResistance', '--');
       setText('aurumSupportDistance', 'Level belum tersedia');
       setText('aurumResistanceDistance', 'Level belum tersedia');
-      setText('marketStructure', 'Data candle ' + symbol + ' belum tersedia dari provider. Analisis ditunda.');
+      setText('marketStructure', 'Data candle ' + symbol + ' belum tersedia atau stale. Analisis ditahan.');
+      setText('signalStatus', 'WAIT');
+      setText('signalDetail', 'Sinyal ditahan karena data candle belum valid dan segar.');
+      const noSignals = document.getElementById('aurumNoSignals');
+      if (noSignals) {
+        noSignals.style.display = 'block';
+        noSignals.textContent = 'Belum ada sinyal: data candle ' + symbol + ' belum valid atau stale. Menunggu data provider terbaru.';
+      }
+      activeTradePlan = null;
+      try { drawTradePlanLines(null); } catch (_) {}
       setText('setupTrend', 'WAIT');
       setText('setupRange', '--');
       setText('setupSupport', '--');
@@ -4688,6 +4697,7 @@ if (useBrowserCache) {
 if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 
 // Status grafik harus mengikuti timestamp/provider, bukan label LIVE statis.
+let primaryChartDataFresh = false;
 const chartStatus = document.getElementById('chartFeedStatus');
 if (chartStatus) {
   const candleStamp = chartFeedMeta && chartFeedMeta.lastCandleAt;
@@ -4722,6 +4732,7 @@ if (chartStatus) {
   } else if (symbol === 'WTI' && (new Date().getUTCDay() === 0 || new Date().getUTCDay() === 6)) {
     state = 'PASAR TUTUP';
   }
+  primaryChartDataFresh = state === 'LIVE DATA';
   chartStatus.textContent = '● ' + state;
   chartStatus.classList.remove('is-live','is-delayed','is-closed');
   chartStatus.classList.add(state === 'LIVE DATA' ? 'is-live' : state === 'PASAR TUTUP' ? 'is-closed' : 'is-delayed');
@@ -5051,8 +5062,20 @@ async function getSharedCandles(interval, requestedSymbol) {
   const symbol = requestedSymbol || document.getElementById('pair').value;
   const cacheKey = symbol + ':' + interval;
   const cached = aurumCandleCache.get(cacheKey);
+  const freshnessLimits = {
+    M1: 180, M5: 600, M15: 1800, M30: 3600,
+    M45: 5400, H1: 7200, H4: 28800, D1: 172800
+  };
+  const maxCandleAge = freshnessLimits[interval] || 1800;
+  const hasFreshLastCandle = data => {
+    const last = Array.isArray(data) ? data[data.length - 1] : null;
+    const candleTime = Number(last?.time);
+    const ageSeconds = Math.floor(Date.now() / 1000) - candleTime;
+    return Number.isFinite(candleTime) &&
+      ageSeconds >= 0 && ageSeconds <= maxCandleAge;
+  };
 
-  if (cached && Date.now() - cached.time < 60000) {
+  if (cached && Date.now() - cached.time < 60000 && hasFreshLastCandle(cached.data)) {
 
     const lastCached =
       cached.data?.[cached.data.length - 1];
@@ -5183,6 +5206,15 @@ if (candles.length === 0) {
     'SEMUA CANDLE TIDAK VALID:',
     interval
   );
+  return [];
+}
+
+// Jangan teruskan candle stale atau timestamp masa depan ke mesin ICT.
+if (!hasFreshLastCandle(candles)) {
+  console.warn('ANALISIS DITAHAN — CANDLE STALE/INVALID:', {
+    symbol, interval, lastCandle: candles[candles.length - 1]
+  });
+  aurumCandleCache.delete(cacheKey);
   return [];
 }
     
@@ -6149,6 +6181,19 @@ function detectFVGZone(data) {
     return null;
   }
 
+  // Validasi OHLC sebelum menghitung gap agar data rusak tidak membentuk FVG palsu.
+  const validOhlc = candle => {
+    const open = Number(candle.open);
+    const high = Number(candle.high);
+    const low = Number(candle.low);
+    const close = Number(candle.close);
+    return [open, high, low, close].every(Number.isFinite) &&
+      high >= Math.max(open, close) &&
+      low <= Math.min(open, close) &&
+      high >= low;
+  };
+  if (!candles.every(validOhlc)) return null;
+
   // Cari FVG terbaru yang belum tersentuh
   for (let i = candles.length - 3; i >= 5; i--) {
     const a = candles[i];
@@ -6192,7 +6237,9 @@ function detectFVGZone(data) {
       let mitigated = false;
 
       for (let j = i + 3; j < candles.length; j++) {
-        if (candles[j].low <= high) {
+        // Mitigasi hanya terjadi jika rentang candle benar-benar
+        // beririsan dengan zona FVG [low, high].
+        if (candles[j].low <= high && candles[j].high >= low) {
           mitigated = true;
           break;
         }
@@ -6222,7 +6269,9 @@ function detectFVGZone(data) {
       let mitigated = false;
 
       for (let j = i + 3; j < candles.length; j++) {
-        if (candles[j].high >= low) {
+        // Mitigasi hanya terjadi jika rentang candle benar-benar
+        // beririsan dengan zona FVG [low, high].
+        if (candles[j].high >= low && candles[j].low <= high) {
           mitigated = true;
           break;
         }
@@ -6279,7 +6328,9 @@ function detectOrderBlock(data) {
     !Number.isFinite(c.high) ||
     !Number.isFinite(c.low) ||
     !Number.isFinite(c.close) ||
-    c.high < c.low
+    c.high < c.low ||
+    c.high < Math.max(c.open, c.close) ||
+    c.low > Math.min(c.open, c.close)
   )) {
     return {
       status: 'DATA_INVALID',
@@ -6679,24 +6730,24 @@ async function analyzeOrderBlockMultiTimeframe(requestedSymbol) {
 
     // KONFIRMASI BULLISH
     if (
+      trendH4 === 'BULLISH' &&
       trendH1 === 'BULLISH' &&
       trendM15 === 'BULLISH' &&
       obH1 === 'BULLISH' &&
       obM15 === 'BULLISH'
     ) {
-      return 'BUY ALIGNMENT — Struktur dan Order Block H1/M15 bullish' +
-        ' | H4: ' + trendH4;
+      return 'BUY ALIGNMENT — Struktur H4/H1/M15 dan Order Block H1/M15 bullish';
     }
 
-    // KONFIRMASI BEARISH
+    // KONFIRMASI BEARISH — H4 wajib searah sebagai filter tren utama
     if (
+      trendH4 === 'BEARISH' &&
       trendH1 === 'BEARISH' &&
       trendM15 === 'BEARISH' &&
       obH1 === 'BEARISH' &&
       obM15 === 'BEARISH'
     ) {
-      return 'SELL ALIGNMENT — Struktur dan Order Block H1/M15 bearish' +
-        ' | H4: ' + trendH4;
+      return 'SELL ALIGNMENT — Struktur H4/H1/M15 dan Order Block H1/M15 bearish';
     }
 
     return 'WAIT — Struktur atau Order Block belum searah' +
@@ -6722,10 +6773,45 @@ console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
 
 if (!candles || candles.length === 0) {
+  clearSelectedInstrumentView(symbol + ' · Candle belum tersedia dari provider');
   document.querySelector('.status').textContent =
-    'CANDLE KOSONG';
+    'DATA CANDLE TIDAK TERSEDIA — SINYAL DITAHAN';
 
   console.warn('TIDAK ADA DATA CANDLE');
+  return;
+}
+
+// Pemeriksaan terakhir sebelum candle masuk ke grafik dan mesin ICT.
+// Status API saja tidak cukup: umur candle dihitung ulang dari timestamp aslinya.
+const candleFreshnessLimits = {
+  M1: 180, M5: 600, M15: 1800, M30: 3600,
+  M45: 5400, H1: 7200, H4: 28800, D1: 172800
+};
+const lastCandle = candles[candles.length - 1];
+const lastCandleTime = Number(lastCandle?.time);
+const candleAgeSeconds = Math.floor(Date.now() / 1000) - lastCandleTime;
+const candlesHaveValidOhlc = candles.every(c => {
+  const o = Number(c.open), h = Number(c.high), l = Number(c.low), cl = Number(c.close);
+  return [o, h, l, cl].every(Number.isFinite) &&
+    h >= Math.max(o, cl) && l <= Math.min(o, cl) && h >= l;
+});
+const candleIsFresh = Number.isFinite(lastCandleTime) &&
+  candleAgeSeconds >= 0 &&
+  candleAgeSeconds <= (candleFreshnessLimits[interval] || 1800);
+
+if (!candlesHaveValidOhlc || !candleIsFresh) {
+  aurumCandleCache.delete(cacheKey);
+  const reason = !candlesHaveValidOhlc
+    ? 'OHLC tidak valid'
+    : candleAgeSeconds < 0
+      ? 'timestamp candle berada di masa depan'
+      : 'candle terakhir berumur ' + candleAgeSeconds + ' detik';
+  clearSelectedInstrumentView(symbol + ' · DATA STALE/INVALID — ' + reason);
+  document.querySelector('.status').textContent =
+    'DATA CANDLE STALE/INVALID — ANALISIS ICT DITAHAN';
+  console.warn('ANALISIS DITAHAN — DATA CANDLE TIDAK LAYAK:', {
+    symbol, interval, candleAgeSeconds, lastCandle, candlesHaveValidOhlc
+  });
   return;
 }
 
@@ -6947,9 +7033,9 @@ const signalDetail = document.getElementById('signalDetail');
 
 let finalSignal = 'WAIT';
 
-if (marketBias === 'BUY' && mtfBias === 'BUY') {
+if (primaryChartDataFresh && marketBias === 'BUY' && mtfBias === 'BUY') {
   finalSignal = 'BUY';
-} else if (marketBias === 'SELL' && mtfBias === 'SELL') {
+} else if (primaryChartDataFresh && marketBias === 'SELL' && mtfBias === 'SELL') {
   finalSignal = 'SELL';
 }
 
@@ -6957,8 +7043,12 @@ const noSignalsPanel = document.getElementById('aurumNoSignals');
 if (noSignalsPanel) {
   noSignalsPanel.style.display = finalSignal === 'WAIT' ? 'block' : 'none';
   noSignalsPanel.textContent = finalSignal === 'WAIT'
-    ? 'Belum ada sinyal terkonfirmasi. Market Structure: ' + structure +
-      ' · Konfirmasi MTF: ' + orderBlockMTF
+    ? (!primaryChartDataFresh
+      ? 'Sinyal ditahan: candle timeframe utama belum segar atau pasar sedang tutup. ' +
+        'Status grafik: ' + (chartStatus?.textContent || 'TERTUNDA') +
+        ' · Market Structure: ' + structure + ' · Konfirmasi MTF: ' + orderBlockMTF
+      : 'Belum ada sinyal terkonfirmasi. Market Structure: ' + structure +
+        ' · Konfirmasi MTF: ' + orderBlockMTF)
     : 'Sinyal ' + finalSignal + ' terkonfirmasi berdasarkan Market Structure dan MTF.';
 }
 const tradePlanPanel = document.getElementById('aurumTradePlan');
@@ -6974,7 +7064,9 @@ if (signalStatus && signalDetail) {
 
   signalDetail.textContent =
     finalSignal === 'WAIT'
-      ? 'Market Structure dan konfirmasi MTF belum searah.'
+      ? (!primaryChartDataFresh
+        ? 'Sinyal ditahan karena candle timeframe utama belum LIVE/valid atau pasar sedang tutup.'
+        : 'Market Structure dan konfirmasi MTF belum searah.')
       : 'Market Structure dan Order Block MTF sudah searah.';
 }      
 
