@@ -431,7 +431,13 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      const lastCandleAt = candleData.lastCandleAt || candleData.candles[candleData.candles.length - 1].datetime;
+      // Derive freshness from the actual newest candle in the payload.
+      // Cached metadata can lag behind the candle array and must not misreport its age.
+      const newestCandle = candleData.candles.reduce((latest, candle) =>
+        Date.parse(candle?.datetime || "") > Date.parse(latest?.datetime || "") ? candle : latest,
+        candleData.candles[0]
+      );
+      const lastCandleAt = newestCandle.datetime;
       const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
       const output = {
         ...candleData,
