@@ -8,6 +8,10 @@ on:
       - 'api/cron.js'
       - 'api/engine.js'
       - 'api/index.js'
+      - 'api/signals.js'
+      - 'api/push-subscribe.js'
+      - 'public/index.html'
+      - 'public/sw.js'
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
