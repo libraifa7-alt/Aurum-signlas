@@ -21,7 +21,10 @@ async function redis(command) {
 async function updateSignalOutcomes(symbol, candles) {
   const rows = await redis(['LRANGE','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','99']);
   if (!Array.isArray(rows) || !rows.length || !Array.isArray(candles) || !candles.length) return;
-  const candle = candles[candles.length - 1];
+  // Match the strategy engine: never finalize outcomes from a still-forming M15 candle.
+  // The newest array element may be incomplete, so use the preceding closed candle.
+  if (candles.length < 2) return;
+  const candle = candles[candles.length - 2];
   const candleAt = Number(candle.time);
   if (!Number.isFinite(candleAt) || !Number.isFinite(candle.high) || !Number.isFinite(candle.low)) return;
 
