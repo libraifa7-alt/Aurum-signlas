@@ -513,7 +513,19 @@ module.exports = async function handler(req, res) {
         candleData.candles[0]
       );
       const lastCandleAt = newestCandle.datetime;
-      const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
+      const rawCandleAgeSeconds = Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000);
+      const candleAgeSeconds = Number.isFinite(rawCandleAgeSeconds)
+        ? Math.max(0, rawCandleAgeSeconds)
+        : null;
+      const freshnessLimit = ({
+        M1: 300, M5: 900, M15: 2700, M30: 5400,
+        M45: 8100, H1: 10800, H4: 43200, D1: 259200
+      }[selected] || 2700);
+      // Re-evaluate freshness on EVERY response. A cached candle's old
+      // "fresh_candles" label must expire as its actual timestamp ages.
+      const candleIsFresh = Number.isFinite(rawCandleAgeSeconds) &&
+        rawCandleAgeSeconds >= -60 &&
+        rawCandleAgeSeconds <= freshnessLimit;
       const output = {
         ...candleData,
         status: "success",
@@ -523,7 +535,7 @@ module.exports = async function handler(req, res) {
         providerFetchedAt: candleData.providerFetchedAt || null,
         lastCandleAt,
         candleAgeSeconds,
-        candleStatus: candleData.candleStatus || "stale_candles",
+        candleStatus: candleIsFresh ? "fresh_candles" : "stale_candles",
         livePrice: quote?.price ?? null,
         livePriceUpdatedAt: quote?.receivedAt ?? null,
         livePriceSource: quote?.source || "XAUS spot API",
