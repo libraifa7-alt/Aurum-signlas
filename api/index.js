@@ -88,8 +88,30 @@ module.exports = async function handler(req, res) {
           "1day": 1800000
         }[interval] || 180000);
 
+  // Recalculate candle age whenever Yahoo cache is served; cache age is not candle age.
+  function withYahooCandleFreshness(payload) {
+    if (selectedSymbol !== "WTI" && selectedSymbol !== "BTC/USD") return payload;
+    const lastCandleAt = payload?.lastCandleAt || payload?.candles?.[payload.candles.length - 1]?.datetime || null;
+    const timestamp = lastCandleAt ? Date.parse(lastCandleAt) : NaN;
+    const candleAgeSeconds = Number.isFinite(timestamp)
+      ? Math.max(0, Math.floor((Date.now() - timestamp) / 1000))
+      : null;
+    const freshnessLimitSeconds = ({
+      M1: 180, M5: 600, M15: 1800, M30: 3600,
+      M45: 5400, H1: 7200, H4: 28800, D1: 172800
+    }[selected] || 1800);
+    return {
+      ...payload,
+      lastCandleAt,
+      candleAgeSeconds,
+      candleStatus: candleAgeSeconds !== null && candleAgeSeconds <= freshnessLimitSeconds
+        ? "fresh_candles"
+        : "stale_candles"
+    };
+  }
+
   if (selectedSymbol !== "XAU/USD" && !debugRaw && !debugQuote && cached && Date.now() - cached.time < cacheTTL) {
-    return res.status(200).json(cached.data);
+    return res.status(200).json(withYahooCandleFreshness(cached.data));
   }
 
     try {
@@ -124,7 +146,7 @@ module.exports = async function handler(req, res) {
       });
 
       if (selectedSymbol !== "XAU/USD" && !debugRaw && !debugQuote && Date.now() - redisCached.time < cacheTTL) {
-        return res.status(200).json(redisCached.data);
+        return res.status(200).json(withYahooCandleFreshness(redisCached.data));
       }
     }
 
@@ -528,7 +550,7 @@ module.exports = async function handler(req, res) {
       if (!response.ok || !result) {
         if (redisCached && redisCached.data) {
           return res.status(200).json({
-            ...redisCached.data,
+            ...withYahooCandleFreshness(redisCached.data),
             cache: "stale"
           });
         }
@@ -547,7 +569,7 @@ module.exports = async function handler(req, res) {
       if (!quote) {
         if (redisCached && redisCached.data) {
           return res.status(200).json({
-            ...redisCached.data,
+            ...withYahooCandleFreshness(redisCached.data),
             cache: "stale"
           });
         }
