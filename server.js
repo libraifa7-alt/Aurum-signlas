@@ -34,10 +34,6 @@ app.use(express.static(path.join(__dirname, "public"), {
   }
 }));
 
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
 app.use((error, _req, res, _next) => {
   console.error("AURUM SERVER ERROR:", error.message);
   if (res.headersSent) return;
