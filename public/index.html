@@ -8318,6 +8318,13 @@ body.aurum-user-dark .app-page{background:transparent!important}
   const names={'XAU/USD':'GOLD · XAU/USD','BTC/USD':'BITCOIN · BTC/USD','WTI':'WTI OIL'};
   const safe=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmt=v=>Number.isFinite(Number(v))?Number(v).toFixed(2):'--';
+  function ageLabel(seconds){
+    if(!Number.isFinite(Number(seconds)))return 'n/a';
+    const n=Math.max(0,Math.floor(Number(seconds)));
+    if(n<60)return n+' dtk';
+    if(n<3600)return Math.floor(n/60)+' mnt';
+    return Math.floor(n/3600)+' jam '+Math.floor(n%3600/60)+' mnt';
+  }
   function card(item){
     const cur=item.current||{};
     const status=cur.status||'NO DATA';
@@ -8326,8 +8333,14 @@ body.aurum-user-dark .app-page{background:transparent!important}
     const plan=cur.tradePlan||{};
     const detail=status==='SIGNAL'
       ? 'Entry '+fmt(plan.entryLow)+'–'+fmt(plan.entryHigh)+' · SL '+fmt(plan.sl)+' · TP '+fmt(plan.tp1)+' / '+fmt(plan.tp2)+' / '+fmt(plan.tp3)
-      : (cur.reason||'Belum ada hasil pemindaian tersimpan');
-    return '<article class="aurum-server-row"><strong>'+safe(names[item.symbol]||item.symbol)+'</strong><b class="'+cls+'">'+safe(dir)+'</b><small>'+safe(detail)+'</small></article>';
+      : (cur.reason==='STALE_OR_MISSING_CANDLES'?'Menunggu candle terbaru · timeframe: '+(cur.timeframes||[]).join(', '):(cur.reason||'Belum ada hasil pemindaian tersimpan'));
+    const feeds=cur.feedDiagnostics||{};
+    const feedLine=Object.keys(feeds).sort((a,b)=>['M5','M15','M30','M45','H1','H4','D1'].indexOf(a)-['M5','M15','M30','M45','H1','H4','D1'].indexOf(b)).map(tf=>{
+      const d=feeds[tf]||{};
+      return tf+' '+ageLabel(d.candleAgeSeconds);
+    }).join(' · ');
+    const checked=cur.checkedAt?'Diperiksa '+new Date(cur.checkedAt).toLocaleTimeString('id-ID'):'';
+    return '<article class="aurum-server-row"><strong>'+safe(names[item.symbol]||item.symbol)+'</strong><b class="'+cls+'">'+safe(dir)+'</b><small>'+safe(detail)+'</small>'+(feedLine?'<small class="aurum-server-muted">Usia candle: '+safe(feedLine)+'</small>':'')+(checked?'<small class="aurum-server-muted">'+safe(checked)+'</small>':'')+'</article>';
   }
   async function refresh(){
     try{
