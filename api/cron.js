@@ -1,6 +1,7 @@
 'use strict';
 
 const { TIMEFRAMES, normalizeCandles, evaluateMarket } = require('./engine');
+const webpush = require('web-push');
 
 async function redis(command) {
   const url=process.env.KV_REST_API_URL;
@@ -79,7 +80,35 @@ module.exports=async function handler(req,res){
         await redis(['LPUSH','aurum:server-signal-history:'+encodeURIComponent(symbol),JSON.stringify(record)]);
         await redis(['LTRIM','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','99']);
       }
-      results.push({symbol,status:evaluation.status,reason:evaluation.reason||null,changed,
+      let pushResult='not_sent';
+      if(changed&&evaluation.status==='SIGNAL'&&process.env.VAPID_PUBLIC_KEY&&process.env.VAPID_PRIVATE_KEY&&process.env.VAPID_SUBJECT){
+        webpush.setVapidDetails(process.env.VAPID_SUBJECT,process.env.VAPID_PUBLIC_KEY,process.env.VAPID_PRIVATE_KEY);
+        const ids=await redis(['SMEMBERS','aurum:push:subscriptions'])||[];
+        let sent=0,failed=0;
+        for(const id of ids){
+          const raw=await redis(['GET','aurum:push:subscription:'+id]);
+          if(!raw) { await redis(['SREM','aurum:push:subscriptions',id]); continue; }
+          try{
+            await webpush.sendNotification(JSON.parse(raw),JSON.stringify({
+              title:'AURUM SIGNAL — '+symbol,
+              body:evaluation.direction+' | Entry '+evaluation.tradePlan.entryLow+'–'+evaluation.tradePlan.entryHigh+' | SL '+evaluation.tradePlan.sl,
+              tag:'aurum-'+encodeURIComponent(symbol),
+              url:'/'
+            }));
+            sent++;
+          }catch(pushError){
+            failed++;
+            if(pushError.statusCode===404||pushError.statusCode===410){
+              await redis(['DEL','aurum:push:subscription:'+id]);
+              await redis(['SREM','aurum:push:subscriptions',id]);
+            }
+          }
+        }
+        pushResult={sent,failed};
+      }else if(!process.env.VAPID_PUBLIC_KEY||!process.env.VAPID_PRIVATE_KEY||!process.env.VAPID_SUBJECT){
+        pushResult='vapid_not_configured';
+      }
+      results.push({symbol,status:evaluation.status,reason:evaluation.reason||null,changed,push:pushResult,
         direction:evaluation.direction||null,latestCandleAt:Object.fromEntries(TIMEFRAMES.map(tf=>[tf,new Date((candleSets[tf].at(-1).time)*1000).toISOString()]))});
     }
 
