@@ -6170,6 +6170,19 @@ function detectFVGZone(data) {
     return null;
   }
 
+  // Validasi OHLC sebelum menghitung gap agar data rusak tidak membentuk FVG palsu.
+  const validOhlc = candle => {
+    const open = Number(candle.open);
+    const high = Number(candle.high);
+    const low = Number(candle.low);
+    const close = Number(candle.close);
+    return [open, high, low, close].every(Number.isFinite) &&
+      high >= Math.max(open, close) &&
+      low <= Math.min(open, close) &&
+      high >= low;
+  };
+  if (!candles.every(validOhlc)) return null;
+
   // Cari FVG terbaru yang belum tersentuh
   for (let i = candles.length - 3; i >= 5; i--) {
     const a = candles[i];
@@ -6300,7 +6313,9 @@ function detectOrderBlock(data) {
     !Number.isFinite(c.high) ||
     !Number.isFinite(c.low) ||
     !Number.isFinite(c.close) ||
-    c.high < c.low
+    c.high < c.low ||
+    c.high < Math.max(c.open, c.close) ||
+    c.low > Math.min(c.open, c.close)
   )) {
     return {
       status: 'DATA_INVALID',
