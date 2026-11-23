@@ -93,8 +93,10 @@ module.exports = async function handler(req, res) {
     if (selectedSymbol !== "WTI" && selectedSymbol !== "BTC/USD") return payload;
     const lastCandleAt = payload?.lastCandleAt || payload?.candles?.[payload.candles.length - 1]?.datetime || null;
     const timestamp = lastCandleAt ? Date.parse(lastCandleAt) : NaN;
-    const candleAgeSeconds = Number.isFinite(timestamp)
-      ? Math.max(0, Math.floor((Date.now() - timestamp) / 1000))
+    const ageMs = Number.isFinite(timestamp) ? Date.now() - timestamp : NaN;
+    // Timestamp masa depan/invalid tidak boleh dianggap candle baru.
+    const candleAgeSeconds = Number.isFinite(ageMs) && ageMs >= 0
+      ? Math.floor(ageMs / 1000)
       : null;
     const freshnessLimitSeconds = ({
       M1: 180, M5: 600, M15: 1800, M30: 3600,
@@ -648,8 +650,12 @@ module.exports = async function handler(req, res) {
       // bukan hanya waktu respons provider. Ini mencegah data lama terlihat live.
       const lastCandleAt = candles[candles.length - 1].datetime;
       const lastCandleMs = Date.parse(lastCandleAt);
-      const candleAgeSeconds = Number.isFinite(lastCandleMs)
-        ? Math.max(0, Math.floor((Date.now() - lastCandleMs) / 1000))
+      const candleAgeMs = Number.isFinite(lastCandleMs)
+        ? Date.now() - lastCandleMs
+        : NaN;
+      // Tolak timestamp masa depan agar tidak pernah lolos sebagai fresh.
+      const candleAgeSeconds = Number.isFinite(candleAgeMs) && candleAgeMs >= 0
+        ? Math.floor(candleAgeMs / 1000)
         : null;
       const freshnessLimitSeconds = ({
         M1: 180,
