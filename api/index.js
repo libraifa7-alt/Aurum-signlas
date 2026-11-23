@@ -133,6 +133,7 @@ module.exports = async function handler(req, res) {
     // Candle hanya berasal dari endpoint OHLCV; harga spot tidak disisipkan ke candle historis.
     if (selectedSymbol === "XAU/USD" && !debugRaw && !debugQuote) {
       const quoteKey = "aurum:quote:XAUUSD:xaus:v1";
+      const naifQuoteKey = "aurum:quote:XAUUSD:naif:v1";
       let savedQuote = null;
       try {
         const rawQuote = await aurumRedis(["GET", quoteKey]);
@@ -151,6 +152,7 @@ module.exports = async function handler(req, res) {
         : null;
 
       if (!quote) {
+        let xausFailure = null;
         try {
           const xausResponse = await fetch("https://xaus.com/api/v1/spot?compact=1", {
             headers: { "Accept": "application/json" },
@@ -172,6 +174,7 @@ module.exports = async function handler(req, res) {
               source: "XAUS spot API",
               status: "live_quote",
               cache: "provider",
+              attribution: null,
               error: null
             };
             try {
@@ -180,15 +183,84 @@ module.exports = async function handler(req, res) {
               console.warn("XAUS QUOTE CACHE WRITE:", error.message);
             }
           } else {
-            const reason = xausData.error || (xausData.stale ? "XAUS mengembalikan harga stale" : "Timestamp harga XAUS tidak cukup baru");
-            quote = savedQuote && Number.isFinite(Number(savedQuote.price))
-              ? { ...savedQuote, status: "stale_quote", cache: "redis_stale_quote", error: reason }
-              : { price: null, receivedAt: null, source: "XAUS spot API", status: "quote_unavailable", cache: "provider_error", error: reason };
+            xausFailure = xausData.error || (xausData.stale ? "XAUS mengembalikan harga stale" : "Timestamp harga XAUS tidak cukup baru");
           }
         } catch (error) {
+          xausFailure = String(error.message || "XAUS tidak dapat dihubungi").slice(0, 180);
+        }
+
+        // NAIF Free fallback: rates refresh every 60 seconds.
+        // Keep this quote separate from OHLC candles; never synthesize candles from spot prices.
+        if (!quote && process.env.NAIF_KEY) {
+          try {
+            let naifQuote = null;
+            const cachedNaifRaw = await aurumRedis(["GET", naifQuoteKey]);
+            if (cachedNaifRaw) {
+              const parsedNaif = JSON.parse(cachedNaifRaw);
+              const age = parsedNaif?.fetchedAt ? Date.now() - Date.parse(parsedNaif.fetchedAt) : Infinity;
+              if (age >= 0 && age < 60000 && Number.isFinite(Number(parsedNaif.price))) {
+                naifQuote = { ...parsedNaif, cache: "redis_naif_quote" };
+              }
+            }
+
+            if (!naifQuote) {
+              const naifUrl = new URL("https://api.naif.ae/api/v1/rates");
+              naifUrl.searchParams.set("symbols", "XAUUSD");
+              const naifResponse = await fetch(naifUrl, {
+                headers: {
+                  "Accept": "application/json",
+                  "Authorization": "Bearer " + process.env.NAIF_KEY,
+                  "Origin": "https://aurum-signals-ai.vercel.app",
+                  "Referer": "https://aurum-signals-ai.vercel.app/"
+                },
+                signal: AbortSignal.timeout(8000)
+              });
+              const naifBody = await naifResponse.json();
+              if (!naifResponse.ok) {
+                throw new Error("Naif API HTTP " + naifResponse.status);
+              }
+              const item = Array.isArray(naifBody.items)
+                ? naifBody.items.find(entry => String(entry.code || "").toUpperCase() === "XAUUSD")
+                : null;
+              const buy = Number(item?.buy);
+              const sell = Number(item?.sell);
+              const price = Number.isFinite(buy) && buy > 0 && Number.isFinite(sell) && sell > 0
+                ? (buy + sell) / 2
+                : NaN;
+              const updatedAt = item?.updated_at || naifBody.generated_at || null;
+              const updatedAge = updatedAt ? Date.now() - Date.parse(updatedAt) : Infinity;
+              if (!item || !Number.isFinite(price) || price <= 0 ||
+                  !Number.isFinite(updatedAge) || updatedAge < -60000 || updatedAge > 180000 ||
+                  item.stale === true) {
+                throw new Error("Naif tidak mengirim harga XAUUSD yang valid dan cukup baru");
+              }
+
+              naifQuote = {
+                price,
+                buy,
+                sell,
+                receivedAt: updatedAt,
+                fetchedAt: new Date().toISOString(),
+                source: "Naif API (buy/sell midpoint)",
+                status: "delayed_quote",
+                cache: "provider",
+                attribution: "Prices from naif.ae",
+                refreshSeconds: Number(naifBody.refresh_seconds) || 60,
+                error: null
+              };
+              await aurumRedis(["SET", naifQuoteKey, JSON.stringify(naifQuote), "EX", "86400"]);
+            }
+            quote = naifQuote;
+          } catch (error) {
+            console.warn("NAIF QUOTE FALLBACK:", error.message);
+            quote = savedQuote && Number.isFinite(Number(savedQuote.price))
+              ? { ...savedQuote, status: "stale_quote", cache: "redis_stale_quote", error: xausFailure || error.message }
+              : { price: null, receivedAt: null, source: "XAUS + Naif spot API", status: "quote_unavailable", cache: "provider_error", attribution: null, error: String(error.message || xausFailure || "Harga spot tidak tersedia").slice(0, 180) };
+          }
+        } else if (!quote) {
           quote = savedQuote && Number.isFinite(Number(savedQuote.price))
-            ? { ...savedQuote, status: "stale_quote", cache: "redis_stale_quote", error: String(error.message || "XAUS tidak dapat dihubungi").slice(0, 180) }
-            : { price: null, receivedAt: null, source: "XAUS spot API", status: "quote_unavailable", cache: "provider_error", error: String(error.message || "XAUS tidak dapat dihubungi").slice(0, 180) };
+            ? { ...savedQuote, status: "stale_quote", cache: "redis_stale_quote", error: xausFailure }
+            : { price: null, receivedAt: null, source: "XAUS spot API", status: "quote_unavailable", cache: "provider_error", attribution: null, error: xausFailure || "NAIF_KEY belum dikonfigurasi" };
         }
       }
 
