@@ -8350,8 +8350,11 @@ body.aurum-user-dark .app-page{background:transparent!important}
       safe(p.label||p.key)+': Entry '+fmt(p.entryLow)+'–'+fmt(p.entryHigh)+' · SL '+fmt(p.sl)+' · TP '+fmt(p.tp1)+'/'+fmt(p.tp2)+'/'+fmt(p.tp3)
     ).join(' | '):'';
     const riskLine=profiles?'<small class="aurum-server-muted">Profil risiko: '+profiles+'</small>':'';
+    const contextualStale=Array.isArray(cur.contextualTimeframesStale)&&cur.contextualTimeframesStale.length
+      ? '<small class="aurum-server-muted">Timeframe konteks stale (dikecualikan dari skor): '+safe(cur.contextualTimeframesStale.join(', '))+'</small>'
+      : '';
     const checked=cur.checkedAt?'Diperiksa '+new Date(cur.checkedAt).toLocaleTimeString('id-ID'):'';
-    return '<article class="aurum-server-row"><strong>'+safe(names[item.symbol]||item.symbol)+'</strong><b class="'+cls+'">'+safe(dir)+'</b><small>'+safe(detail)+'</small>'+strength+riskLine+(feedLine?'<small class="aurum-server-muted">Usia candle: '+safe(feedLine)+'</small>':'')+(checked?'<small class="aurum-server-muted">'+safe(checked)+'</small>':'')+'</article>';
+    return '<article class="aurum-server-row"><strong>'+safe(names[item.symbol]||item.symbol)+'</strong><b class="'+cls+'">'+safe(dir)+'</b><small>'+safe(detail)+'</small>'+strength+riskLine+contextualStale+(feedLine?'<small class="aurum-server-muted">Usia candle: '+safe(feedLine)+'</small>':'')+(checked?'<small class="aurum-server-muted">'+safe(checked)+'</small>':'')+'</article>';
   }
   async function refresh(){
     try{
