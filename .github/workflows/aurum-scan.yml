@@ -48,7 +48,7 @@ jobs:
 
           signals=$(curl --silent --show-error --fail --max-time 30 \
             -H "Accept: application/json" "$AURUM_URL/api/signals")
-          printf '%s\\n' "$signals"
+          printf '%s\n' "$signals"
           printf '%s' "$signals" | jq -e '
             .status == "success" and
             (.results | length == 3) and
