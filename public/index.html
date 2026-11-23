@@ -5051,8 +5051,20 @@ async function getSharedCandles(interval, requestedSymbol) {
   const symbol = requestedSymbol || document.getElementById('pair').value;
   const cacheKey = symbol + ':' + interval;
   const cached = aurumCandleCache.get(cacheKey);
+  const freshnessLimits = {
+    M1: 180, M5: 600, M15: 1800, M30: 3600,
+    M45: 5400, H1: 7200, H4: 28800, D1: 172800
+  };
+  const maxCandleAge = freshnessLimits[interval] || 1800;
+  const hasFreshLastCandle = data => {
+    const last = Array.isArray(data) ? data[data.length - 1] : null;
+    const candleTime = Number(last?.time);
+    const ageSeconds = Math.floor(Date.now() / 1000) - candleTime;
+    return Number.isFinite(candleTime) &&
+      ageSeconds >= 0 && ageSeconds <= maxCandleAge;
+  };
 
-  if (cached && Date.now() - cached.time < 60000) {
+  if (cached && Date.now() - cached.time < 60000 && hasFreshLastCandle(cached.data)) {
 
     const lastCached =
       cached.data?.[cached.data.length - 1];
@@ -5183,6 +5195,15 @@ if (candles.length === 0) {
     'SEMUA CANDLE TIDAK VALID:',
     interval
   );
+  return [];
+}
+
+// Jangan teruskan candle stale atau timestamp masa depan ke mesin ICT.
+if (!hasFreshLastCandle(candles)) {
+  console.warn('ANALISIS DITAHAN — CANDLE STALE/INVALID:', {
+    symbol, interval, lastCandle: candles[candles.length - 1]
+  });
+  aurumCandleCache.delete(cacheKey);
   return [];
 }
     
