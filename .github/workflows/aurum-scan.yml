@@ -1,6 +1,9 @@
 name: AURUM Signal Scanner
 
 on:
+  push:
+    paths:
+      - '.github/workflows/aurum-scan.yml'
   schedule:
     - cron: '*/15 * * * *'
   workflow_dispatch:
