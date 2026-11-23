@@ -54,7 +54,16 @@ module.exports = async function handler(req, res) {
     req.query.interval || "M15"
   ).toUpperCase();
 
-  const interval = allowedIntervals[selected] || "15min";
+  if (!Object.prototype.hasOwnProperty.call(allowedIntervals, selected)) {
+    return res.status(400).json({
+      status: "error",
+      code: "INVALID_INTERVAL",
+      message: "Interval tidak valid",
+      receivedInterval: selected
+    });
+  }
+
+  const interval = allowedIntervals[selected];
   const debugRaw = req.query.debug === "raw" && selectedSymbol === "XAU/USD";
   const debugQuote = req.query.debug === "quote" && selectedSymbol === "XAU/USD";
 
@@ -348,7 +357,10 @@ module.exports = async function handler(req, res) {
           }
 
           const lastCandleAt = candles[candles.length - 1].datetime;
-          const candleAgeSeconds = Math.max(0, Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000));
+          const rawCandleAgeSeconds = (Date.now() - Date.parse(lastCandleAt)) / 1000;
+          const candleAgeSeconds = Number.isFinite(rawCandleAgeSeconds) && rawCandleAgeSeconds >= 0
+            ? Math.floor(rawCandleAgeSeconds)
+            : null;
           // Keep backend candle freshness thresholds aligned with the chart UI.
           const freshnessLimit = ({
             M1: 180, M5: 600, M15: 1800, M30: 3600,
@@ -364,7 +376,7 @@ module.exports = async function handler(req, res) {
             providerFetchedAt: new Date().toISOString(),
             lastCandleAt,
             candleAgeSeconds,
-            candleStatus: candleAgeSeconds <= freshnessLimit ? "fresh_candles" : "stale_candles",
+            candleStatus: candleAgeSeconds !== null && candleAgeSeconds <= freshnessLimit ? "fresh_candles" : "stale_candles",
             candles
           };
 
