@@ -1,5 +1,5 @@
 name: AURUM Signal Scanner
-# Scanner heartbeat: run every 15 minutes and immediately after workflow maintenance.
+# Scanner heartbeat: run every 5 minutes and immediately after workflow maintenance.
 
 on:
   push:
