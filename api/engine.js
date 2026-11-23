@@ -606,16 +606,29 @@ function evaluateMarket(symbol, candleSets) {
   else if (diagnostics.D1==='BEARISH' && diagnostics.H4==='BEARISH' &&
            diagnostics.H1==='BEARISH' && diagnostics.M45==='BEARISH' && bearish>=5) bias='SELL';
 
+  // Samakan gerbang server dengan sinyal utama dashboard:
+  // bias D1/H4 + H1/M45 + minimal 5 dari 7 timeframe,
+  // lalu struktur H4/H1/M15 harus tersedia dan H1 serta M15 searah.
   const h1Ob=detectOrderBlock(candleSets.H1);
   const m15Ob=detectOrderBlock(candleSets.M15);
+  const obStructureKnown = ['H4','H1','M15'].every(tf => diagnostics[tf] !== 'UNKNOWN');
+  const obStructureAligned = bias==='BUY'
+    ? diagnostics.H1==='BULLISH' && diagnostics.M15==='BULLISH'
+    : bias==='SELL'
+      ? diagnostics.H1==='BEARISH' && diagnostics.M15==='BEARISH'
+      : false;
   const alignedOb = bias==='BUY'
     ? h1Ob.status==='VALID' && m15Ob.status==='VALID' && h1Ob.type==='BULLISH' && m15Ob.type==='BULLISH'
     : bias==='SELL'
       ? h1Ob.status==='VALID' && m15Ob.status==='VALID' && h1Ob.type==='BEARISH' && m15Ob.type==='BEARISH'
       : false;
 
-  if (bias==='WAIT' || !alignedOb) {
-    return {status:'WAIT',reason:bias==='WAIT'?'MTF_NOT_ALIGNED':'ORDER_BLOCK_NOT_ALIGNED',
+  if (bias==='WAIT' || !obStructureKnown || !obStructureAligned || !alignedOb) {
+    const reason = bias==='WAIT' ? 'MTF_NOT_ALIGNED'
+      : !obStructureKnown ? 'OB_STRUCTURE_DATA_INSUFFICIENT'
+      : !obStructureAligned ? 'OB_STRUCTURE_NOT_ALIGNED'
+      : 'ORDER_BLOCK_NOT_ALIGNED';
+    return {status:'WAIT',reason,
       symbol,trends:diagnostics,bullish,bearish,unknown,
       orderBlocks:{H1:{status:h1Ob.status,type:h1Ob.type||null},M15:{status:m15Ob.status,type:m15Ob.type||null}}};
   }
