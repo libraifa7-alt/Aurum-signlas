@@ -7195,7 +7195,7 @@ const validTradePlan =
     : null;
 
 const riskProfiles = validTradePlan ? calculateRiskProfiles(obZone) : [];
-window.aurumSelectedRiskProfile = null;
+window.aurumSelectedRiskProfileKey = window.aurumSelectedRiskProfileKey || 'MEDIUM';
 const strengthPanel = document.getElementById('aurumSignalStrength');
 const strengthValue = document.getElementById('aurumSignalStrengthValue');
 const strengthBar = document.getElementById('aurumSignalStrengthBar');
@@ -7223,7 +7223,7 @@ if (riskProfilesNode) {
     button.addEventListener('click', () => {
       const selected = riskProfiles.find(p => p.key === button.dataset.aurumRisk);
       if (!selected || !priceMapNode) return;
-      window.aurumSelectedRiskProfile = selected;
+      window.aurumSelectedRiskProfileKey = selected.key;
       riskProfilesNode.querySelectorAll('button').forEach(b => {
         b.style.borderColor = b === button ? '#20c997' : 'rgba(148,163,184,.35)';
         b.style.background = b === button ? 'rgba(32,201,151,.10)' : 'transparent';
@@ -7237,15 +7237,15 @@ if (riskProfilesNode) {
         '<div style="opacity:.7;margin-top:5px">Risk/Reward ' + selected.riskReward + '</div>';
     });
   });
-  const mediumButton = riskProfilesNode.querySelector('[data-aurum-risk="MEDIUM"]');
-  if (mediumButton) mediumButton.click();
+  const preferredButton = riskProfilesNode.querySelector('[data-aurum-risk="' + window.aurumSelectedRiskProfileKey + '"]') || riskProfilesNode.querySelector('[data-aurum-risk="MEDIUM"]');
+  if (preferredButton) preferredButton.click();
 }
 if (riskProfilesNode && !validTradePlan) riskProfilesNode.innerHTML = '';
 if (priceMapNode && !validTradePlan) priceMapNode.textContent = 'Menunggu sinyal valid dan data candle terbaru';
 
 // Catat sinyal yang lolos seluruh konfirmasi sebagai simulasi/paper tracking.
 if (validTradePlan && window.aurumJournalCapture) {
-  const journalPlan = window.aurumSelectedRiskProfile || validTradePlan;
+  const journalPlan = riskProfiles.find(profile => profile.key === window.aurumSelectedRiskProfileKey) || validTradePlan;
   window.aurumJournalCapture({
     direction: finalSignal,
     entryLow: journalPlan.entryLow,
@@ -7255,7 +7255,7 @@ if (validTradePlan && window.aurumJournalCapture) {
     tp1: journalPlan.tp1,
     tp2: journalPlan.tp2,
     tp3: journalPlan.tp3,
-    riskProfile: window.aurumSelectedRiskProfile?.key || 'BASE'
+    riskProfile: journalPlan.key || 'BASE'
   }, document.getElementById('pair')?.value || 'XAU/USD', latestCandle.time);
 }
 if (window.aurumJournalMonitor) {
