@@ -586,51 +586,56 @@ function normalizeCandles(rows) {
 }
 
 function evaluateMarket(symbol, candleSets) {
-  const missing = TIMEFRAMES.filter(tf => !Array.isArray(candleSets[tf]) || candleSets[tf].length < 30);
+  // Mirror the live dashboard's actual MTF confirmation:
+  // H4 is contextual; H1 and M15 must agree, and both OB zones must
+  // confirm that same direction. Do not require D1/M45 or 5-of-7
+  // alignment here; that was stricter than the dashboard strategy.
+  const required = ['H4','H1','M15'];
+  const missing = required.filter(tf => !Array.isArray(candleSets[tf]) || candleSets[tf].length < 30);
   if (missing.length) return {status:'WAIT',reason:'DATA_TIMEFRAME_KURANG',missing,symbol};
 
   const trends = {};
   const diagnostics = {};
   for (const tf of TIMEFRAMES) {
-    trends[tf] = getStructureSignal(candleSets[tf],tf);
+    trends[tf] = Array.isArray(candleSets[tf]) && candleSets[tf].length >= 30
+      ? getStructureSignal(candleSets[tf],tf)
+      : 'UNKNOWN';
     diagnostics[tf] = classify(trends[tf]);
   }
 
-  const bullish = Object.values(diagnostics).filter(x=>x==='BULLISH').length;
-  const bearish = Object.values(diagnostics).filter(x=>x==='BEARISH').length;
-  const unknown = Object.values(diagnostics).filter(x=>x==='UNKNOWN').length;
-  let bias = 'WAIT';
-  if (unknown) bias='WAIT';
-  else if (diagnostics.D1==='BULLISH' && diagnostics.H4==='BULLISH' &&
-           diagnostics.H1==='BULLISH' && diagnostics.M45==='BULLISH' && bullish>=5) bias='BUY';
-  else if (diagnostics.D1==='BEARISH' && diagnostics.H4==='BEARISH' &&
-           diagnostics.H1==='BEARISH' && diagnostics.M45==='BEARISH' && bearish>=5) bias='SELL';
+  const h4 = diagnostics.H4;
+  const h1 = diagnostics.H1;
+  const m15 = diagnostics.M15;
+  const h1Ob = detectOrderBlock(candleSets.H1);
+  const m15Ob = detectOrderBlock(candleSets.M15);
 
-  // Samakan gerbang server dengan sinyal utama dashboard:
-  // bias D1/H4 + H1/M45 + minimal 5 dari 7 timeframe,
-  // lalu struktur H4/H1/M15 harus tersedia dan H1 serta M15 searah.
-  const h1Ob=detectOrderBlock(candleSets.H1);
-  const m15Ob=detectOrderBlock(candleSets.M15);
-  const obStructureKnown = ['H4','H1','M15'].every(tf => diagnostics[tf] !== 'UNKNOWN');
-  const obStructureAligned = bias==='BUY'
-    ? diagnostics.H1==='BULLISH' && diagnostics.M15==='BULLISH'
-    : bias==='SELL'
-      ? diagnostics.H1==='BEARISH' && diagnostics.M15==='BEARISH'
-      : false;
+  if ([h4,h1,m15].includes('UNKNOWN')) {
+    return {
+      status:'WAIT',reason:'OB_STRUCTURE_DATA_INSUFFICIENT',symbol,
+      trends:diagnostics,
+      orderBlocks:{H1:{status:h1Ob.status,type:h1Ob.type||null},M15:{status:m15Ob.status,type:m15Ob.type||null}}
+    };
+  }
+
+  // H4 remains visible as higher-timeframe context, matching the dashboard.
+  // H1 + M15 structure and H1 + M15 order blocks are the execution gate.
+  let bias = 'WAIT';
+  if (h1==='BULLISH' && m15==='BULLISH') bias='BUY';
+  else if (h1==='BEARISH' && m15==='BEARISH') bias='SELL';
+
   const alignedOb = bias==='BUY'
     ? h1Ob.status==='VALID' && m15Ob.status==='VALID' && h1Ob.type==='BULLISH' && m15Ob.type==='BULLISH'
     : bias==='SELL'
       ? h1Ob.status==='VALID' && m15Ob.status==='VALID' && h1Ob.type==='BEARISH' && m15Ob.type==='BEARISH'
       : false;
 
-  if (bias==='WAIT' || !obStructureKnown || !obStructureAligned || !alignedOb) {
-    const reason = bias==='WAIT' ? 'MTF_NOT_ALIGNED'
-      : !obStructureKnown ? 'OB_STRUCTURE_DATA_INSUFFICIENT'
-      : !obStructureAligned ? 'OB_STRUCTURE_NOT_ALIGNED'
-      : 'ORDER_BLOCK_NOT_ALIGNED';
-    return {status:'WAIT',reason,
-      symbol,trends:diagnostics,bullish,bearish,unknown,
-      orderBlocks:{H1:{status:h1Ob.status,type:h1Ob.type||null},M15:{status:m15Ob.status,type:m15Ob.type||null}}};
+  if (bias==='WAIT' || !alignedOb) {
+    return {
+      status:'WAIT',
+      reason:bias==='WAIT'?'MTF_NOT_ALIGNED':'ORDER_BLOCK_NOT_ALIGNED',
+      symbol,trends:diagnostics,
+      orderBlocks:{H1:{status:h1Ob.status,type:h1Ob.type||null},M15:{status:m15Ob.status,type:m15Ob.type||null}}
+    };
   }
 
   const selectedOb=m15Ob;
@@ -639,9 +644,28 @@ function evaluateMarket(symbol, candleSets) {
   if (!tradePlan || riskProfiles.length!==3) {
     return {status:'WAIT',reason:'TRADE_PLAN_INVALID',symbol,trends:diagnostics};
   }
+
+  const wanted=bias==='BUY'?'BULLISH':'BEARISH';
+  const alignedCount=Object.values(diagnostics).filter(value=>value===wanted).length;
+  const availableCount=Object.values(diagnostics).filter(value=>value!=='UNKNOWN').length;
+  const h4Aligned=h4===wanted;
+  const strengthParts=[
+    {label:'Struktur H1 dan M15 searah',points:25,earned:25},
+    {label:'Konfirmasi Order Block H1 dan M15',points:25,earned:25},
+    {label:'Konteks H4 searah',points:25,earned:h4Aligned?25:0},
+    {label:'Keselarasan timeframe tersedia ('+alignedCount+'/'+availableCount+')',points:25,earned:Math.round(25*(alignedCount/Math.max(1,availableCount)))}
+  ];
+  const signalStrength={
+    score:strengthParts.reduce((sum,item)=>sum+item.earned,0),
+    reasons:strengthParts.map(item=>item.label+': '+item.earned+'/'+item.points)
+  };
+
   return {
     status:'SIGNAL',direction:bias,symbol,generatedAt:new Date().toISOString(),
-    trends:diagnostics,bullish,bearish,unknown,
+    trends:diagnostics,bullish:Object.values(diagnostics).filter(x=>x==='BULLISH').length,
+    bearish:Object.values(diagnostics).filter(x=>x==='BEARISH').length,
+    unknown:Object.values(diagnostics).filter(x=>x==='UNKNOWN').length,
+    signalStrength,
     orderBlocks:{H1:{status:h1Ob.status,type:h1Ob.type},M15:{status:m15Ob.status,type:m15Ob.type}},
     tradePlan,riskProfiles
   };
