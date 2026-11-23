@@ -57,7 +57,23 @@ module.exports=async function handler(req,res){
         return !last||age< -60||age>limits[tf];
       });
       if(stale.length){
-        results.push({symbol,status:'WAIT',reason:'STALE_OR_MISSING_CANDLES',timeframes:stale});
+        // Replace any previous signal with an explicit WAIT state so an old
+        // BUY/SELL cannot remain visible when one or more candle feeds go stale.
+        const stateKey='aurum:server-signal:'+encodeURIComponent(symbol);
+        const fingerprint='WAIT:STALE_OR_MISSING_CANDLES:'+stale.join(',');
+        const record={
+          status:'WAIT',
+          symbol,
+          reason:'STALE_OR_MISSING_CANDLES',
+          timeframes:stale,
+          checkedAt:new Date().toISOString(),
+          fingerprint
+        };
+        const priorRaw=await redis(['GET',stateKey]);
+        const prior=priorRaw?JSON.parse(priorRaw):null;
+        record.changed=!prior||prior.fingerprint!==fingerprint;
+        await redis(['SET',stateKey,JSON.stringify(record),'EX','604800']);
+        results.push({symbol,status:'WAIT',reason:record.reason,timeframes:stale,changed:record.changed});
         continue;
       }
 
