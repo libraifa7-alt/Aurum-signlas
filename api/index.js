@@ -621,6 +621,28 @@ module.exports = async function handler(req, res) {
         });
       }
 
+      // Status kesegaran candle Yahoo dihitung dari waktu candle terakhir,
+      // bukan hanya waktu respons provider. Ini mencegah data lama terlihat live.
+      const lastCandleAt = candles[candles.length - 1].datetime;
+      const lastCandleMs = Date.parse(lastCandleAt);
+      const candleAgeSeconds = Number.isFinite(lastCandleMs)
+        ? Math.max(0, Math.floor((Date.now() - lastCandleMs) / 1000))
+        : null;
+      const freshnessLimitSeconds = ({
+        M1: 180,
+        M5: 600,
+        M15: 1800,
+        M30: 3600,
+        M45: 5400,
+        H1: 7200,
+        H4: 28800,
+        D1: 172800
+      }[selected] || 1800);
+      const candleStatus = candleAgeSeconds !== null &&
+        candleAgeSeconds <= freshnessLimitSeconds
+        ? "fresh_candles"
+        : "stale_candles";
+
       // HASIL DATA WTI + penanda waktu agar kesegaran data dapat diperiksa.
       const output = {
         status: "success",
@@ -628,7 +650,9 @@ module.exports = async function handler(req, res) {
         interval: selected,
         source: `Yahoo Finance (${yahooSymbol})`,
         providerFetchedAt: new Date().toISOString(),
-        lastCandleAt: candles[candles.length - 1].datetime,
+        lastCandleAt,
+        candleAgeSeconds,
+        candleStatus,
         candles
       };
 
