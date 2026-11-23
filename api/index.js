@@ -522,14 +522,163 @@ module.exports = async function handler(req, res) {
         return res.status(200).json(output);
       }
 
-      // XAUS Chart is a Yahoo Finance proxy. If its last bar is stale, do not stop here:
-      // continue to the independent Twelve Data path below. Never relabel stale XAUS bars as live.
+      // XAUS Chart is a Yahoo Finance proxy. Try an independent MT5 tick/OHLC feed
+      // before Twelve Data when the primary Gold candle is stale.
       chartError = chartError || ("XAUS Chart candle stale: " + (candleAgeSeconds === null ? "timestamp invalid/future" : candleAgeSeconds + " seconds old"));
-      console.warn("AURUM GOLD PRIMARY CANDLE SOURCE STALE; TRYING TWELVE DATA FALLBACK:", {
+      console.warn("AURUM GOLD PRIMARY CANDLE SOURCE STALE; TRYING BIQUOTE MT5:", {
         interval: selected,
         lastCandleAt,
         candleAgeSeconds
       });
+
+      try {
+        const biquoteIntervals = {
+          M1: "1m", M5: "5m", M15: "15m", M30: "30m",
+          M45: "15m", H1: "1h", H4: "4h", D1: "1d"
+        };
+        const biquoteInterval = biquoteIntervals[selected];
+        const biquoteLimits = {
+          M1: 300, M5: 288, M15: 192, M30: 192,
+          M45: 300, H1: 168, H4: 180, D1: 500
+        };
+        const biquoteUrl = new URL("https://biquote.io/api/XAUUSD/ohlc");
+        biquoteUrl.searchParams.set("interval", biquoteInterval);
+        biquoteUrl.searchParams.set("limit", String(biquoteLimits[selected] || 100));
+
+        const [barsResponse, tickResponse] = await Promise.all([
+          fetch(biquoteUrl, {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(10000)
+          }),
+          fetch("https://biquote.io/api/XAUUSD?allowStale=false", {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(8000)
+          })
+        ]);
+        const [biquotePayload, biquoteTick] = await Promise.all([
+          barsResponse.json(),
+          tickResponse.json()
+        ]);
+        if (!barsResponse.ok) {
+          throw new Error(biquotePayload?.message || "BiQuote OHLC HTTP " + barsResponse.status);
+        }
+
+        let biquoteBars = (Array.isArray(biquotePayload.bars) ? biquotePayload.bars : [])
+          .filter(bar => bar && bar.isOpen !== true)
+          .map(bar => {
+            const timestamp = Date.parse(bar.openTime);
+            const open = Number(bar.open);
+            const high = Number(bar.high);
+            const low = Number(bar.low);
+            const close = Number(bar.close);
+            const volume = Number(bar.tickVolume ?? bar.volume ?? 0);
+            if (!Number.isFinite(timestamp) || timestamp <= 0 ||
+                ![open, high, low, close].every(Number.isFinite) ||
+                open <= 0 || high <= 0 || low <= 0 || close <= 0 ||
+                high < Math.max(open, close, low) ||
+                low > Math.min(open, close, high)) return null;
+            return {
+              timestamp: Math.floor(timestamp / 1000),
+              datetime: new Date(timestamp).toISOString(),
+              open, high, low, close,
+              volume: Number.isFinite(volume) ? volume : 0
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.timestamp - b.timestamp);
+
+        if (selected === "M45") {
+          const buckets = new Map();
+          for (const bar of biquoteBars) {
+            const bucket = Math.floor(bar.timestamp / 2700) * 2700;
+            if (!buckets.has(bucket)) buckets.set(bucket, []);
+            buckets.get(bucket).push(bar);
+          }
+          biquoteBars = Array.from(buckets.entries())
+            .filter(([bucket, group]) =>
+              group.length === 3 &&
+              group.some(bar => bar.timestamp === bucket) &&
+              group.some(bar => bar.timestamp === bucket + 900) &&
+              group.some(bar => bar.timestamp === bucket + 1800)
+            )
+            .map(([bucket, group]) => {
+              group.sort((a, b) => a.timestamp - b.timestamp);
+              return {
+                timestamp: bucket,
+                datetime: new Date(bucket * 1000).toISOString(),
+                open: group[0].open,
+                high: Math.max(...group.map(bar => bar.high)),
+                low: Math.min(...group.map(bar => bar.low)),
+                close: group[2].close,
+                volume: group.reduce((sum, bar) => sum + bar.volume, 0)
+              };
+            });
+        }
+
+        const biquoteLast = biquoteBars[biquoteBars.length - 1];
+        const biquoteAgeMs = biquoteLast ? Date.now() - Date.parse(biquoteLast.datetime) : NaN;
+        const biquoteAgeSeconds = Number.isFinite(biquoteAgeMs) && biquoteAgeMs >= 0
+          ? Math.floor(biquoteAgeMs / 1000)
+          : null;
+        const biquoteFreshnessLimit = ({
+          M1: 180, M5: 600, M15: 1800, M30: 3600,
+          M45: 5400, H1: 7200, H4: 28800, D1: 172800
+        }[selected] || 1800);
+
+        if (!biquoteLast || biquoteAgeSeconds === null || biquoteAgeSeconds > biquoteFreshnessLimit) {
+          throw new Error("BiQuote candle stale/invalid: " + (biquoteAgeSeconds === null ? "timestamp invalid" : biquoteAgeSeconds + " seconds old"));
+        }
+
+        const tickMid = Number(biquoteTick?.mid);
+        const tickUpdatedAt = biquoteTick?.timestamp || biquoteTick?.lastQuoteAt || null;
+        const tickAgeMs = tickUpdatedAt ? Date.now() - Date.parse(tickUpdatedAt) : NaN;
+        const tickAgeSeconds = Number.isFinite(tickAgeMs) && tickAgeMs >= 0
+          ? Math.floor(tickAgeMs / 1000)
+          : null;
+        const tickIsFresh = Number.isFinite(tickMid) && tickMid > 0 &&
+          tickAgeSeconds !== null && tickAgeSeconds <= 120 &&
+          biquoteTick?.stale !== true && biquoteTick?.marketState !== "closed";
+
+        const biquoteOutput = {
+          status: "success",
+          symbol: selectedSymbol,
+          interval: selected,
+          source: "BiQuote MT5 (XAUUSD CFD)",
+          candleSource: "BiQuote MT5",
+          providerFetchedAt: new Date().toISOString(),
+          lastCandleAt: biquoteLast.datetime,
+          candleAgeSeconds: biquoteAgeSeconds,
+          candleStatus: "fresh_candles",
+          livePrice: Number.isFinite(tickMid) && tickMid > 0 ? tickMid : null,
+          livePriceUpdatedAt: tickUpdatedAt,
+          livePriceSource: biquoteTick?.source || "BiQuote MT5",
+          livePriceStatus: tickIsFresh ? "live_quote" : "stale_quote",
+          livePriceError: tickIsFresh ? null : (biquoteTick?.message || "Kuotasi BiQuote belum memenuhi batas kesegaran"),
+          marketStatus: biquoteTick?.marketState || null,
+          candles: biquoteBars.slice(-500)
+        };
+
+        console.log("AURUM GOLD USING BIQUOTE MT5 FALLBACK:", {
+          interval: selected,
+          lastCandleAt: biquoteOutput.lastCandleAt,
+          candleAgeSeconds: biquoteOutput.candleAgeSeconds,
+          livePriceStatus: biquoteOutput.livePriceStatus,
+          bars: biquoteOutput.candles.length
+        });
+        globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: biquoteOutput });
+        try {
+          await aurumRedis([
+            "SET", redisKey,
+            JSON.stringify({ time: Date.now(), data: biquoteOutput }),
+            "EX", "604800"
+          ]);
+        } catch (error) {
+          console.warn("BIQUOTE GOLD CACHE WRITE:", error.message);
+        }
+        return res.status(200).json(biquoteOutput);
+      } catch (biquoteError) {
+        console.warn("AURUM BIQUOTE GOLD FALLBACK FAILED; TRYING TWELVE DATA:", String(biquoteError.message || biquoteError).slice(0, 180));
+      }
     }
 
     // Cooldown Twelve Data hanya berlaku untuk simbol yang masih memakai provider tersebut.
