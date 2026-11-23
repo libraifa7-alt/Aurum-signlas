@@ -3401,6 +3401,10 @@ body {
     <div id="aurumServerSignalRows" class="aurum-server-rows">
       <p class="aurum-server-muted">Mengambil hasil pemindaian server…</p>
     </div>
+    <div class="aurum-server-history" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(148,163,184,.25)">
+      <strong style="display:block;font-size:12px;margin-bottom:8px">RIWAYAT SINYAL SERVER</strong>
+      <div id="aurumServerHistoryRows"><small class="aurum-server-muted">Belum ada sinyal tersimpan.</small></div>
+    </div>
     <small id="aurumServerUpdated" class="aurum-server-updated">Menunggu pembaruan server</small>
   </section>
   <!-- END AURUM SERVER-SIDE SIGNALS -->
@@ -8355,6 +8359,20 @@ body.aurum-user-dark .app-page{background:transparent!important}
       const data=await response.json();
       if(!response.ok||data.status!=='success')throw new Error(data.message||'Server signal belum tersedia');
       rows.innerHTML=(data.results||[]).map(card).join('')||'<p class="aurum-server-muted">Belum ada data sinyal.</p>';
+      const historyNode=document.getElementById('aurumServerHistoryRows');
+      if(historyNode){
+        const history=(data.results||[]).flatMap(item=>(item.history||[]).map(record=>({symbol:item.symbol,record})))
+          .sort((a,b)=>Date.parse(b.record.generatedAt||b.record.checkedAt||0)-Date.parse(a.record.generatedAt||a.record.checkedAt||0))
+          .slice(0,12);
+        historyNode.innerHTML=history.length?history.map(({symbol,record})=>{
+          const plan=record.tradePlan||{};
+          const when=record.generatedAt||record.checkedAt;
+          return '<div style="display:flex;flex-wrap:wrap;gap:5px 10px;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(148,163,184,.15)">'+
+            '<span><b>'+safe(names[symbol]||symbol)+'</b> <b class="'+(record.direction==='BUY'?'buy':'sell')+'">'+safe(record.direction||'SIGNAL')+'</b></span>'+
+            '<small class="aurum-server-muted">'+(when?safe(new Date(when).toLocaleString('id-ID')):'')+'</small>'+
+            '<small class="aurum-server-muted" style="width:100%">Entry '+fmt(plan.entryLow)+'–'+fmt(plan.entryHigh)+' · SL '+fmt(plan.sl)+' · TP '+fmt(plan.tp1)+' / '+fmt(plan.tp2)+' / '+fmt(plan.tp3)+'</small></div>';
+        }).join(''):'<small class="aurum-server-muted">Belum ada sinyal valid yang tercatat. Sinyal WAIT tidak dimasukkan ke riwayat.</small>';
+      }
       state.textContent='SERVER TERHUBUNG';state.className='aurum-server-state ok';
       updated.textContent='Data server diperbarui: '+new Date(data.updatedAt||Date.now()).toLocaleString('id-ID')+' · pembaruan otomatis tiap 60 detik';
     }catch(error){
