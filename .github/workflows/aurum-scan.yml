@@ -1,5 +1,5 @@
 name: AURUM Signal Scanner
-# Scanner heartbeat: keep scheduled server evaluation active.
+# Scanner heartbeat: execute an immediate verification scan after strategy alignment.
 
 on:
   push:
