@@ -46,3 +46,13 @@ jobs:
             exit 1
           fi
 
+          signals=$(curl --silent --show-error --fail --max-time 30 \
+            -H "Accept: application/json" "$AURUM_URL/api/signals")
+          printf '%s\\n' "$signals"
+          printf '%s' "$signals" | jq -e '
+            .status == "success" and
+            (.results | length == 3) and
+            all(.results[]; (.symbol != null) and has("current") and has("history"))
+          ' >/dev/null
+          echo "API signals smoke test: OK (3 instruments)"
+
