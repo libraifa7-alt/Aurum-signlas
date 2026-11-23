@@ -4197,6 +4197,7 @@ window.aurumJournalCapture = function(plan, symbol, candleTime){
     id:'AUR-'+now+'-'+Math.random().toString(36).slice(2,8),
     symbol,direction:plan.direction,entryLow:Number(plan.entryLow),entryHigh:Number(plan.entryHigh),
     entry:Number(plan.entry),sl:Number(plan.sl),tp1:Number(plan.tp1),tp2:Number(plan.tp2),tp3:Number(plan.tp3),
+    riskProfile:String(plan.riskProfile || 'BASE'),
     createdAt:new Date(now).toISOString(),signalCandleTime:candleTime||null,
     status:'PENDING_ENTRY',enteredAt:null,enteredCandleTime:null,closedAt:null,
     exitPrice:null,resultPoints:null,source:'AURUM analysis',tracking:'paper'
