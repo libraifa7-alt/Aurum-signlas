@@ -14,8 +14,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Check API syntax
-        run: node --check api/index.js
+      - name: Check API and alternate-host syntax
+        run: |
+          node --check api/index.js
+          node --check server.js
       - name: Run Gold fallback regression tests
         run: npm test
       - name: Check inline browser JavaScript syntax
