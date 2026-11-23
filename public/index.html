@@ -7224,6 +7224,7 @@ if (riskProfilesNode) {
       const selected = riskProfiles.find(p => p.key === button.dataset.aurumRisk);
       if (!selected || !priceMapNode) return;
       window.aurumSelectedRiskProfileKey = selected.key;
+      drawTradePlanLines(selected);
       riskProfilesNode.querySelectorAll('button').forEach(b => {
         b.style.borderColor = b === button ? '#20c997' : 'rgba(148,163,184,.35)';
         b.style.background = b === button ? 'rgba(32,201,151,.10)' : 'transparent';
@@ -7262,7 +7263,7 @@ if (window.aurumJournalMonitor) {
   window.aurumJournalMonitor(document.getElementById('pair')?.value || 'XAU/USD', latestCandle);
 }
 
-drawTradePlanLines(validTradePlan);
+drawTradePlanLines(riskProfiles.find(profile => profile.key === window.aurumSelectedRiskProfileKey) || validTradePlan);
 
 if (tradeCard && validTradePlan) {
   activeTradePlan = validTradePlan;
