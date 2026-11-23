@@ -91,7 +91,7 @@ test("stale XAUS Gold candles fall back to fresh BiQuote MT5 bars", async () => 
 
     assert.equal(res.statusCode, 200);
     assert.equal(res.payload.status, "success");
-    assert.equal(res.payload.candleSource, "BiQuote MT5");
+    assert.equal(res.payload.candleSource, "BiQuote OHLC");
     assert.equal(res.payload.candleStatus, "fresh_candles");
     assert.equal(res.payload.livePrice, 4201.5);
     assert.equal(res.payload.livePriceStatus, "live_quote");
@@ -270,7 +270,7 @@ test("XAUS chart outage still tries BiQuote before returning an error", async ()
     await handler({ query: { symbol: "XAU/USD", interval: "M1" } }, res);
 
     assert.equal(res.statusCode, 200);
-    assert.equal(res.payload.candleSource, "BiQuote MT5");
+    assert.equal(res.payload.candleSource, "BiQuote OHLC");
     assert.equal(res.payload.candleStatus, "fresh_candles");
     assert.equal(res.payload.livePriceStatus, "live_quote");
     assert.ok(calls.includes("xaus.com/api/v1/chart"));
