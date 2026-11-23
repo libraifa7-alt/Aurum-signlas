@@ -24,8 +24,8 @@ jobs:
           const path = require('node:path');
           const { spawnSync } = require('node:child_process');
           const html = fs.readFileSync('public/index.html', 'utf8');
-          const scripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
-            .filter(match => !/\\bsrc\\s*=/.test(match[1]))
+          const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+            .filter(match => !/\bsrc\s*=/.test(match[1]))
             .map(match => match[2]);
           if (!scripts.length) throw new Error('No inline scripts found');
           scripts.forEach((source, index) => {
