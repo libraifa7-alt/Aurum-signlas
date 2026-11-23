@@ -1,0 +1,41 @@
+name: AURUM QA validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [qa/yahoo-candle-freshness]
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check API syntax
+        run: node --check api/index.js
+      - name: Check inline browser JavaScript syntax
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const os = require('node:os');
+          const path = require('node:path');
+          const { spawnSync } = require('node:child_process');
+          const html = fs.readFileSync('public/index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
+            .filter(match => !/\\bsrc\\s*=/.test(match[1]))
+            .map(match => match[2]);
+          if (!scripts.length) throw new Error('No inline scripts found');
+          scripts.forEach((source, index) => {
+            const file = path.join(os.tmpdir(), `aurum-inline-${index}.js`);
+            fs.writeFileSync(file, source);
+            const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
+            if (result.status !== 0) {
+              process.stderr.write(result.stderr || result.stdout);
+              process.exit(result.status || 1);
+            }
+          });
+          console.log(`Validated API syntax and ${scripts.length} inline script blocks.`);
+          NODE
