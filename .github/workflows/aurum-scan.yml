@@ -1,4 +1,5 @@
 name: AURUM Signal Scanner
+# Scanner heartbeat: keep scheduled server evaluation active.
 
 on:
   push:
