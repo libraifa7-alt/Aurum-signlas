@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'aurum-pwa-v1';
+const CACHE_NAME = 'aurum-pwa-v2';
 
 const APP_SHELL = [
   '/',
@@ -26,6 +26,41 @@ self.addEventListener('activate', event => {
       )
     ).then(() => self.clients.claim())
   );
+});
+
+
+ 
+// BACKGROUND WEB PUSH: menerima notifikasi walau halaman tidak terbuka.
+self.addEventListener('push', event => {
+  let payload = {};
+  try { payload = event.data ? event.data.json() : {}; }
+  catch (_) { payload = { body: event.data ? event.data.text() : 'Sinyal baru tersedia' }; }
+  const title = payload.title || 'AURUM SIGNAL';
+  const options = {
+    body: payload.body || 'Ada pembaruan sinyal pasar.',
+    icon: '/aurum-icon-192.png',
+    badge: '/aurum-icon-192.png',
+    tag: payload.tag || 'aurum-signal',
+    renotify: true,
+    data: { url: payload.url || '/' }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || '/', self.location.origin).href;
+  event.waitUntil((async () => {
+    const clientsList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientsList) {
+      if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+        await client.focus();
+        if ('navigate' in client) await client.navigate(target);
+        return;
+      }
+    }
+    if (self.clients.openWindow) await self.clients.openWindow(target);
+  })());
 });
 
 // FETCH REQUEST
