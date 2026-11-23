@@ -3292,7 +3292,7 @@ body {
       <div class="aurum-setting-row"><span>Unlock sound</span><button type="button" id="aurumSoundToggle">Off</button></div>
       <div class="aurum-setting-row"><span>Language</span><div class="aurum-language-options"><button type="button" data-aurum-language="EN">EN</button><button type="button" data-aurum-language="BM">BM</button><button type="button" data-aurum-language="中文">中文</button><button type="button" data-aurum-language="ID">ID</button></div></div>
     </div>
-    <div class="aurum-notice-card"><strong>Notifications <span id="aurumNotificationState">are on</span></strong><small>Izinkan notifikasi perangkat untuk menerima pemberitahuan sinyal.</small><button type="button" id="aurumTestNotification">Send test</button></div>
+    <div class="aurum-notice-card"><strong>Notifications <span id="aurumNotificationState">are on</span></strong><small>Izinkan notifikasi perangkat untuk menerima pemberitahuan sinyal.</small><button type="button" id="aurumTestNotification">Send test</button><button type="button" id="aurumEnablePush">Enable background alerts</button><small id="aurumPushStatus">Notifikasi saat aplikasi ditutup memerlukan konfigurasi server.</small></div>
     <div class="aurum-panel-promo"><div><strong>Invite friends</strong><small>Bagikan AURUM Signals AI.</small></div><button type="button" id="aurumInviteButton">Invite</button></div>
     <div class="aurum-panel-promo"><div><strong>Telegram channel</strong><small>Channel belum dihubungkan.</small></div><span class="aurum-muted-pill">Belum tersedia</span></div>
     <button type="button" class="aurum-setup-guide" id="aurumSetupGuide">Setup guide: home screen & notifications</button>
@@ -8222,6 +8222,31 @@ body.aurum-user-dark .app-page{background:transparent!important}
  $('aurumTestNotification')?.addEventListener('click',async()=>{
   if(!('Notification'in window)){alert('Browser ini belum mendukung notifikasi.');return;}
   try{let permission=Notification.permission;if(permission==='default')permission=await Notification.requestPermission();if(permission==='granted'){const sent=await window.aurumNotify('AURUM Signals AI','Notifikasi uji berhasil. Notifikasi sinyal berjalan saat aplikasi aktif.','aurum-test');if(!sent)alert('Izin aktif, tetapi browser gagal menampilkan notifikasi. Periksa izin situs dan pengaturan baterai.');}else alert('Izin notifikasi belum diberikan di browser.');renderPrefs();}catch(e){alert('Notifikasi tidak dapat dikirim dari browser ini.');}
+ });
+ $('aurumEnablePush')?.addEventListener('click',async()=>{
+  const status=$('aurumPushStatus');
+  const setStatus=(message)=>{if(status)status.textContent=message;};
+  try{
+   if(!('serviceWorker'in navigator)||!('PushManager'in window)){setStatus('Browser ini belum mendukung background push.');return;}
+   let permission=Notification.permission;
+   if(permission==='default')permission=await Notification.requestPermission();
+   if(permission!=='granted'){setStatus('Izin notifikasi belum diberikan.');return;}
+   const keyResponse=await fetch('/api/push-subscribe',{cache:'no-store'});
+   const keyData=await keyResponse.json();
+   if(!keyResponse.ok||!keyData.publicKey)throw new Error(keyData.message||'Kunci Push server belum tersedia.');
+   const registration=await navigator.serviceWorker.ready;
+   let subscription=await registration.pushManager.getSubscription();
+   if(!subscription){
+    const padding='='.repeat((4-keyData.publicKey.length%4)%4);
+    const raw=atob((keyData.publicKey+padding).replace(/-/g,'+').replace(/_/g,'/'));
+    const applicationServerKey=Uint8Array.from(raw,c=>c.charCodeAt(0));
+    subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey});
+   }
+   const saved=await fetch('/api/push-subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subscription)});
+   const result=await saved.json();
+   if(!saved.ok||result.status!=='success')throw new Error(result.message||'Gagal menyimpan langganan Push.');
+   setStatus('Background push terdaftar pada perangkat ini.');
+  }catch(error){setStatus(String(error.message||'Push belum dapat diaktifkan.'));}
  });
  $('aurumInviteButton')?.addEventListener('click',()=>{const url=location.href; if(navigator.clipboard?.writeText){navigator.clipboard.writeText(url).then(()=>alert('Tautan AURUM disalin.')).catch(()=>alert(url));}else alert(url);});
  $('aurumSetupGuide')?.addEventListener('click',()=>{hide(profile);document.querySelector('.nav-item[data-page="guidePage"]')?.click();});
