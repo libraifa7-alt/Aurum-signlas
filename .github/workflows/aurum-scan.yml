@@ -24,7 +24,16 @@ jobs:
             echo "Repository secret CRON_SECRET belum diatur."
             exit 1
           fi
-          curl --fail --silent --show-error --max-time 120 \
+          response=$(curl --silent --show-error --max-time 120 \
+            -w '\nHTTP_STATUS:%{http_code}' \
             -X POST "$AURUM_URL/api/cron" \
             -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Accept: application/json"
+            -H "Accept: application/json")
+          curl_exit=$?
+          printf '%s\n' "$response"
+          if [ "$curl_exit" -ne 0 ]; then exit "$curl_exit"; fi
+          http_status="${response##*HTTP_STATUS:}"
+          if [ "$http_status" -lt 200 ] || [ "$http_status" -ge 300 ]; then
+            echo "Server scan gagal dengan HTTP $http_status"
+            exit 1
+          fi
