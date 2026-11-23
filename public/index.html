@@ -4697,6 +4697,7 @@ if (useBrowserCache) {
 if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 
 // Status grafik harus mengikuti timestamp/provider, bukan label LIVE statis.
+let primaryChartDataFresh = false;
 const chartStatus = document.getElementById('chartFeedStatus');
 if (chartStatus) {
   const candleStamp = chartFeedMeta && chartFeedMeta.lastCandleAt;
@@ -4731,6 +4732,7 @@ if (chartStatus) {
   } else if (symbol === 'WTI' && (new Date().getUTCDay() === 0 || new Date().getUTCDay() === 6)) {
     state = 'PASAR TUTUP';
   }
+  primaryChartDataFresh = state === 'LIVE DATA';
   chartStatus.textContent = '● ' + state;
   chartStatus.classList.remove('is-live','is-delayed','is-closed');
   chartStatus.classList.add(state === 'LIVE DATA' ? 'is-live' : state === 'PASAR TUTUP' ? 'is-closed' : 'is-delayed');
@@ -7031,9 +7033,9 @@ const signalDetail = document.getElementById('signalDetail');
 
 let finalSignal = 'WAIT';
 
-if (marketBias === 'BUY' && mtfBias === 'BUY') {
+if (primaryChartDataFresh && marketBias === 'BUY' && mtfBias === 'BUY') {
   finalSignal = 'BUY';
-} else if (marketBias === 'SELL' && mtfBias === 'SELL') {
+} else if (primaryChartDataFresh && marketBias === 'SELL' && mtfBias === 'SELL') {
   finalSignal = 'SELL';
 }
 
@@ -7041,8 +7043,12 @@ const noSignalsPanel = document.getElementById('aurumNoSignals');
 if (noSignalsPanel) {
   noSignalsPanel.style.display = finalSignal === 'WAIT' ? 'block' : 'none';
   noSignalsPanel.textContent = finalSignal === 'WAIT'
-    ? 'Belum ada sinyal terkonfirmasi. Market Structure: ' + structure +
-      ' · Konfirmasi MTF: ' + orderBlockMTF
+    ? (!primaryChartDataFresh
+      ? 'Sinyal ditahan: candle timeframe utama belum segar atau pasar sedang tutup. ' +
+        'Status grafik: ' + (chartStatus?.textContent || 'TERTUNDA') +
+        ' · Market Structure: ' + structure + ' · Konfirmasi MTF: ' + orderBlockMTF
+      : 'Belum ada sinyal terkonfirmasi. Market Structure: ' + structure +
+        ' · Konfirmasi MTF: ' + orderBlockMTF)
     : 'Sinyal ' + finalSignal + ' terkonfirmasi berdasarkan Market Structure dan MTF.';
 }
 const tradePlanPanel = document.getElementById('aurumTradePlan');
@@ -7058,7 +7064,9 @@ if (signalStatus && signalDetail) {
 
   signalDetail.textContent =
     finalSignal === 'WAIT'
-      ? 'Market Structure dan konfirmasi MTF belum searah.'
+      ? (!primaryChartDataFresh
+        ? 'Sinyal ditahan karena candle timeframe utama belum LIVE/valid atau pasar sedang tutup.'
+        : 'Market Structure dan konfirmasi MTF belum searah.')
       : 'Market Structure dan Order Block MTF sudah searah.';
 }      
 
