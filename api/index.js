@@ -212,9 +212,12 @@ module.exports = async function handler(req, res) {
       const cachedGoldAge = Number.isFinite(cachedGoldFetchedAt)
         ? Date.now() - cachedGoldFetchedAt
         : Infinity;
+      const cachedGoldLastTime = Date.parse(cachedGold?.lastCandleAt || cachedGold?.candles?.[cachedGold?.candles?.length - 1]?.datetime || "");
+      const cachedGoldHasFutureCandles = Number.isFinite(cachedGoldLastTime) && cachedGoldLastTime > Date.now() + 60000;
 
       let candleData = cachedGold &&
         Array.isArray(cachedGold.candles) &&
+        !cachedGoldHasFutureCandles &&
         cachedGoldAge >= 0 && cachedGoldAge < cacheTTL
         ? cachedGold
         : null;
@@ -383,7 +386,7 @@ module.exports = async function handler(req, res) {
           } catch (cacheError) {
             console.warn("XAUS CHART COOLDOWN WRITE:", cacheError.message);
           }
-          if (cachedGold && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
+          if (cachedGold && !cachedGoldHasFutureCandles && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
             candleData = {
               ...cachedGold,
               candleStatus: "stale_candles",
