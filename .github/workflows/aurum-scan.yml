@@ -9,7 +9,7 @@ on:
       - 'api/engine.js'
       - 'api/index.js'
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
