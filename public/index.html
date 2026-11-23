@@ -7194,6 +7194,7 @@ const validTradePlan =
     : null;
 
 const riskProfiles = validTradePlan ? calculateRiskProfiles(obZone) : [];
+window.aurumSelectedRiskProfile = null;
 const strengthPanel = document.getElementById('aurumSignalStrength');
 const strengthValue = document.getElementById('aurumSignalStrengthValue');
 const strengthBar = document.getElementById('aurumSignalStrengthBar');
@@ -7221,6 +7222,7 @@ if (riskProfilesNode) {
     button.addEventListener('click', () => {
       const selected = riskProfiles.find(p => p.key === button.dataset.aurumRisk);
       if (!selected || !priceMapNode) return;
+      window.aurumSelectedRiskProfile = selected;
       riskProfilesNode.querySelectorAll('button').forEach(b => {
         b.style.borderColor = b === button ? '#20c997' : 'rgba(148,163,184,.35)';
         b.style.background = b === button ? 'rgba(32,201,151,.10)' : 'transparent';
@@ -7250,7 +7252,12 @@ if (validTradePlan && window.aurumJournalCapture) {
     sl: validTradePlan.sl,
     tp1: validTradePlan.tp1,
     tp2: validTradePlan.tp2,
-    tp3: validTradePlan.tp3
+    tp3: (window.aurumSelectedRiskProfile || validTradePlan).tp3,
+    entryLow: (window.aurumSelectedRiskProfile || validTradePlan).entryLow,
+    entryHigh: (window.aurumSelectedRiskProfile || validTradePlan).entryHigh,
+    entry: (window.aurumSelectedRiskProfile || validTradePlan).entry,
+    sl: (window.aurumSelectedRiskProfile || validTradePlan).sl,
+    riskProfile: window.aurumSelectedRiskProfile?.key || 'BASE'
   }, document.getElementById('pair')?.value || 'XAU/USD', latestCandle.time);
 }
 if (window.aurumJournalMonitor) {
