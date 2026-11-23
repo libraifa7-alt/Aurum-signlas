@@ -69,7 +69,7 @@ module.exports = async function handler(req, res) {
 
   // Versioned provider cache prevents old MarketAPI candles being reused.
   const cacheSource = (selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? "yahoo" : selectedSymbol === "XAU/USD" ? "xaus-chart" : "twelvedata";
-  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + ((selectedSymbol === "XAU/USD" || selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? ":v3" : ":v2");
+  const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + ((selectedSymbol === "XAU/USD" || selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? ":v4" : ":v2");
   const cached = globalThis.aurumCache.get(cacheKey);
 
   // AURUM SMART API CACHE OPTIMIZATION
@@ -236,7 +236,13 @@ module.exports = async function handler(req, res) {
         D1: { interval: "1d", range: "2y" }
       };
       const config = chartConfig[selected] || chartConfig.M15;
-      const cachedGold = redisCached?.data || cached?.data || null;
+      const cachedGoldCandidate = redisCached?.data || cached?.data || null;
+      // Cache key versions are isolated, but verify provenance before reusing Gold candles.
+      // Twelve Data fallback candles must never be mislabeled as XAUS Chart data.
+      const cachedGold = cachedGoldCandidate && (
+        cachedGoldCandidate.candleSource === "XAUS Chart API" ||
+        cachedGoldCandidate.source === "XAUS Chart API (OHLCV)"
+      ) ? cachedGoldCandidate : null;
       // Gunakan waktu fetch provider, bukan waktu cache ditulis ulang.
       // Fallback candle lama tidak boleh memperpanjang umur data.
       const cachedGoldFetchedAt = cachedGold?.providerFetchedAt
@@ -469,6 +475,7 @@ module.exports = async function handler(req, res) {
         symbol: selectedSymbol,
         interval: selected,
         source: candleData.source || "XAUS Chart API (OHLCV)",
+        candleSource: candleData.candleSource || "XAUS Chart API",
         providerFetchedAt: candleData.providerFetchedAt || null,
         lastCandleAt,
         candleAgeSeconds,
@@ -482,8 +489,19 @@ module.exports = async function handler(req, res) {
         candleError: candleData.candleError || chartError || null
       };
 
-      globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: output });
-      return res.status(200).json(output);
+      if (candleStatus === "fresh_candles") {
+        globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: output });
+        return res.status(200).json(output);
+      }
+
+      // XAUS Chart is a Yahoo Finance proxy. If its last bar is stale, do not stop here:
+      // continue to the independent Twelve Data path below. Never relabel stale XAUS bars as live.
+      chartError = chartError || ("XAUS Chart candle stale: " + (candleAgeSeconds === null ? "timestamp invalid/future" : candleAgeSeconds + " seconds old"));
+      console.warn("AURUM GOLD PRIMARY CANDLE SOURCE STALE; TRYING TWELVE DATA FALLBACK:", {
+        interval: selected,
+        lastCandleAt,
+        candleAgeSeconds
+      });
     }
 
     // Cooldown Twelve Data hanya berlaku untuk simbol yang masih memakai provider tersebut.
@@ -859,8 +877,16 @@ async function getCachedGoldQuote() {
 }
 
 async function respondWithStaleCache() {
+  const cachedPayload = redisCached.data;
+  const cachedLastCandleAt = cachedPayload?.lastCandleAt || cachedPayload?.candles?.[cachedPayload.candles.length - 1]?.datetime || null;
+  const cachedTimestamp = cachedLastCandleAt ? Date.parse(cachedLastCandleAt) : NaN;
+  const cachedAgeMs = Number.isFinite(cachedTimestamp) ? Date.now() - cachedTimestamp : NaN;
+  const cachedAgeSeconds = Number.isFinite(cachedAgeMs) && cachedAgeMs >= 0 ? Math.floor(cachedAgeMs / 1000) : null;
   const fallback = {
-    ...redisCached.data,
+    ...cachedPayload,
+    lastCandleAt: cachedLastCandleAt,
+    candleAgeSeconds: cachedAgeSeconds,
+    candleStatus: "stale_candles",
     cache: "stale_candles"
   };
 
@@ -992,7 +1018,10 @@ const convertedCandles = twelveData.values
     Number.isFinite(c.open) &&
     Number.isFinite(c.high) &&
     Number.isFinite(c.low) &&
-    Number.isFinite(c.close)
+    Number.isFinite(c.close) &&
+    c.open > 0 && c.high > 0 && c.low > 0 && c.close > 0 &&
+    c.high >= Math.max(c.open, c.close, c.low) &&
+    c.low <= Math.min(c.open, c.close, c.high)
   );
 
 if (convertedCandles.length === 0) {
@@ -1081,13 +1110,27 @@ if (selectedSymbol === "XAU/USD") {
 
 const providerFetchedAt = new Date().toISOString();
 const lastCandleAt = candles[candles.length - 1]?.datetime || null;
+const candleAgeMs = lastCandleAt ? Date.now() - Date.parse(lastCandleAt) : NaN;
+const candleAgeSeconds = Number.isFinite(candleAgeMs) && candleAgeMs >= 0
+  ? Math.floor(candleAgeMs / 1000)
+  : null;
+const candleFreshnessLimitSeconds = ({
+  M1: 180, M5: 600, M15: 1800, M30: 3600,
+  M45: 5400, H1: 7200, H4: 28800, D1: 172800
+}[selected] || 1800);
+const candleStatus = candleAgeSeconds !== null && candleAgeSeconds <= candleFreshnessLimitSeconds
+  ? "fresh_candles"
+  : "stale_candles";
 const output = {
   status: "success",
   symbol: selectedSymbol,
   interval: selected,
   source: "Twelve Data",
+  candleSource: "Twelve Data",
   providerFetchedAt,
   lastCandleAt,
+  candleAgeSeconds,
+  candleStatus,
   livePrice,
   livePriceUpdatedAt,
   livePriceSource,
