@@ -4210,16 +4210,34 @@ window.aurumJournalMonitor = function(symbol, candle){
     if(stamp && stamp===r.enteredCandleTime) return;
     const buy=r.direction==='BUY';
     const stopHit=buy?low<=Number(r.sl):high>=Number(r.sl);
-    const targetHit=buy?high>=Number(r.tp1):low<=Number(r.tp1);
-    if(stopHit&&targetHit){r.status='AMBIGUOUS';r.closedAt=new Date().toISOString();r.exitPrice=null;r.resultPoints=null;r.note='SL dan TP tersentuh dalam candle yang sama; hasil tidak dihitung';changed=true;return;}
-    if(stopHit||targetHit){
-      r.status=targetHit?'TP_HIT':'SL_HIT';
-      r.exitPrice=targetHit?Number(r.tp1):Number(r.sl);
+    const targets=[['TP1',Number(r.tp1)],['TP2',Number(r.tp2)],['TP3',Number(r.tp3)]];
+    r.hitTargets=Array.isArray(r.hitTargets)?r.hitTargets:[];
+    const touched=targets.filter(([name,price])=>
+      Number.isFinite(price) && (buy?high>=price:low<=price) && !r.hitTargets.includes(name));
+    if(stopHit&&touched.length){
+      r.status='AMBIGUOUS';r.closedAt=new Date().toISOString();r.exitPrice=null;r.resultPoints=null;
+      r.note='SL dan target profit tersentuh dalam candle yang sama; hasil candle tidak dapat dipastikan';
+      changed=true;return;
+    }
+    if(stopHit){
+      r.status='SL_HIT';r.exitPrice=Number(r.sl);
       r.resultPoints=buy?r.exitPrice-Number(r.entry):Number(r.entry)-r.exitPrice;
       r.closedAt=new Date().toISOString();changed=true;
-      notices.push({title:targetHit?'TP1 tercapai · '+symbol:'Stop Loss tersentuh · '+symbol,
-        body:r.direction+' · '+(targetHit?'Target TP1 '+Number(r.tp1).toFixed(2):'SL '+Number(r.sl).toFixed(2)),
+      notices.push({title:'Stop Loss tersentuh · '+symbol,
+        body:r.direction+' · SL '+Number(r.sl).toFixed(2)+(r.hitTargets.length?' · Target sebelumnya: '+r.hitTargets.join(', '):''),
         tag:'aurum-result-'+r.id});
+      return;
+    }
+    touched.forEach(([name,price])=>{
+      r.hitTargets.push(name);changed=true;
+      notices.push({title:name+' tercapai · '+symbol,
+        body:r.direction+' · '+name+' '+price.toFixed(2),
+        tag:'aurum-'+name.toLowerCase()+'-'+r.id});
+    });
+    if(r.hitTargets.includes('TP3')){
+      r.status='TP_HIT';r.exitPrice=Number(r.tp3);
+      r.resultPoints=buy?r.exitPrice-Number(r.entry):Number(r.entry)-r.exitPrice;
+      r.closedAt=new Date().toISOString();changed=true;
     }
   });
   if(changed){window.aurumJournalWrite(rows);if(window.aurumRenderPerformance)window.aurumRenderPerformance();}
