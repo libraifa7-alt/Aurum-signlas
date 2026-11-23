@@ -220,8 +220,29 @@ module.exports=async function handler(req,res){
         ? [evaluation.direction,evaluation.tradePlan.entryLow,evaluation.tradePlan.entryHigh,evaluation.tradePlan.sl].join(':')
         : 'WAIT:'+evaluation.reason;
       const changed=!prior||prior.fingerprint!==fingerprint;
+      const sameSignal = evaluation.status === 'SIGNAL' &&
+        prior && prior.status === 'SIGNAL' && prior.fingerprint === fingerprint;
+      const preservedProfiles = sameSignal && Array.isArray(prior.riskProfiles)
+        ? evaluation.riskProfiles.map(profile => {
+            const previous = prior.riskProfiles.find(item => item.key === profile.key);
+            return previous
+              ? {
+                  ...profile,
+                  ...(previous.outcomeStatus ? { outcomeStatus: previous.outcomeStatus } : {}),
+                  ...(previous.outcomeUpdatedAt ? { outcomeUpdatedAt: previous.outcomeUpdatedAt } : {})
+                }
+              : profile;
+          })
+        : evaluation.riskProfiles;
       const record={
         ...evaluation,
+        ...(sameSignal ? {
+          riskProfiles: preservedProfiles,
+          ...(prior.outcomeStatus ? { outcomeStatus: prior.outcomeStatus } : {}),
+          ...(prior.lastOutcomeCandleAt ? { lastOutcomeCandleAt: prior.lastOutcomeCandleAt } : {}),
+          ...(prior.lastOutcomePrice !== undefined ? { lastOutcomePrice: prior.lastOutcomePrice } : {}),
+          ...(prior.outcomeCheckedAt ? { outcomeCheckedAt: prior.outcomeCheckedAt } : {})
+        } : {}),
         feedDiagnostics,
         checkedAt:new Date().toISOString(),
         fingerprint,
