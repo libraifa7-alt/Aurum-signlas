@@ -350,9 +350,10 @@ module.exports = async function handler(req, res) {
           const futureToleranceMs = 60000;
 
           let candles = rawPoints.map(point => {
-            let timestamp = Number(point.t ?? point.timestamp ?? point.time);
-            if (!Number.isFinite(timestamp) && typeof point.t === "string") {
-              timestamp = Date.parse(point.t) / 1000;
+            const rawTimestamp = point.t ?? point.timestamp ?? point.time;
+            let timestamp = Number(rawTimestamp);
+            if (!Number.isFinite(timestamp) && typeof rawTimestamp === "string") {
+              timestamp = Date.parse(rawTimestamp) / 1000;
             }
             if (timestamp > 1000000000000) timestamp = timestamp / 1000;
 
