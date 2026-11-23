@@ -5,6 +5,9 @@ on:
   push:
     paths:
       - '.github/workflows/aurum-scan.yml'
+      - 'api/cron.js'
+      - 'api/engine.js'
+      - 'api/index.js'
   schedule:
     - cron: '*/15 * * * *'
   workflow_dispatch:
