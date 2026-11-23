@@ -1,0 +1,27 @@
+name: AURUM Signal Scanner
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger server-side market scan
+        env:
+          AURUM_URL: https://aurum-signals-ai.vercel.app
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "Repository secret CRON_SECRET belum diatur."
+            exit 1
+          fi
+          curl --fail --silent --show-error --max-time 120 \
+            -X POST "$AURUM_URL/api/cron" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Accept: application/json"
