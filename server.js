@@ -27,4 +27,12 @@ app.get("/api/dashboard", (req, res) => {
   });
 });
 
+const PORT = Number(process.env.PORT || 3000);
+
+if (require.main === module) {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Aurum Signals server listening on port ${PORT}`);
+  });
+}
+
 module.exports = app;
