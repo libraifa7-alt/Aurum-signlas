@@ -4149,6 +4149,24 @@ window.aurumJournalWrite = function(rows){
   try { localStorage.setItem(window.aurumJournalKey,JSON.stringify(rows.slice(-500))); return true; }
   catch(e){ console.warn('AURUM journal write:',e); return false; }
 };
+window.aurumNotify = async function(title, body, tag){
+  if (!('Notification' in window) || Notification.permission !== 'granted') return false;
+  const options = { body:String(body || ''), tag:String(tag || 'aurum-update'), icon:'/aurum-icon-192.png', badge:'/aurum-icon-192.png' };
+  try {
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      if (registration && typeof registration.showNotification === 'function') {
+        await registration.showNotification(String(title || 'AURUM Signals AI'), options);
+        return true;
+      }
+    }
+    new Notification(String(title || 'AURUM Signals AI'), options);
+    return true;
+  } catch (error) {
+    console.warn('AURUM notification:', error);
+    return false;
+  }
+};
 window.aurumJournalCapture = function(plan, symbol, candleTime){
   if(!plan || !['BUY','SELL'].includes(plan.direction)) return;
   const rows=window.aurumJournalRead(), now=Date.now();
@@ -4169,16 +4187,23 @@ window.aurumJournalCapture = function(plan, symbol, candleTime){
   });
   window.aurumJournalWrite(rows);
   if(window.aurumRenderPerformance) window.aurumRenderPerformance();
+  window.aurumNotify('Sinyal '+plan.direction+' baru · '+symbol,
+    'Entry '+Number(plan.entryLow).toFixed(2)+'–'+Number(plan.entryHigh).toFixed(2)+
+    ' | SL '+Number(plan.sl).toFixed(2)+' | TP1 '+Number(plan.tp1).toFixed(2)+
+    ' | TP2 '+Number(plan.tp2).toFixed(2)+' | TP3 '+Number(plan.tp3).toFixed(2),
+    'aurum-signal-'+symbol+'-'+now);
 };
 window.aurumJournalMonitor = function(symbol, candle){
   if(!candle || !Number.isFinite(Number(candle.high)) || !Number.isFinite(Number(candle.low))) return;
   const rows=window.aurumJournalRead(); let changed=false;
+  const notices=[];
   const high=Number(candle.high),low=Number(candle.low),stamp=String(candle.time||'');
   rows.forEach(r=>{
     if(r.symbol!==symbol || !['PENDING_ENTRY','OPEN'].includes(r.status)) return;
     if(r.status==='PENDING_ENTRY'){
       if(high>=Number(r.entryLow) && low<=Number(r.entryHigh)){
         r.status='OPEN';r.enteredAt=new Date().toISOString();r.enteredCandleTime=stamp;changed=true;
+        notices.push({title:'Entry tersentuh · '+symbol,body:r.direction+' masuk area entry '+Number(r.entryLow).toFixed(2)+'–'+Number(r.entryHigh).toFixed(2),tag:'aurum-entry-'+r.id});
       }
       return;
     }
@@ -4192,9 +4217,13 @@ window.aurumJournalMonitor = function(symbol, candle){
       r.exitPrice=targetHit?Number(r.tp1):Number(r.sl);
       r.resultPoints=buy?r.exitPrice-Number(r.entry):Number(r.entry)-r.exitPrice;
       r.closedAt=new Date().toISOString();changed=true;
+      notices.push({title:targetHit?'TP1 tercapai · '+symbol:'Stop Loss tersentuh · '+symbol,
+        body:r.direction+' · '+(targetHit?'Target TP1 '+Number(r.tp1).toFixed(2):'SL '+Number(r.sl).toFixed(2)),
+        tag:'aurum-result-'+r.id});
     }
   });
   if(changed){window.aurumJournalWrite(rows);if(window.aurumRenderPerformance)window.aurumRenderPerformance();}
+  notices.forEach(n=>window.aurumNotify(n.title,n.body,n.tag));
 };
 
 let fvgZoneOverlay = null;
@@ -7042,8 +7071,18 @@ const planDirection =
   tradePlan && tradePlan.type === 'BEARISH' ? 'SELL' :
   'WAIT';
 
+const signalCandleAgeMs = Date.now() - Number(latestCandle.time) * 1000;
+const signalFreshnessMs = ({
+  M1: 300000, M5: 900000, M15: 2700000, M30: 5400000,
+  M45: 8100000, H1: 10800000, H4: 43200000, D1: 259200000
+}[document.getElementById('tf')?.value || 'M15'] || 2700000);
+const signalDataIsFresh = Number.isFinite(signalCandleAgeMs) &&
+  signalCandleAgeMs >= -60000 && signalCandleAgeMs <= signalFreshnessMs &&
+  (document.getElementById('pair')?.value !== 'XAU/USD' ||
+    chartFeedMeta?.candleStatus === 'fresh_candles');
 const validTradePlan =
   tradePlan &&
+  signalDataIsFresh &&
   finalSignal !== 'WAIT' &&
   planDirection === finalSignal &&
   orderBlock.includes(tradePlan.type + ' ORDER BLOCK')
