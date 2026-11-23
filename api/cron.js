@@ -29,9 +29,9 @@ module.exports=async function handler(req,res){
   }
 
   try {
-    const host=process.env.VERCEL_URL||req.headers.host;
-    if(!host) throw new Error('Host deployment tidak tersedia');
-    const baseUrl='https://'+host;
+    // Use the canonical public deployment URL. VERCEL_URL may point to a protected
+    // preview/deployment hostname and return 401 when called from a serverless function.
+    const baseUrl=process.env.AURUM_PUBLIC_URL||'https://aurum-signals-ai.vercel.app';
     const symbols=['XAU/USD','BTC/USD','WTI'];
     const results=[];
 
