@@ -1,5 +1,5 @@
 name: AURUM Signal Scanner
-# Scanner heartbeat: execute an immediate verification scan after strategy alignment.
+# Scanner heartbeat: run every 15 minutes and immediately after workflow maintenance.
 
 on:
   push:
