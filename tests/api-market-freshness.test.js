@@ -678,8 +678,12 @@ test("fundamental page does not fabricate unavailable DXY, Treasury, news, or ca
   assert.notEqual(start, -1);
   assert.notEqual(end, -1);
   const page = html.slice(start, end);
-  assert.match(page, /DXY[\s\S]{0,180}BELUM TERHUBUNG/);
-  assert.match(page, /US 10Y YIELD[\s\S]{0,180}BELUM TERHUBUNG/);
+  assert.ok(page.includes('id="aurumFundamentalBroadUsd"'));
+  assert.ok(page.includes("DTWEXBGS"));
+  assert.ok(page.includes("bukan ICE DXY"));
+  assert.ok(page.includes('id="aurumFundamentalUs10y"'));
+  assert.ok(page.includes("DGS10"));
+  assert.ok(page.includes("fetch('/api/fundamental'"));
   assert.match(page, /Belum ada penyedia berita ekonomi yang terhubung/);
   assert.match(page, /Kalender ekonomi belum terhubung ke penyedia data/);
   assert.ok(html.includes("fetch('/api/signals'"));
