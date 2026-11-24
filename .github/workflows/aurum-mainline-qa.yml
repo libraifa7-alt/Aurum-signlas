@@ -1,0 +1,49 @@
+name: AURUM mainline QA
+
+on:
+  push:
+    branches:
+      - qa/mainline-market-freshness
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  market-freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Check API syntax
+        run: node --check api/index.js
+      - name: Run market data regression tests
+        run: npm test
+      - name: Parse all inline browser scripts
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const html = fs.readFileSync('public/index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)];
+          let checked = 0;
+          for (let i = 0; i < scripts.length; i++) {
+            const attrs = scripts[i][1];
+            const source = scripts[i][2];
+            if (/\\bsrc\\s*=/.test(attrs)) continue;
+            const type = (attrs.match(/\\btype\\s*=\\s*["']([^"']+)["']/i) || [])[1] || '';
+            if (/application\\/(json|ld\\+json)|importmap/i.test(type)) continue;
+            try {
+              new Function(source);
+              checked++;
+            } catch (error) {
+              console.error('Inline script ' + (i + 1) + ' failed to parse:', error.message);
+              process.exitCode = 1;
+            }
+          }
+          console.log('Parsed ' + checked + ' inline browser scripts.');
+          NODE
