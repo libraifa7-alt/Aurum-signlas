@@ -118,9 +118,11 @@ async function updateSignalOutcomes(symbol, candles) {
       await redis(['LSET','aurum:server-signal-history:'+encodeURIComponent(symbol),String(index),JSON.stringify(updated)]);
 
       // Keep the live monitor synchronized with the matching history record.
-      if (currentRecord && currentRecord.status === 'SIGNAL' &&
-          ((currentRecord.generatedAt && currentRecord.generatedAt === updated.generatedAt) ||
-           (currentRecord.fingerprint && currentRecord.fingerprint === updated.fingerprint))) {
+      const matchesCurrent = currentRecord && currentRecord.status === 'SIGNAL' &&
+        (currentRecord.generatedAt
+          ? currentRecord.generatedAt === updated.generatedAt
+          : currentRecord.fingerprint && currentRecord.fingerprint === updated.fingerprint);
+      if (matchesCurrent) {
         currentRecord = updated;
         await redis(['SET',currentKey,JSON.stringify(currentRecord),'EX','604800']);
       }
