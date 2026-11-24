@@ -795,15 +795,15 @@ test("fundamental endpoint rejects non-GET requests without fetching FRED", asyn
 test("fundamental CSV parser skips missing values and rejects mismatched series headers", () => {
   const { parseLatestObservation } = require("../api/fundamental.js");
   assert.deepEqual(
-    parseLatestObservation("observation_date,DGS10\\n2026-11-20,.\\n2026-11-21,4.31\\n", "DGS10"),
+    parseLatestObservation("observation_date,DGS10\n2026-11-20,.\n2026-11-21,4.31\n", "DGS10"),
     { date: "2026-11-21", value: 4.31 }
   );
   assert.equal(
-    parseLatestObservation("observation_date,DTWEXBGS\\n2026-11-21,119.5\\n", "DGS10"),
+    parseLatestObservation("observation_date,DTWEXBGS\n2026-11-21,119.5\n", "DGS10"),
     null
   );
   assert.equal(
-    parseLatestObservation("observation_date,DGS10\\n2026-02-30,4.2\\n", "DGS10"),
+    parseLatestObservation("observation_date,DGS10\n2026-02-30,4.2\n", "DGS10"),
     null
   );
 });
@@ -818,7 +818,7 @@ test("fundamental endpoint keeps one valid macro series when the other provider 
     if (id === "DGS10") throw new Error("Temporary FRED timeout");
     return {
       ok: true,
-      async text() { return "observation_date,DTWEXBGS\\n" + today + ",118.7\\n"; }
+      async text() { return "observation_date,DTWEXBGS\n" + today + ",118.7\n"; }
     };
   };
   try {
@@ -844,7 +844,7 @@ test("fundamental endpoint rejects future-dated observations", async () => {
     return {
       ok: true,
       async text() {
-        return "observation_date," + id + "\\n" + future + ",4.2\\n";
+        return "observation_date," + id + "\n" + future + ",4.2\n";
       }
     };
   };
