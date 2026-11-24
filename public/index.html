@@ -3971,31 +3971,26 @@ body {
 <script>
 (function () {
   function initAurumNavigation() {
-    const navItems = document.querySelectorAll(
-      '.aurum-bottom-nav .nav-item'
-    );
-
+    const navItems = document.querySelectorAll('.aurum-bottom-nav .nav-item');
     const pages = document.querySelectorAll('.app-page');
+    const validPages = new Set(Array.from(pages, page => page.id));
 
-    function showPage(pageId) {
-      const targetPage = document.getElementById(pageId);
-      if (!targetPage) return;
+    function showPage(pageId, updateAddress) {
+      if (!validPages.has(pageId)) return;
 
       pages.forEach(function (page) {
         page.classList.toggle('active', page.id === pageId);
       });
 
       navItems.forEach(function (item) {
-        item.classList.toggle(
-          'active',
-          item.dataset.page === pageId
-        );
+        item.classList.toggle('active', item.dataset.page === pageId);
       });
 
-      window.scrollTo({
-        top: 0,
-        behavior: 'auto'
-      });
+      if (updateAddress && window.location.hash !== '#' + pageId) {
+        window.history.pushState({ aurumPage: pageId }, '', '#' + pageId);
+      }
+
+      window.scrollTo({ top: 0, behavior: 'auto' });
 
       if (pageId === 'marketPage' || pageId === 'chartPage') {
         requestAnimationFrame(function () {
@@ -4007,18 +4002,22 @@ body {
     navItems.forEach(function (item) {
       item.addEventListener('click', function (event) {
         event.preventDefault();
-        showPage(this.dataset.page);
+        showPage(this.dataset.page, true);
       });
     });
 
-    showPage('homePage');
+    function restorePageFromAddress() {
+      const requestedPage = decodeURIComponent(window.location.hash.slice(1));
+      showPage(validPages.has(requestedPage) ? requestedPage : 'homePage', false);
+    }
+
+    window.addEventListener('hashchange', restorePageFromAddress);
+    window.addEventListener('popstate', restorePageFromAddress);
+    restorePageFromAddress();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener(
-      'DOMContentLoaded',
-      initAurumNavigation
-    );
+    document.addEventListener('DOMContentLoaded', initAurumNavigation, { once: true });
   } else {
     initAurumNavigation();
   }
