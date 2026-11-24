@@ -3916,49 +3916,25 @@ body {
 <section id="aurumNews" class="panel" style="margin-top:16px">
   <h3>✦ PUTUSAN AURUM</h3>
   <p class="sub">MARKET INTELLIGENCE & FUNDAMENTAL ANALYSIS</p>
-
-  <div class="signal" style="margin-top:16px;text-align:center">
-    <small class="sub">CURRENT MARKET DECISION</small>
-    <h2 class="gold">NO CALL RIGHT NOW</h2>
-    <p class="sub">Menunggu konfirmasi data pasar dan fundamental.</p>
+  <div class="signal" style="margin-top:16px">
+    <small class="sub">RINGKASAN KEPUTUSAN SERVER</small>
+    <h2 class="gold" id="aurumFundamentalDecision">MEMUAT DATA…</h2>
+    <p class="sub" id="aurumFundamentalDecisionNote">Mengambil status terbaru Gold, Bitcoin, dan WTI dari server AURUM.</p>
+    <small class="sub" id="aurumFundamentalUpdated">Pembaruan: menunggu server</small>
   </div>
-
   <h3>FUNDAMENTAL MONITOR</h3>
-
   <div class="cards">
-    <div class="card">
-      <small>US DOLLAR INDEX</small>
-      <strong class="gold">DATA PENDING</strong>
-      <small>DXY</small>
-    </div>
-
-    <div class="card">
-      <small>US 10Y YIELD</small>
-      <strong class="gold">DATA PENDING</strong>
-      <small>Treasury Yield</small>
-    </div>
+    <div class="card"><small>US DOLLAR INDEX</small><strong class="gold">BELUM TERHUBUNG</strong><small>DXY · Sumber data belum dipasang</small></div>
+    <div class="card"><small>US 10Y YIELD</small><strong class="gold">BELUM TERHUBUNG</strong><small>Treasury Yield · Sumber data belum dipasang</small></div>
   </div>
-
   <h3 style="margin-top:20px">ECONOMIC NEWS</h3>
-
-  <div class="signal">
-    <small class="sub">LATEST MARKET NEWS</small>
-    <p>Menunggu koneksi sumber berita ekonomi.</p>
-  </div>
-
+  <div class="signal"><small class="sub">LATEST MARKET NEWS</small><p>Belum ada penyedia berita ekonomi yang terhubung. Berita tidak ditampilkan sebelum sumber dan waktu publikasinya dapat diverifikasi.</p></div>
   <h3 style="margin-top:20px">ECONOMIC CALENDAR</h3>
-
-  <div class="signal">
-    <small class="sub">UPCOMING EVENTS</small>
-    <p>Data kalender ekonomi belum terhubung.</p>
-  </div>
-
+  <div class="signal"><small class="sub">UPCOMING EVENTS</small><p>Kalender ekonomi belum terhubung ke penyedia data. Jadwal dan tingkat dampak belum tersedia.</p></div>
+  <h3 style="margin-top:20px">SERVER MARKET MONITOR</h3>
+  <div id="aurumFundamentalMarkets" class="cards"><div class="signal"><p class="sub">Mengambil status server…</p></div></div>
   <h3 style="margin-top:20px">DECISION HISTORY</h3>
-
-  <div class="signal">
-    <small class="sub">AURUM SIGNAL RECORD</small>
-    <p>Belum ada riwayat keputusan yang tercatat.</p>
-  </div>
+  <div id="aurumFundamentalHistory"><div class="signal"><p class="sub">Mengambil riwayat keputusan…</p></div></div>
 
   <p class="sub" style="margin-top:16px">
     Aurum Signals AI · Fundamental intelligence · Educational use only
@@ -8834,6 +8810,50 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
  window.aurumRenderPnl=render;panel.querySelectorAll('[data-pnl-period]').forEach(b=>b.addEventListener('click',()=>{period=b.dataset.pnlPeriod;panel.querySelectorAll('[data-pnl-period]').forEach(x=>x.classList.toggle('active',x===b));render();}));render();
 })();
 </script>
+<script id="aurum-fundamental-live">
+(function(){
+ const root=document.getElementById('newsPage');if(!root)return;
+ const $=id=>document.getElementById(id);
+ const safe=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const names={'XAU/USD':'GOLD · XAU/USD','BTC/USD':'BITCOIN · BTC/USD','WTI':'WTI OIL'};
+ const statusLabel=v=>({BUY:'BUY',SELL:'SELL',WAIT:'MENUNGGU KONFIRMASI',SIGNAL:'SINYAL AKTIF',NO_SIGNAL:'BELUM ADA SINYAL',COMPLETED:'SELESAI'}[String(v||'').toUpperCase()]||String(v||'MENUNGGU'));
+ const fmt=v=>Number.isFinite(Number(v))?Number(v).toLocaleString('id-ID',{maximumFractionDigits:5}):'--';
+ function recordLine(r,symbol){
+  const plan=r.tradePlan||{},strength=r.signalStrength||{};
+  const date=r.generatedAt?new Date(r.generatedAt).toLocaleString('id-ID'):'Waktu tidak tersedia';
+  const side=['BUY','SELL'].includes(r.direction)?r.direction:'WAIT';
+  const entry=Number.isFinite(Number(plan.entryLow))&&Number.isFinite(Number(plan.entryHigh))?fmt(plan.entryLow)+' – '+fmt(plan.entryHigh):'--';
+  const outcome=r.outcomeStatus||'Menunggu hasil';
+  return '<article class="signal" style="margin:8px 0"><strong>'+safe(names[symbol]||symbol)+' · '+safe(side)+'</strong><small style="display:block;color:#8792a2;margin-top:4px">'+safe(date)+'</small><p style="margin:7px 0">Entry '+safe(entry)+' · SL '+safe(fmt(plan.sl))+' · TP '+safe(fmt(plan.tp1))+' / '+safe(fmt(plan.tp2))+' / '+safe(fmt(plan.tp3))+'</p><small>Status: '+safe(outcome)+'</small></article>';
+ }
+ async function refresh(){
+  const decision=$('aurumFundamentalDecision'),note=$('aurumFundamentalDecisionNote'),updated=$('aurumFundamentalUpdated'),markets=$('aurumFundamentalMarkets'),history=$('aurumFundamentalHistory');
+  try{
+   const res=await fetch('/api/signals',{cache:'no-store',headers:{Accept:'application/json'}});
+   const data=await res.json();if(!res.ok||data.status!=='success')throw new Error(data.message||'Server tidak tersedia');
+   const results=Array.isArray(data.results)?data.results:[];
+   const active=results.filter(x=>x.current&&x.current.status==='SIGNAL'&&['BUY','SELL'].includes(x.current.direction));
+   if(decision)decision.textContent=active.length?active.length+' SETUP AKTIF':'BELUM ADA SETUP AKTIF';
+   if(note)note.textContent=active.length?active.map(x=>(names[x.symbol]||x.symbol)+' '+x.current.direction).join(' · '):'Belum ada keputusan BUY/SELL aktif dari pemindaian server.';
+   if(updated)updated.textContent='Data server diperbarui: '+new Date(data.updatedAt||Date.now()).toLocaleString('id-ID');
+   if(markets)markets.innerHTML=results.map(x=>{
+    const r=x.current||{},p=r.tradePlan||{},sg=r.signalStrength||{},score=Number(sg.score);
+    const detail=r.status==='SIGNAL'&&['BUY','SELL'].includes(r.direction)?('Entry '+fmt(p.entryLow)+'–'+fmt(p.entryHigh)+' · SL '+fmt(p.sl)+' · TP '+fmt(p.tp1)+' / '+fmt(p.tp2)+' / '+fmt(p.tp3)):safe(r.reason||r.code||'Menunggu konfirmasi multi-timeframe');
+    return '<article class="card"><small>'+safe(names[x.symbol]||x.symbol)+'</small><strong class="gold">'+safe(statusLabel(r.direction||r.status||'WAIT'))+'</strong><small>'+safe(detail)+'</small><small>Kekuatan: '+(Number.isFinite(score)?Math.round(score)+'/100':'Belum tersedia')+'</small></article>';
+   }).join('')||'<div class="signal"><p class="sub">Data instrumen belum tersedia.</p></div>';
+   const rows=results.flatMap(x=>(Array.isArray(x.history)?x.history:[]).map(r=>({r,symbol:x.symbol}))).filter(x=>x.r&&x.r.status==='SIGNAL').sort((a,b)=>Date.parse(b.r.generatedAt||0)-Date.parse(a.r.generatedAt||0)).slice(0,8);
+   if(history)history.innerHTML=rows.length?rows.map(x=>recordLine(x.r,x.symbol)).join(''):'<div class="signal"><p class="sub">Belum ada riwayat keputusan server.</p></div>';
+  }catch(e){
+   if(decision)decision.textContent='SERVER BELUM TERSEDIA';
+   if(note)note.textContent='Ringkasan keputusan tidak dapat diperbarui: '+String(e.message||e);
+   if(markets)markets.innerHTML='<div class="signal"><p class="sub">Tidak dapat mengambil data market server. Coba lagi otomatis.</p></div>';
+   if(history)history.innerHTML='<div class="signal"><p class="sub">Riwayat belum dapat dimuat.</p></div>';
+  }
+ }
+ refresh();setInterval(refresh,60000);
+})();
+</script>
+
 </body>
 </html>
 
