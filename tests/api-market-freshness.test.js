@@ -251,3 +251,16 @@ test("does not turn incomplete or gapped M45 Yahoo bars into a candle", async ()
   assert.equal(res.statusCode, 502);
   assert.match(res.payload.message, /candle/i);
 });
+
+test("does not publish a still-forming M45 bucket", async () => {
+  const targetSeconds = 45 * 60;
+  const bucketStart = Math.floor(Date.now() / 1000 / targetSeconds) * targetSeconds;
+  const timestamps = [bucketStart, bucketStart + 900, bucketStart + 1800];
+  const res = await requestMarket("WTI", "M45", async () => ({
+    ok: true,
+    async json() { return yahooSeriesPayload(timestamps); }
+  }));
+
+  assert.equal(res.statusCode, 502);
+  assert.match(res.payload.message, /candle/i);
+});
