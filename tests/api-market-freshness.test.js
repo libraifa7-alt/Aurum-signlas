@@ -908,3 +908,19 @@ test("chat form and suggested prompts are wired to the same local assistant", ()
   assert.ok(chat.includes("Saya belum memiliki jawaban terverifikasi"));
   assert.ok(!chat.includes("fetch('https://"));
 });
+
+
+test("market directory selection uses the shared router to keep page, URL, and active tab synchronized", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf("document.getElementById('aurumMarketDirectory')?.addEventListener('click'");
+  const end = html.indexOf("document.getElementById('aurumSignalDetailBack').addEventListener", start);
+  assert.notEqual(start, -1, "Market directory click handler must exist");
+  assert.notEqual(end, -1, "Market directory handler must end before signal detail back handler");
+  const handler = html.slice(start, end);
+  assert.ok(handler.includes("window.aurumShowPage('marketPage')"),
+    "Instrument selection must use the shared page router");
+  assert.ok(!handler.includes("item.dataset.page==='marketDirectoryPage'"),
+    "Instrument selection must not manually set a potentially stale navigation state");
+  assert.ok(handler.includes("pairSelect.dispatchEvent(new Event('change'"),
+    "Selecting an instrument must update the active market data feed");
+});
