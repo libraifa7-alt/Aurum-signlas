@@ -3392,22 +3392,7 @@ body {
     </div>
   </section>
 
-  <!-- AURUM SERVER-SIDE SIGNALS -->
-  <section class="aurum-server-signals panel" id="aurumServerSignals" aria-live="polite">
-    <div class="aurum-server-head">
-      <div><strong>SERVER SIGNAL MONITOR</strong><small>Hasil pemindaian otomatis AURUM</small></div>
-      <span id="aurumServerState" class="aurum-server-state">MEMUAT…</span>
-    </div>
-    <div id="aurumServerSignalRows" class="aurum-server-rows">
-      <p class="aurum-server-muted">Mengambil hasil pemindaian server…</p>
-    </div>
-    <div class="aurum-server-history" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(148,163,184,.25)">
-      <strong style="display:block;font-size:12px;margin-bottom:8px">RIWAYAT SINYAL SERVER</strong>
-      <div id="aurumServerHistoryRows"><small class="aurum-server-muted">Belum ada sinyal tersimpan.</small></div>
-    </div>
-    <small id="aurumServerUpdated" class="aurum-server-updated">Menunggu pembaruan server</small>
-  </section>
-  <!-- END AURUM SERVER-SIDE SIGNALS -->
+
 
   <!-- MARKET CARDS -->
   <section class="home-section">
@@ -3562,6 +3547,22 @@ body {
 
     <!-- HALAMAN SINYAL -->
   <section id="marketPage" class="app-page">
+    <!-- AURUM SERVER-SIDE SIGNALS -->
+    <section class="aurum-server-signals panel" id="aurumServerSignals" aria-live="polite">
+    <div class="aurum-server-head">
+      <div><strong>SERVER SIGNAL MONITOR</strong><small>Hasil pemindaian otomatis AURUM</small></div>
+      <span id="aurumServerState" class="aurum-server-state">MEMUAT…</span>
+    </div>
+    <div id="aurumServerSignalRows" class="aurum-server-rows">
+      <p class="aurum-server-muted">Mengambil hasil pemindaian server…</p>
+    </div>
+    <div class="aurum-server-history" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(148,163,184,.25)">
+      <strong style="display:block;font-size:12px;margin-bottom:8px">RIWAYAT SINYAL SERVER</strong>
+      <div id="aurumServerHistoryRows"><small class="aurum-server-muted">Belum ada sinyal tersimpan.</small></div>
+    </div>
+    <small id="aurumServerUpdated" class="aurum-server-updated">Menunggu pembaruan server</small>
+  </section>
+    <!-- END AURUM SERVER-SIDE SIGNALS -->
     <div class="aurum-asset-switch" aria-label="Pilih instrumen pasar">
       <button type="button" class="active" data-asset="XAU/USD">🟡 Gold</button>
       <button type="button" data-asset="BTC/USD">₿ Bitcoin</button>
