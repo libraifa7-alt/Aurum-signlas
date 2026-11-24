@@ -456,3 +456,84 @@ test("signals endpoint applies no-store and nosniff headers before method valida
   assert.equal(res.headers["Cache-Control"], "no-store, max-age=0");
   assert.equal(res.headers["X-Content-Type-Options"], "nosniff");
 });
+
+
+test("push subscriptions accept supported browser push services and valid keys", async () => {
+  const handler = require("../api/push-subscribe.js");
+  const names = ["KV_REST_API_URL", "KV_REST_API_TOKEN"];
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]]));
+  const originalFetch = global.fetch;
+  process.env.KV_REST_API_URL = "https://redis.example.test";
+  process.env.KV_REST_API_TOKEN = "test-token";
+  const commands = [];
+  global.fetch = async (_url, options) => {
+    commands.push(JSON.parse(options.body));
+    return { ok: true, async json() { return { result: "OK" }; } };
+  };
+  try {
+    const res = responseRecorder();
+    await handler({ method: "POST", body: {
+      endpoint: "https://fcm.googleapis.com/fcm/send/test-token",
+      keys: { p256dh: "A".repeat(87), auth: "B".repeat(22) }
+    } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.payload.subscribed, true);
+    assert.equal(commands.length, 2);
+  } finally {
+    global.fetch = originalFetch;
+    for (const name of names) {
+      if (previous[name] === undefined) delete process.env[name];
+      else process.env[name] = previous[name];
+    }
+  }
+});
+
+test("push subscriptions reject arbitrary HTTPS hosts before Redis writes", async () => {
+  const handler = require("../api/push-subscribe.js");
+  const names = ["KV_REST_API_URL", "KV_REST_API_TOKEN"];
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]]));
+  const originalFetch = global.fetch;
+  process.env.KV_REST_API_URL = "https://redis.example.test";
+  process.env.KV_REST_API_TOKEN = "test-token";
+  let fetchCalled = false;
+  global.fetch = async () => { fetchCalled = true; throw new Error("Redis must not be called"); };
+  try {
+    const res = responseRecorder();
+    await handler({ method: "POST", body: {
+      endpoint: "https://attacker.example/collect",
+      keys: { p256dh: "A".repeat(87), auth: "B".repeat(22) }
+    } }, res);
+    assert.equal(res.statusCode, 400);
+    assert.equal(fetchCalled, false);
+  } finally {
+    global.fetch = originalFetch;
+    for (const name of names) {
+      if (previous[name] === undefined) delete process.env[name];
+      else process.env[name] = previous[name];
+    }
+  }
+});
+
+test("push unsubscription needs only a previously registered endpoint", async () => {
+  const handler = require("../api/push-subscribe.js");
+  const names = ["KV_REST_API_URL", "KV_REST_API_TOKEN"];
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]]));
+  const originalFetch = global.fetch;
+  process.env.KV_REST_API_URL = "https://redis.example.test";
+  process.env.KV_REST_API_TOKEN = "test-token";
+  let calls = 0;
+  global.fetch = async () => { calls++; return { ok: true, async json() { return { result: 1 }; } }; };
+  try {
+    const res = responseRecorder();
+    await handler({ method: "DELETE", body: { endpoint: "https://fcm.googleapis.com/fcm/send/test-token" } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.payload.subscribed, false);
+    assert.equal(calls, 2);
+  } finally {
+    global.fetch = originalFetch;
+    for (const name of names) {
+      if (previous[name] === undefined) delete process.env[name];
+      else process.env[name] = previous[name];
+    }
+  }
+});

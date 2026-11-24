@@ -10,6 +10,31 @@ async function redis(command){
   return body.result;
 }
 
+function validateSubscription(subscription, requireKeys) {
+  if (!subscription || typeof subscription.endpoint !== 'string' || subscription.endpoint.length > 4096) {
+    return false;
+  }
+  let endpoint;
+  try { endpoint = new URL(subscription.endpoint); } catch { return false; }
+  if (endpoint.protocol !== 'https:' || endpoint.username || endpoint.password || endpoint.port) return false;
+
+  // Only accept known browser push-service domains. This prevents the cron
+  // worker from being used as a generic HTTPS request proxy.
+  const host = endpoint.hostname.toLowerCase();
+  const allowedHost = host === 'fcm.googleapis.com' ||
+    host === 'web.push.apple.com' ||
+    host.endsWith('.push.services.mozilla.com') ||
+    host === 'push.services.mozilla.com' ||
+    host.endsWith('.notify.windows.com');
+  if (!allowedHost) return false;
+
+  if (!requireKeys) return true;
+  const keys = subscription.keys;
+  return Boolean(keys &&
+    typeof keys.p256dh === 'string' && /^[A-Za-z0-9_-]{40,200}$/.test(keys.p256dh) &&
+    typeof keys.auth === 'string' && /^[A-Za-z0-9_-]{16,100}$/.test(keys.auth));
+}
+
 module.exports=async function handler(req,res){
   if (typeof res.setHeader === 'function') {
     res.setHeader('Cache-Control', 'no-store, max-age=0');
@@ -23,8 +48,7 @@ module.exports=async function handler(req,res){
   if(!process.env.KV_REST_API_URL||!process.env.KV_REST_API_TOKEN) return res.status(503).json({status:'not_configured',message:'Redis KV belum dikonfigurasi'});
   try{
     const subscription=req.body;
-    if(!subscription||typeof subscription.endpoint!=='string'||!subscription.endpoint.startsWith('https://')||
-       !subscription.keys||typeof subscription.keys.p256dh!=='string'||typeof subscription.keys.auth!=='string'){
+    if(!validateSubscription(subscription, req.method === 'POST')){
       return res.status(400).json({status:'error',message:'Format subscription tidak valid'});
     }
     const id=crypto.createHash('sha256').update(subscription.endpoint).digest('hex');
@@ -33,7 +57,11 @@ module.exports=async function handler(req,res){
       await redis(['DEL',key]);await redis(['SREM','aurum:push:subscriptions',id]);
       return res.status(200).json({status:'success',subscribed:false});
     }
-    await redis(['SET',key,JSON.stringify(subscription),'EX','7776000']);
+    const serialized=JSON.stringify(subscription);
+    if (Buffer.byteLength(serialized, 'utf8') > 8192) {
+      return res.status(413).json({status:'error',message:'Ukuran subscription terlalu besar'});
+    }
+    await redis(['SET',key,serialized,'EX','7776000']);
     await redis(['SADD','aurum:push:subscriptions',id]);
     return res.status(200).json({status:'success',subscribed:true});
   }catch(error){return res.status(500).json({status:'error',message:String(error.message||error).slice(0,180)});}
