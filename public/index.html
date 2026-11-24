@@ -3886,45 +3886,7 @@ body {
     </section>
   </section>
   <!-- END HALAMAN SINYAL -->
-<script id="aurum-market-directory-actions">
-(function(){
-  function openInstrument(row){
-    var asset=row.getAttribute('data-asset');
-    var pair=document.getElementById('pair');
-    var source=document.querySelector('#marketPage .aurum-asset-switch [data-asset="'+asset+'"]');
-    // Select the actual chart/API symbol directly; do not rely only on a visual shortcut click.
-    if(pair && ['XAU/USD','BTC/USD','WTI'].indexOf(asset)!==-1 && pair.value!==asset){
-      pair.value=asset;
-      pair.dispatchEvent(new Event('change',{bubbles:true}));
-    }
-    document.querySelectorAll('#marketPage .aurum-asset-switch [data-asset]').forEach(function(button){
-      button.classList.toggle('active',button.dataset.asset===asset);
-    });
-    // Route through the shared navigation controller so URL, active tab,
-    // and accessibility state stay in sync when an instrument is opened.
-    if(typeof window.aurumShowPage==='function'){
-      window.aurumShowPage('marketPage');
-    }else{
-      document.querySelectorAll('.app-page').forEach(function(page){page.classList.toggle('active',page.id==='marketPage');});
-      document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(function(item){
-        var active=item.dataset.page==='marketDirectoryPage';
-        item.classList.toggle('active',active);
-        if(active)item.setAttribute('aria-current','page');
-        else item.removeAttribute('aria-current');
-      });
-      window.scrollTo({top:0,behavior:'auto'});
-      requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));});
-    }
-  }
-  function bindAurumMarketDirectory(){
-    document.querySelectorAll('#aurumMarketDirectory [data-asset]').forEach(function(row){
-      row.addEventListener('click',function(){openInstrument(this);});
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindAurumMarketDirectory);
-  else bindAurumMarketDirectory();
-})();
-</script>
+
 
   <!-- HALAMAN GRAFIK -->
   <section id="chartPage" class="app-page">
