@@ -4334,7 +4334,12 @@ body {
     });
 
     function restorePageFromAddress() {
-      const requestedPage = decodeURIComponent(window.location.hash.slice(1));
+      let requestedPage = window.location.hash.slice(1);
+      try {
+        requestedPage = decodeURIComponent(requestedPage);
+      } catch (_) {
+        requestedPage = '';
+      }
       showPage(validPages.has(requestedPage) ? requestedPage : 'homePage', false);
     }
 
