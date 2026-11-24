@@ -37,6 +37,25 @@ function yahooPayload(timestamp) {
   };
 }
 
+function yahooSeriesPayload(timestamps) {
+  return {
+    chart: {
+      result: [{
+        timestamp: timestamps,
+        indicators: {
+          quote: [{
+            open: timestamps.map((_, i) => 4200 + i),
+            high: timestamps.map((_, i) => 4210 + i),
+            low: timestamps.map((_, i) => 4190 - i),
+            close: timestamps.map((_, i) => 4205 + i),
+            volume: timestamps.map((_, i) => 100 + i)
+          }]
+        }
+      }]
+    }
+  };
+}
+
 async function requestMarket(symbol, interval, fetchImpl) {
   globalThis.aurumCache = new Map();
   const originalFetch = global.fetch;
@@ -181,4 +200,54 @@ test("internal chart diagnostics never overwrite the customer-facing Aurum statu
   assert.equal((html.match(/id="aurumDebugStatus"/g) || []).length, 1);
   assert.ok(html.includes('<div class="status" role="status" aria-live="polite">● AURUM SIGNALS</div>'));
   assert.ok(!html.includes("document.querySelector('.status')"));
+});
+
+test("aggregates M45 only from three consecutive completed Yahoo M15 bars", async () => {
+  const targetSeconds = 45 * 60;
+  const bucketStart = Math.floor(Date.now() / 1000 / targetSeconds) * targetSeconds - targetSeconds;
+  const timestamps = [bucketStart, bucketStart + 900, bucketStart + 1800];
+  const res = await requestMarket("WTI", "M45", async () => ({
+    ok: true,
+    async json() { return yahooSeriesPayload(timestamps); }
+  }));
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.payload.candles.length, 1);
+  assert.equal(res.payload.candles[0].datetime, new Date(bucketStart * 1000).toISOString());
+  assert.equal(res.payload.candles[0].open, 4200);
+  assert.equal(res.payload.candles[0].high, 4212);
+  assert.equal(res.payload.candles[0].low, 4188);
+  assert.equal(res.payload.candles[0].close, 4207);
+  assert.equal(res.payload.candles[0].volume, 303);
+});
+
+test("aggregates H4 only from four consecutive completed Yahoo H1 bars", async () => {
+  const targetSeconds = 4 * 60 * 60;
+  const bucketStart = Math.floor(Date.now() / 1000 / targetSeconds) * targetSeconds - targetSeconds;
+  const timestamps = [0, 1, 2, 3].map(index => bucketStart + index * 3600);
+  const res = await requestMarket("BTC/USD", "H4", async () => ({
+    ok: true,
+    async json() { return yahooSeriesPayload(timestamps); }
+  }));
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.payload.candles.length, 1);
+  assert.equal(res.payload.candles[0].datetime, new Date(bucketStart * 1000).toISOString());
+  assert.equal(res.payload.candles[0].open, 4200);
+  assert.equal(res.payload.candles[0].high, 4213);
+  assert.equal(res.payload.candles[0].low, 4187);
+  assert.equal(res.payload.candles[0].close, 4208);
+  assert.equal(res.payload.candles[0].volume, 406);
+});
+
+test("does not turn incomplete or gapped M45 Yahoo bars into a candle", async () => {
+  const targetSeconds = 45 * 60;
+  const bucketStart = Math.floor(Date.now() / 1000 / targetSeconds) * targetSeconds - targetSeconds;
+  const res = await requestMarket("WTI", "M45", async () => ({
+    ok: true,
+    async json() { return yahooSeriesPayload([bucketStart, bucketStart + 1800]); }
+  }));
+
+  assert.equal(res.statusCode, 502);
+  assert.match(res.payload.message, /candle/i);
 });
