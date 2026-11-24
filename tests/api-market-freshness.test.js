@@ -858,3 +858,21 @@ test("fundamental endpoint rejects future-dated observations", async () => {
     globalThis.aurumFundamentalCache = null;
   }
 });
+
+
+test("chart refresh failure marks the visible feed delayed instead of leaving a live-looking timestamp", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf('<script id="aurum-setup-live-tick">');
+  const end = html.indexOf("</script>", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const chart = html.slice(start, end);
+  const catchStart = chart.indexOf("}catch(e){");
+  const catchEnd = chart.indexOf("console.warn('AURUM setup live tick:',e);", catchStart);
+  assert.notEqual(catchStart, -1);
+  assert.notEqual(catchEnd, -1);
+  const failureState = chart.slice(catchStart, catchEnd);
+  assert.ok(failureState.includes("PEMBARUAN GAGAL"));
+  assert.ok(failureState.includes("DATA TERTUNDA"));
+  assert.ok(failureState.includes("marketState.dataset.state='delayed'"));
+});
