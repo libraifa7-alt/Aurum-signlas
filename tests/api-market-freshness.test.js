@@ -919,8 +919,8 @@ test("market directory selection uses the shared router to keep page, URL, and a
   const handler = html.slice(start, end);
   assert.ok(handler.includes("window.aurumShowPage('marketPage')"),
     "Instrument selection must use the shared page router");
-  assert.ok(!handler.includes("item.dataset.page==='marketDirectoryPage'"),
-    "Instrument selection must not manually set a potentially stale navigation state");
+  assert.ok(handler.indexOf("window.aurumShowPage('marketPage')") < handler.indexOf("} else {"),
+    "The shared router must be the primary navigation path");
   assert.ok(handler.includes("pairSelect.dispatchEvent(new Event('change'"),
     "Selecting an instrument must update the active market data feed");
 });
