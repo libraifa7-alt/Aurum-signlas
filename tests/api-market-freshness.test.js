@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const handler = require("../api/index.js");
 const healthHandler = require("../api/health.js");
 const fs = require("node:fs");
+const { normalizeCandles } = require("../api/engine.js");
 
 function responseRecorder() {
   return {
@@ -536,4 +537,31 @@ test("push unsubscription needs only a previously registered endpoint", async ()
       else process.env[name] = previous[name];
     }
   }
+});
+
+
+test("normalizes valid candle series in chronological order", () => {
+  const candles = normalizeCandles([
+    { datetime: "2026-11-25T10:02:00Z", open: 101, high: 104, low: 100, close: 103 },
+    { datetime: "2026-11-25T10:01:00Z", open: 99, high: 102, low: 98, close: 101 }
+  ]);
+  assert.equal(candles.length, 2);
+  assert.equal(candles[0].open, 99);
+  assert.ok(candles[0].time < candles[1].time);
+});
+
+test("rejects the entire candle series when one OHLC bar is malformed", () => {
+  const candles = normalizeCandles([
+    { time: 1795600800, open: 100, high: 105, low: 99, close: 103 },
+    { time: 1795600860, open: 103, high: 104, low: 106, close: 102 }
+  ]);
+  assert.deepEqual(candles, []);
+});
+
+test("rejects duplicate candle timestamps instead of creating false sequential bars", () => {
+  const candles = normalizeCandles([
+    { time: 1795600800, open: 100, high: 105, low: 99, close: 103 },
+    { time: 1795600800, open: 103, high: 106, low: 101, close: 104 }
+  ]);
+  assert.deepEqual(candles, []);
 });

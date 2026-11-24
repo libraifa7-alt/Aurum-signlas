@@ -570,19 +570,33 @@ function classify(signal) {
 }
 
 function normalizeCandles(rows) {
-  if (!Array.isArray(rows)) return [];
-  return rows.map(c => ({
+  if (!Array.isArray(rows) || rows.length === 0) return [];
+  const candles = rows.map(c => ({
     time: Number(c.time ?? c.timestamp ?? (Date.parse(c.datetime) / 1000)),
     open: Number(c.open ?? c.o),
     high: Number(c.high ?? c.h),
     low: Number(c.low ?? c.l),
     close: Number(c.close ?? c.c)
-  })).filter(c =>
-    Number.isFinite(c.time) && Number.isFinite(c.open) &&
-    Number.isFinite(c.high) && Number.isFinite(c.low) &&
-    Number.isFinite(c.close) && c.high >= Math.max(c.open,c.close) &&
-    c.low <= Math.min(c.open,c.close) && c.high >= c.low
-  ).sort((a,b)=>a.time-b.time);
+  }));
+
+  // Do not silently discard malformed bars: a partial series can distort
+  // swings, BOS/CHOCH and order-block detection while appearing complete.
+  if (candles.some(c =>
+    !Number.isFinite(c.time) || c.time <= 0 ||
+    !Number.isFinite(c.open) || c.open <= 0 ||
+    !Number.isFinite(c.high) || c.high <= 0 ||
+    !Number.isFinite(c.low) || c.low <= 0 ||
+    !Number.isFinite(c.close) || c.close <= 0 ||
+    c.high < Math.max(c.open, c.close) ||
+    c.low > Math.min(c.open, c.close) ||
+    c.high < c.low
+  )) return [];
+
+  candles.sort((a, b) => a.time - b.time);
+  for (let i = 1; i < candles.length; i++) {
+    if (candles[i].time <= candles[i - 1].time) return [];
+  }
+  return candles;
 }
 
 function evaluateMarket(symbol, candleSets) {
