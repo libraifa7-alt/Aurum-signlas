@@ -669,3 +669,36 @@ test("Aurum chat exposes the core ICT and risk-management learning topics", () =
   assert.ok(chat.includes("Saya belum memiliki jawaban terverifikasi"));
   assert.ok(!chat.includes("fetch('https://"));
 });
+
+
+test("fundamental page does not fabricate unavailable DXY, Treasury, news, or calendar data", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf('<section id="newsPage"');
+  const end = html.indexOf("<!-- END HALAMAN BERITA -->", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const page = html.slice(start, end);
+  assert.match(page, /DXY[\s\S]{0,180}BELUM TERHUBUNG/);
+  assert.match(page, /US 10Y YIELD[\s\S]{0,180}BELUM TERHUBUNG/);
+  assert.match(page, /Belum ada penyedia berita ekonomi yang terhubung/);
+  assert.match(page, /Kalender ekonomi belum terhubung ke penyedia data/);
+  assert.ok(page.includes("fetch('/api/signals'"));
+});
+
+test("education page exposes all six core lessons and honest live-class availability", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf('<section id="guidePage"');
+  const end = html.indexOf("<!-- END HALAMAN PANDUAN -->", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const page = html.slice(start, end);
+  for (const title of [
+    "Struktur Market", "Support &amp; Resistance", "Change of Character",
+    "Liquidity Sweep", "Fair Value Gap", "Order Block"
+  ]) assert.ok(page.includes(title), "Missing lesson: " + title);
+  for (const tab of ["live", "lessons", "manual"]) {
+    assert.ok(page.includes('data-guide-tab="' + tab + '"'));
+  }
+  assert.ok(page.includes("Kelas langsung belum dijadwalkan"));
+  assert.ok(page.includes("Pemutar video AURUM baru dapat diaktifkan setelah sumber video asli tersedia"));
+});
