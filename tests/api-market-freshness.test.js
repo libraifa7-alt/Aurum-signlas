@@ -876,3 +876,35 @@ test("chart refresh failure marks the visible feed delayed instead of leaving a 
   assert.ok(failureState.includes("DATA TERTUNDA"));
   assert.ok(failureState.includes("marketState.dataset.state='delayed'"));
 });
+
+
+test("education tabs connect live class, lesson catalog, and app manual panels", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf('<script id="aurum-traxa-parity-behavior">');
+  const end = html.indexOf("</script>", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const behavior = html.slice(start, end);
+  for (const key of ["live", "lessons", "manual"]) {
+    assert.ok(html.includes('data-guide-tab="' + key + '"'));
+    assert.ok(behavior.includes("$('aurumGuide" + (key === "live" ? "Live" : key === "lessons" ? "Lessons" : "Manual") + "')"));
+  }
+  assert.ok(behavior.includes("document.querySelectorAll('[data-guide-tab]').forEach"));
+  assert.ok(behavior.includes("x.setAttribute('aria-selected',active?'true':'false')"));
+  assert.ok(behavior.includes("x.hidden=key!=="));
+});
+
+test("chat form and suggested prompts are wired to the same local assistant", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf('<script id="aurum-chat-assistant">');
+  const end = html.indexOf("</script>", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const chat = html.slice(start, end);
+  assert.ok(chat.includes("form.addEventListener('submit'"));
+  assert.ok(chat.includes("document.querySelectorAll('[data-aurum-chat-prompt]')"));
+  assert.ok(chat.includes("send(b.getAttribute('data-aurum-chat-prompt'))"));
+  assert.ok(chat.includes("async function send(q)"));
+  assert.ok(chat.includes("Saya belum memiliki jawaban terverifikasi"));
+  assert.ok(!chat.includes("fetch('https://"));
+});
