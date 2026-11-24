@@ -725,10 +725,17 @@ module.exports = async function handler(req, res) {
 
       let candles = timestamps.map((timestamp, i) => {
         const timestampMs = Number(timestamp) * 1000;
-        const open = Number(quote.open?.[i]);
-        const high = Number(quote.high?.[i]);
-        const low = Number(quote.low?.[i]);
-        const close = Number(quote.close?.[i]);
+        const rawOpen = quote.open?.[i];
+        const rawHigh = quote.high?.[i];
+        const rawLow = quote.low?.[i];
+        const rawClose = quote.close?.[i];
+        if (rawOpen == null || rawHigh == null || rawLow == null || rawClose == null) {
+          return null;
+        }
+        const open = Number(rawOpen);
+        const high = Number(rawHigh);
+        const low = Number(rawLow);
+        const close = Number(rawClose);
 
         if (
           !Number.isFinite(timestampMs) ||
