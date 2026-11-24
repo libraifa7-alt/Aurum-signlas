@@ -3926,8 +3926,8 @@ body {
   </div>
   <h3>FUNDAMENTAL MONITOR</h3>
   <div class="cards">
-    <div class="card"><small>US DOLLAR INDEX</small><strong class="gold">BELUM TERHUBUNG</strong><small>DXY · Sumber data belum dipasang</small></div>
-    <div class="card"><small>US 10Y YIELD</small><strong class="gold">BELUM TERHUBUNG</strong><small>Treasury Yield · Sumber data belum dipasang</small></div>
+    <div class="card"><small>NOMINAL BROAD U.S. DOLLAR INDEX</small><strong class="gold" id="aurumFundamentalBroadUsd">MEMUAT…</strong><small id="aurumFundamentalBroadUsdMeta">DTWEXBGS · Federal Reserve H.10 via FRED · bukan ICE DXY</small></div>
+    <div class="card"><small>US 10Y TREASURY YIELD</small><strong class="gold" id="aurumFundamentalUs10y">MEMUAT…</strong><small id="aurumFundamentalUs10yMeta">DGS10 · Federal Reserve H.15 via FRED</small></div>
   </div>
   <h3 style="margin-top:20px">ECONOMIC NEWS</h3>
   <div class="signal"><small class="sub">LATEST MARKET NEWS</small><p>Belum ada penyedia berita ekonomi yang terhubung. Berita tidak ditampilkan sebelum sumber dan waktu publikasinya dapat diverifikasi.</p></div>
@@ -8910,6 +8910,31 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
    if(history)history.innerHTML='<div class="signal"><p class="sub">Riwayat belum dapat dimuat.</p></div>';
   }
  }
+ async function refreshMacro(){
+  const cards=[
+   {key:'broadUsd',value:'aurumFundamentalBroadUsd',meta:'aurumFundamentalBroadUsdMeta',digits:2},
+   {key:'us10y',value:'aurumFundamentalUs10y',meta:'aurumFundamentalUs10yMeta',digits:2}
+  ];
+  try{
+   const response=await fetch('/api/fundamental',{cache:'no-store',headers:{Accept:'application/json'}});
+   const data=await response.json();
+   if(!response.ok||data.status!=='success')throw new Error(data.message||'Data fundamental belum tersedia');
+   cards.forEach(item=>{
+    const record=data.results?.[item.key],valueNode=$(item.value),metaNode=$(item.meta);
+    if(!valueNode||!metaNode)return;
+    if(record?.status==='available'){
+     valueNode.textContent=Number(record.value).toLocaleString('id-ID',{minimumFractionDigits:item.digits,maximumFractionDigits:item.digits})+(record.unit==='%'?'%':'');
+     metaNode.textContent=record.seriesId+' · Observasi '+record.observationDate+' · '+record.source+(record.note?' · '+record.note:'');
+    }else{
+     valueNode.textContent='TIDAK TERSEDIA';
+     metaNode.textContent=(record?.seriesId||item.key)+' · '+(record?.message||'Data belum dapat diverifikasi');
+    }
+   });
+  }catch(error){
+   cards.forEach(item=>{const valueNode=$(item.value),metaNode=$(item.meta);if(valueNode)valueNode.textContent='TIDAK TERSEDIA';if(metaNode)metaNode.textContent='Data makro gagal dimuat; coba lagi otomatis.';});
+  }
+ }
+ refreshMacro();setInterval(refreshMacro,30*60*1000);
  refresh();setInterval(refresh,60000);
 })();
 </script>
