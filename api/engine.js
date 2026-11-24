@@ -570,7 +570,7 @@ function classify(signal) {
 }
 
 function normalizeCandles(rows) {
-  if (!Array.isArray(rows) || rows.length === 0) return [];
+  if (!Array.isArray(rows) || rows.length === 0 || rows.some(c => !c || typeof c !== 'object' || Array.isArray(c))) return [];
   const candles = rows.map(c => ({
     time: Number(c.time ?? c.timestamp ?? (Date.parse(c.datetime) / 1000)),
     open: Number(c.open ?? c.o),

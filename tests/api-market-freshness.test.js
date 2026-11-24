@@ -565,3 +565,9 @@ test("rejects duplicate candle timestamps instead of creating false sequential b
   ]);
   assert.deepEqual(candles, []);
 });
+
+
+test("rejects null or non-object candle rows without throwing", () => {
+  assert.deepEqual(normalizeCandles([null]), []);
+  assert.deepEqual(normalizeCandles(["not-a-candle"]), []);
+});
