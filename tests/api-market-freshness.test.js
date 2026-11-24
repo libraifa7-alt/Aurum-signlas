@@ -274,3 +274,31 @@ test("the first-visit splash screen has a working dashboard entry control", () =
   assert.ok(html.includes("localStorage.setItem('aurumSplashSeen', 'true')"));
   assert.ok(html.includes('<section id="homePage" class="app-page active">'));
 });
+
+
+test("every visible navigation destination resolves to one unique app page", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const pageIds = [...html.matchAll(/<section\\b[^>]*\\bid=["']([^"']+)["'][^>]*class=["'][^"']*\\bapp-page\\b[^"']*["'][^>]*>/g)]
+    .map(match => match[1]);
+  const navTargets = [...html.matchAll(/data-page=["']([^"']+)["']/g)]
+    .map(match => match[1]);
+  assert.ok(pageIds.includes("homePage"));
+  assert.ok(navTargets.length >= 6);
+  assert.equal(new Set(pageIds).size, pageIds.length, "App page IDs must be unique");
+  for (const target of navTargets) {
+    assert.ok(pageIds.includes(target), "Navigation target has no app page: " + target);
+  }
+});
+
+test("education tabs each point to an existing content panel and chat states its integration mode", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const guideTabs = [...html.matchAll(/data-guide-tab=["']([^"']+)["']/g)]
+    .map(match => match[1]);
+  assert.deepEqual(guideTabs, ["live", "lessons", "manual"]);
+  for (const tab of guideTabs) {
+    assert.ok(html.includes('id="aurumGuide' + tab[0].toUpperCase() + tab.slice(1) + '"'),
+      "Missing education panel for tab: " + tab);
+  }
+  assert.ok(html.includes('id="aurumChatForm"'));
+  assert.ok(html.includes("Mode asisten berbasis aturan dan data server. Model AI generatif eksternal belum terhubung."));
+});
