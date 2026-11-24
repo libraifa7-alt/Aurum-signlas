@@ -8663,8 +8663,15 @@ body.aurum-user-dark .app-page{background:transparent!important}
     document.getElementById('aurumDetailDirectionCaption').textContent='ARAH '+(cur.direction||'SIGNAL');
     document.getElementById('aurumDetailEntry').textContent=fmtDetail(plan.entryLow)+' – '+fmtDetail(plan.entryHigh);
     document.getElementById('aurumDetailUpdated').textContent=cur.generatedAt?'Dibuat '+new Date(cur.generatedAt).toLocaleString('id-ID'):'Pembaruan '+(cur.checkedAt?new Date(cur.checkedAt).toLocaleString('id-ID'):'server');
-    const liveNode=document.getElementById('goldPrice');
-    document.getElementById('aurumDetailLivePrice').textContent=liveNode&&liveNode.textContent.trim()&&liveNode.textContent.trim()!=='Memuat harga...'?liveNode.textContent.trim():'Harga live belum tersedia';
+    const livePriceIds={'XAU/USD':'homePriceXAU','BTC/USD':'homePriceBTC','WTI':'homePriceWTI'};
+    const liveStatusIds={'XAU/USD':'homeStatusXAU','BTC/USD':'homeStatusBTC','WTI':'homeStatusWTI'};
+    const liveNode=document.getElementById(livePriceIds[symbol]||'');
+    const liveStatus=document.getElementById(liveStatusIds[symbol]||'');
+    const liveValue=liveNode?.textContent?.trim()||'';
+    const liveState=liveStatus?.textContent?.trim()||'';
+    document.getElementById('aurumDetailLivePrice').textContent=liveValue&&liveValue!=='--'
+      ?liveValue+(liveState?' · '+liveState:'')
+      :'Harga '+(names[symbol]||symbol)+' belum tersedia';
     document.getElementById('aurumDetailOutcome').textContent=outcomeLabel(cur.outcomeStatus||'WAITING_FOR_ENTRY').toUpperCase();
     const riskNode=document.getElementById('aurumDetailRiskProfiles');
     riskNode.innerHTML=profiles.map(p=>'<button type="button" class="aurum-detail-risk" data-detail-risk="'+safe(String(p.key||p.label||'RISK'))+'" aria-pressed="false"><strong>'+safe(p.label||p.key||'RISK')+'</strong><small>'+safe(outcomeLabel(p.outcomeStatus||'WAITING_FOR_ENTRY'))+'</small><small>Entry '+fmtDetail(p.entryLow)+'–'+fmtDetail(p.entryHigh)+'</small><small>SL '+fmtDetail(p.sl)+'</small><small>TP '+fmtDetail(p.tp1)+' / '+fmtDetail(p.tp2)+' / '+fmtDetail(p.tp3)+'</small></button>').join('')||'<div class="aurum-detail-risk">Profil risiko belum tersedia</div>';
