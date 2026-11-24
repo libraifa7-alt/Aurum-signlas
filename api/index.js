@@ -761,27 +761,47 @@ module.exports = async function handler(req, res) {
         };
       }).filter(Boolean);
 
-      // AGREGASI KHUSUS TIMEFRAME M45
-      if (selected === "M45") {
-        const aggregated = [];
+      // Build complete M45/H4 candles only from consecutive, closed Yahoo bars.
+      // This prevents partial or gapped provider bars from becoming false signals.
+      if (selected === "M45" || selected === "H4") {
+        const sourceSeconds = selected === "M45" ? 15 * 60 : 60 * 60;
+        const targetSeconds = selected === "M45" ? 45 * 60 : 4 * 60 * 60;
+        const expectedBars = targetSeconds / sourceSeconds;
+        const buckets = new Map();
+        const nowMs = Date.now();
 
-        for (let i = 0; i + 2 < candles.length; i += 3) {
-          const group = candles.slice(i, i + 3);
+        for (const candle of candles) {
+          const candleSeconds = Math.floor(Date.parse(candle.datetime) / 1000);
+          if (!Number.isFinite(candleSeconds)) continue;
 
-          aggregated.push({
-            datetime: group[0].datetime,
-            open: group[0].open,
-            high: Math.max(...group.map(c => c.high)),
-            low: Math.min(...group.map(c => c.low)),
-            close: group[2].close,
-            volume: group.reduce(
-              (sum, c) => sum + c.volume,
-              0
-            )
-          });
+          const bucketStart = Math.floor(candleSeconds / targetSeconds) * targetSeconds;
+          const offset = candleSeconds - bucketStart;
+          if (offset < 0 || offset >= targetSeconds || offset % sourceSeconds !== 0) continue;
+
+          const bucket = buckets.get(bucketStart) || [];
+          bucket.push(candle);
+          buckets.set(bucketStart, bucket);
         }
 
-        candles = aggregated;
+        candles = Array.from(buckets.entries())
+          .sort((a, b) => a[0] - b[0])
+          .filter(([bucketStart, group]) => {
+            if (group.length !== expectedBars) return false;
+            if ((bucketStart + targetSeconds) * 1000 > nowMs) return false;
+
+            group.sort((a, b) => Date.parse(a.datetime) - Date.parse(b.datetime));
+            return group.every((candle, index) =>
+              Date.parse(candle.datetime) === (bucketStart + index * sourceSeconds) * 1000
+            );
+          })
+          .map(([bucketStart, group]) => ({
+            datetime: new Date(bucketStart * 1000).toISOString(),
+            open: group[0].open,
+            high: Math.max(...group.map(candle => candle.high)),
+            low: Math.min(...group.map(candle => candle.low)),
+            close: group[group.length - 1].close,
+            volume: group.reduce((sum, candle) => sum + candle.volume, 0)
+          }));
       }
 
       // Urutkan berdasarkan waktu dan kirim hanya candle paling baru.
