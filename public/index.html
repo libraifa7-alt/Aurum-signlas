@@ -3993,19 +3993,25 @@ body {
     </div>
   </div>
 
-  <h3 style="margin-top:20px">CHAT STATUS</h3>
-
-  <div class="signal">
-    <p class="gold">AI CHAT — INTEGRATION PENDING</p>
-    <p class="sub">
-      Koneksi asisten AI belum diaktifkan.
-      Fitur percakapan akan dihubungkan pada tahap berikutnya.
-    </p>
+  <h3 style="margin-top:20px">OBROLAN AURUM</h3>
+  <div class="signal" style="margin-top:12px">
+    <p class="gold" id="aurumChatStatus">ASISTEN DATA & EDUKASI AKTIF</p>
+    <p class="sub">Tanyakan status sinyal server Gold, Bitcoin, WTI, atau konsep edukasi SMC/ICT. Jawaban pasar akan merujuk data server yang tersedia.</p>
   </div>
-
-  <p class="sub" style="margin-top:16px">
-    Aurum Signals AI · Intelligent Market Assistant
-  </p>
+  <div id="aurumChatMessages" aria-live="polite" style="display:flex;flex-direction:column;gap:10px;margin:14px 0">
+    <div class="signal"><strong class="gold">AURUM</strong><p>Halo! Saya dapat membantu memeriksa status sinyal dan menjelaskan konsep Market Structure, Support & Resistance, CHOCH, Liquidity Sweep, FVG, serta Order Block.</p></div>
+  </div>
+  <div class="cards" style="margin-bottom:12px">
+    <button type="button" data-aurum-chat-prompt="Bagaimana status sinyal Gold, Bitcoin, dan WTI sekarang?">Status sinyal</button>
+    <button type="button" data-aurum-chat-prompt="Jelaskan apa itu Change of Character (CHOCH).">Apa itu CHOCH?</button>
+    <button type="button" data-aurum-chat-prompt="Jelaskan Liquidity Sweep dan cara mengenalinya.">Liquidity Sweep</button>
+    <button type="button" data-aurum-chat-prompt="Apa itu Fair Value Gap (FVG)?">Fair Value Gap</button>
+  </div>
+  <form id="aurumChatForm" class="signal" style="display:flex;gap:8px;align-items:center">
+    <input id="aurumChatInput" type="text" maxlength="500" autocomplete="off" placeholder="Tulis pertanyaan Anda..." aria-label="Pertanyaan untuk Aurum" style="flex:1;min-width:0">
+    <button type="submit" class="gold">Kirim</button>
+  </form>
+  <p class="sub" id="aurumChatDisclaimer" style="margin-top:10px">Mode asisten berbasis aturan dan data server. Model AI generatif eksternal belum terhubung.</p>
 
 
 
@@ -8851,6 +8857,54 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   }
  }
  refresh();setInterval(refresh,60000);
+})();
+</script>
+
+<script id="aurum-chat-assistant">
+(function(){
+ const form=document.getElementById('aurumChatForm');if(!form)return;
+ const input=document.getElementById('aurumChatInput'),messages=document.getElementById('aurumChatMessages');
+ const safe=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const knowledge=[
+  {keys:['market structure','struktur market','struktur pasar'],answer:'Market Structure membaca rangkaian swing high dan swing low. Uptrend umumnya membentuk higher high dan higher low; downtrend membentuk lower low dan lower high. Dalam kondisi range, harga bergerak di antara batas atas dan bawah. Tunggu konfirmasi, jangan menyimpulkan tren dari satu candle.'},
+  {keys:['support','resistance'],answer:'Support adalah area harga yang sebelumnya menarik minat beli; resistance adalah area yang sebelumnya menarik minat jual. Anggap keduanya sebagai zona, bukan garis yang pasti menahan harga. Perhatikan reaksi candle, struktur, dan risiko jika level ditembus.'},
+  {keys:['choch','change of character'],answer:'Change of Character (CHOCH) adalah indikasi awal perubahan karakter struktur, misalnya harga menembus swing low penting setelah rangkaian higher low. CHOCH adalah sinyal peringatan, bukan jaminan pembalikan. Cari konfirmasi lanjutan dan konteks timeframe lebih tinggi.'},
+  {keys:['liquidity sweep','sweep','sapu likuiditas'],answer:'Liquidity Sweep terjadi ketika harga melewati area swing high/low atau level likuiditas lalu kembali masuk ke area sebelumnya. Penembusan sesaat saja belum cukup; amati penutupan candle dan perubahan struktur setelah sweep.'},
+  {keys:['fair value gap','fvg'],answer:'Fair Value Gap (FVG) adalah ketidakseimbangan tiga candle: rentang candle pertama dan ketiga tidak saling tumpang tindih pada sisi tertentu. Area ini dapat menjadi zona reaksi, tetapi tidak wajib diisi dan bukan sinyal entry tunggal.'},
+  {keys:['order block','ob'],answer:'Order Block biasanya merujuk pada candle berlawanan terakhir sebelum impuls yang menyebabkan perpindahan struktur. Tandai zona candle tersebut, lalu nilai apakah impulsnya kuat, apakah struktur terkonfirmasi, dan apakah zona masih valid.'},
+  {keys:['risk','risiko','stop loss','position size'],answer:'Batasi risiko per transaksi sesuai rencana pribadi. Tentukan invalidasi dan Stop Loss sebelum entry, hitung ukuran posisi dari jarak SL dan batas risiko, serta jangan memperlebar SL hanya untuk menghindari kerugian.'}
+ ];
+ function add(who,text){
+  const node=document.createElement('div');node.className='signal';
+  node.innerHTML='<strong class="'+(who==='AURUM'?'gold':'')+'">'+who+'</strong><p style="white-space:pre-wrap;margin:7px 0 0">'+safe(text)+'</p>';
+  messages.appendChild(node);node.scrollIntoView({block:'nearest',behavior:'smooth'});
+ }
+ async function answer(q){
+  const text=q.toLowerCase();
+  if(/status|sinyal|signal|gold|xau|bitcoin|btc|wti|oil|market sekarang/.test(text)){
+   try{
+    const res=await fetch('/api/signals',{cache:'no-store'}),data=await res.json();
+    if(!res.ok||data.status!=='success')throw new Error(data.message||'Server sinyal belum tersedia');
+    const names={'XAU/USD':'Gold (XAU/USD)','BTC/USD':'Bitcoin (BTC/USD)','WTI':'WTI Oil'};
+    return (data.results||[]).map(x=>{
+     const r=x.current||{},p=r.tradePlan||{},d=['BUY','SELL'].includes(r.direction)?r.direction:'Belum ada BUY/SELL';
+     const score=Number(r.signalStrength?.score);
+     return (names[x.symbol]||x.symbol)+': '+d+(d==='BUY'||d==='SELL'?' · Entry '+(p.entryLow??'--')+'–'+(p.entryHigh??'--')+' · SL '+(p.sl??'--')+' · TP '+[p.tp1,p.tp2,p.tp3].map(v=>v??'--').join('/'):' · '+(r.reason||r.code||'Menunggu konfirmasi'))+(Number.isFinite(score)?' · Kekuatan '+Math.round(score)+'/100':'');
+    }).join('\n')+'\n\nData diambil dari API sinyal AURUM. Periksa waktu pembaruan dan chart sebelum mengambil keputusan.';
+   }catch(e){return 'Saya belum dapat mengambil status sinyal: '+e.message+'. Coba lagi setelah server tersedia.';}
+  }
+  const found=knowledge.find(k=>k.keys.some(x=>text.includes(x)));
+  if(found)return found.answer;
+  if(/halo|hai|hello|selamat/.test(text))return 'Halo! Silakan tanyakan status sinyal Gold/BTC/WTI atau konsep Market Structure, Support & Resistance, CHOCH, Liquidity Sweep, FVG, Order Block, dan manajemen risiko.';
+  return 'Saya belum memiliki jawaban terverifikasi untuk pertanyaan itu. Saat ini saya mendukung pemeriksaan status sinyal server dan topik edukasi SMC/ICT yang tercantum. Model AI generatif belum terhubung, jadi saya tidak akan mengarang analisis atau berita.';
+ }
+ async function send(q){
+  q=String(q||'').trim();if(!q)return;
+  add('ANDA',q);input.value='';const waiting=document.createElement('div');waiting.className='signal';waiting.textContent='AURUM sedang memeriksa…';messages.appendChild(waiting);
+  const reply=await answer(q);waiting.remove();add('AURUM',reply);
+ }
+ form.addEventListener('submit',e=>{e.preventDefault();send(input.value);});
+ document.querySelectorAll('[data-aurum-chat-prompt]').forEach(b=>b.addEventListener('click',()=>send(b.getAttribute('data-aurum-chat-prompt'))));
 })();
 </script>
 
