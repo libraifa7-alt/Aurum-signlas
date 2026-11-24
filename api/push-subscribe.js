@@ -11,7 +11,10 @@ async function redis(command){
 }
 
 module.exports=async function handler(req,res){
-  res.setHeader('Cache-Control','no-store');
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
   if(req.method==='GET'){
     if(!process.env.VAPID_PUBLIC_KEY) return res.status(503).json({status:'not_configured',message:'VAPID_PUBLIC_KEY belum dikonfigurasi'});
     return res.status(200).json({status:'success',publicKey:process.env.VAPID_PUBLIC_KEY});

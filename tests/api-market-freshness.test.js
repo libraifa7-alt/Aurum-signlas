@@ -394,3 +394,52 @@ test("health endpoint disables caching and marks market provider probe as pendin
     }
   }
 });
+
+
+test("cron endpoint rejects unauthorized requests without contacting external services", async () => {
+  const cronHandler = require("../api/cron.js");
+  const names = ["CRON_SECRET", "KV_REST_API_URL", "KV_REST_API_TOKEN"];
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]]));
+  const originalFetch = global.fetch;
+  process.env.CRON_SECRET = "test-cron-secret";
+  process.env.KV_REST_API_URL = "https://redis.example.test";
+  process.env.KV_REST_API_TOKEN = "test-redis-token";
+  let fetchCalled = false;
+  global.fetch = async () => {
+    fetchCalled = true;
+    throw new Error("Unauthorized cron request must not call Redis or market APIs");
+  };
+  try {
+    const res = responseRecorder();
+    await cronHandler({ method: "POST", headers: { authorization: "Bearer wrong-secret" } }, res);
+    assert.equal(res.statusCode, 401);
+    assert.equal(res.payload.message, "Unauthorized");
+    assert.equal(fetchCalled, false);
+    assert.equal(res.headers["Cache-Control"], "no-store, max-age=0");
+    assert.equal(res.headers["X-Content-Type-Options"], "nosniff");
+  } finally {
+    global.fetch = originalFetch;
+    for (const name of names) {
+      if (previous[name] === undefined) delete process.env[name];
+      else process.env[name] = previous[name];
+    }
+  }
+});
+
+test("cron endpoint rejects unsupported methods with security headers", async () => {
+  const cronHandler = require("../api/cron.js");
+  const res = responseRecorder();
+  await cronHandler({ method: "PUT", headers: {} }, res);
+  assert.equal(res.statusCode, 405);
+  assert.equal(res.headers["Cache-Control"], "no-store, max-age=0");
+  assert.equal(res.headers["X-Content-Type-Options"], "nosniff");
+});
+
+test("signals endpoint applies no-store and nosniff headers before method validation", async () => {
+  const signalsHandler = require("../api/signals.js");
+  const res = responseRecorder();
+  await signalsHandler({ method: "POST" }, res);
+  assert.equal(res.statusCode, 405);
+  assert.equal(res.headers["Cache-Control"], "no-store, max-age=0");
+  assert.equal(res.headers["X-Content-Type-Options"], "nosniff");
+});

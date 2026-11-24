@@ -131,6 +131,10 @@ async function updateSignalOutcomes(symbol, candles) {
 }
 
 module.exports=async function handler(req,res){
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
   if(req.method!=='GET'&&req.method!=='POST') return res.status(405).json({status:'error',message:'Method not allowed'});
   const secret=process.env.CRON_SECRET;
   if(!secret) return res.status(503).json({status:'not_configured',message:'CRON_SECRET belum dikonfigurasi'});

@@ -16,7 +16,10 @@ async function redis(command) {
 }
 
 module.exports=async function handler(req,res){
-  res.setHeader('Cache-Control','no-store');
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
   if(req.method!=='GET') return res.status(405).json({status:'error',message:'Method not allowed'});
   if(!process.env.KV_REST_API_URL||!process.env.KV_REST_API_TOKEN)
     return res.status(503).json({status:'not_configured',message:'Redis KV belum dikonfigurasi'});
