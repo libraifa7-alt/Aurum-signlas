@@ -2506,6 +2506,13 @@ body {
 .aurum-detail-map-track span:last-child{color:#d14d58}
 @media(max-width:390px){.aurum-detail-trends{grid-template-columns:1fr}.aurum-detail-live strong{font-size:17px}}
 
+
+.aurum-detail-map-track.aurum-price-map-visual{display:block;width:100%;overflow:hidden}
+.aurum-price-map-visual svg{display:block;width:100%;height:auto;min-height:230px}
+.aurum-price-map-visual .map-label{font:700 10px Arial,sans-serif;fill:#64748b}
+.aurum-price-map-visual .map-value{font:700 11px Arial,sans-serif;fill:#1f2937}
+.aurum-price-map-visual .map-line{stroke-width:2;stroke-linecap:round}
+
 </style>
 
 <style id="aurum-traxa-performance">
@@ -8520,7 +8527,23 @@ body.aurum-user-dark .app-page{background:transparent!important}
       return '<div><small>ORDER BLOCK '+tf+'</small><b>'+safe(ob.status||'Belum tersedia')+(ob.type?' · '+safe(ob.type):'')+'</b></div>';
     }).join('');
     document.getElementById('aurumDetailLevels').innerHTML=[['SL',plan.sl],['TP 1',plan.tp1],['TP 2',plan.tp2],['TP 3',plan.tp3]].map(x=>'<div class="aurum-detail-level"><small>'+x[0]+'</small><b>'+fmtDetail(x[1])+'</b></div>').join('');
-    document.getElementById('aurumDetailPriceMap').innerHTML=[['TP 3',plan.tp3],['TP 2',plan.tp2],['TP 1',plan.tp1],['ZONA ENTRY',fmtDetail(plan.entryLow)+' – '+fmtDetail(plan.entryHigh)],['STOP LOSS',plan.sl]].map(x=>'<span><b>'+x[0]+'</b><strong>'+ (typeof x[1]==='number'?fmtDetail(x[1]):safe(x[1]??'--'))+'</strong></span>').join('');
+    const mapNode=document.getElementById('aurumDetailPriceMap');
+    const mapPoints=[{label:'TP 3',value:Number(plan.tp3),color:'#2997dc'},{label:'TP 2',value:Number(plan.tp2),color:'#2997dc'},{label:'TP 1',value:Number(plan.tp1),color:'#20a66b'},{label:'ENTRY',value:(Number(plan.entryLow)+Number(plan.entryHigh))/2,color:'#d5a72e'},{label:'STOP LOSS',value:Number(plan.sl),color:'#e0525b'}].filter(p=>Number.isFinite(p.value));
+    if(mapPoints.length===5&&Number.isFinite(Number(plan.entryLow))&&Number.isFinite(Number(plan.entryHigh))){
+      const values=mapPoints.map(p=>p.value).concat([Number(plan.entryLow),Number(plan.entryHigh)]);
+      const min=Math.min(...values),max=Math.max(...values),range=Math.max(max-min,0.000001);
+      const y=v=>Math.round(20+(max-v)/range*205);
+      const top=y(Math.max(Number(plan.entryLow),Number(plan.entryHigh))),bottom=y(Math.min(Number(plan.entryLow),Number(plan.entryHigh)));
+      mapNode.classList.add('aurum-price-map-visual');
+      mapNode.innerHTML='<svg viewBox="0 0 360 250" role="img" aria-label="Peta harga dengan level TP, zona entry, dan stop loss">'+
+        '<rect x="105" y="'+top+'" width="205" height="'+Math.max(8,bottom-top)+'" rx="8" fill="#e9f3ff" stroke="#65a9e8" stroke-width="1.5" stroke-dasharray="5 3"/>'+
+        '<text x="207" y="'+Math.max(12,top+15)+'" text-anchor="middle" class="map-label">ZONA ENTRY</text>'+
+        mapPoints.map(p=>'<line class="map-line" x1="105" x2="310" y1="'+y(p.value)+'" y2="'+y(p.value)+'" stroke="'+p.color+'"/><circle cx="207" cy="'+y(p.value)+'" r="5" fill="'+p.color+'" stroke="#fff" stroke-width="2"/><text x="12" y="'+(y(p.value)+4)+'" class="map-label">'+p.label+'</text><text x="348" y="'+(y(p.value)+4)+'" text-anchor="end" class="map-value">'+fmtDetail(p.value)+'</text>').join('')+
+        '<text x="207" y="244" text-anchor="middle" class="map-label">LEVEL HARGA BERDASARKAN TRADE PLAN SERVER</text></svg>';
+    }else{
+      mapNode.classList.remove('aurum-price-map-visual');
+      mapNode.textContent='Peta harga belum dapat ditampilkan karena level Trade Plan tidak lengkap.';
+    }
     const strengthData=cur.signalStrength||{};
     const score=Number(strengthData.score);
     document.getElementById('aurumDetailStrength').textContent=Number.isFinite(score)?fmtDetail(score)+'/100':'Belum tersedia';
