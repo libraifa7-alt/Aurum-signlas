@@ -912,6 +912,19 @@ test("chat form and suggested prompts are wired to the same local assistant", ()
 
 
 
+test("splash entry survives browsers that deny localStorage access", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf("<!-- AURUM SPLASH SCREEN INTERACTION -->");
+  const end = html.indexOf("<!-- END AURUM SPLASH SCREEN INTERACTION -->", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const splash = html.slice(start, end);
+  assert.ok(splash.includes("let splashAlreadySeen = false"));
+  assert.ok(splash.includes("splashAlreadySeen = localStorage.getItem('aurumSplashSeen') === 'true'"));
+  assert.ok(splash.includes("localStorage.setItem('aurumSplashSeen', 'true')"));
+  assert.ok(splash.includes("The splash still closes for this visit"));
+});
+
 test("opening an instrument from the market directory uses the shared router and preserves aria-current", () => {
   const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
   const start = html.indexOf('<script id="aurum-market-directory-actions">');
