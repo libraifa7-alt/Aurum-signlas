@@ -54,7 +54,16 @@ module.exports = async function handler(req, res) {
     req.query.interval || "M15"
   ).toUpperCase();
 
-  const interval = allowedIntervals[selected] || "15min";
+  if (!Object.prototype.hasOwnProperty.call(allowedIntervals, selected)) {
+    return res.status(400).json({
+      status: "error",
+      code: "INVALID_INTERVAL",
+      message: "Interval tidak valid",
+      receivedInterval: selected
+    });
+  }
+
+  const interval = allowedIntervals[selected];
   const debugRaw = req.query.debug === "raw" && selectedSymbol === "XAU/USD";
   const debugQuote = req.query.debug === "quote" && selectedSymbol === "XAU/USD";
 
@@ -62,6 +71,49 @@ module.exports = async function handler(req, res) {
   const cacheSource = (selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? "yahoo" : selectedSymbol === "XAU/USD" ? "xaus-chart" : "twelvedata";
   const cacheKey = selectedSymbol + ":" + interval + ":" + cacheSource + ((selectedSymbol === "XAU/USD" || selectedSymbol === "WTI" || selectedSymbol === "BTC/USD") ? ":v3" : ":v2");
   const cached = globalThis.aurumCache.get(cacheKey);
+
+  // Recalculate BTC/WTI candle freshness from the candle timestamps on every
+  // response. A recent fetch/cache write must never make old candles look live.
+  function withYahooCandleFreshness(payload, cacheLabel) {
+    if (!payload || (selectedSymbol !== "WTI" && selectedSymbol !== "BTC/USD")) {
+      return payload;
+    }
+
+    const candles = Array.isArray(payload.candles) ? payload.candles : [];
+    const newest = candles.reduce((latest, candle) => {
+      const candidateTime = Date.parse(candle?.datetime || "");
+      const latestTime = Date.parse(latest?.datetime || "");
+      return Number.isFinite(candidateTime) && (!Number.isFinite(latestTime) || candidateTime > latestTime)
+        ? candle
+        : latest;
+    }, null);
+    const lastCandleAt = newest?.datetime || payload.lastCandleAt || null;
+    const rawAgeSeconds = lastCandleAt
+      ? Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000)
+      : NaN;
+    const freshnessLimit = ({
+      M1: 300,
+      M5: 900,
+      M15: 2700,
+      M30: 5400,
+      M45: 8100,
+      H1: 10800,
+      H4: 43200,
+      D1: 259200
+    }[selected] || 2700);
+    const fresh = candles.length > 0 &&
+      Number.isFinite(rawAgeSeconds) &&
+      rawAgeSeconds >= -60 &&
+      rawAgeSeconds <= freshnessLimit;
+
+    return {
+      ...payload,
+      lastCandleAt,
+      candleAgeSeconds: Number.isFinite(rawAgeSeconds) ? Math.max(0, rawAgeSeconds) : null,
+      candleStatus: fresh ? "fresh_candles" : "stale_candles",
+      ...(cacheLabel ? { cache: cacheLabel } : {})
+    };
+  }
 
   // AURUM SMART API CACHE OPTIMIZATION
   const cacheTTL = (selectedSymbol === "WTI" || selectedSymbol === "BTC/USD")
@@ -89,7 +141,7 @@ module.exports = async function handler(req, res) {
         }[interval] || 180000);
 
   if (selectedSymbol !== "XAU/USD" && !debugRaw && !debugQuote && cached && Date.now() - cached.time < cacheTTL) {
-    return res.status(200).json(cached.data);
+    return res.status(200).json(withYahooCandleFreshness(cached.data, "memory"));
   }
 
     try {
@@ -124,7 +176,7 @@ module.exports = async function handler(req, res) {
       });
 
       if (selectedSymbol !== "XAU/USD" && !debugRaw && !debugQuote && Date.now() - redisCached.time < cacheTTL) {
-        return res.status(200).json(redisCached.data);
+        return res.status(200).json(withYahooCandleFreshness(redisCached.data, "redis"));
       }
     }
 
@@ -642,10 +694,9 @@ module.exports = async function handler(req, res) {
 
       if (!response.ok || !result) {
         if (redisCached && redisCached.data) {
-          return res.status(200).json({
-            ...redisCached.data,
-            cache: "stale"
-          });
+          return res.status(200).json(
+            withYahooCandleFreshness(redisCached.data, "stale_fallback")
+          );
         }
 
         return res.status(502).json({
@@ -661,10 +712,9 @@ module.exports = async function handler(req, res) {
 
       if (!quote) {
         if (redisCached && redisCached.data) {
-          return res.status(200).json({
-            ...redisCached.data,
-            cache: "stale"
-          });
+          return res.status(200).json(
+            withYahooCandleFreshness(redisCached.data, "stale_fallback")
+          );
         }
 
         return res.status(502).json({
@@ -674,29 +724,34 @@ module.exports = async function handler(req, res) {
       }
 
       let candles = timestamps.map((timestamp, i) => {
-        const open = quote.open?.[i];
-        const high = quote.high?.[i];
-        const low = quote.low?.[i];
-        const close = quote.close?.[i];
+        const timestampMs = Number(timestamp) * 1000;
+        const open = Number(quote.open?.[i]);
+        const high = Number(quote.high?.[i]);
+        const low = Number(quote.low?.[i]);
+        const close = Number(quote.close?.[i]);
 
         if (
-          open == null ||
-          high == null ||
-          low == null ||
-          close == null
+          !Number.isFinite(timestampMs) ||
+          timestampMs <= 0 ||
+          timestampMs > Date.now() + 60000 ||
+          !Number.isFinite(open) ||
+          !Number.isFinite(high) ||
+          !Number.isFinite(low) ||
+          !Number.isFinite(close) ||
+          high < Math.max(open, close, low) ||
+          low > Math.min(open, close, high)
         ) {
           return null;
         }
 
         return {
-          datetime: new Date(timestamp * 1000).toISOString(),
+          datetime: new Date(timestampMs).toISOString(),
           open,
           high,
           low,
           close,
-          volume: quote.volume?.[i] || 0
+          volume: Number(quote.volume?.[i]) || 0
         };
-      
       }).filter(Boolean);
 
       // AGREGASI KHUSUS TIMEFRAME M45
@@ -737,7 +792,7 @@ module.exports = async function handler(req, res) {
       }
 
       // HASIL DATA WTI + penanda waktu agar kesegaran data dapat diperiksa.
-      const output = {
+      const output = withYahooCandleFreshness({
         status: "success",
         symbol: selectedSymbol,
         interval: selected,
@@ -745,7 +800,7 @@ module.exports = async function handler(req, res) {
         providerFetchedAt: new Date().toISOString(),
         lastCandleAt: candles[candles.length - 1].datetime,
         candles
-      };
+      });
 
       // SIMPAN KE MEMORY CACHE
       globalThis.aurumCache.set(cacheKey, {
