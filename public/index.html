@@ -2513,6 +2513,24 @@ body {
 .aurum-price-map-visual .map-value{font:700 11px Arial,sans-serif;fill:#1f2937}
 .aurum-price-map-visual .map-line{stroke-width:2;stroke-linecap:round}
 
+
+/* TRAXA-style signal feed: server monitor stays internal, user sees signal cards */
+#aurumServerSignals{display:none!important}
+#aurumTradePlan{display:none!important}
+.aurum-signal-feed-status{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:10px 0 12px;color:#8792a2;font-size:10px}
+.aurum-signal-feed{display:grid;gap:10px}
+.aurum-signal-feed-card{display:grid;gap:9px;width:100%;padding:13px;border:1px solid #e4e9f0;border-radius:13px;background:#fff;color:#202b3c;text-align:left;cursor:pointer;box-shadow:0 4px 14px rgba(25,40,60,.045)}
+.aurum-signal-feed-card:focus{outline:2px solid #d4b24e;outline-offset:2px}
+.aurum-signal-feed-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.aurum-signal-feed-name{font-size:12px;font-weight:800;letter-spacing:.3px}
+.aurum-signal-feed-direction{font-size:12px;font-weight:900;padding:5px 10px;border-radius:20px;background:#e7f7ef;color:#16865d}
+.aurum-signal-feed-direction.sell{background:#fff0f1;color:#d34c58}
+.aurum-signal-feed-meta{display:flex;justify-content:space-between;gap:8px;color:#7c8797;font-size:10px}
+.aurum-signal-feed-entry{font-size:12px;font-weight:700;color:#26364d}
+.aurum-signal-feed-levels{font-size:11px;line-height:1.6;color:#738093}
+.aurum-signal-feed-result{font-size:10px;color:#9a7b36;font-weight:700}
+.aurum-signal-feed-empty{padding:18px 12px;border:1px dashed #dce3eb;border-radius:12px;text-align:center;color:#8490a0;font-size:12px;line-height:1.6}
+
 </style>
 
 <style id="aurum-traxa-performance">
@@ -3680,6 +3698,8 @@ body {
 
     <section class="aurum-signal-panel active" data-signal-panel="setup" role="tabpanel">
       <div class="aurum-todays-signals-head"><span>●</span><div><strong>TODAY'S SIGNALS</strong><small>Setup pasar AURUM hari ini</small></div></div>
+      <div class="aurum-signal-feed-status"><span id="aurumFeedServerState">Menghubungkan ke server…</span><span id="aurumFeedUpdated"></span></div>
+      <div id="aurumSignalCards" class="aurum-signal-feed" aria-live="polite"></div>
       <div id="aurumNoSignals" class="aurum-no-signals">Belum ada sinyal terkonfirmasi untuk pasar ini.</div>
       <div id="aurumTradePlan" class="aurum-trade-plan" style="display:none">
         <div class="aurum-panel-heading"><span class="aurum-heading-icon">◎</span><div><strong>AURUM TRADE PLAN</strong><small>Rencana berdasarkan konfirmasi analisis</small></div></div>
@@ -8495,17 +8515,47 @@ body.aurum-user-dark .app-page{background:transparent!important}
     return '<article class="aurum-server-row" '+(status==='SIGNAL'?'role="button" tabindex="0" data-aurum-open-signal="'+safe(item.symbol)+'"':'')+'><strong>'+safe(names[item.symbol]||item.symbol)+'</strong><b class="'+cls+'">'+safe(dir)+'</b><small>'+safe(detail)+'</small>'+strength+riskLine+contextualStale+(feedLine?'<small class="aurum-server-muted">Usia candle: '+safe(feedLine)+'</small>':'')+(checked?'<small class="aurum-server-muted">'+safe(checked)+'</small>':'')+'</article>';
   }
   let latestResults=[];
+  let detailRecords=[];
   function renderCurrentInstrument(){
     const activeSymbol=document.getElementById('pair')?.value||'XAU/USD';
     const item=latestResults.find(x=>x.symbol===activeSymbol);
-    rows.innerHTML=item?card(item):'<p class="aurum-server-muted">Belum ada data server untuk instrumen ini.</p>';
+    const feed=document.getElementById('aurumSignalCards');
+    const empty=document.getElementById('aurumNoSignals');
+    if(!feed)return;
+    const records=[];
+    if(item){
+      if(item.current&&item.current.status==='SIGNAL')records.push({symbol:item.symbol,record:item.current,isCurrent:true});
+      (Array.isArray(item.history)?item.history:[]).forEach(record=>{
+        if(record&&['BUY','SELL'].includes(record.direction)&&record.tradePlan)records.push({symbol:item.symbol,record,isCurrent:false});
+      });
+    }
+    const seen=new Set();
+    detailRecords=records.filter(x=>{
+      const r=x.record,key=String(r.generatedAt||r.fingerprint||'')+'|'+r.direction;
+      if(seen.has(key))return false;seen.add(key);return true;
+    }).sort((a,b)=>Date.parse(b.record.generatedAt||b.record.checkedAt||0)-Date.parse(a.record.generatedAt||a.record.checkedAt||0));
+    feed.innerHTML=detailRecords.length?detailRecords.map((x,index)=>{
+      const r=x.record,p=r.tradePlan||{},when=r.generatedAt||r.checkedAt;
+      const date=when?new Date(when).toLocaleString('id-ID'):'Waktu tidak tersedia';
+      const direction=r.direction==='SELL'?'sell':'';
+      const tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'Setup terkonfirmasi';
+      return '<button type="button" class="aurum-signal-feed-card" data-aurum-signal-index="'+index+'">'+
+        '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-name">'+safe(names[x.symbol]||x.symbol)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+safe(r.direction)+'</b></span>'+
+        '<span class="aurum-signal-feed-meta"><span>'+safe(tf)+'</span><span>'+safe(date)+'</span></span>'+
+        '<span class="aurum-signal-feed-entry">Entry '+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</span>'+
+        '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
+        '<span class="aurum-signal-feed-result">Status: '+safe(outcomeLabel(r.outcomeStatus||'WAITING_FOR_ENTRY'))+' · Ketuk untuk analisis lengkap ›</span></button>';
+    }).join(''):'<div class="aurum-signal-feed-empty">Belum ada sinyal BUY/SELL terkonfirmasi untuk instrumen ini. Sinyal WAIT tidak ditampilkan sebagai sinyal aktif.</div>';
+    if(empty)empty.hidden=detailRecords.length>0;
+    const status=document.getElementById('aurumFeedServerState');
+    if(status)status.textContent='DATA SERVER '+(item?'TERHUBUNG':'MENUNGGU INSTRUMEN');
   }
   document.getElementById('pair')?.addEventListener('change',renderCurrentInstrument);
   const detailView=document.getElementById('aurumSignalDetailView');
-  function openSignalDetail(symbol){
-    const item=latestResults.find(x=>x.symbol===symbol);
-    if(!item||!item.current||item.current.status!=='SIGNAL')return;
-    const cur=item.current,plan=cur.tradePlan||{},profiles=Array.isArray(cur.riskProfiles)?cur.riskProfiles:[];
+  function openSignalDetail(index){
+    const selected=detailRecords[Number(index)];
+    if(!selected||!selected.record)return;
+    const symbol=selected.symbol,cur=selected.record,plan=cur.tradePlan||{},profiles=Array.isArray(cur.riskProfiles)?cur.riskProfiles:[];
     const fmtDetail=v=>Number.isFinite(Number(v))?Number(v).toFixed(2):'--';
     const name=names[symbol]||symbol;
     document.getElementById('aurumDetailInstrument').textContent=name;
@@ -8553,11 +8603,12 @@ body.aurum-user-dark .app-page{background:transparent!important}
     document.querySelectorAll('#marketPage > .aurum-asset-switch,#marketPage > .aurum-signal-summary,#marketPage > .aurum-signal-tabs,#marketPage > .aurum-signal-panel').forEach(n=>n.hidden=true);
     window.scrollTo({top:0,behavior:'auto'});
   }
-  rows.addEventListener('click',e=>{const card=e.target.closest('[data-aurum-open-signal]');if(card)openSignalDetail(card.getAttribute('data-aurum-open-signal'));});
-  rows.addEventListener('keydown',e=>{const card=e.target.closest('[data-aurum-open-signal]');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSignalDetail(card.getAttribute('data-aurum-open-signal'));}});
+  const feed=document.getElementById('aurumSignalCards');
+  feed?.addEventListener('click',e=>{const selected=e.target.closest('[data-aurum-signal-index]');if(selected)openSignalDetail(selected.getAttribute('data-aurum-signal-index'));});
   document.getElementById('aurumSignalDetailBack').addEventListener('click',()=>{
-    detailView.hidden=true;panel.hidden=false;
-    document.querySelectorAll('#marketPage > .aurum-asset-switch,#marketPage > .aurum-signal-summary,#marketPage > .aurum-signal-tabs,#marketPage > .aurum-signal-panel').forEach(n=>n.hidden=false);
+    detailView.hidden=true;panel.hidden=true;
+    document.querySelectorAll('#marketPage > .aurum-asset-switch,#marketPage > .aurum-signal-summary,#marketPage > .aurum-signal-tabs').forEach(n=>n.hidden=false);
+    document.querySelectorAll('#marketPage > .aurum-signal-panel').forEach(n=>{n.hidden=n.dataset.signalPanel!=='setup';});
     window.scrollTo({top:0,behavior:'auto'});
   });
 
@@ -8586,8 +8637,12 @@ body.aurum-user-dark .app-page{background:transparent!important}
       }
       state.textContent='SERVER TERHUBUNG';state.className='aurum-server-state ok';
       updated.textContent='Data server diperbarui: '+new Date(data.updatedAt||Date.now()).toLocaleString('id-ID')+' · pembaruan otomatis tiap 60 detik';
+      const feedUpdated=document.getElementById('aurumFeedUpdated');
+      if(feedUpdated)feedUpdated.textContent='Diperbarui '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('id-ID');
     }catch(error){
       state.textContent='BELUM TERHUBUNG';state.className='aurum-server-state err';
+      const feedStatus=document.getElementById('aurumFeedServerState');
+      if(feedStatus)feedStatus.textContent='SERVER BELUM TERHUBUNG';
       rows.innerHTML='<p class="aurum-server-muted">'+safe(error.message||'Data server belum dapat dibaca')+'</p>';
       updated.textContent='Monitor akan mencoba kembali otomatis.';
     }
