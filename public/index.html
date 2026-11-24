@@ -8836,8 +8836,19 @@ body.aurum-user-dark .app-page{background:transparent!important}
       pairSelect.value=choice.dataset.asset;
       pairSelect.dispatchEvent(new Event('change',{bubbles:true}));
     }
-    document.querySelectorAll('.app-page').forEach(page=>page.classList.toggle('active',page.id==='marketPage'));
-    document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(item=>item.classList.toggle('active',item.dataset.page==='marketDirectoryPage'));
+    // Use the shared page router so the URL, active tab, and aria-current
+    // stay synchronized when an instrument is opened from the market directory.
+    if (typeof window.aurumShowPage === 'function') {
+      window.aurumShowPage('marketPage');
+    } else {
+      document.querySelectorAll('.app-page').forEach(page=>page.classList.toggle('active',page.id==='marketPage'));
+      document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(item=>{
+        const active=item.dataset.page==='marketDirectoryPage';
+        item.classList.toggle('active',active);
+        if(active)item.setAttribute('aria-current','page');
+        else item.removeAttribute('aria-current');
+      });
+    }
     document.querySelectorAll('#marketPage > .aurum-asset-switch,#marketPage > .aurum-signal-summary,#marketPage > .aurum-signal-tabs').forEach(node=>node.hidden=false);
     document.querySelectorAll('#marketPage > .aurum-signal-panel').forEach(node=>{node.hidden=node.dataset.signalPanel!=='setup';});
     detailView.hidden=true;panel.hidden=true;
