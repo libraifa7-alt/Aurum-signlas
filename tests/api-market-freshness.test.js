@@ -910,6 +910,21 @@ test("chat form and suggested prompts are wired to the same local assistant", ()
 });
 
 
+
+
+test("opening an instrument from the market directory uses the shared router and preserves aria-current", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf('<script id="aurum-market-directory-actions">');
+  const end = html.indexOf("</script>", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const actions = html.slice(start, end);
+  assert.ok(actions.includes("window.aurumShowPage('marketPage')"));
+  assert.ok(actions.includes("item.setAttribute('aria-current','page')"));
+  assert.ok(actions.includes("item.removeAttribute('aria-current')"));
+  assert.ok(actions.indexOf("window.aurumShowPage('marketPage')") < actions.indexOf("}else{"));
+  assert.ok(actions.includes("pair.dispatchEvent(new Event('change',{bubbles:true}))"));
+});
 test("market directory selection uses the shared router to keep page, URL, and active tab synchronized", () => {
   const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
   const start = html.indexOf("document.getElementById('aurumMarketDirectory')?.addEventListener('click'");
