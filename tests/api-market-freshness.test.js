@@ -598,3 +598,36 @@ test("rejects null or non-object candle rows without throwing", () => {
   assert.deepEqual(normalizeCandles([null]), []);
   assert.deepEqual(normalizeCandles(["not-a-candle"]), []);
 });
+
+
+test("signals endpoint skips a malformed current Redis record without failing all instruments", async () => {
+  const signalsHandler = require("../api/signals.js");
+  const originalFetch = global.fetch;
+  const originalUrl = process.env.KV_REST_API_URL;
+  const originalToken = process.env.KV_REST_API_TOKEN;
+  process.env.KV_REST_API_URL = "https://redis.example.test";
+  process.env.KV_REST_API_TOKEN = "test-token";
+  let commandIndex = 0;
+  global.fetch = async (_url, options) => {
+    const command = JSON.parse(options.body);
+    const isCurrentRead = command[0] === "GET";
+    const result = isCurrentRead
+      ? (commandIndex++ === 0 ? "{malformed-json" : null)
+      : [];
+    return { ok: true, json: async () => ({ result }) };
+  };
+  try {
+    const res = responseRecorder();
+    await signalsHandler({ method: "GET" }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.payload.status, "success");
+    assert.equal(res.payload.results.length, 3);
+    assert.equal(res.payload.results[0].current, null);
+  } finally {
+    global.fetch = originalFetch;
+    if (originalUrl === undefined) delete process.env.KV_REST_API_URL;
+    else process.env.KV_REST_API_URL = originalUrl;
+    if (originalToken === undefined) delete process.env.KV_REST_API_TOKEN;
+    else process.env.KV_REST_API_TOKEN = originalToken;
+  }
+});
