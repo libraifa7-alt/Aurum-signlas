@@ -8,6 +8,11 @@ function responseRecorder() {
   return {
     statusCode: 200,
     payload: null,
+    headers: {},
+    setHeader(name, value) {
+      this.headers[name] = value;
+      return this;
+    },
     status(code) {
       this.statusCode = code;
       return this;
@@ -311,7 +316,7 @@ test("health endpoint reports missing core configuration without exposing secret
   for (const name of names) delete process.env[name];
   try {
     const res = responseRecorder();
-    await healthHandler({}, res);
+    await healthHandler({ method: 'GET' }, res);
     assert.equal(res.statusCode, 200);
     assert.equal(res.payload.status, "degraded");
     assert.equal(res.payload.checks.redis, "not_configured");
@@ -340,13 +345,49 @@ test("health endpoint verifies Redis connectivity without returning credentials"
   };
   try {
     const res = responseRecorder();
-    await healthHandler({}, res);
+    await healthHandler({ method: 'GET' }, res);
     assert.equal(res.payload.status, "ok");
     assert.equal(res.payload.checks.redis, "connected");
     assert.equal(JSON.stringify(res.payload).includes("test-redis-token"), false);
     assert.equal(JSON.stringify(res.payload).includes("test-cron-secret"), false);
   } finally {
     global.fetch = originalFetch;
+    for (const name of names) {
+      if (previous[name] === undefined) delete process.env[name];
+      else process.env[name] = previous[name];
+    }
+  }
+});
+
+test("health endpoint rejects non-GET requests before checking Redis", async () => {
+  const originalFetch = global.fetch;
+  let fetchCalled = false;
+  global.fetch = async () => {
+    fetchCalled = true;
+    throw new Error("Redis must not be contacted for a rejected method");
+  };
+  try {
+    const res = responseRecorder();
+    await healthHandler({ method: 'POST' }, res);
+    assert.equal(res.statusCode, 405);
+    assert.equal(res.payload.message, "Method not allowed");
+    assert.equal(fetchCalled, false);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("health endpoint disables caching and marks market provider probe as pending", async () => {
+  const names = ["CRON_SECRET", "KV_REST_API_URL", "KV_REST_API_TOKEN"];
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]]));
+  for (const name of names) delete process.env[name];
+  try {
+    const res = responseRecorder();
+    await healthHandler({ method: 'GET' }, res);
+    assert.equal(res.headers["Cache-Control"], "no-store, max-age=0");
+    assert.equal(res.headers["X-Content-Type-Options"], "nosniff");
+    assert.equal(res.payload.checks.marketApi, "not_probed");
+  } finally {
     for (const name of names) {
       if (previous[name] === undefined) delete process.env[name];
       else process.env[name] = previous[name];
