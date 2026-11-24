@@ -631,3 +631,41 @@ test("signals endpoint skips a malformed current Redis record without failing al
     else process.env.KV_REST_API_TOKEN = originalToken;
   }
 });
+
+
+test("dashboard refresh keeps one status icon and handles chart fetch errors safely", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const homeStart = html.indexOf('<script id="aurum-home-live-ui">');
+  const homeEnd = html.indexOf("</script>", homeStart);
+  const chartStart = html.indexOf('<script id="aurum-setup-live-tick">');
+  const chartEnd = html.indexOf("</script>", chartStart);
+  assert.notEqual(homeStart, -1);
+  assert.notEqual(homeEnd, -1);
+  assert.notEqual(chartStart, -1);
+  assert.notEqual(chartEnd, -1);
+  const home = html.slice(homeStart, homeEnd);
+  const chart = html.slice(chartStart, chartEnd);
+  assert.ok(home.includes("if(!badge.querySelector('i'))"));
+  assert.equal((home.match(/badge\.prepend\(dot\)/g) || []).length, 1);
+  assert.ok(chart.includes("const symbol=pairEl.value||'XAU/USD';\n    try{"));
+  assert.ok(chart.includes("if(pairEl.value===symbol"));
+});
+
+test("Aurum chat exposes the core ICT and risk-management learning topics", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf('<script id="aurum-chat-assistant">');
+  const end = html.indexOf("</script>", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const chat = html.slice(start, end);
+  for (const topic of [
+    "market structure", "support", "choch", "liquidity sweep",
+    "fair value gap", "order block", "break of structure",
+    "inducement", "premium discount", "stop loss"
+  ]) {
+    assert.ok(chat.toLowerCase().includes(topic), "Missing chat topic: " + topic);
+  }
+  assert.ok(chat.includes("new RegExp('\\\\b'+x+'\\\\b','i')"));
+  assert.ok(chat.includes("Saya belum memiliki jawaban terverifikasi"));
+  assert.ok(!chat.includes("fetch('https://"));
+});
