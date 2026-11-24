@@ -347,7 +347,7 @@ test("education tabs each point to an existing content panel and chat states its
       "Missing education panel for tab: " + tab);
   }
   assert.ok(html.includes('id="aurumChatForm"'));
-  assert.ok(html.includes("Mode asisten berbasis aturan dan data server. Model AI generatif eksternal belum terhubung."));
+  assert.ok(html.includes("Asisten menggunakan aturan dan data server; tidak memerlukan layanan AI eksternal."));
 });
 
 
