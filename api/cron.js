@@ -18,45 +18,6 @@ async function redis(command) {
   return body.result;
 }
 
-async function sendTelegramSignal(symbol, evaluation, baseUrl) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return 'not_configured';
-
-  const escapeHtml = value => String(value ?? '').replace(/[&<>"]/g, character => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
-  })[character]);
-  const plan = evaluation.tradePlan || {};
-  const message = [
-    '<b>AURUM SIGNAL — ' + escapeHtml(symbol) + '</b>',
-    '<b>Arah:</b> ' + escapeHtml(evaluation.direction),
-    '<b>Entry:</b> ' + escapeHtml(plan.entryLow) + ' – ' + escapeHtml(plan.entryHigh),
-    '<b>Stop Loss:</b> ' + escapeHtml(plan.sl),
-    '<b>TP1 / TP2 / TP3:</b> ' + [plan.tp1, plan.tp2, plan.tp3].map(escapeHtml).join(' / '),
-    '<b>Waktu:</b> ' + escapeHtml(evaluation.generatedAt || new Date().toISOString()),
-    '<a href="' + escapeHtml(baseUrl) + '">Buka Aurum Signals</a>'
-  ].join('\n');
-
-  const response = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: message,
-      parse_mode: 'HTML',
-      disable_web_page_preview: true
-    }),
-    signal: AbortSignal.timeout(8000)
-  });
-  let payload = null;
-  try { payload = await response.json(); } catch {}
-  if (!response.ok || !payload?.ok) {
-    // Do not echo the Telegram URL or bot token into logs/API responses.
-    throw new Error('Telegram sendMessage gagal (HTTP ' + response.status + ')');
-  }
-  return 'sent';
-}
-
 async function updateSignalOutcomes(symbol, candles) {
   const rows = await redis(['LRANGE','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','99']);
   // The final candle may still be forming. Process every closed candle after
@@ -298,18 +259,6 @@ module.exports=async function handler(req,res){
         await redis(['LPUSH','aurum:server-signal-history:'+encodeURIComponent(symbol),JSON.stringify(record)]);
         await redis(['LTRIM','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','99']);
       }
-      let telegramResult='not_sent';
-      if(changed&&evaluation.status==='SIGNAL'){
-        try {
-          telegramResult = await sendTelegramSignal(symbol, evaluation, baseUrl);
-        } catch (telegramError) {
-          telegramResult = 'failed';
-          console.warn('AURUM TELEGRAM NOTIFICATION:', telegramError.message);
-        }
-      } else if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
-        telegramResult = 'not_configured';
-      }
-
       let pushResult='not_sent';
       if(changed&&evaluation.status==='SIGNAL'&&process.env.VAPID_PUBLIC_KEY&&process.env.VAPID_PRIVATE_KEY&&process.env.VAPID_SUBJECT){
         webpush.setVapidDetails(process.env.VAPID_SUBJECT,process.env.VAPID_PUBLIC_KEY,process.env.VAPID_PRIVATE_KEY);
@@ -338,7 +287,7 @@ module.exports=async function handler(req,res){
       }else if(!process.env.VAPID_PUBLIC_KEY||!process.env.VAPID_PRIVATE_KEY||!process.env.VAPID_SUBJECT){
         pushResult='vapid_not_configured';
       }
-      results.push({symbol,status:evaluation.status,reason:evaluation.reason||null,changed,push:pushResult,telegram:telegramResult,
+      results.push({symbol,status:evaluation.status,reason:evaluation.reason||null,changed,push:pushResult,
         direction:evaluation.direction||null,contextualTimeframesStale:contextualStale,feedDiagnostics,
         latestCandleAt:Object.fromEntries(TIMEFRAMES.map(tf=>[tf,feedDiagnostics[tf].lastCandleAt]))});
     }
@@ -349,5 +298,3 @@ module.exports=async function handler(req,res){
     return res.status(500).json({status:'error',message:String(error.message||error).slice(0,240)});
   }
 };
-
-module.exports.sendTelegramSignal = sendTelegramSignal;
