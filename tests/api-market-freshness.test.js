@@ -264,3 +264,13 @@ test("does not publish a still-forming M45 bucket", async () => {
   assert.equal(res.statusCode, 502);
   assert.match(res.payload.message, /candle/i);
 });
+
+test("the first-visit splash screen has a working dashboard entry control", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  assert.ok(html.includes('<div id="aurumSplash" class="aurum-splash">'));
+  assert.ok(html.includes('id="aurumEnterButton"'));
+  assert.ok(html.includes("function enterDashboard()"));
+  assert.ok(html.includes("enterButton.addEventListener('click', enterDashboard)"));
+  assert.ok(html.includes("localStorage.setItem('aurumSplashSeen', 'true')"));
+  assert.ok(html.includes('<section id="homePage" class="app-page active">'));
+});
