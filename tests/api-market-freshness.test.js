@@ -925,19 +925,6 @@ test("splash entry survives browsers that deny localStorage access", () => {
   assert.ok(splash.includes("The splash still closes for this visit"));
 });
 
-test("opening an instrument from the market directory uses the shared router and preserves aria-current", () => {
-  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
-  const start = html.indexOf('<script id="aurum-market-directory-actions">');
-  const end = html.indexOf("</script>", start);
-  assert.notEqual(start, -1);
-  assert.notEqual(end, -1);
-  const actions = html.slice(start, end);
-  assert.ok(actions.includes("window.aurumShowPage('marketPage')"));
-  assert.ok(actions.includes("item.setAttribute('aria-current','page')"));
-  assert.ok(actions.includes("item.removeAttribute('aria-current')"));
-  assert.ok(actions.indexOf("window.aurumShowPage('marketPage')") < actions.indexOf("}else{"));
-  assert.ok(actions.includes("pair.dispatchEvent(new Event('change',{bubbles:true}))"));
-});
 test("market directory selection uses the shared router to keep page, URL, and active tab synchronized", () => {
   const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
   const start = html.indexOf("document.getElementById('aurumMarketDirectory')?.addEventListener('click'");
@@ -951,4 +938,8 @@ test("market directory selection uses the shared router to keep page, URL, and a
     "The shared router must be the primary navigation path");
   assert.ok(handler.includes("pairSelect.dispatchEvent(new Event('change'"),
     "Selecting an instrument must update the active market data feed");
+  assert.equal((html.match(/document.getElementById\('aurumMarketDirectory'\)\?\.addEventListener\('click'/g) || []).length, 1,
+    "The market directory must have one delegated click handler, not duplicate handlers");
+  assert.ok(!html.includes('id="aurum-market-directory-actions"'),
+    "The obsolete per-row market handler must be removed");
 });
