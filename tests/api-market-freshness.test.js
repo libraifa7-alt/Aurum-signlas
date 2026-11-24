@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const handler = require("../api/index.js");
+const fs = require("node:fs");
 
 function responseRecorder() {
   return {
@@ -135,4 +136,10 @@ test("rejects Yahoo candles timestamped materially in the future", async () => {
 
   assert.equal(res.statusCode, 502);
   assert.match(res.payload.message, /candle/i);
+});
+
+test("frontend blocks signal generation unless backend marks candles fresh for every asset", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  assert.match(html, /const signalDataIsFresh[\\s\\S]*?chartFeedMeta\\?\\.candleStatus === 'fresh_candles'/);
+  assert.doesNotMatch(html, /pair[^;]{0,100}!== 'XAU\\/USD'[\\s\\S]{0,100}candleStatus/);
 });
