@@ -3463,7 +3463,7 @@ body {
       <div class="aurum-setting-row"><span>Language</span><div class="aurum-language-options"><button type="button" data-aurum-language="EN">EN</button><button type="button" data-aurum-language="BM">BM</button><button type="button" data-aurum-language="中文">中文</button><button type="button" data-aurum-language="ID">ID</button></div></div>
     </div>
     <div class="aurum-notice-card"><strong>Notifications <span id="aurumNotificationState">are on</span></strong><small>Izinkan notifikasi perangkat untuk menerima pemberitahuan sinyal.</small><button type="button" id="aurumTestNotification">Send test</button><button type="button" id="aurumEnablePush">Enable background alerts</button><small id="aurumPushStatus">Notifikasi saat aplikasi ditutup memerlukan konfigurasi server.</small></div>
-    <div class="aurum-panel-promo"><div><strong>Invite friends</strong><small>Bagikan AURUM Signals AI.</small></div><button type="button" id="aurumInviteButton">Invite</button></div>
+    <div class="aurum-panel-promo"><div><strong>Undang teman</strong><small>Bagikan AURUM Signals AI.</small></div><button type="button" id="aurumInviteButton">Invite</button></div>
     <div class="aurum-panel-promo"><div><strong>Telegram channel</strong><small>Channel belum dihubungkan.</small></div><span class="aurum-muted-pill">Belum tersedia</span></div>
     <button type="button" class="aurum-setup-guide" id="aurumSetupGuide">Setup guide: home screen & notifications</button>
     <details class="aurum-account-details"><summary>Username & trading accounts</summary><p>AURUM saat ini menyimpan preferensi dan jurnal sinyal di perangkat ini. Tidak terhubung ke akun broker dan tidak mengeksekusi transaksi.</p></details>
@@ -3552,7 +3552,7 @@ body {
   <!-- MARKET CARDS -->
   <section class="home-section">
     <div class="home-section-heading">
-      <h3>MARKETS</h3>
+      <h3>PASAR</h3>
       <span class="home-live" id="homeLiveStatus" role="status" aria-live="polite"><i></i> Memeriksa data...</span>
     </div>
 
@@ -3579,7 +3579,14 @@ body {
     </div>
   </section>
 
-  <!-- TRADING MENU -->
+  <!-- AURUM QUICK ACCESS -->
+<section class="home-section aurum-home-new-section"><div class="home-section-heading"><h3>BARU DI AURUM</h3></div>
+<div class="aurum-home-feature-grid">
+<button type="button" class="aurum-home-feature" onclick="document.querySelector('.nav-item[data-page=guidePage]').click()"><span class="home-menu-icon green-icon aurum-glow-icon">▱</span><span><strong>Kelas</strong><small>Pelajaran dan panduan aplikasi</small></span><em>BARU</em></button>
+<button type="button" class="aurum-home-feature" onclick="document.getElementById('aurumOpenNotifications')?.click()"><span class="home-menu-icon blue aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Jurnal sinyal paper di perangkat ini</small></span><em>JURNAL</em></button>
+<button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="document.getElementById('aurumOpenProfile')?.click()"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
+</div></section>
+<!-- TRADING MENU -->
   <section class="home-section">
     <div class="home-section-heading">
       <h3>TRADING</h3>
@@ -3589,25 +3596,25 @@ body {
       <a href="#marketPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=setup]')?.click(),80);return false;">
         <span class="home-menu-icon purple aurum-glow-icon">⚡</span>
-        <span><strong>Signals</strong><small>Live setups</small></span>
+        <span><strong>Sinyal</strong><small>Setup pasar terkini</small></span>
       </a>
 
       <a href="#marketPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=performance]')?.click(),80);return false;">
         <span class="home-menu-icon teal aurum-glow-icon">▥</span>
-        <span><strong>Performance</strong><small>Results and win rate</small></span>
+        <span><strong>Performa</strong><small>Hasil dan win rate</small></span>
       </a>
 
       <a href="#marketPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=analysis]')?.click(),80);return false;">
         <span class="home-menu-icon coral aurum-glow-icon">◉</span>
-        <span><strong>Analysis</strong><small>Key levels and range</small></span>
+        <span><strong>Analisis</strong><small>Level kunci dan rentang</small></span>
       </a>
 
       <a href="#newsPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=newsPage]').click();return false;">
         <span class="home-menu-icon blue aurum-glow-icon">▣</span>
-        <span><strong>News</strong><small>Red news ahead</small></span>
+        <span><strong>Berita</strong><small>Berita fundamental</small></span>
       </a>
     </div>
   </section>
@@ -3615,14 +3622,14 @@ body {
   <!-- COMMUNITY MENU -->
   <section class="home-section">
     <div class="home-section-heading">
-      <h3>COMMUNITY</h3>
+      <h3>KOMUNITAS</h3>
     </div>
 
     <div class="home-community-grid">
       <a href="#chatPage"
          onclick="document.querySelector('.nav-item[data-page=chatPage]').click();return false;">
         <span class="community-icon pink aurum-glow-icon">▱</span>
-        <strong>Chat</strong>
+        <strong>Obrolan</strong>
       </a>
 
       <a href="#chatPage"
@@ -3642,27 +3649,21 @@ body {
   <!-- TOOLS MENU -->
   <section class="home-section">
     <div class="home-section-heading">
-      <h3>TOOLS</h3>
+      <h3>ALAT</h3>
     </div>
 
     <div class="home-tools-grid">
       <a href="#guidePage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
         <span class="home-menu-icon green-icon aurum-glow-icon">▶</span>
-        <span><strong>Guides</strong><small>How Traxa works</small></span>
+        <span><strong>Edukasi</strong><small>Pelajaran dan cara memakai AURUM</small></span>
       </a>
 
-      <a href="#newsPage" class="home-menu-card"
-         onclick="document.querySelector('.nav-item[data-page=newsPage]').click();return false;">
-        <span class="home-menu-icon amber aurum-glow-icon">♟</span>
-        <span><strong>Alerts</strong><small>What pings you</small></span>
-      </a>
+      <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenNotifications')?.click();return false;">
+        <span class="home-menu-icon amber aurum-glow-icon">♟</span><span><strong>Notifikasi</strong><small>Atur peringatan yang diterima</small></span></a>
 
-      <a href="#guidePage" class="home-menu-card home-tool-wide"
-         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
-        <span class="home-menu-icon slate aurum-glow-icon">⚙</span>
-        <span><strong>Settings</strong><small>Look, sound, language, password</small></span>
-      </a>
+      <a href="#homePage" class="home-menu-card home-tool-wide" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
+        <span class="home-menu-icon slate aurum-glow-icon">⚙</span><span><strong>Pengaturan</strong><small>Tampilan, suara, bahasa, akun</small></span></a>
     </div>
   </section>
 
@@ -3681,17 +3682,17 @@ body {
       <div class="aurum-market-list">
         <button type="button" class="aurum-market-row" data-asset="XAU/USD">
           <span class="aurum-directory-icon aurum-directory-gold">XAU</span>
-          <span class="aurum-directory-copy"><strong>Gold</strong><small>XAU/USD</small></span>
+          <span class="aurum-directory-copy"><strong>Gold</strong><small>XAU/USD</small><small><b id="directoryPriceXAU">Harga --</b> · <span id="directoryCountXAU">memuat setup</span></small></span>
           <span class="aurum-directory-arrow" aria-hidden="true">›</span>
         </button>
         <button type="button" class="aurum-market-row" data-asset="BTC/USD">
           <span class="aurum-directory-icon aurum-directory-bitcoin">₿</span>
-          <span class="aurum-directory-copy"><strong>Bitcoin</strong><small>BTC/USD</small></span>
+          <span class="aurum-directory-copy"><strong>Bitcoin</strong><small>BTC/USD</small><small><b id="directoryPriceBTC">Harga --</b> · <span id="directoryCountBTC">memuat setup</span></small></span>
           <span class="aurum-directory-arrow" aria-hidden="true">›</span>
         </button>
         <button type="button" class="aurum-market-row" data-asset="WTI">
           <span class="aurum-directory-icon aurum-directory-oil">OIL</span>
-          <span class="aurum-directory-copy"><strong>WTI oil</strong><small>USOIL</small></span>
+          <span class="aurum-directory-copy"><strong>WTI oil</strong><small>USOIL</small><small><b id="directoryPriceWTI">Harga --</b> · <span id="directoryCountWTI">memuat setup</span></small></span>
           <span class="aurum-directory-running">3 instrumen</span>
           <span class="aurum-directory-arrow" aria-hidden="true">›</span>
         </button>
@@ -3731,7 +3732,7 @@ body {
         <div class="aurum-strength-layout"><div class="aurum-strength-gauge" id="aurumDetailGauge"><div><strong id="aurumDetailStrength">--/100</strong><small id="aurumDetailStrengthLabel">MENUNGGU DATA</small></div></div><div class="aurum-strength-notes"><span>SKOR KEKUATAN SETUP</span><small>Struktur market, Order Block, konteks H4, dan keselarasan timeframe.</small></div></div>
         <ul id="aurumDetailReasons"></ul>
       </div>
-      <p class="aurum-detail-disclaimer">Informasi ini berasal dari hasil pemindaian server AURUM. Bukan saran keuangan atau jaminan hasil trading.</p>
+      <div class="aurum-detail-feedback"><div class="aurum-detail-feedback-head"><strong>YOUR FEEDBACK</strong><small>Bagikan pengalaman Anda melihat setup ini</small></div><textarea id="aurumDetailFeedbackText" rows="3" maxlength="1200" placeholder="Bagaimana hasil setup ini menurut Anda?"></textarea><div class="aurum-detail-feedback-actions"><label><input type="checkbox" id="aurumDetailFeedbackShare"> Boleh digunakan sebagai masukan AURUM</label><button type="button" id="aurumDetailFeedbackSend">Kirim feedback</button></div><small id="aurumDetailFeedbackStatus" aria-live="polite">Feedback disimpan lokal pada perangkat ini; pengiriman ke tim belum terhubung.</small></div><p class="aurum-detail-disclaimer">Informasi ini berasal dari hasil pemindaian server AURUM. Bukan saran keuangan atau jaminan hasil trading.</p>
     </section>
     <div class="aurum-asset-switch" aria-label="Pilih instrumen pasar">
       <button type="button" class="active" data-asset="XAU/USD">🟡 Gold</button>
@@ -4047,7 +4048,10 @@ body {
   
   <h3>✦ AURUM EDUKASI</h3>
   <p class="sub">PUSAT PEMBELAJARAN MARKET STRUCTURE & SMART MONEY CONCEPTS</p>
+  <div class="aurum-guide-tabs" role="tablist" aria-label="Bagian kelas"><button type="button" class="active" data-guide-tab="live" aria-selected="true">Langsung <small>SEGERA</small></button><button type="button" data-guide-tab="lessons" aria-selected="false">Pelajaran</button><button type="button" data-guide-tab="manual" aria-selected="false">Panduan aplikasi</button></div>
+  <div id="aurumGuideLive" class="aurum-guide-live"><div class="aurum-guide-live-card"><span>◉</span><small>SEGERA HADIR</small><h3>KELAS LANGSUNG</h3><p>Belajar dan berdiskusi tentang analisis market bersama komunitas AURUM.</p><p>Jadwal kelas dan siaran ulang akan ditampilkan setelah kanal kelas resmi tersedia.</p><div class="aurum-guide-live-status">Kelas langsung belum dijadwalkan</div></div></div>
 
+  <div id="aurumGuideLessons">
   <div class="signal" style="margin-top:16px">
     <h3 class="gold">WELCOME TO AURUM GUIDE</h3>
     <p>
@@ -4092,7 +4096,8 @@ body {
     </article>
   </div>
   <p class="sub" style="margin-top:10px">Catatan: video referensi memperlihatkan kartu pelajaran dan durasinya, tetapi tidak menyediakan berkas video pembelajaran. Pemutar video AURUM baru dapat diaktifkan setelah sumber video asli tersedia.</p>
-
+  </div>
+  <div id="aurumGuideManual" hidden>
   <h3 style="margin-top:20px">PANDUAN PENGGUNAAN AURUM</h3>
   <div class="signal">
     <p class="gold">MARKET OVERVIEW</p>
@@ -4171,7 +4176,9 @@ body {
 <!-- END AURUM GUIDE PAGE -->
 
   </section>
-  <!-- END HALAMAN PANDUAN -->
+  
+  </div>
+<!-- END HALAMAN PANDUAN -->
 
 </main>
 
@@ -8768,6 +8775,20 @@ body.aurum-user-dark .app-page{background:transparent!important}
 })();
 </script>
 
+<style id="aurum-traxa-parity-batch">
+.aurum-home-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.aurum-home-feature{position:relative;display:flex;align-items:center;gap:10px;min-width:0;padding:12px;border:1px solid #e8ebf0;border-radius:14px;background:#fff;text-align:left;color:#273247;box-shadow:0 3px 12px rgba(31,41,55,.045)}.aurum-home-feature span:nth-child(2){display:flex;flex-direction:column;gap:3px;min-width:0}.aurum-home-feature strong{font-size:12px}.aurum-home-feature small{font-size:9px;color:#8791a1;line-height:1.35}.aurum-home-feature em{position:absolute;right:8px;top:7px;font-size:7px;font-style:normal;letter-spacing:.5px;color:#9a762e}.aurum-home-feature-wide{grid-column:1/-1}.aurum-directory-copy>small:last-child{margin-top:4px;font-size:9px;color:#8791a1}.aurum-directory-copy>small:last-child b{color:#273247;font-weight:700}.aurum-detail-feedback{margin:14px 0;padding:14px;border:1px solid #e5e9ef;border-radius:14px;background:#fff}.aurum-detail-feedback-head{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.aurum-detail-feedback-head strong{font-size:11px;letter-spacing:1px}.aurum-detail-feedback-head small,.aurum-detail-feedback>small{font-size:9px;color:#8791a1}.aurum-detail-feedback textarea{width:100%;box-sizing:border-box;resize:vertical;padding:11px;border:1px solid #dce1e8;border-radius:10px;font:inherit;font-size:12px;background:#fafbfc;color:#263247}.aurum-detail-feedback-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}.aurum-detail-feedback-actions label{font-size:9px;color:#788394}.aurum-detail-feedback-actions button{border:0;border-radius:9px;padding:9px 13px;background:#d7b34d;color:#211d13;font-size:10px;font-weight:800}.aurum-detail-feedback>small{display:block;margin-top:8px}.aurum-guide-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px;margin:14px 0;border:1px solid #e4e8ee;border-radius:12px;background:#fff}.aurum-guide-tabs button{border:0;border-radius:8px;padding:9px 4px;background:transparent;color:#697486;font-size:10px;font-weight:700}.aurum-guide-tabs button.active{background:linear-gradient(100deg,#17a9c6,#6949d8);color:#fff}.aurum-guide-tabs button small{display:block;font-size:7px;margin-top:3px}.aurum-guide-live-card{max-width:560px;margin:12px auto;padding:24px 18px;border-radius:16px;background:radial-gradient(circle at 50% 0%,rgba(211,174,73,.2),transparent 45%),linear-gradient(145deg,#080b13,#1a1c28);color:#fff;text-align:center}.aurum-guide-live-card>span{display:grid;place-items:center;width:48px;height:48px;margin:0 auto 12px;border:1px solid #b38b36;border-radius:50%;color:#d8b14f;font-size:22px}.aurum-guide-live-card>small{font-size:8px;letter-spacing:2px;color:#d8b14f}.aurum-guide-live-card h3{margin:8px 0;color:#fff}.aurum-guide-live-card p{font-size:11px;line-height:1.6;color:#c4cad4}.aurum-guide-live-status{display:inline-block;margin-top:8px;padding:8px 12px;border:1px solid rgba(255,255,255,.18);border-radius:20px;font-size:9px;color:#d7c48b}@media(max-width:480px){.aurum-home-feature-grid{gap:7px}.aurum-home-feature{padding:10px 8px}.aurum-home-feature strong{font-size:11px}.aurum-guide-tabs button{font-size:9px}}
+</style>
+<script id="aurum-traxa-parity-behavior">
+(function(){const $=id=>document.getElementById(id);
+const priceMap={'XAU/USD':['homePriceXAU','directoryPriceXAU'],'BTC/USD':['homePriceBTC','directoryPriceBTC'],WTI:['homePriceWTI','directoryPriceWTI']},countMap={'XAU/USD':'directoryCountXAU','BTC/USD':'directoryCountBTC',WTI:'directoryCountWTI'};
+function syncDirectory(){Object.values(priceMap).forEach(ids=>{const target=$(ids[1]),source=$(ids[0]);if(target&&source)target.textContent='Harga '+source.textContent.replace(/^--$/,'belum tersedia');});}
+async function refreshCounts(){try{const res=await fetch('/api/signals',{cache:'no-store'});if(!res.ok)return;const data=await res.json();if(data.status!=='success')return;(data.results||[]).forEach(item=>{const target=$(countMap[item.symbol]);if(!target)return;const records=[item.current,...(Array.isArray(item.history)?item.history:[])].filter(r=>r&&r.status==='SIGNAL'&&['BUY','SELL'].includes(r.direction));target.textContent=records.length+' setup';});}catch(e){}}
+syncDirectory();setInterval(syncDirectory,12000);refreshCounts();setInterval(refreshCounts,60000);
+document.querySelectorAll('.home-menu-card').forEach(a=>{const title=a.querySelector('strong')?.textContent?.trim();if(title==='Notifikasi')a.onclick=()=>{$('aurumOpenNotifications')?.click();return false;};if(title==='Pengaturan')a.onclick=()=>{$('aurumOpenProfile')?.click();return false;};});
+document.querySelectorAll('[data-guide-tab]').forEach(b=>b.addEventListener('click',()=>{const key=b.dataset.guideTab;document.querySelectorAll('[data-guide-tab]').forEach(x=>{const active=x===b;x.classList.toggle('active',active);x.setAttribute('aria-selected',active?'true':'false');});if($('aurumGuideLive'))$('aurumGuideLive').hidden=key!=='live';if($('aurumGuideLessons'))$('aurumGuideLessons').hidden=key!=='lessons';if($('aurumGuideManual'))$('aurumGuideManual').hidden=key!=='manual';}));
+$('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurumDetailFeedbackText')?.value.trim(),status=$('aurumDetailFeedbackStatus');if(!value){if(status)status.textContent='Tulis masukan terlebih dahulu.';return;}try{const rows=JSON.parse(localStorage.getItem('aurum.detail-feedback.v1')||'[]');rows.push({text:value,share:!!$('aurumDetailFeedbackShare')?.checked,createdAt:new Date().toISOString()});localStorage.setItem('aurum.detail-feedback.v1',JSON.stringify(rows.slice(-100)));$('aurumDetailFeedbackText').value='';if(status)status.textContent='Masukan tersimpan pada perangkat ini. Belum dikirim ke server AURUM.';}catch(e){if(status)status.textContent='Penyimpanan lokal tidak tersedia pada browser ini.';}});
+})();
+</script>
 </body>
 </html>
 
