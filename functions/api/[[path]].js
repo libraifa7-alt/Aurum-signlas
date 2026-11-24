@@ -1,3 +1,4 @@
+import marketHandler from "../../api/index.js";
 import signalsHandler from "../../api/signals.js";
 import fundamentalHandler from "../../api/fundamental.js";
 import pushSubscribeHandler from "../../api/push-subscribe.js";
@@ -62,7 +63,9 @@ export async function onRequest(context) {
     });
   }
 
-  const handler = handlers[route];
+  // Cloudflare Pages resolves /api through this catch-all function with an
+  // empty path parameter. Route the bare /api endpoint to the market handler.
+  const handler = route ? handlers[route] : marketHandler;
   if (!handler) {
     return Response.json({
       status: "error",
