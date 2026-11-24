@@ -3397,6 +3397,7 @@ body {
 
 
 <body id="top">
+<div id="aurumDebugStatus" hidden aria-hidden="true"></div>
 
 <!-- AURUM PREMIUM SPLASH SCREEN -->
 <div id="aurumSplash" class="aurum-splash">
@@ -3446,7 +3447,7 @@ body {
     <button type="button" class="aurum-header-action aurum-notification-action" id="aurumOpenNotifications" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg><i id="aurumNotificationDot"></i></button>
     <button type="button" class="aurum-header-action aurum-profile-action" id="aurumOpenProfile" aria-label="Profile">A</button>
   </div>
-  <div class="status">● CEK DEPLOY TERBARU</div>
+  <div class="status" role="status" aria-live="polite">● AURUM SIGNALS</div>
 
 </header>
   
@@ -4250,15 +4251,12 @@ body {
 <script>
 (function () {
   function initAurumNavigation() {
-    const navItems = document.querySelectorAll(
-      '.aurum-bottom-nav .nav-item'
-    );
-
+    const navItems = document.querySelectorAll('.aurum-bottom-nav .nav-item');
     const pages = document.querySelectorAll('.app-page');
+    const validPages = new Set(Array.from(pages, page => page.id));
 
-    function showPage(pageId) {
-      const targetPage = document.getElementById(pageId);
-      if (!targetPage) return;
+    function showPage(pageId, updateAddress) {
+      if (!validPages.has(pageId)) return;
       window.aurumShowPage = showPage;
 
       pages.forEach(function (page) {
@@ -4268,14 +4266,16 @@ body {
       navItems.forEach(function (item) {
         item.classList.toggle(
           'active',
-          item.dataset.page === pageId || (pageId === 'pnlPage' && item.dataset.page === 'homePage')
+          item.dataset.page === pageId ||
+            (pageId === 'pnlPage' && item.dataset.page === 'homePage')
         );
       });
 
-      window.scrollTo({
-        top: 0,
-        behavior: 'auto'
-      });
+      if (updateAddress !== false && window.location.hash !== '#' + pageId) {
+        window.history.pushState({ aurumPage: pageId }, '', '#' + pageId);
+      }
+
+      window.scrollTo({ top: 0, behavior: 'auto' });
 
       if (pageId === 'marketPage' || pageId === 'chartPage') {
         requestAnimationFrame(function () {
@@ -4287,18 +4287,22 @@ body {
     navItems.forEach(function (item) {
       item.addEventListener('click', function (event) {
         event.preventDefault();
-        showPage(this.dataset.page);
+        showPage(this.dataset.page, true);
       });
     });
 
-    showPage('homePage');
+    function restorePageFromAddress() {
+      const requestedPage = decodeURIComponent(window.location.hash.slice(1));
+      showPage(validPages.has(requestedPage) ? requestedPage : 'homePage', false);
+    }
+
+    window.addEventListener('hashchange', restorePageFromAddress);
+    window.addEventListener('popstate', restorePageFromAddress);
+    restorePageFromAddress();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener(
-      'DOMContentLoaded',
-      initAurumNavigation
-    );
+    document.addEventListener('DOMContentLoaded', initAurumNavigation, { once: true });
   } else {
     initAurumNavigation();
   }
@@ -4311,13 +4315,13 @@ body {
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 
 <script>
-document.querySelector('.status').textContent = 'TES SCRIPT TERPISAH BERHASIL';
+document.getElementById('aurumDebugStatus').textContent = 'TES SCRIPT TERPISAH BERHASIL';
 </script>
 
 <script>
 const aurumCandleCache = new Map();
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'SCRIPT UTAMA MULAI BERJALAN';
 
 console.log('CEK LOADCHART DIMULAI');
@@ -4328,7 +4332,7 @@ if (el && window.LightweightCharts) {
   console.log('MASUK KE BLOK GRAFIK');
   console.log('UKURAN AREA GRAFIK:', el.clientWidth, el.clientHeight);
 
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'UKURAN GRAFIK: ' + el.clientWidth + ' x ' + el.clientHeight;
 
   const chart = LightweightCharts.createChart(el, {
@@ -4925,13 +4929,13 @@ async function loadChart(interval) {
       window.aurumDisplayedSignalSymbol = symbol;
     }
     try {
-      document.querySelector('.status').textContent =
+      document.getElementById('aurumDebugStatus').textContent =
         'LOADCHART BERJALAN: ' + interval;
 
       
 console.log('SIMBOL YANG DIPILIH:', symbol);
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'PAIR DIPILIH: ' + symbol;
 
 const cacheKey = symbol + ':' + interval;
@@ -4949,7 +4953,7 @@ const response = useBrowserCache
     );
 
 if (response) {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'API HTTP: ' + response.status;
 }
 
@@ -4960,7 +4964,7 @@ if (useBrowserCache) {
   candles = cached.data;
   chartFeedMeta = { fromCache: true };
 
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'CACHE AKTIF | CANDLES: ' + candles.length;
 
 } else {
@@ -4981,14 +4985,14 @@ if (useBrowserCache) {
   };
   if (symbol === 'XAU/USD') updateLiveQuoteTrace(chartFeedMeta);
 
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'API STATUS: ' + data.status +
     ' | CANDLES: ' + (data.candles?.length || 0);
 
   if (data.status !== 'success' || !data.candles?.length) {
     console.log('Data grafik belum tersedia untuk', symbol, data);
     clearSelectedInstrumentView(symbol + ' · Data belum tersedia dari provider');
-    document.querySelector('.status').textContent = 'DATA ' + symbol + ' BELUM TERSEDIA';
+    document.getElementById('aurumDebugStatus').textContent = 'DATA ' + symbol + ' BELUM TERSEDIA';
     return;
   }
 
@@ -5120,14 +5124,14 @@ const hargaValid = candles.every(c =>
   Number.isFinite(c.close)
 );
 if (!waktuValid || !hargaValid) {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'DATA CANDLE TIDAK VALID | WAKTU: ' + waktuValid +
     ' | HARGA: ' + hargaValid;
   return;
   }
 const el = document.getElementById('candleChart');
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'AREA GRAFIK: ' + (el ? el.clientWidth : 'TIDAK ADA') +
   ' x ' + (el ? el.clientHeight : 'TIDAK ADA');
      
@@ -7115,17 +7119,17 @@ async function analyzeOrderBlockMultiTimeframe(requestedSymbol) {
   }
 }
       
-      document.querySelector('.status').textContent =
+      document.getElementById('aurumDebugStatus').textContent =
   'DATA CANDLE: ' + candles.length;
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'CANDLE SIAP: ' + candles.length;
 
 console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
 
 if (!candles || candles.length === 0) {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'CANDLE KOSONG';
 
   console.warn('TIDAK ADA DATA CANDLE');
@@ -7133,7 +7137,7 @@ if (!candles || candles.length === 0) {
 }
 
 try {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'MENGIRIM DATA KE GRAFIK...';
 
   console.log('JUMLAH CANDLE:', candles.length);
@@ -7150,11 +7154,11 @@ series.setData(candles);
 
 // Live spot is displayed by the dedicated quote trace above; avoid a duplicate price-line label.
 
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
 
 } catch (error) {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'ERROR SETDATA: ' + error.message;
 
   console.log('ERROR SETDATA:', error);
@@ -7659,7 +7663,7 @@ setInterval(async function() {
 
 } // Penutup blok IF
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'MEMUAT DATA CANDLE... | CHART: ' + !!window.LightweightCharts +
   ' | ELEMENT: ' + !!document.getElementById('candleChart');
 
