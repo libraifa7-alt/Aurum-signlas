@@ -707,3 +707,82 @@ test("education page exposes all six core lessons and honest live-class availabi
   }
   assert.ok(page.includes("<summary>Pelajari"));
 });
+
+
+test("fundamental endpoint exposes verified FRED macro observations with honest series labels", async () => {
+  const fundamentalHandler = require("../api/fundamental.js");
+  const originalFetch = global.fetch;
+  globalThis.aurumFundamentalCache = null;
+  const today = new Date().toISOString().slice(0, 10);
+  global.fetch = async url => {
+    const id = new URL(url).searchParams.get("id");
+    return {
+      ok: true,
+      async text() {
+        return id === "DGS10"
+          ? "observation_date,DGS10\\n" + today + ",4.25\\n"
+          : "observation_date,DTWEXBGS\\n" + today + ",119.5\\n";
+      }
+    };
+  };
+  try {
+    const res = responseRecorder();
+    await fundamentalHandler({ method: "GET" }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.payload.status, "success");
+    assert.equal(res.payload.results.us10y.value, 4.25);
+    assert.equal(res.payload.results.us10y.unit, "%");
+    assert.equal(res.payload.results.broadUsd.value, 119.5);
+    assert.match(res.payload.results.broadUsd.note, /bukan ICE.*DXY/i);
+    assert.equal(res.payload.results.broadUsd.seriesId, "DTWEXBGS");
+    assert.equal(res.headers["Cache-Control"], "no-store, max-age=0");
+  } finally {
+    global.fetch = originalFetch;
+    globalThis.aurumFundamentalCache = null;
+  }
+});
+
+test("fundamental endpoint marks stale or invalid FRED observations unavailable", async () => {
+  const fundamentalHandler = require("../api/fundamental.js");
+  const originalFetch = global.fetch;
+  globalThis.aurumFundamentalCache = null;
+  const stale = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  global.fetch = async url => {
+    const id = new URL(url).searchParams.get("id");
+    return {
+      ok: true,
+      async text() {
+        return id === "DGS10"
+          ? "observation_date,DGS10\\n" + stale + ",4.1\\n"
+          : "observation_date,DTWEXBGS\\nnot-a-date,120\\n";
+      }
+    };
+  };
+  try {
+    const res = responseRecorder();
+    await fundamentalHandler({ method: "GET" }, res);
+    assert.equal(res.payload.results.us10y.status, "unavailable");
+    assert.equal(res.payload.results.broadUsd.status, "unavailable");
+    assert.equal(res.payload.status, "success");
+  } finally {
+    global.fetch = originalFetch;
+    globalThis.aurumFundamentalCache = null;
+  }
+});
+
+test("fundamental endpoint rejects non-GET requests without fetching FRED", async () => {
+  const fundamentalHandler = require("../api/fundamental.js");
+  const originalFetch = global.fetch;
+  let called = false;
+  global.fetch = async () => { called = true; throw new Error("Must not fetch"); };
+  try {
+    const res = responseRecorder();
+    await fundamentalHandler({ method: "POST" }, res);
+    assert.equal(res.statusCode, 405);
+    assert.equal(res.payload.code, "METHOD_NOT_ALLOWED");
+    assert.equal(res.headers.Allow, "GET");
+    assert.equal(called, false);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
