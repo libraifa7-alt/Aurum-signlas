@@ -2,8 +2,16 @@
 
 // Readiness diagnostics for Aurum. Never return secret values to the client.
 module.exports = async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ status: 'error', message: 'Method not allowed' });
+  }
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
+
   const checks = {
-    marketApi: true,
+    marketApi: 'not_probed',
     cronSecret: Boolean(process.env.CRON_SECRET),
     redisConfigured: Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN),
     pushConfigured: Boolean(
@@ -37,8 +45,7 @@ module.exports = async function handler(req, res) {
   }
   checks.redis = redis;
 
-  const ready = checks.marketApi && checks.cronSecret &&
-    checks.redisConfigured && redis === 'connected';
+  const ready = checks.cronSecret && checks.redisConfigured && redis === 'connected';
 
   return res.status(200).json({
     status: ready ? 'ok' : 'degraded',
