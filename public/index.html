@@ -2531,6 +2531,23 @@ body {
 .aurum-signal-feed-result{font-size:10px;color:#9a7b36;font-weight:700}
 .aurum-signal-feed-empty{padding:18px 12px;border:1px dashed #dce3eb;border-radius:12px;text-align:center;color:#8490a0;font-size:12px;line-height:1.6}
 
+.aurum-detail-risk{appearance:none;width:100%;font:inherit;color:inherit;cursor:pointer;text-align:left;transition:border-color .15s,box-shadow .15s,transform .15s}
+.aurum-detail-risk.selected{border:2px solid #d6b34a!important;box-shadow:0 0 0 2px rgba(214,179,74,.12);transform:translateY(-1px)}
+.aurum-detail-risk:focus-visible{outline:2px solid #2388c7;outline-offset:2px}
+.aurum-map-risk-caption{font-size:10px;font-weight:800;letter-spacing:.7px;color:#8b7541;margin:0 0 5px}
+.aurum-strength-layout{display:flex;align-items:center;gap:14px;margin:8px 0 12px}
+.aurum-strength-gauge{--strength-score:0;width:112px;height:112px;flex:0 0 112px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#28bd79 calc(var(--strength-score)*1%),#edf0f4 0);position:relative}
+.aurum-strength-gauge:before{content:"";position:absolute;inset:9px;border-radius:50%;background:#fff}
+.aurum-strength-gauge>div{position:relative;z-index:1;text-align:center}
+.aurum-strength-gauge strong{display:block;font-size:23px;line-height:1.1}
+.aurum-strength-gauge small{display:block;font-size:8px;font-weight:900;letter-spacing:1px;margin-top:5px;color:#718096}
+.aurum-strength-gauge[data-level="moderate"]{background:conic-gradient(#d6b34a calc(var(--strength-score)*1%),#edf0f4 0)}
+.aurum-strength-gauge[data-level="weak"]{background:conic-gradient(#e45d66 calc(var(--strength-score)*1%),#edf0f4 0)}
+.aurum-strength-notes{display:grid;gap:6px;min-width:0}
+.aurum-strength-notes span{font-size:10px;font-weight:900;letter-spacing:.8px}
+.aurum-strength-notes small{font-size:10px;line-height:1.5;color:#7c8797}
+@media(max-width:380px){.aurum-strength-gauge{width:94px;height:94px;flex-basis:94px}.aurum-strength-gauge strong{font-size:19px}}
+
 </style>
 
 <style id="aurum-traxa-performance">
@@ -3711,8 +3728,7 @@ body {
       </div>
       <div class="aurum-detail-strength">
         <h3>KEKUATAN SINYAL</h3>
-        <strong id="aurumDetailStrength">--/100</strong>
-        <div class="aurum-detail-strength-bar"><span id="aurumDetailStrengthBar"></span></div>
+        <div class="aurum-strength-layout"><div class="aurum-strength-gauge" id="aurumDetailGauge"><div><strong id="aurumDetailStrength">--/100</strong><small id="aurumDetailStrengthLabel">MENUNGGU DATA</small></div></div><div class="aurum-strength-notes"><span>SKOR KEKUATAN SETUP</span><small>Struktur market, Order Block, konteks H4, dan keselarasan timeframe.</small></div></div>
         <ul id="aurumDetailReasons"></ul>
       </div>
       <p class="aurum-detail-disclaimer">Informasi ini berasal dari hasil pemindaian server AURUM. Bukan saran keuangan atau jaminan hasil trading.</p>
@@ -8625,7 +8641,8 @@ body.aurum-user-dark .app-page{background:transparent!important}
     const liveNode=document.getElementById('goldPrice');
     document.getElementById('aurumDetailLivePrice').textContent=liveNode&&liveNode.textContent.trim()&&liveNode.textContent.trim()!=='Memuat harga...'?liveNode.textContent.trim():'Harga live belum tersedia';
     document.getElementById('aurumDetailOutcome').textContent=outcomeLabel(cur.outcomeStatus||'WAITING_FOR_ENTRY').toUpperCase();
-    document.getElementById('aurumDetailRiskProfiles').innerHTML=profiles.map(p=>'<div class="aurum-detail-risk"><strong>'+safe(p.label||p.key||'RISK')+'</strong><small>'+safe(outcomeLabel(p.outcomeStatus))+'</small><small>Entry '+fmtDetail(p.entryLow)+'–'+fmtDetail(p.entryHigh)+'</small><small>SL '+fmtDetail(p.sl)+'</small><small>TP '+fmtDetail(p.tp1)+' / '+fmtDetail(p.tp2)+' / '+fmtDetail(p.tp3)+'</small></div>').join('')||'<div class="aurum-detail-risk">Profil risiko belum tersedia</div>';
+    const riskNode=document.getElementById('aurumDetailRiskProfiles');
+    riskNode.innerHTML=profiles.map(p=>'<button type="button" class="aurum-detail-risk" data-detail-risk="'+safe(String(p.key||p.label||'RISK'))+'" aria-pressed="false"><strong>'+safe(p.label||p.key||'RISK')+'</strong><small>'+safe(outcomeLabel(p.outcomeStatus||'WAITING_FOR_ENTRY'))+'</small><small>Entry '+fmtDetail(p.entryLow)+'–'+fmtDetail(p.entryHigh)+'</small><small>SL '+fmtDetail(p.sl)+'</small><small>TP '+fmtDetail(p.tp1)+' / '+fmtDetail(p.tp2)+' / '+fmtDetail(p.tp3)+'</small></button>').join('')||'<div class="aurum-detail-risk">Profil risiko belum tersedia</div>';
     const trendOrder=['M5','M15','M30','M45','H1','H4','D1'];
     const trends=cur.trends&&typeof cur.trends==='object'?cur.trends:{};
     document.getElementById('aurumDetailTrends').innerHTML=trendOrder.filter(tf=>trends[tf]).map(tf=>'<div class="aurum-detail-trend"><b>'+tf+'</b><span>'+safe(String(trends[tf]).replaceAll('_',' '))+'</span></div>').join('')||'<div class="aurum-detail-trend">Data struktur timeframe belum tersedia</div>';
@@ -8652,10 +8669,37 @@ body.aurum-user-dark .app-page{background:transparent!important}
       mapNode.classList.remove('aurum-price-map-visual');
       mapNode.textContent='Peta harga belum dapat ditampilkan karena level Trade Plan tidak lengkap.';
     }
+    const renderRiskProfile=profile=>{
+      if(!profile)return;
+      riskNode.querySelectorAll('[data-detail-risk]').forEach(button=>{
+        const active=button.dataset.detailRisk===String(profile.key||profile.label||'RISK');
+        button.classList.toggle('selected',active);button.setAttribute('aria-pressed',active?'true':'false');
+      });
+      document.getElementById('aurumDetailLevels').innerHTML=[['SL',profile.sl],['TP 1',profile.tp1],['TP 2',profile.tp2],['TP 3',profile.tp3]].map(x=>'<div class="aurum-detail-level"><small>'+x[0]+'</small><b>'+fmtDetail(x[1])+'</b></div>').join('');
+      const vals=[Number(profile.tp3),Number(profile.tp2),Number(profile.tp1),(Number(profile.entryLow)+Number(profile.entryHigh))/2,Number(profile.sl)];
+      const low=Number(profile.entryLow),high=Number(profile.entryHigh);
+      if(!vals.every(Number.isFinite)||!Number.isFinite(low)||!Number.isFinite(high))return;
+      const min=Math.min(...vals,low,high),max=Math.max(...vals,low,high),range=Math.max(max-min,.000001);
+      const y=v=>Math.round(22+(max-v)/range*198),top=y(Math.max(low,high)),bottom=y(Math.min(low,high));
+      const mapLabels=[['TP 3',vals[0],'#2997dc'],['TP 2',vals[1],'#2997dc'],['TP 1',vals[2],'#20a66b'],['ENTRY',vals[3],'#d5a72e'],['STOP LOSS',vals[4],'#e0525b']];
+      const liveText=(document.getElementById('aurumDetailLivePrice')?.textContent||'').replace(/[^0-9.,-]/g,'').replace(/,(?=.*[,])/g,'').replace(',','.');
+      const live=Number(liveText),liveOk=Number.isFinite(live)&&live>0&&live>=min&&live<=max;
+      mapNode.classList.add('aurum-price-map-visual');
+      mapNode.innerHTML='<div class="aurum-map-risk-caption">PROFIL '+safe(String(profile.label||profile.key||'RISK').toUpperCase())+' · '+safe(outcomeLabel(profile.outcomeStatus||'WAITING_FOR_ENTRY'))+'</div><svg viewBox="0 0 360 250" role="img" aria-label="Peta harga dengan zona Entry, Stop Loss dan Take Profit"><rect x="105" y="'+top+'" width="205" height="'+Math.max(8,bottom-top)+'" rx="8" fill="'+(cur.direction==='SELL'?'#fff0f0':'#e9f3ff')+'" stroke="'+(cur.direction==='SELL'?'#e87878':'#65a9e8')+'" stroke-width="1.5" stroke-dasharray="5 3"/><text x="207" y="'+Math.max(14,top+15)+'" text-anchor="middle" class="map-label">ZONA ENTRY</text>'+mapLabels.map(p=>'<line class="map-line" x1="105" x2="310" y1="'+y(p[1])+'" y2="'+y(p[1])+'" stroke="'+p[2]+'"/><circle cx="207" cy="'+y(p[1])+'" r="5" fill="'+p[2]+'" stroke="#fff" stroke-width="2"/><text x="12" y="'+(y(p[1])+4)+'" class="map-label">'+p[0]+'</text><text x="348" y="'+(y(p[1])+4)+'" text-anchor="end" class="map-value">'+fmtDetail(p[1])+'</text>').join('')+(liveOk?'<line x1="85" x2="325" y1="'+y(live)+'" y2="'+y(live)+'" stroke="#172033" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="207" cy="'+y(live)+'" r="5" fill="#172033"/><text x="85" y="'+(y(live)-7)+'" class="map-label">HARGA LIVE</text>':'')+'<text x="207" y="244" text-anchor="middle" class="map-label">LEVEL HARGA TRADE PLAN SERVER</text></svg>';
+    };
+    riskNode.querySelectorAll('[data-detail-risk]').forEach(button=>button.addEventListener('click',()=>{
+      const chosen=profiles.find(p=>String(p.key||p.label||'RISK')===button.dataset.detailRisk);
+      if(chosen)renderRiskProfile(chosen);
+    }));
+    const defaultRisk=profiles.find(p=>String(p.key||'').toUpperCase()==='MEDIUM')||profiles[1]||profiles[0];
+    if(defaultRisk)renderRiskProfile(defaultRisk);
     const strengthData=cur.signalStrength||{};
     const score=Number(strengthData.score);
-    document.getElementById('aurumDetailStrength').textContent=Number.isFinite(score)?fmtDetail(score)+'/100':'Belum tersedia';
-    document.getElementById('aurumDetailStrengthBar').style.width=Math.max(0,Math.min(100,Number.isFinite(score)?score:0))+'%';
+    document.getElementById('aurumDetailStrength').textContent=Number.isFinite(score)?Math.round(score)+'/100':'--/100';
+    const gauge=document.getElementById('aurumDetailGauge'),gaugeLabel=document.getElementById('aurumDetailStrengthLabel');
+    const safeScore=Math.max(0,Math.min(100,Number.isFinite(score)?score:0));
+    if(gauge){gauge.style.setProperty('--strength-score',safeScore);gauge.dataset.level=Number.isFinite(score)?(score>=75?'strong':score>=50?'moderate':'weak'):'unknown';}
+    if(gaugeLabel)gaugeLabel.textContent=Number.isFinite(score)?(score>=75?'KUAT':score>=50?'SEDANG':'BERISIKO'):'MENUNGGU DATA';
     document.getElementById('aurumDetailReasons').innerHTML=(Array.isArray(strengthData.reasons)?strengthData.reasons:[]).map(x=>'<li>'+safe(x)+'</li>').join('')||'<li>Alasan rinci belum tersedia dari server.</li>';
     panel.hidden=true;detailView.hidden=false;
     document.querySelectorAll('#marketPage > .aurum-asset-switch,#marketPage > .aurum-signal-summary,#marketPage > .aurum-signal-tabs,#marketPage > .aurum-signal-panel').forEach(n=>n.hidden=true);
