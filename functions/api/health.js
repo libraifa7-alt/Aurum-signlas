@@ -16,7 +16,12 @@ export async function onRequest(context) {
     setHeader(name, value) { headers.set(name, String(value)); },
     status(code) { statusCode = code; return this; },
     json(payload) {
-      response = Response.json(payload, { status: statusCode, headers });
+      response = Response.json({
+        ...payload,
+        app: "Aurum Signals AI",
+        api: "mounted",
+        host: "Cloudflare Pages"
+      }, { status: statusCode, headers });
       return response;
     }
   };
@@ -26,13 +31,19 @@ export async function onRequest(context) {
     if (result instanceof Response) return result;
     return response || Response.json({
       status: "error",
-      code: "EMPTY_HEALTH_RESPONSE"
+      code: "EMPTY_HEALTH_RESPONSE",
+      app: "Aurum Signals AI",
+      api: "mounted",
+      host: "Cloudflare Pages"
     }, { status: 502, headers });
   } catch (error) {
     console.error("AURUM Pages health API error:", error);
     return Response.json({
       status: "error",
-      message: "Health check gagal"
+      message: "Health check gagal",
+      app: "Aurum Signals AI",
+      api: "mounted",
+      host: "Cloudflare Pages"
     }, { status: 500, headers });
   }
 }
