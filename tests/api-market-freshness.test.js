@@ -148,3 +148,16 @@ test("frontend blocks signal generation unless backend marks candles fresh for e
   assert.ok(freshnessGate.includes("chartFeedMeta?.candleStatus === 'fresh_candles'"));
   assert.ok(!freshnessGate.includes("!== 'XAU/USD'"));
 });
+
+test("TRAXA-aligned Aurum destinations exist and unsupported partner features are disclosed", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  for (const pageId of [
+    "homePage", "marketDirectoryPage", "marketPage", "chartPage",
+    "newsPage", "chatPage", "guidePage", "pnlPage",
+    "partnerPage", "announcementsPage"
+  ]) {
+    assert.ok(html.includes('id="' + pageId + '"'), "Missing page: " + pageId);
+  }
+  assert.ok(html.includes("Pelacakan undangan, dashboard pendapatan, dan pembayaran komisi belum terhubung"));
+  assert.ok(html.includes("Belum ada pengumuman resmi"));
+});
