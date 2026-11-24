@@ -790,3 +790,71 @@ test("fundamental endpoint rejects non-GET requests without fetching FRED", asyn
     global.fetch = originalFetch;
   }
 });
+
+
+test("fundamental CSV parser skips missing values and rejects mismatched series headers", () => {
+  const { parseLatestObservation } = require("../api/fundamental.js");
+  assert.deepEqual(
+    parseLatestObservation("observation_date,DGS10\\n2026-11-20,.\\n2026-11-21,4.31\\n", "DGS10"),
+    { date: "2026-11-21", value: 4.31 }
+  );
+  assert.equal(
+    parseLatestObservation("observation_date,DTWEXBGS\\n2026-11-21,119.5\\n", "DGS10"),
+    null
+  );
+  assert.equal(
+    parseLatestObservation("observation_date,DGS10\\n2026-02-30,4.2\\n", "DGS10"),
+    null
+  );
+});
+
+test("fundamental endpoint keeps one valid macro series when the other provider request fails", async () => {
+  const fundamentalHandler = require("../api/fundamental.js");
+  const originalFetch = global.fetch;
+  globalThis.aurumFundamentalCache = null;
+  const today = new Date().toISOString().slice(0, 10);
+  global.fetch = async url => {
+    const id = new URL(url).searchParams.get("id");
+    if (id === "DGS10") throw new Error("Temporary FRED timeout");
+    return {
+      ok: true,
+      async text() { return "observation_date,DTWEXBGS\\n" + today + ",118.7\\n"; }
+    };
+  };
+  try {
+    const res = responseRecorder();
+    await fundamentalHandler({ method: "GET" }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.payload.results.us10y.status, "unavailable");
+    assert.equal(res.payload.results.broadUsd.status, "available");
+    assert.equal(res.payload.results.broadUsd.value, 118.7);
+  } finally {
+    global.fetch = originalFetch;
+    globalThis.aurumFundamentalCache = null;
+  }
+});
+
+test("fundamental endpoint rejects future-dated observations", async () => {
+  const fundamentalHandler = require("../api/fundamental.js");
+  const originalFetch = global.fetch;
+  globalThis.aurumFundamentalCache = null;
+  const future = new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10);
+  global.fetch = async url => {
+    const id = new URL(url).searchParams.get("id");
+    return {
+      ok: true,
+      async text() {
+        return "observation_date," + id + "\\n" + future + ",4.2\\n";
+      }
+    };
+  };
+  try {
+    const res = responseRecorder();
+    await fundamentalHandler({ method: "GET" }, res);
+    assert.equal(res.payload.results.us10y.status, "unavailable");
+    assert.equal(res.payload.results.broadUsd.status, "unavailable");
+  } finally {
+    global.fetch = originalFetch;
+    globalThis.aurumFundamentalCache = null;
+  }
+});
