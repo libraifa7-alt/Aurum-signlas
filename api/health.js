@@ -2,12 +2,13 @@
 
 // Readiness diagnostics for Aurum. Never return secret values to the client.
 module.exports = async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ status: 'error', message: 'Method not allowed' });
-  }
+  // Apply security/cache headers to both successful and rejected responses.
   if (typeof res.setHeader === 'function') {
     res.setHeader('Cache-Control', 'no-store, max-age=0');
     res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
+  if (req.method !== 'GET') {
+    return res.status(405).json({ status: 'error', message: 'Method not allowed' });
   }
 
   const checks = {
