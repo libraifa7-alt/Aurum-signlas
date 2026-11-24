@@ -7772,7 +7772,13 @@ console.log('STATUS SERVER DIPERIKSA');
   const enterButton = document.getElementById('aurumEnterButton');
   if (!splash || !enterButton) return;
 
-  if (localStorage.getItem('aurumSplashSeen') === 'true') {
+  let splashAlreadySeen = false;
+  try {
+    splashAlreadySeen = localStorage.getItem('aurumSplashSeen') === 'true';
+  } catch (_) {
+    // Private browsing or storage restrictions must not prevent app entry.
+  }
+  if (splashAlreadySeen) {
     splash.classList.add('hidden');
     splash.style.display = 'none';
     return;
@@ -7794,7 +7800,11 @@ console.log('STATUS SERVER DIPERIKSA');
   function enterDashboard() {
     if (splash.classList.contains('hidden')) return;
     stopSplashMusic();
-    localStorage.setItem('aurumSplashSeen', 'true');
+    try {
+      localStorage.setItem('aurumSplashSeen', 'true');
+    } catch (_) {
+      // The splash still closes for this visit when persistent storage is unavailable.
+    }
     splash.classList.add('hidden');
     setTimeout(function () { splash.style.display = 'none'; }, 750);
   }
