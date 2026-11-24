@@ -15,6 +15,19 @@ async function redis(command) {
   return body.result;
 }
 
+function parseSignalRecord(raw) {
+  if (typeof raw !== 'string' || !raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? parsed
+      : null;
+  } catch (_) {
+    // A damaged Redis record must not take down the whole signals response.
+    return null;
+  }
+}
+
 module.exports=async function handler(req,res){
   if (typeof res.setHeader === 'function') {
     res.setHeader('Cache-Control', 'no-store, max-age=0');
@@ -31,7 +44,7 @@ module.exports=async function handler(req,res){
       const history=await redis(['LRANGE','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','19']);
       return {
         symbol,
-        current:raw?JSON.parse(raw):null,
+        current:parseSignalRecord(raw),
         history:Array.isArray(history)?history.map(item=>{try{return JSON.parse(item)}catch{return null}}).filter(Boolean):[]
       };
     }));
