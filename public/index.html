@@ -8138,10 +8138,17 @@ console.log('STATUS SERVER DIPERIKSA');
         ? (hasFreshGoldQuote ? 'XAU/USD · LIVE '+new Date(data.livePriceUpdatedAt).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB' : 'XAU/USD · Harga candle terakhir')
         : symbol+' · '+(data.source || 'Data candle')+' · '+new Date(candles[candles.length-1].datetime).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB';
     }catch(e){
-      if(pairEl.value===symbol && String(priceEl.textContent||'').startsWith('Memuat')){
-        priceEl.textContent='--';
+      if(pairEl.value===symbol){
         const timeEl=document.getElementById('goldTime');
-        if(timeEl)timeEl.textContent=symbol+' · Data belum tersedia';
+        if(String(priceEl.textContent||'').startsWith('Memuat'))priceEl.textContent='--';
+        if(timeEl)timeEl.textContent=symbol+' · PEMBARUAN GAGAL · harga terakhir tidak diperbarui';
+        const marketState=document.querySelector('.aurum-market-state');
+        if(marketState){
+          marketState.textContent='● DATA TERTUNDA';
+          marketState.dataset.state='delayed';
+          marketState.title='Pembaruan grafik gagal: '+String(e.message||e);
+          marketState.style.color='#b7791f';
+        }
       }
       console.warn('AURUM setup live tick:',e);
     }
