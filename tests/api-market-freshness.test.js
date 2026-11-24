@@ -140,6 +140,11 @@ test("rejects Yahoo candles timestamped materially in the future", async () => {
 
 test("frontend blocks signal generation unless backend marks candles fresh for every asset", () => {
   const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
-  assert.match(html, /const signalDataIsFresh[\\s\\S]*?chartFeedMeta\\?\\.candleStatus === 'fresh_candles'/);
-  assert.doesNotMatch(html, /pair[^;]{0,100}!== 'XAU\\/USD'[\\s\\S]{0,100}candleStatus/);
+  const start = html.indexOf("const signalDataIsFresh");
+  const end = html.indexOf("const validTradePlan", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const freshnessGate = html.slice(start, end);
+  assert.ok(freshnessGate.includes("chartFeedMeta?.candleStatus === 'fresh_candles'"));
+  assert.ok(!freshnessGate.includes("!== 'XAU/USD'"));
 });
