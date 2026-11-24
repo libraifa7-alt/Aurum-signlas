@@ -701,4 +701,9 @@ test("education page exposes all six core lessons and honest live-class availabi
   }
   assert.ok(page.includes("Kelas langsung belum dijadwalkan"));
   assert.ok(page.includes("Pemutar video AURUM baru dapat diaktifkan setelah sumber video asli tersedia"));
+  assert.equal((page.match(/<details class="aurum-lesson-detail">/g) || []).length, 6);
+  for (const concept of ["higher high", "higher low", "BOS", "CHOCH", "liquidity sweep", "Bullish FVG", "Bearish FVG", "displacement", "invalidasi"]) {
+    assert.ok(page.toLowerCase().includes(concept.toLowerCase()), "Missing practical lesson detail: " + concept);
+  }
+  assert.ok(page.includes("<summary>Pelajari"));
 });
