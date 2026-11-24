@@ -3594,19 +3594,19 @@ body {
 
     <div class="home-menu-grid">
       <a href="#marketPage" class="home-menu-card"
-         onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=setup]')?.click(),80);return false;">
+         onclick="window.aurumShowPage?.('marketPage');document.querySelector('[data-signal-tab=setup]')?.click();return false;">
         <span class="home-menu-icon purple aurum-glow-icon">⚡</span>
         <span><strong>Sinyal</strong><small>Setup pasar terkini</small></span>
       </a>
 
       <a href="#marketPage" class="home-menu-card"
-         onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=performance]')?.click(),80);return false;">
+         onclick="window.aurumShowPage?.('marketPage');document.querySelector('[data-signal-tab=performance]')?.click();return false;">
         <span class="home-menu-icon teal aurum-glow-icon">▥</span>
         <span><strong>Performa</strong><small>Hasil dan win rate</small></span>
       </a>
 
       <a href="#marketPage" class="home-menu-card"
-         onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();setTimeout(()=>document.querySelector('[data-signal-tab=analysis]')?.click(),80);return false;">
+         onclick="window.aurumShowPage?.('marketPage');document.querySelector('[data-signal-tab=analysis]')?.click();return false;">
         <span class="home-menu-icon coral aurum-glow-icon">◉</span>
         <span><strong>Analisis</strong><small>Level kunci dan rentang</small></span>
       </a>
@@ -3657,6 +3657,7 @@ body {
         <span><strong>Edukasi</strong><small>Pelajaran dan cara memakai AURUM</small></span>
       </a>
 
+      <a href="#pnlPage" class="home-menu-card" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.();return false;"><span class="home-menu-icon teal aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Hasil paper tracking AURUM</small></span></a>
       <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenNotifications')?.click();return false;">
         <span class="home-menu-icon amber aurum-glow-icon">♟</span><span><strong>Notifikasi</strong><small>Atur peringatan yang diterima</small></span></a>
 
