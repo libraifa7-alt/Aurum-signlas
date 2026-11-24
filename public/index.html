@@ -3580,22 +3580,7 @@ body {
 
     <!-- HALAMAN SINYAL -->
   <section id="marketPage" class="app-page">
-    <!-- AURUM SERVER-SIDE SIGNALS -->
-    <section class="aurum-server-signals panel" id="aurumServerSignals" aria-live="polite">
-    <div class="aurum-server-head">
-      <div><strong>SERVER SIGNAL MONITOR</strong><small>Hasil pemindaian otomatis AURUM</small></div>
-      <span id="aurumServerState" class="aurum-server-state">MEMUAT…</span>
-    </div>
-    <div id="aurumServerSignalRows" class="aurum-server-rows">
-      <p class="aurum-server-muted">Mengambil hasil pemindaian server…</p>
-    </div>
-    <div class="aurum-server-history" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(148,163,184,.25)">
-      <strong style="display:block;font-size:12px;margin-bottom:8px">RIWAYAT SINYAL SERVER</strong>
-      <div id="aurumServerHistoryRows"><small class="aurum-server-muted">Belum ada sinyal tersimpan.</small></div>
-    </div>
-    <small id="aurumServerUpdated" class="aurum-server-updated">Menunggu pembaruan server</small>
-  </section>
-    <!-- END AURUM SERVER-SIDE SIGNALS -->
+
     <section id="aurumSignalDetailView" class="aurum-signal-detail-view" hidden aria-live="polite">
       <button type="button" id="aurumSignalDetailBack" class="aurum-detail-back">‹ Kembali ke daftar sinyal</button>
       <div class="aurum-detail-hero">
@@ -3686,6 +3671,22 @@ body {
         <p style="font-size:11px;opacity:.7;margin:10px 0 0">High/Medium/Low adalah variasi lebar zona entry dari Order Block yang sama; bukan tingkat keamanan atau probabilitas profit.</p>
       </div>
       <p class="aurum-disclaimer">Sinyal dan analisis hanya untuk informasi dan bukan saran keuangan. Trading dengan risiko Anda sendiri.</p>
+    <!-- AURUM SERVER-SIDE SIGNALS -->
+    <section class="aurum-server-signals panel" id="aurumServerSignals" aria-live="polite">
+    <div class="aurum-server-head">
+      <div><strong>SERVER SIGNAL MONITOR</strong><small>Hasil pemindaian otomatis AURUM</small></div>
+      <span id="aurumServerState" class="aurum-server-state">MEMUAT…</span>
+    </div>
+    <div id="aurumServerSignalRows" class="aurum-server-rows">
+      <p class="aurum-server-muted">Mengambil hasil pemindaian server…</p>
+    </div>
+    <div class="aurum-server-history" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(148,163,184,.25)">
+      <strong style="display:block;font-size:12px;margin-bottom:8px">RIWAYAT SINYAL SERVER</strong>
+      <div id="aurumServerHistoryRows"><small class="aurum-server-muted">Belum ada sinyal tersimpan.</small></div>
+    </div>
+    <small id="aurumServerUpdated" class="aurum-server-updated">Menunggu pembaruan server</small>
+  </section>
+    <!-- END AURUM SERVER-SIDE SIGNALS -->
     </section>
 
     <section class="aurum-signal-panel aurum-performance-panel" data-signal-panel="performance" role="tabpanel" hidden>
@@ -7898,6 +7899,12 @@ console.log('STATUS SERVER DIPERIKSA');
       '<path class="aurum-setup-line" d="'+d+'" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
   }
   let latestResults=[];
+  function renderCurrentInstrument(){
+    const activeSymbol=document.getElementById('pair')?.value||'XAU/USD';
+    const item=latestResults.find(x=>x.symbol===activeSymbol);
+    rows.innerHTML=item?card(item):'<p class="aurum-server-muted">Belum ada data server untuk instrumen ini.</p>';
+  }
+  document.getElementById('pair')?.addEventListener('change',renderCurrentInstrument);
   const detailView=document.getElementById('aurumSignalDetailView');
   function openSignalDetail(symbol){
     const item=latestResults.find(x=>x.symbol===symbol);
@@ -8491,10 +8498,11 @@ body.aurum-user-dark .app-page{background:transparent!important}
       const data=await response.json();
       if(!response.ok||data.status!=='success')throw new Error(data.message||'Server signal belum tersedia');
       latestResults=data.results||[];
-      rows.innerHTML=latestResults.map(card).join('')||'<p class="aurum-server-muted">Belum ada data sinyal.</p>';
+      renderCurrentInstrument();
       const historyNode=document.getElementById('aurumServerHistoryRows');
       if(historyNode){
-        const history=(data.results||[]).flatMap(item=>(item.history||[]).map(record=>({symbol:item.symbol,record})))
+        const activeSymbol=document.getElementById('pair')?.value||'XAU/USD';
+        const history=(data.results||[]).filter(item=>item.symbol===activeSymbol).flatMap(item=>(item.history||[]).map(record=>({symbol:item.symbol,record})))
           .sort((a,b)=>Date.parse(b.record.generatedAt||b.record.checkedAt||0)-Date.parse(a.record.generatedAt||a.record.checkedAt||0))
           .slice(0,12);
         historyNode.innerHTML=history.length?history.map(({symbol,record})=>{
