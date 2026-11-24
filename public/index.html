@@ -7451,8 +7451,7 @@ const signalFreshnessMs = ({
 }[document.getElementById('tf')?.value || 'M15'] || 2700000);
 const signalDataIsFresh = Number.isFinite(signalCandleAgeMs) &&
   signalCandleAgeMs >= -60000 && signalCandleAgeMs <= signalFreshnessMs &&
-  (document.getElementById('pair')?.value !== 'XAU/USD' ||
-    chartFeedMeta?.candleStatus === 'fresh_candles');
+  chartFeedMeta?.candleStatus === 'fresh_candles';
 const validTradePlan =
   tradePlan &&
   signalDataIsFresh &&
