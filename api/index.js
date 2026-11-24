@@ -1,6 +1,19 @@
 
 
 module.exports = async function handler(req, res) {
+  if (typeof res.setHeader === "function") {
+    res.setHeader("Cache-Control", "no-store, max-age=0");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+  }
+  if (req.method && req.method !== "GET") {
+    if (typeof res.setHeader === "function") res.setHeader("Allow", "GET");
+    return res.status(405).json({
+      status: "error",
+      code: "METHOD_NOT_ALLOWED",
+      message: "Market data endpoint hanya menerima GET"
+    });
+  }
+
   if (!globalThis.aurumCache) {
     globalThis.aurumCache = new Map();
   }
@@ -20,7 +33,8 @@ module.exports = async function handler(req, res) {
         Authorization: "Bearer " + redisToken,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(command)
+      body: JSON.stringify(command),
+      signal: AbortSignal.timeout(8000)
     });
 
     const result = await response.json();

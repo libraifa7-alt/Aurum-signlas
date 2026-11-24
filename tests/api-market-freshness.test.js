@@ -69,12 +69,33 @@ async function requestMarket(symbol, interval, fetchImpl) {
   global.fetch = fetchImpl;
   try {
     const res = responseRecorder();
-    await handler({ query: { symbol, interval } }, res);
+    await handler({ method: "GET", query: { symbol, interval } }, res);
     return res;
   } finally {
     global.fetch = originalFetch;
   }
 }
+
+test("rejects non-GET market requests before contacting providers", async () => {
+  globalThis.aurumCache = new Map();
+  const originalFetch = global.fetch;
+  let fetchCalled = false;
+  global.fetch = async () => {
+    fetchCalled = true;
+    throw new Error("Provider must not be called for a non-GET request");
+  };
+  try {
+    const res = responseRecorder();
+    await handler({ method: "POST", query: { symbol: "XAU/USD", interval: "M15" } }, res);
+    assert.equal(res.statusCode, 405);
+    assert.equal(res.payload.code, "METHOD_NOT_ALLOWED");
+    assert.equal(res.headers.Allow, "GET");
+    assert.equal(res.headers["Cache-Control"], "no-store, max-age=0");
+    assert.equal(fetchCalled, false);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
 
 test("rejects unsupported market symbols before contacting providers", async () => {
   let fetchCalled = false;
