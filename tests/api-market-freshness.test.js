@@ -683,7 +683,7 @@ test("fundamental page does not fabricate unavailable DXY, Treasury, news, or ca
   assert.ok(page.includes("bukan ICE DXY"));
   assert.ok(page.includes('id="aurumFundamentalUs10y"'));
   assert.ok(page.includes("DGS10"));
-  assert.ok(page.includes("fetch('/api/fundamental'"));
+  assert.ok(html.includes("fetch('/api/fundamental'"));
   assert.match(page, /Belum ada penyedia berita ekonomi yang terhubung/);
   assert.match(page, /Kalender ekonomi belum terhubung ke penyedia data/);
   assert.ok(html.includes("fetch('/api/signals'"));
@@ -724,8 +724,8 @@ test("fundamental endpoint exposes verified FRED macro observations with honest 
       ok: true,
       async text() {
         return id === "DGS10"
-          ? "observation_date,DGS10\\n" + today + ",4.25\\n"
-          : "observation_date,DTWEXBGS\\n" + today + ",119.5\\n";
+          ? "observation_date,DGS10\n" + today + ",4.25\n"
+          : "observation_date,DTWEXBGS\n" + today + ",119.5\n";
       }
     };
   };
@@ -757,8 +757,8 @@ test("fundamental endpoint marks stale or invalid FRED observations unavailable"
       ok: true,
       async text() {
         return id === "DGS10"
-          ? "observation_date,DGS10\\n" + stale + ",4.1\\n"
-          : "observation_date,DTWEXBGS\\nnot-a-date,120\\n";
+          ? "observation_date,DGS10\n" + stale + ",4.1\n"
+          : "observation_date,DTWEXBGS\nnot-a-date,120\n";
       }
     };
   };
