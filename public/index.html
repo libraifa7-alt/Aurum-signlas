@@ -3301,6 +3301,61 @@ body {
 @media(max-width:390px){.aurum-detail-risk-grid{gap:5px}.aurum-detail-risk{padding:8px 3px}.aurum-detail-levels{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 
+<style id="aurum-traxa-reference-detail-pass">
+/* TRAXA reference pass: signal detail hierarchy and compact mobile market cards */
+#aurumSignalDetailView{max-width:480px;margin:10px auto 22px;padding:14px;border-radius:19px;background:#fff;box-shadow:0 10px 28px rgba(32,45,66,.07)}
+#aurumSignalDetailView .aurum-detail-back{display:block;font-size:12px;font-weight:800;color:#687487;padding:7px 0 13px}
+#aurumSignalDetailView .aurum-detail-hero{padding:22px 13px 18px;border:1px solid #dce8f3;border-radius:15px;background:linear-gradient(155deg,#f3faff,#fff 72%);text-align:center}
+#aurumDetailInstrument{font-size:10px;letter-spacing:1.5px;color:#718096}
+#aurumDetailTimeframe{display:block;margin:5px 0 8px;color:#8a95a5;font-size:10px;font-weight:800;letter-spacing:1px}
+#aurumSignalDetailView .aurum-detail-hero h2{margin:7px 0 12px;font-size:22px;font-weight:900;letter-spacing:.5px;color:#18a477}
+#aurumSignalDetailView .aurum-detail-hero h2.sell{color:#d9535f}
+#aurumSignalDetailView .aurum-detail-hero p{font-size:10px;letter-spacing:1.5px;color:#8b95a4}
+#aurumSignalDetailView #aurumDetailEntry{font-size:clamp(29px,8vw,39px);line-height:1.15;letter-spacing:-1.1px}
+#aurumSignalDetailView #aurumDetailUpdated{display:block;margin-top:10px}
+#aurumSignalDetailView .aurum-detail-status{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:12px}
+#aurumSignalDetailView .aurum-detail-status span{display:inline-flex;padding:6px 10px;border-radius:20px;background:#eef5f7;color:#758497;font-size:9px;font-weight:900;letter-spacing:.5px}
+#aurumSignalDetailView .aurum-detail-status span:first-child{background:#e8f7ef;color:#19865f}
+#aurumSignalDetailView .aurum-detail-live{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;padding:13px 14px;border:1px solid #dce7f3;border-radius:12px;background:#f7fbff}
+#aurumSignalDetailView .aurum-detail-live small{font-size:9px;font-weight:900;letter-spacing:1px;color:#8290a2}
+#aurumSignalDetailView .aurum-detail-live strong{display:block;margin-top:5px;font-size:20px;letter-spacing:-.3px;color:#26364c}
+#aurumSignalDetailView .aurum-detail-context{margin-top:12px;padding:14px;border:1px solid #e4e9ef;border-radius:13px;background:#fff}
+#aurumSignalDetailView .aurum-detail-context h3,#aurumSignalDetailView .aurum-detail-map h3,#aurumSignalDetailView .aurum-detail-strength h3{font-size:12px;font-weight:900;letter-spacing:1.1px;color:#202b3c;margin:0 0 12px}
+#aurumSignalDetailView .aurum-detail-trends{display:grid;gap:6px}
+#aurumSignalDetailView .aurum-detail-trend{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;border:1px solid #e8edf2;border-radius:9px;background:#fbfcfe;font-size:11px}
+#aurumSignalDetailView .aurum-detail-trend b{color:#273449;font-size:11px}
+#aurumSignalDetailView .aurum-detail-trend span{font-weight:700;color:#687487;text-align:right}
+#aurumSignalDetailView .aurum-detail-orderblocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:9px}
+#aurumSignalDetailView .aurum-detail-orderblocks>div{padding:10px;border:1px solid #eadfbe;border-radius:10px;background:#fcfaf4;min-width:0}
+#aurumSignalDetailView .aurum-detail-orderblocks small{display:block;font-size:8px;color:#8c805f;letter-spacing:.5px}
+#aurumSignalDetailView .aurum-detail-orderblocks b{display:block;margin-top:5px;font-size:10px;color:#4b4b45;overflow-wrap:anywhere}
+#aurumSignalDetailView .aurum-detail-risk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}
+#aurumSignalDetailView .aurum-detail-risk{padding:10px 7px;border:1px solid #e8d4d4;border-radius:11px;background:#fff8f8;text-align:left}
+#aurumSignalDetailView .aurum-detail-risk:nth-child(2){border-color:#e9dfbd;background:#fffdf5}
+#aurumSignalDetailView .aurum-detail-risk:nth-child(3){border-color:#cfe8dc;background:#f6fffa}
+#aurumSignalDetailView .aurum-detail-risk strong{font-size:10px;color:#30394a;white-space:normal}
+#aurumSignalDetailView .aurum-detail-risk small{display:block;margin-top:5px;font-size:9px;line-height:1.45;color:#687487;overflow-wrap:anywhere}
+#aurumSignalDetailView .aurum-detail-levels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0}
+#aurumSignalDetailView .aurum-detail-level{padding:10px 11px;border:1px solid #e3e8ef;border-radius:10px;background:#f7fbff}
+#aurumSignalDetailView .aurum-detail-level:first-child{background:#fff7f7;border-color:#f0d4d5}
+#aurumSignalDetailView .aurum-detail-level small{font-size:9px;font-weight:900;letter-spacing:.6px}
+#aurumSignalDetailView .aurum-detail-level b{font-size:13px;color:#273449}
+#aurumSignalDetailView .aurum-detail-map,#aurumSignalDetailView .aurum-detail-strength{margin-top:12px;padding:14px;border:1px solid #e4e9ef;border-radius:13px;background:#fff}
+#aurumSignalDetailView .aurum-detail-map-track.aurum-price-map-visual{display:block;overflow:hidden;width:100%}
+#aurumSignalDetailView .aurum-price-map-visual svg{width:100%;height:auto;min-height:235px}
+#aurumSignalDetailView .aurum-detail-strength>strong{font-size:27px;color:#202b3c;letter-spacing:-.5px}
+#aurumSignalDetailView .aurum-detail-strength-bar{height:9px;margin:10px 0 12px;background:#edf1f5}
+#aurumSignalDetailView .aurum-detail-strength-bar span{background:#d7b344}
+#aurumSignalDetailView .aurum-detail-strength ul{padding-left:19px;margin:8px 0 0;font-size:12px;line-height:1.7;color:#59677d}
+#aurumSignalDetailView .aurum-detail-disclaimer{margin:12px 2px 0;font-size:10px;line-height:1.6;color:#8993a2}
+@media(max-width:390px){
+ #aurumSignalDetailView{padding:11px}
+ #aurumSignalDetailView .aurum-detail-risk-grid{gap:5px}
+ #aurumSignalDetailView .aurum-detail-risk{padding:8px 5px}
+ #aurumSignalDetailView .aurum-detail-risk small{font-size:8px}
+ #aurumSignalDetailView .aurum-detail-orderblocks{gap:5px}
+}
+</style>
 </head>
   
   
@@ -3635,6 +3690,7 @@ body {
       <button type="button" id="aurumSignalDetailBack" class="aurum-detail-back">‹ Kembali ke daftar sinyal</button>
       <div class="aurum-detail-hero">
         <small id="aurumDetailInstrument">INSTRUMEN</small>
+        <span id="aurumDetailTimeframe">ANALISIS MULTI-TIMEFRAME</span>
         <h2 id="aurumDetailDirection">BUY</h2>
         <p id="aurumDetailEntryCaption">ZONA ENTRY</p>
         <strong id="aurumDetailEntry">--</strong>
