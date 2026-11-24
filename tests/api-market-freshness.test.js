@@ -161,3 +161,24 @@ test("TRAXA-aligned Aurum destinations exist and unsupported partner features ar
   assert.ok(html.includes("Pelacakan undangan, dashboard pendapatan, dan pembayaran komisi belum terhubung"));
   assert.ok(html.includes("Belum ada pengumuman resmi"));
 });
+
+test("navigation restores deep links, supports browser history, and safely falls back on malformed hashes", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  const start = html.indexOf("function initAurumNavigation()");
+  const end = html.indexOf("</script>", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+  const navigation = html.slice(start, end);
+  assert.ok(navigation.includes("window.history.pushState"));
+  assert.ok(navigation.includes("window.addEventListener('hashchange', restorePageFromAddress)"));
+  assert.ok(navigation.includes("window.addEventListener('popstate', restorePageFromAddress)"));
+  assert.ok(navigation.includes("validPages.has(requestedPage) ? requestedPage : 'homePage'"));
+  assert.ok(navigation.includes("catch (_)"));
+});
+
+test("internal chart diagnostics never overwrite the customer-facing Aurum status", () => {
+  const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
+  assert.equal((html.match(/id="aurumDebugStatus"/g) || []).length, 1);
+  assert.ok(html.includes('<div class="status" role="status" aria-live="polite">● AURUM SIGNALS</div>'));
+  assert.ok(!html.includes("document.querySelector('.status')"));
+});
