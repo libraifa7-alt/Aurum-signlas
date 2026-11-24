@@ -8594,7 +8594,7 @@ body.aurum-user-dark .app-page{background:transparent!important}
       const r=x.record,p=r.tradePlan||{},when=r.generatedAt||r.checkedAt;
       const date=when?new Date(when).toLocaleString('id-ID'):'Waktu tidak tersedia';
       const direction=r.direction==='SELL'?'sell':'';
-      const tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'Setup terkonfirmasi';
+      const tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'M15';
       return '<button type="button" class="aurum-signal-feed-card" data-aurum-signal-index="'+index+'">'+
         '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-name">'+safe(names[x.symbol]||x.symbol)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+safe(r.direction)+'</b></span>'+
         '<span class="aurum-signal-feed-meta"><span>'+safe(tf)+'</span><span>'+safe(date)+'</span></span>'+
@@ -8612,9 +8612,11 @@ body.aurum-user-dark .app-page{background:transparent!important}
     const selected=detailRecords[Number(index)];
     if(!selected||!selected.record)return;
     const symbol=selected.symbol,cur=selected.record,plan=cur.tradePlan||{},profiles=Array.isArray(cur.riskProfiles)?cur.riskProfiles:[];
-    const fmtDetail=v=>Number.isFinite(Number(v))?Number(v).toFixed(2):'--';
+    const fmtDetail=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v).toFixed(2):'--';
     const name=names[symbol]||symbol;
-    document.getElementById('aurumDetailInstrument').textContent=name;
+    document.getElementById('aurumDetailInstrument').textContent=name+' · '+symbol;
+    const detailTf=cur.timeframe||cur.signalTimeframe||cur.triggerTimeframe||'M15';
+    document.getElementById('aurumDetailTimeframe').textContent=detailTf+' · ANALISIS MULTI-TIMEFRAME';
     const direction=document.getElementById('aurumDetailDirection');
     direction.textContent=cur.direction||'SIGNAL';direction.className=cur.direction==='SELL'?'sell':'';
     document.getElementById('aurumDetailDirectionCaption').textContent='ARAH '+(cur.direction||'SIGNAL');
