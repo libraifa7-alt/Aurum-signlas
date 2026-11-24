@@ -8231,8 +8231,8 @@ main {
   width: min(100%, 570px);
   left: 50%;
   transform: translateX(-50%);
-  min-height: 64px;
-  padding: 5px 6px;
+  min-height: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding: 5px 6px calc(5px + env(safe-area-inset-bottom, 0px));
   gap: 3px;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   border-radius: 18px 18px 0 0;
@@ -8240,13 +8240,14 @@ main {
 .aurum-bottom-nav .nav-item { min-height: 48px; gap: 3px; padding: 4px 1px; }
 .aurum-bottom-nav .nav-item span { width: 26px; height: 24px; font-size: 18px; }
 .aurum-bottom-nav .nav-item small { font-size: 8px; }
-body { padding-bottom: 70px; }
+body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
 @media (max-width: 479px) {
-  header, main, .aurum-bottom-nav { width: min(84vw, 570px); }
-  header { padding: 8px 7px; }
-  header .brand { font-size: 11px; letter-spacing: 0; }
-  header .status { font-size: 6px; padding: 5px 6px; }
-  main { padding-left: 0; padding-right: 0; }
+  /* Use the available phone width; the previous 84vw rule squeezed every page. */
+  header, main, .aurum-bottom-nav { width: 100%; }
+  header { padding: 8px 12px; }
+  header .brand { font-size: 13px; letter-spacing: 0; }
+  header .status { font-size: 7px; padding: 5px 7px; }
+  main { padding: 8px 12px 22px; }
   #homePage .aurum-home-hero-v2 { min-height: 300px; }
   .aurum-session-clock { width: 194px; height: 194px; }
   .aurum-clock-face { width: 182px; height: 182px; }
@@ -8297,7 +8298,8 @@ header .brand{
 }
 @media (prefers-reduced-motion:reduce){
   .aurum-live-ticker .ticker-track{
-    animation:aurumTickerScroll 24s linear infinite !important;
+    animation:none !important;
+    transform:none !important;
   }
 }
 </style>
