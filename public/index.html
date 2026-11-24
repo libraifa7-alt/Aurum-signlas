@@ -3585,7 +3585,7 @@ body {
 <div class="aurum-home-feature-grid">
 <button type="button" class="aurum-home-feature" onclick="document.querySelector('.nav-item[data-page=guidePage]').click()"><span class="home-menu-icon green-icon aurum-glow-icon">▱</span><span><strong>Kelas</strong><small>Pelajaran dan panduan aplikasi</small></span><em>BARU</em></button>
 <button type="button" class="aurum-home-feature" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.()"><span class="home-menu-icon blue aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Jurnal sinyal paper di perangkat ini</small></span><em>JURNAL</em></button>
-<button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="document.getElementById('aurumOpenProfile')?.click()"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
+<button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="window.aurumShowPage?.('partnerPage')"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
 </div></section>
 <!-- TRADING MENU -->
   <section class="home-section">
@@ -3638,7 +3638,7 @@ body {
         <strong>Telegram</strong>
       </a>
 
-      <a href="#homePage" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
+      <a href="#partnerPage" onclick="window.aurumShowPage?.('partnerPage');return false;">
         <span class="community-icon amber aurum-glow-icon">♧</span>
         <strong>Undang teman</strong>
       </a>
@@ -3652,6 +3652,11 @@ body {
     </div>
 
     <div class="home-tools-grid">
+      <a href="#announcementsPage" class="home-menu-card" onclick="window.aurumShowPage?.('announcementsPage');return false;">
+        <span class="home-menu-icon amber aurum-glow-icon">▤</span>
+        <span><strong>Pengumuman</strong><small>Informasi dan pembaruan AURUM</small></span>
+      </a>
+
       <a href="#guidePage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
         <span class="home-menu-icon green-icon aurum-glow-icon">▶</span>
@@ -4039,6 +4044,43 @@ body {
       </div>
       <h3>RIWAYAT PAPER TRACKING</h3><div id="aurumPnlHistory" class="aurum-pnl-history"><p class="sub">Belum ada riwayat.</p></div>
       <p class="sub">Hasil dihitung dari pemantauan candle oleh AURUM di browser ini. Sinyal yang belum selesai dan candle ambigu tidak dimasukkan ke hasil bersih.</p>
+    </section>
+  </section>
+
+  <!-- HALAMAN PARTNER -->
+  <section id="partnerPage" class="app-page">
+    <section class="panel" style="margin-top:14px;padding:16px;border-radius:18px">
+      <button type="button" class="aurum-detail-back" onclick="window.aurumShowPage?.('homePage')">‹ Kembali ke Dashboard</button>
+      <div style="padding:22px 16px;border-radius:16px;background:radial-gradient(circle at 50% 0%,rgba(181,138,53,.24),transparent 55%),linear-gradient(145deg,#090b12,#1c1b17);color:#f8f5ed;text-align:center;border:1px solid rgba(181,138,53,.42)">
+        <div style="width:58px;height:58px;margin:0 auto 12px;border:1px solid rgba(231,190,91,.65);border-radius:50%;display:grid;place-items:center;color:#e8c46c;font-size:26px">♧</div>
+        <small style="color:#d7b65f;letter-spacing:2px;font-weight:800">AURUM COMMUNITY</small>
+        <h2 style="margin:9px 0;color:#fff">PROGRAM PARTNER</h2>
+        <p style="max-width:360px;margin:0 auto;color:#d7d5ce;font-size:12px;line-height:1.7">Bagikan AURUM Signals AI kepada teman dan komunitas trading Anda.</p>
+        <button type="button" id="aurumPartnerShare" style="width:100%;margin-top:20px;padding:13px;border:0;border-radius:10px;background:linear-gradient(90deg,#d4a83f,#f2d98a);color:#211b0e;font-weight:800">BAGIKAN AURUM</button>
+      </div>
+      <h3 style="margin:18px 0 10px">DASHBOARD PARTNER</h3>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px">
+        <div class="signal"><small class="sub">UNDANGAN TERVERIFIKASI</small><strong style="display:block;font-size:22px">—</strong><small class="sub">Menunggu sistem referral</small></div>
+        <div class="signal"><small class="sub">KOMISI PARTNER</small><strong style="display:block;font-size:22px">—</strong><small class="sub">Belum diaktifkan</small></div>
+      </div>
+      <div class="signal" style="margin-top:12px">
+        <strong>STATUS PROGRAM</strong>
+        <p class="sub" style="margin-bottom:0">Tautan berbagi AURUM dapat digunakan. Pelacakan undangan, dashboard pendapatan, dan pembayaran komisi belum terhubung ke backend partner resmi. Angka referral atau komisi tidak akan dibuat-buat.</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- HALAMAN PENGUMUMAN -->
+  <section id="announcementsPage" class="app-page">
+    <section class="panel" style="margin-top:14px;padding:16px;border-radius:18px">
+      <button type="button" class="aurum-detail-back" onclick="window.aurumShowPage?.('homePage')">‹ Kembali ke Dashboard</button>
+      <h2 style="margin:4px 0 6px">PENGUMUMAN AURUM</h2>
+      <p class="sub">Pusat informasi layanan, pembaruan aplikasi, dan pemberitahuan komunitas.</p>
+      <div class="signal" style="margin-top:14px;padding:20px;text-align:center">
+        <div style="font-size:30px;color:#b58a35">▤</div>
+        <strong>Belum ada pengumuman resmi</strong>
+        <p class="sub" style="margin-bottom:0">Pengumuman akan ditampilkan di sini setelah kanal publikasi AURUM terhubung. Informasi yang belum diterbitkan tidak akan ditampilkan sebagai berita resmi.</p>
+      </div>
     </section>
   </section>
 
@@ -8911,6 +8953,27 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 })();
 </script>
 
+<script id="aurum-partner-share">
+(function(){
+  var button=document.getElementById('aurumPartnerShare');
+  if(!button)return;
+  button.addEventListener('click',async function(){
+    var inviteUrl=window.location.origin+window.location.pathname;
+    try{
+      if(navigator.share){
+        await navigator.share({title:'AURUM Signals AI',text:'Mari lihat AURUM Signals AI.',url:inviteUrl});
+      }else if(navigator.clipboard&&navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(inviteUrl);
+        button.textContent='✓ TAUTAN AURUM DISALIN';
+      }else{
+        window.prompt('Salin tautan AURUM:',inviteUrl);
+      }
+    }catch(error){
+      if(error&&error.name!=='AbortError')button.textContent='TAUTAN BELUM DAPAT DIBAGIKAN';
+    }
+  });
+})();
+</script>
 </body>
 </html>
 
