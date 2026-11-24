@@ -278,7 +278,7 @@ test("the first-visit splash screen has a working dashboard entry control", () =
 
 test("every visible navigation destination resolves to one unique app page", () => {
   const html = fs.readFileSync(require.resolve("../public/index.html"), "utf8");
-  const pageIds = [...html.matchAll(/<section\\b[^>]*\\bid=["']([^"']+)["'][^>]*class=["'][^"']*\\bapp-page\\b[^"']*["'][^>]*>/g)]
+  const pageIds = [...html.matchAll(/<section\b[^>]*\bid=["']([^"']+)["'][^>]*class=["'][^"']*\bapp-page\b[^"']*["'][^>]*>/g)]
     .map(match => match[1]);
   const navTargets = [...html.matchAll(/data-page=["']([^"']+)["']/g)]
     .map(match => match[1]);
