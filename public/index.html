@@ -332,7 +332,7 @@ footer{
   width: 100%;
   min-height: 72px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: center;
   gap: 5px;
   padding: 8px 8px;
@@ -8365,6 +8365,11 @@ body.aurum-user-dark .app-page{background:transparent!important}
     if(n<3600)return Math.floor(n/60)+' mnt';
     return Math.floor(n/3600)+' jam '+Math.floor(n%3600/60)+' mnt';
   }
+  function outcomeLabel(value){
+    const labels={WAITING_FOR_ENTRY:'Menunggu Entry',OPEN:'Posisi Terbuka',TP1:'Target 1 Tercapai',TP2:'Target 2 Tercapai',TP3:'Target 3 Tercapai',SL:'Stop Loss',SL_AFTER_TP1:'SL setelah TP1',SL_AFTER_TP2:'SL setelah TP2',TARGET_HIT:'Target Tercapai',COMPLETED:'Selesai',WAIT:'Menunggu setup'};
+    const key=String(value||'WAITING_FOR_ENTRY');
+    return labels[key]||key.replaceAll('_',' ');
+  }
   function card(item){
     const cur=item.current||{};
     const status=cur.status||'NO DATA';
@@ -8383,7 +8388,7 @@ body.aurum-user-dark .app-page{background:transparent!important}
       ? '<small class="aurum-server-muted">Kekuatan sinyal: '+fmt(cur.signalStrength.score)+'/100'+(Array.isArray(cur.signalStrength.reasons)?' · '+safe(cur.signalStrength.reasons.join(' | ')):'')+'</small>'
       : '';
     const profiles=Array.isArray(cur.riskProfiles)?cur.riskProfiles.map(p=>
-      safe(p.label||p.key)+': '+safe(p.outcomeStatus||'WAITING_FOR_ENTRY')+' · Entry '+fmt(p.entryLow)+'–'+fmt(p.entryHigh)+' · SL '+fmt(p.sl)+' · TP '+fmt(p.tp1)+'/'+fmt(p.tp2)+'/'+fmt(p.tp3)
+      safe(p.label||p.key)+': '+safe(outcomeLabel(p.outcomeStatus))+' · Entry '+fmt(p.entryLow)+'–'+fmt(p.entryHigh)+' · SL '+fmt(p.sl)+' · TP '+fmt(p.tp1)+'/'+fmt(p.tp2)+'/'+fmt(p.tp3)
     ).join(' | '):'';
     const riskLine=profiles?'<small class="aurum-server-muted">Profil risiko: '+profiles+'</small>':'';
     const contextualStale=Array.isArray(cur.contextualTimeframesStale)&&cur.contextualTimeframesStale.length
@@ -8410,7 +8415,7 @@ body.aurum-user-dark .app-page{background:transparent!important}
             '<span><b>'+safe(names[symbol]||symbol)+'</b> <b class="'+(record.direction==='BUY'?'buy':'sell')+'">'+safe(record.direction||'SIGNAL')+'</b></span>'+
             '<small class="aurum-server-muted">'+(when?safe(new Date(when).toLocaleString('id-ID')):'')+'</small>'+
             '<small class="aurum-server-muted" style="width:100%">Entry '+fmt(plan.entryLow)+'–'+fmt(plan.entryHigh)+' · SL '+fmt(plan.sl)+' · TP '+fmt(plan.tp1)+' / '+fmt(plan.tp2)+' / '+fmt(plan.tp3)+'</small>'+
-            '<small class="aurum-server-muted" style="width:100%">Status: '+safe(record.outcomeStatus||'WAITING_FOR_ENTRY')+' · '+safe((record.riskProfiles||[]).map(p=>(p.label||p.key)+': '+(p.outcomeStatus||'WAITING_FOR_ENTRY')).join(' | '))+'</small></div>';
+            '<small class="aurum-server-muted" style="width:100%">Status: '+safe(outcomeLabel(record.outcomeStatus))+' · '+safe((record.riskProfiles||[]).map(p=>(p.label||p.key)+': '+outcomeLabel(p.outcomeStatus)).join(' | '))+'</small></div>';
         }).join(''):'<small class="aurum-server-muted">Belum ada sinyal valid yang tercatat. Sinyal WAIT tidak dimasukkan ke riwayat.</small>';
       }
       state.textContent='SERVER TERHUBUNG';state.className='aurum-server-state ok';
