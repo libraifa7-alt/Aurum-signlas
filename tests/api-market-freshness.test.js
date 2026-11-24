@@ -891,7 +891,7 @@ test("education tabs connect live class, lesson catalog, and app manual panels",
   }
   assert.ok(behavior.includes("document.querySelectorAll('[data-guide-tab]').forEach"));
   assert.ok(behavior.includes("x.setAttribute('aria-selected',active?'true':'false')"));
-  assert.ok(behavior.includes("x.hidden=key!=="));
+  assert.ok(behavior.includes(".hidden=key!=="));
 });
 
 test("chat form and suggested prompts are wired to the same local assistant", () => {
