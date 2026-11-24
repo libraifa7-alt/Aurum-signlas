@@ -8942,7 +8942,7 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
     }).join('\n')+'\n\nData diambil dari API sinyal AURUM. Periksa waktu pembaruan dan chart sebelum mengambil keputusan.';
    }catch(e){return 'Saya belum dapat mengambil status sinyal: '+e.message+'. Coba lagi setelah server tersedia.';}
   }
-  const found=knowledge.find(k=>k.keys.some(x=>x.length<=3?new RegExp('\\\\b'+x+'\\\\b','i').test(text):text.includes(x)));
+  const found=knowledge.find(k=>k.keys.some(x=>x.length<=3?new RegExp('\\b'+x+'\\b','i').test(text):text.includes(x)));
   if(found)return found.answer;
   if(/halo|hai|hello|selamat/.test(text))return 'Halo! Silakan tanyakan status sinyal Gold/BTC/WTI atau konsep Market Structure, Support & Resistance, CHOCH, Liquidity Sweep, FVG, Order Block, dan manajemen risiko.';
   return 'Saya belum memiliki jawaban terverifikasi untuk pertanyaan itu. Saat ini saya mendukung pemeriksaan status sinyal server dan topik edukasi SMC/ICT yang tercantum. Saya menggunakan aturan dan data server yang tersedia; saya tidak akan mengarang analisis atau berita.';
