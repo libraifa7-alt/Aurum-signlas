@@ -88,7 +88,7 @@ test("marks old Yahoo WTI candles stale even when fetched successfully", async (
 });
 
 test("rechecks cached Yahoo candles and does not trust their previous fresh label", async () => {
-  const oldTimestamp = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  const oldTimestamp = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   globalThis.aurumCache = new Map([[
     "WTI:15min:yahoo:v3",
     {
