@@ -682,7 +682,7 @@ test("fundamental page does not fabricate unavailable DXY, Treasury, news, or ca
   assert.match(page, /US 10Y YIELD[\s\S]{0,180}BELUM TERHUBUNG/);
   assert.match(page, /Belum ada penyedia berita ekonomi yang terhubung/);
   assert.match(page, /Kalender ekonomi belum terhubung ke penyedia data/);
-  assert.ok(page.includes("fetch('/api/signals'"));
+  assert.ok(html.includes("fetch('/api/signals'"));
 });
 
 test("education page exposes all six core lessons and honest live-class availability", () => {
