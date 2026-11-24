@@ -54,6 +54,18 @@ module.exports = async function handler(req, res) {
     req.query.interval || "M15"
   ).toUpperCase();
 
+  // Restrict provider access to the instruments actually supported by Aurum.
+  // Arbitrary symbols could consume the configured market-data quota.
+  const allowedSymbols = new Set(["XAU/USD", "BTC/USD", "WTI"]);
+  if (!allowedSymbols.has(selectedSymbol)) {
+    return res.status(400).json({
+      status: "error",
+      code: "INVALID_SYMBOL",
+      message: "Instrumen tidak didukung",
+      receivedSymbol: selectedSymbol
+    });
+  }
+
   if (!Object.prototype.hasOwnProperty.call(allowedIntervals, selected)) {
     return res.status(400).json({
       status: "error",

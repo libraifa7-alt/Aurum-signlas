@@ -75,6 +75,19 @@ async function requestMarket(symbol, interval, fetchImpl) {
   }
 }
 
+test("rejects unsupported market symbols before contacting providers", async () => {
+  let fetchCalled = false;
+  const res = await requestMarket("UNSUPPORTED/PAIR", "M15", async () => {
+    fetchCalled = true;
+    throw new Error("Provider must not be called for an unsupported symbol");
+  });
+
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.payload.code, "INVALID_SYMBOL");
+  assert.equal(res.payload.receivedSymbol, "UNSUPPORTED/PAIR");
+  assert.equal(fetchCalled, false);
+});
+
 test("rejects unsupported market intervals instead of silently using M15", async () => {
   let fetchCalled = false;
   const res = await requestMarket("WTI", "INVALID", async () => {
