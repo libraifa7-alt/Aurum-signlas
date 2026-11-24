@@ -3900,12 +3900,21 @@ body {
     document.querySelectorAll('#marketPage .aurum-asset-switch [data-asset]').forEach(function(button){
       button.classList.toggle('active',button.dataset.asset===asset);
     });
-    // Keep the existing asset button as a fallback for any related UI listeners.
-    if(source && (!pair || pair.value!==asset)) source.click();
-    document.querySelectorAll('.app-page').forEach(function(page){page.classList.toggle('active',page.id==='marketPage');});
-    document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(function(item){item.classList.toggle('active',item.dataset.page==='marketDirectoryPage');});
-    window.scrollTo({top:0,behavior:'auto'});
-    requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));});
+    // Route through the shared navigation controller so URL, active tab,
+    // and accessibility state stay in sync when an instrument is opened.
+    if(typeof window.aurumShowPage==='function'){
+      window.aurumShowPage('marketPage');
+    }else{
+      document.querySelectorAll('.app-page').forEach(function(page){page.classList.toggle('active',page.id==='marketPage');});
+      document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(function(item){
+        var active=item.dataset.page==='marketDirectoryPage';
+        item.classList.toggle('active',active);
+        if(active)item.setAttribute('aria-current','page');
+        else item.removeAttribute('aria-current');
+      });
+      window.scrollTo({top:0,behavior:'auto'});
+      requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));});
+    }
   }
   function bindAurumMarketDirectory(){
     document.querySelectorAll('#aurumMarketDirectory [data-asset]').forEach(function(row){
