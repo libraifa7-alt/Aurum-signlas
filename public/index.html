@@ -3583,7 +3583,7 @@ body {
 <section class="home-section aurum-home-new-section"><div class="home-section-heading"><h3>BARU DI AURUM</h3></div>
 <div class="aurum-home-feature-grid">
 <button type="button" class="aurum-home-feature" onclick="document.querySelector('.nav-item[data-page=guidePage]').click()"><span class="home-menu-icon green-icon aurum-glow-icon">▱</span><span><strong>Kelas</strong><small>Pelajaran dan panduan aplikasi</small></span><em>BARU</em></button>
-<button type="button" class="aurum-home-feature" onclick="document.getElementById('aurumOpenNotifications')?.click()"><span class="home-menu-icon blue aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Jurnal sinyal paper di perangkat ini</small></span><em>JURNAL</em></button>
+<button type="button" class="aurum-home-feature" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.()"><span class="home-menu-icon blue aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Jurnal sinyal paper di perangkat ini</small></span><em>JURNAL</em></button>
 <button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="document.getElementById('aurumOpenProfile')?.click()"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
 </div></section>
 <!-- TRADING MENU -->
@@ -4038,6 +4038,26 @@ body {
   </section>
   <!-- END HALAMAN OBROLAN -->
 
+  <section id="pnlPage" class="app-page">
+    <section class="panel aurum-pnl-page">
+      <button type="button" class="aurum-detail-back" onclick="window.aurumShowPage?.('homePage')">‹ Kembali ke Dashboard</button>
+      <h2>P&amp;L SAYA</h2>
+      <p class="sub">Jurnal hasil pemantauan sinyal AURUM pada perangkat ini. Ini bukan laporan transaksi broker.</p>
+      <div class="aurum-pnl-periods" role="group" aria-label="Periode jurnal">
+        <button class="active" type="button" data-pnl-period="today">HARI INI</button>
+        <button type="button" data-pnl-period="yesterday">KEMARIN</button>
+        <button type="button" data-pnl-period="7days">7 HARI</button>
+        <button type="button" data-pnl-period="30days">30 HARI</button>
+      </div>
+      <div class="aurum-pnl-main"><div><small>HASIL TERCATAT</small><strong id="aurumPnlNet">--</strong><span id="aurumPnlNote">Memuat jurnal...</span></div><div class="aurum-pnl-win"><strong id="aurumPnlWinRate">--</strong><small>WIN RATE</small></div></div>
+      <div class="aurum-pnl-stats">
+        <div><strong id="aurumPnlSignals">0</strong><small>SINYAL</small></div><div><strong id="aurumPnlTp">0</strong><small>TP HIT</small></div><div><strong id="aurumPnlSl">0</strong><small>SL HIT</small></div><div><strong id="aurumPnlOpen">0</strong><small>BERJALAN</small></div>
+      </div>
+      <h3>RIWAYAT PAPER TRACKING</h3><div id="aurumPnlHistory" class="aurum-pnl-history"><p class="sub">Belum ada riwayat.</p></div>
+      <p class="sub">Hasil dihitung dari pemantauan candle oleh AURUM di browser ini. Sinyal yang belum selesai dan candle ambigu tidak dimasukkan ke hasil bersih.</p>
+    </section>
+  </section>
+
   <!-- HALAMAN PANDUAN -->
   <section id="guidePage" class="app-page">
 
@@ -4258,6 +4278,7 @@ body {
     function showPage(pageId) {
       const targetPage = document.getElementById(pageId);
       if (!targetPage) return;
+      window.aurumShowPage = showPage;
 
       pages.forEach(function (page) {
         page.classList.toggle('active', page.id === pageId);
@@ -4266,7 +4287,7 @@ body {
       navItems.forEach(function (item) {
         item.classList.toggle(
           'active',
-          item.dataset.page === pageId
+          item.dataset.page === pageId || (pageId === 'pnlPage' && item.dataset.page === 'homePage')
         );
       });
 
@@ -8785,6 +8806,18 @@ syncDirectory();setInterval(syncDirectory,12000);refreshCounts();setInterval(ref
 document.querySelectorAll('.home-menu-card').forEach(a=>{const title=a.querySelector('strong')?.textContent?.trim();if(title==='Notifikasi')a.onclick=()=>{$('aurumOpenNotifications')?.click();return false;};if(title==='Pengaturan')a.onclick=()=>{$('aurumOpenProfile')?.click();return false;};});
 document.querySelectorAll('[data-guide-tab]').forEach(b=>b.addEventListener('click',()=>{const key=b.dataset.guideTab;document.querySelectorAll('[data-guide-tab]').forEach(x=>{const active=x===b;x.classList.toggle('active',active);x.setAttribute('aria-selected',active?'true':'false');});if($('aurumGuideLive'))$('aurumGuideLive').hidden=key!=='live';if($('aurumGuideLessons'))$('aurumGuideLessons').hidden=key!=='lessons';if($('aurumGuideManual'))$('aurumGuideManual').hidden=key!=='manual';}));
 $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurumDetailFeedbackText')?.value.trim(),status=$('aurumDetailFeedbackStatus');if(!value){if(status)status.textContent='Tulis masukan terlebih dahulu.';return;}try{const rows=JSON.parse(localStorage.getItem('aurum.detail-feedback.v1')||'[]');rows.push({text:value,share:!!$('aurumDetailFeedbackShare')?.checked,createdAt:new Date().toISOString()});localStorage.setItem('aurum.detail-feedback.v1',JSON.stringify(rows.slice(-100)));$('aurumDetailFeedbackText').value='';if(status)status.textContent='Masukan tersimpan pada perangkat ini. Belum dikirim ke server AURUM.';}catch(e){if(status)status.textContent='Penyimpanan lokal tidak tersedia pada browser ini.';}});
+})();
+</script>
+<style id="aurum-pnl-page-style">
+.aurum-pnl-page{max-width:720px;margin:16px auto;padding:16px}.aurum-pnl-periods{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:14px 0}.aurum-pnl-periods button{border:1px solid #e2e7ee;border-radius:9px;padding:8px 3px;background:#fff;color:#687487;font-size:8px;font-weight:800}.aurum-pnl-periods button.active{background:linear-gradient(100deg,#19a9c4,#6949d8);color:#fff;border-color:transparent}.aurum-pnl-main{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:9px;padding:14px;border-radius:13px;background:linear-gradient(120deg,#e8f8ef,#edf5ff)}.aurum-pnl-main>div:first-child{display:flex;flex-direction:column;gap:4px}.aurum-pnl-main small{font-size:8px;color:#718094}.aurum-pnl-main strong{font-size:28px;color:#1a9b61}.aurum-pnl-main span{font-size:9px;color:#7c8797}.aurum-pnl-win{display:flex;align-items:center;justify-content:center;flex-direction:column;border:6px solid #bdebd8;border-radius:50%;background:#fff;aspect-ratio:1}.aurum-pnl-win strong{font-size:16px}.aurum-pnl-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0 18px}.aurum-pnl-stats>div{display:flex;flex-direction:column;gap:4px;padding:10px 5px;border:1px solid #e7eaf0;border-radius:10px;background:#fff;text-align:center}.aurum-pnl-stats strong{font-size:18px;color:#253247}.aurum-pnl-stats small{font-size:7px;color:#8490a1}.aurum-pnl-history{display:grid;gap:7px}.aurum-pnl-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px;border:1px solid #e6eaf0;border-radius:10px;background:#fff}.aurum-pnl-row strong{font-size:11px}.aurum-pnl-row small{font-size:9px;color:#8490a1}.aurum-pnl-row .result{font-weight:800;text-align:right}.aurum-pnl-row .result.positive{color:#169b61}.aurum-pnl-row .result.negative{color:#d34d58}@media(max-width:420px){.aurum-pnl-page{padding:12px}.aurum-pnl-stats{gap:4px}.aurum-pnl-stats>div{padding:8px 2px}}
+</style>
+<script id="aurum-pnl-page-logic">
+(function(){
+ const $=id=>document.getElementById(id),panel=$('pnlPage');if(!panel)return;let period='today';
+ const labels={today:'HARI INI',yesterday:'KEMARIN','7days':'7 HARI','30days':'30 HARI'};
+ function range(){const now=new Date(),start=new Date(now);start.setHours(0,0,0,0);if(period==='yesterday'){start.setDate(start.getDate()-1);const end=new Date(start);end.setDate(end.getDate()+1);return [start.getTime(),end.getTime()];}if(period==='7days')start.setDate(start.getDate()-6);if(period==='30days')start.setDate(start.getDate()-29);return [start.getTime(),Infinity];}
+ function render(){let rows=[];try{rows=window.aurumJournalRead?window.aurumJournalRead():[];}catch(e){}const [from,to]=range();const selected=rows.filter(r=>{const t=Date.parse(r.createdAt||'');return Number.isFinite(t)&&t>=from&&t<to;});const tp=selected.filter(r=>r.status==='TP_HIT').length,sl=selected.filter(r=>r.status==='SL_HIT').length,open=selected.filter(r=>['PENDING_ENTRY','OPEN'].includes(r.status)).length,closed=tp+sl;const net=selected.filter(r=>['TP_HIT','SL_HIT'].includes(r.status)).reduce((a,r)=>a+(Number(r.resultPoints)||0),0);$('aurumPnlNet').textContent=closed?((net>=0?'+':'')+net.toFixed(2)+' pts'):'--';$('aurumPnlWinRate').textContent=closed?Math.round(tp/closed*100)+'%':'--';$('aurumPnlNote').textContent=closed+' hasil selesai · '+open+' masih berjalan';$('aurumPnlSignals').textContent=selected.length;$('aurumPnlTp').textContent=tp;$('aurumPnlSl').textContent=sl;$('aurumPnlOpen').textContent=open;const list=selected.slice().sort((a,b)=>Date.parse(b.createdAt)-Date.parse(a.createdAt));$('aurumPnlHistory').innerHTML=list.length?list.slice(0,60).map(r=>{const positive=Number(r.resultPoints)>=0;const result=['TP_HIT','SL_HIT'].includes(r.status)?((positive?'+':'')+Number(r.resultPoints||0).toFixed(2)+' pts'):r.status==='AMBIGUOUS'?'AMBIGU':r.status==='OPEN'?'BERJALAN':'MENUNGGU';const status=r.status==='TP_HIT'?'TP TERCAPAI':r.status==='SL_HIT'?'STOP LOSS':r.status==='AMBIGUOUS'?'HASIL AMBIGU':r.status==='OPEN'?'POSISI TERBUKA':'MENUNGGU ENTRY';return '<article class="aurum-pnl-row"><strong>'+String(r.symbol||'MARKET')+' · '+String(r.direction||'SIGNAL')+'</strong><span class="result '+(positive?'positive':'negative')+'">'+result+'</span><small>'+new Date(r.createdAt).toLocaleString('id-ID')+' · '+status+'</small><small>Entry '+Number(r.entry||0).toFixed(2)+' · SL '+Number(r.sl||0).toFixed(2)+'</small></article>';}).join(''):'<p class="sub">Belum ada riwayat paper tracking pada periode '+labels[period]+'.</p>';}
+ window.aurumRenderPnl=render;panel.querySelectorAll('[data-pnl-period]').forEach(b=>b.addEventListener('click',()=>{period=b.dataset.pnlPeriod;panel.querySelectorAll('[data-pnl-period]').forEach(x=>x.classList.toggle('active',x===b));render();}));render();
 })();
 </script>
 </body>
