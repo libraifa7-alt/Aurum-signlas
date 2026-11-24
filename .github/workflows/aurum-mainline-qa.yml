@@ -26,6 +26,38 @@ jobs:
             echo "Checking $file"
             node --check "$file"
           done
+      - name: Check Cloudflare Pages function syntax
+        run: |
+          node --input-type=module --check < "functions/api.js"
+          node --input-type=module --check < "functions/api/[[path]].js"
+          node --input-type=module --check < "functions/api/health.js"
+      - name: Smoke test Cloudflare Pages routes
+        run: |
+          npx --yes wrangler@4 pages dev ./public --ip 127.0.0.1 --port 8788 > /tmp/aurum-pages.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8788/api/health > /tmp/aurum-health.json; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat /tmp/aurum-pages.log
+            exit 1
+          fi
+          node -e "const h=require('/tmp/aurum-health.json'); if(h.api!=='mounted'||h.host!=='Cloudflare Pages') process.exit(1)"
+          code=$(curl --silent --output /tmp/aurum-invalid.json --write-out '%{http_code}' 'http://127.0.0.1:8788/api?symbol=XAU%2FUSD&interval=INVALID')
+          test "$code" = "400"
+          node -e "const d=require('/tmp/aurum-invalid.json'); if(d.code!=='INVALID_INTERVAL') process.exit(1)"
+          code=$(curl --silent --output /tmp/aurum-signals.json --write-out '%{http_code}' 'http://127.0.0.1:8788/api/signals')
+          test "$code" = "503"
+          node -e "const d=require('/tmp/aurum-signals.json'); if(d.status!=='not_configured') process.exit(1)"
+          code=$(curl --silent --output /tmp/aurum-cron.json --write-out '%{http_code}' 'http://127.0.0.1:8788/api/cron')
+          test "$code" = "503"
+          node -e "const d=require('/tmp/aurum-cron.json'); if(d.code!=='CRON_RUNTIME_NOT_CONFIGURED') process.exit(1)"
       - name: Run market data regression tests
         run: npm test
       - name: Parse all inline browser scripts
