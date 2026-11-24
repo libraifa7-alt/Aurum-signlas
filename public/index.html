@@ -8711,13 +8711,21 @@ body.aurum-user-dark .app-page{background:transparent!important}
       const vals=[Number(profile.tp3),Number(profile.tp2),Number(profile.tp1),(Number(profile.entryLow)+Number(profile.entryHigh))/2,Number(profile.sl)];
       const low=Number(profile.entryLow),high=Number(profile.entryHigh);
       if(!vals.every(Number.isFinite)||!Number.isFinite(low)||!Number.isFinite(high))return;
-      const min=Math.min(...vals,low,high),max=Math.max(...vals,low,high),range=Math.max(max-min,.000001);
+      const liveIds={'XAU/USD':'homePriceXAU','BTC/USD':'homePriceBTC','WTI':'homePriceWTI'};
+      const liveRaw=(document.getElementById(liveIds[symbol]||'')?.textContent||'').replace(/[^0-9.,-]/g,'');
+      let liveText=liveRaw;
+      if(liveText.includes(',')&&liveText.includes('.')){
+        liveText=liveText.lastIndexOf('.')>liveText.lastIndexOf(',')?liveText.replace(/,/g,''):liveText.replace(/\./g,'').replace(',','.');
+      }else if(liveText.includes(',')){
+        const decimals=liveText.length-liveText.lastIndexOf(',')-1;
+        liveText=decimals>0&&decimals<=2?liveText.replace(',','.'):liveText.replace(/,/g,'');
+      }
+      const live=Number(liveText),liveOk=Number.isFinite(live)&&live>0;
+      const min=Math.min(...vals,low,high,...(liveOk?[live]:[])),max=Math.max(...vals,low,high,...(liveOk?[live]:[])),range=Math.max(max-min,.000001);
       const y=v=>Math.round(22+(max-v)/range*198),top=y(Math.max(low,high)),bottom=y(Math.min(low,high));
       const mapLabels=[['TP 3',vals[0],'#2997dc'],['TP 2',vals[1],'#2997dc'],['TP 1',vals[2],'#20a66b'],['ENTRY',vals[3],'#d5a72e'],['STOP LOSS',vals[4],'#e0525b']];
-      const liveText=(document.getElementById('aurumDetailLivePrice')?.textContent||'').replace(/[^0-9.,-]/g,'').replace(/,(?=.*[,])/g,'').replace(',','.');
-      const live=Number(liveText),liveOk=Number.isFinite(live)&&live>0&&live>=min&&live<=max;
       mapNode.classList.add('aurum-price-map-visual');
-      mapNode.innerHTML='<div class="aurum-map-risk-caption">PROFIL '+safe(String(profile.label||profile.key||'RISK').toUpperCase())+' · '+safe(outcomeLabel(profile.outcomeStatus||'WAITING_FOR_ENTRY'))+'</div><svg viewBox="0 0 360 250" role="img" aria-label="Peta harga dengan zona Entry, Stop Loss dan Take Profit"><rect x="105" y="'+top+'" width="205" height="'+Math.max(8,bottom-top)+'" rx="8" fill="'+(cur.direction==='SELL'?'#fff0f0':'#e9f3ff')+'" stroke="'+(cur.direction==='SELL'?'#e87878':'#65a9e8')+'" stroke-width="1.5" stroke-dasharray="5 3"/><text x="207" y="'+Math.max(14,top+15)+'" text-anchor="middle" class="map-label">ZONA ENTRY</text>'+mapLabels.map(p=>'<line class="map-line" x1="105" x2="310" y1="'+y(p[1])+'" y2="'+y(p[1])+'" stroke="'+p[2]+'"/><circle cx="207" cy="'+y(p[1])+'" r="5" fill="'+p[2]+'" stroke="#fff" stroke-width="2"/><text x="12" y="'+(y(p[1])+4)+'" class="map-label">'+p[0]+'</text><text x="348" y="'+(y(p[1])+4)+'" text-anchor="end" class="map-value">'+fmtDetail(p[1])+'</text>').join('')+(liveOk?'<line x1="85" x2="325" y1="'+y(live)+'" y2="'+y(live)+'" stroke="#172033" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="207" cy="'+y(live)+'" r="5" fill="#172033"/><text x="85" y="'+(y(live)-7)+'" class="map-label">HARGA LIVE</text>':'')+'<text x="207" y="244" text-anchor="middle" class="map-label">LEVEL HARGA TRADE PLAN SERVER</text></svg>';
+      mapNode.innerHTML='<div class="aurum-map-risk-caption">PROFIL '+safe(String(profile.label||profile.key||'RISK').toUpperCase())+' · '+safe(outcomeLabel(profile.outcomeStatus||'WAITING_FOR_ENTRY'))+'</div><svg viewBox="0 0 360 250" role="img" aria-label="Peta harga dengan zona Entry, Stop Loss dan Take Profit"><rect x="105" y="'+top+'" width="205" height="'+Math.max(8,bottom-top)+'" rx="8" fill="'+(cur.direction==='SELL'?'#fff0f0':'#e9f3ff')+'" stroke="'+(cur.direction==='SELL'?'#e87878':'#65a9e8')+'" stroke-width="1.5" stroke-dasharray="5 3"/><text x="207" y="'+Math.max(14,top+15)+'" text-anchor="middle" class="map-label">ZONA ENTRY</text>'+mapLabels.map(p=>'<line class="map-line" x1="105" x2="310" y1="'+y(p[1])+'" y2="'+y(p[1])+'" stroke="'+p[2]+'"/><circle cx="207" cy="'+y(p[1])+'" r="5" fill="'+p[2]+'" stroke="#fff" stroke-width="2"/><text x="12" y="'+(y(p[1])+4)+'" class="map-label">'+p[0]+'</text><text x="348" y="'+(y(p[1])+4)+'" text-anchor="end" class="map-value">'+fmtDetail(p[1])+'</text>').join('')+(liveOk?'<line x1="85" x2="325" y1="'+y(live)+'" y2="'+y(live)+'" stroke="#172033" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="207" cy="'+y(live)+'" r="5" fill="#172033"/><text x="85" y="'+(y(live)-7)+'" class="map-label">HARGA LIVE '+fmtDetail(live)+'</text>':'')+'<text x="207" y="244" text-anchor="middle" class="map-label">LEVEL HARGA TRADE PLAN SERVER</text></svg>';
     };
     riskNode.querySelectorAll('[data-detail-risk]').forEach(button=>button.addEventListener('click',()=>{
       const chosen=profiles.find(p=>String(p.key||p.label||'RISK')===button.dataset.detailRisk);
