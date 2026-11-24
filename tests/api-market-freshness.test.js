@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const handler = require("../api/index.js");
+const healthHandler = require("../api/health.js");
 const fs = require("node:fs");
 
 function responseRecorder() {
@@ -301,4 +302,54 @@ test("education tabs each point to an existing content panel and chat states its
   }
   assert.ok(html.includes('id="aurumChatForm"'));
   assert.ok(html.includes("Mode asisten berbasis aturan dan data server. Model AI generatif eksternal belum terhubung."));
+});
+
+
+test("health endpoint reports missing core configuration without exposing secrets", async () => {
+  const names = ["CRON_SECRET", "KV_REST_API_URL", "KV_REST_API_TOKEN", "VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJECT", "NAIF_KEY", "TWELVE_DATA_API_KEY"];
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]]));
+  for (const name of names) delete process.env[name];
+  try {
+    const res = responseRecorder();
+    await healthHandler({}, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.payload.status, "degraded");
+    assert.equal(res.payload.checks.redis, "not_configured");
+    assert.equal(res.payload.checks.cronSecret, false);
+    assert.equal(JSON.stringify(res.payload).includes("Bearer"), false);
+    assert.ok(res.payload.checkedAt);
+  } finally {
+    for (const name of names) {
+      if (previous[name] === undefined) delete process.env[name];
+      else process.env[name] = previous[name];
+    }
+  }
+});
+
+test("health endpoint verifies Redis connectivity without returning credentials", async () => {
+  const names = ["CRON_SECRET", "KV_REST_API_URL", "KV_REST_API_TOKEN"];
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]]));
+  const originalFetch = global.fetch;
+  process.env.CRON_SECRET = "test-cron-secret";
+  process.env.KV_REST_API_URL = "https://redis.example.test";
+  process.env.KV_REST_API_TOKEN = "test-redis-token";
+  global.fetch = async (_url, options) => {
+    assert.equal(options.headers.Authorization, "Bearer test-redis-token");
+    assert.equal(options.body, JSON.stringify(["PING"]));
+    return { ok: true, async json() { return { result: "PONG" }; } };
+  };
+  try {
+    const res = responseRecorder();
+    await healthHandler({}, res);
+    assert.equal(res.payload.status, "ok");
+    assert.equal(res.payload.checks.redis, "connected");
+    assert.equal(JSON.stringify(res.payload).includes("test-redis-token"), false);
+    assert.equal(JSON.stringify(res.payload).includes("test-cron-secret"), false);
+  } finally {
+    global.fetch = originalFetch;
+    for (const name of names) {
+      if (previous[name] === undefined) delete process.env[name];
+      else process.env[name] = previous[name];
+    }
+  }
 });
