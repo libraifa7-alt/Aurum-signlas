@@ -8605,6 +8605,21 @@ body.aurum-user-dark .app-page{background:transparent!important}
   }
   const feed=document.getElementById('aurumSignalCards');
   feed?.addEventListener('click',e=>{const selected=e.target.closest('[data-aurum-signal-index]');if(selected)openSignalDetail(selected.getAttribute('data-aurum-signal-index'));});
+  document.getElementById('aurumMarketDirectory')?.addEventListener('click',e=>{
+    const choice=e.target.closest('.aurum-market-row[data-asset]');
+    if(!choice)return;
+    const pairSelect=document.getElementById('pair');
+    if(pairSelect&&pairSelect.value!==choice.dataset.asset){
+      pairSelect.value=choice.dataset.asset;
+      pairSelect.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+    document.querySelectorAll('.app-page').forEach(page=>page.classList.toggle('active',page.id==='marketPage'));
+    document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(item=>item.classList.toggle('active',item.dataset.page==='marketDirectoryPage'));
+    document.querySelectorAll('#marketPage > .aurum-asset-switch,#marketPage > .aurum-signal-summary,#marketPage > .aurum-signal-tabs').forEach(node=>node.hidden=false);
+    document.querySelectorAll('#marketPage > .aurum-signal-panel').forEach(node=>{node.hidden=node.dataset.signalPanel!=='setup';});
+    detailView.hidden=true;panel.hidden=true;
+    window.scrollTo({top:0,behavior:'auto'});
+  });
   document.getElementById('aurumSignalDetailBack').addEventListener('click',()=>{
     detailView.hidden=true;panel.hidden=true;
     document.querySelectorAll('#marketPage > .aurum-asset-switch,#marketPage > .aurum-signal-summary,#marketPage > .aurum-signal-tabs').forEach(n=>n.hidden=false);
