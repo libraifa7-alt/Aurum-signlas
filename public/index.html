@@ -3960,7 +3960,7 @@ body {
   <p class="sub">ASISTEN DATA PASAR & EDUKASI SMC/ICT</p>
 
   <div class="signal" style="margin-top:16px">
-    <h3 class="gold">WELCOME TO AURUM AI</h3>
+    <h3 class="gold">WELCOME TO OBROLAN AURUM</h3>
     <p>
       Asisten analisis pasar untuk membantu memahami
       pergerakan Forex, Gold, Crypto, dan Oil.
@@ -4013,7 +4013,7 @@ body {
     <input id="aurumChatInput" type="text" maxlength="500" autocomplete="off" placeholder="Tulis pertanyaan Anda..." aria-label="Pertanyaan untuk Aurum" style="flex:1;min-width:0">
     <button type="submit" class="gold">Kirim</button>
   </form>
-  <p class="sub" id="aurumChatDisclaimer" style="margin-top:10px">Mode asisten berbasis aturan dan data server. Model AI generatif eksternal belum terhubung.</p>
+  <p class="sub" id="aurumChatDisclaimer" style="margin-top:10px">Asisten menggunakan aturan dan data server; tidak memerlukan layanan AI eksternal.</p>
 
 
 
@@ -8942,7 +8942,7 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   const found=knowledge.find(k=>k.keys.some(x=>text.includes(x)));
   if(found)return found.answer;
   if(/halo|hai|hello|selamat/.test(text))return 'Halo! Silakan tanyakan status sinyal Gold/BTC/WTI atau konsep Market Structure, Support & Resistance, CHOCH, Liquidity Sweep, FVG, Order Block, dan manajemen risiko.';
-  return 'Saya belum memiliki jawaban terverifikasi untuk pertanyaan itu. Saat ini saya mendukung pemeriksaan status sinyal server dan topik edukasi SMC/ICT yang tercantum. Model AI generatif belum terhubung, jadi saya tidak akan mengarang analisis atau berita.';
+  return 'Saya belum memiliki jawaban terverifikasi untuk pertanyaan itu. Saat ini saya mendukung pemeriksaan status sinyal server dan topik edukasi SMC/ICT yang tercantum. Saya menggunakan aturan dan data server yang tersedia; saya tidak akan mengarang analisis atau berita.';
  }
  async function send(q){
   q=String(q||'').trim();if(!q)return;
