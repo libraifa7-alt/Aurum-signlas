@@ -123,12 +123,18 @@ test("rejects unsupported market intervals instead of silently using M15", async
   assert.equal(fetchCalled, false);
 });
 
-test("marks recent Yahoo BTC candles fresh from their actual timestamp", async () => {
+test("marks recent Yahoo BTC candles fresh and applies a provider timeout", async () => {
   const timestamp = Math.floor(Date.now() / 1000) - 60;
-  const res = await requestMarket("BTC/USD", "M1", async () => ({
-    ok: true,
-    async json() { return yahooPayload(timestamp); }
-  }));
+  let requestOptions;
+  const res = await requestMarket("BTC/USD", "M1", async (_url, options) => {
+    requestOptions = options;
+    return {
+      ok: true,
+      async json() { return yahooPayload(timestamp); }
+    };
+  });
+  assert.ok(requestOptions?.signal instanceof AbortSignal);
+  assert.equal(requestOptions.signal.aborted, false);
 
   assert.equal(res.statusCode, 200);
   assert.equal(res.payload.candleStatus, "fresh_candles");
