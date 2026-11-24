@@ -8918,6 +8918,9 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   {keys:['liquidity sweep','sweep','sapu likuiditas'],answer:'Liquidity Sweep terjadi ketika harga melewati area swing high/low atau level likuiditas lalu kembali masuk ke area sebelumnya. Penembusan sesaat saja belum cukup; amati penutupan candle dan perubahan struktur setelah sweep.'},
   {keys:['fair value gap','fvg'],answer:'Fair Value Gap (FVG) adalah ketidakseimbangan tiga candle: rentang candle pertama dan ketiga tidak saling tumpang tindih pada sisi tertentu. Area ini dapat menjadi zona reaksi, tetapi tidak wajib diisi dan bukan sinyal entry tunggal.'},
   {keys:['order block','ob'],answer:'Order Block biasanya merujuk pada candle berlawanan terakhir sebelum impuls yang menyebabkan perpindahan struktur. Tandai zona candle tersebut, lalu nilai apakah impulsnya kuat, apakah struktur terkonfirmasi, dan apakah zona masih valid.'},
+  {keys:['bos','break of structure'],answer:'Break of Structure (BOS) terjadi ketika harga menembus swing penting yang searah dengan struktur dominan. Perhatikan penutupan candle dan konteks timeframe; wick yang menembus level saja belum tentu konfirmasi BOS.'},
+  {keys:['inducement','inducement liquidity'],answer:'Inducement adalah pergerakan atau level yang dapat menarik trader masuk terlalu awal sebelum harga bergerak menuju likuiditas yang lebih besar. Ini konsep interpretatif, bukan pola yang selalu muncul; konfirmasi tetap perlu dari struktur dan reaksi harga.'},
+  {keys:['premium discount','premium','discount'],answer:'Dalam dealing range, area di atas titik tengah (50%) disebut premium dan area di bawahnya discount. Konsep ini membantu memberi konteks lokasi harga, tetapi tidak cukup menjadi alasan entry tanpa struktur, konfirmasi, dan rencana risiko.'},
   {keys:['risk','risiko','stop loss','position size'],answer:'Batasi risiko per transaksi sesuai rencana pribadi. Tentukan invalidasi dan Stop Loss sebelum entry, hitung ukuran posisi dari jarak SL dan batas risiko, serta jangan memperlebar SL hanya untuk menghindari kerugian.'}
  ];
  function add(who,text){
@@ -8939,7 +8942,7 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
     }).join('\n')+'\n\nData diambil dari API sinyal AURUM. Periksa waktu pembaruan dan chart sebelum mengambil keputusan.';
    }catch(e){return 'Saya belum dapat mengambil status sinyal: '+e.message+'. Coba lagi setelah server tersedia.';}
   }
-  const found=knowledge.find(k=>k.keys.some(x=>text.includes(x)));
+  const found=knowledge.find(k=>k.keys.some(x=>x.length<=3?new RegExp('\\\\b'+x+'\\\\b','i').test(text):text.includes(x)));
   if(found)return found.answer;
   if(/halo|hai|hello|selamat/.test(text))return 'Halo! Silakan tanyakan status sinyal Gold/BTC/WTI atau konsep Market Structure, Support & Resistance, CHOCH, Liquidity Sweep, FVG, Order Block, dan manajemen risiko.';
   return 'Saya belum memiliki jawaban terverifikasi untuk pertanyaan itu. Saat ini saya mendukung pemeriksaan status sinyal server dan topik edukasi SMC/ICT yang tercantum. Saya menggunakan aturan dan data server yang tersedia; saya tidak akan mengarang analisis atau berita.';
