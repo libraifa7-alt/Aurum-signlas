@@ -1,0 +1,71 @@
+/* SIGNATURE TRADING — brand layer; presentation only. */
+.signature-brand{position:static!important;display:flex!important;align-items:center!important;gap:9px!important;width:auto!important;height:auto!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#f5c451!important;font-weight:950!important;letter-spacing:.7px!important;white-space:nowrap!important}
+.signature-brand .signature-brand-mark{display:grid!important;place-items:center!important;width:30px;height:30px;border-radius:10px;color:#081425!important;background:linear-gradient(145deg,#fff0a8,#e7a91f 65%,#a86b08)!important;box-shadow:0 0 16px #f3b82d77!important;font-size:23px!important;font-weight:1000!important}
+.signature-brand span:last-child{display:inline!important;color:#f8d77b!important;font-size:clamp(12px,2vw,17px)!important}
+.signature-status{color:#00c979!important;border-color:#1ebc7b!important;background:#071b17!important}
+.signature-clock-center{display:grid!important;place-items:center!important;color:#171006!important;font-weight:1000!important;font-size:12px!important;background:linear-gradient(145deg,#fff0a8,#d49a20 60%,#80520b)!important;border:2px solid #ffe6a0!important;box-shadow:0 0 18px #f0bd48aa!important}
+.signature-presenter-banner{position:relative;isolation:isolate;display:grid;grid-template-columns:112px minmax(0,1fr) auto;align-items:center;gap:18px;overflow:hidden;margin:16px 0 22px;padding:14px 18px;border:1px solid #dba83d;border-radius:20px;background:radial-gradient(circle at 80% 0%,#0b4d89 0,transparent 32%),radial-gradient(circle at 4% 100%,#7b4a0a 0,transparent 30%),linear-gradient(115deg,#050a13,#101a2b 56%,#050a13);box-shadow:0 10px 28px #071a3440,inset 0 1px #fff5;color:#f7f8ff}
+.signature-presenter-banner:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.18;background-image:linear-gradient(#8dcaff22 1px,transparent 1px),linear-gradient(90deg,#8dcaff22 1px,transparent 1px);background-size:22px 22px;mask-image:linear-gradient(90deg,#000,transparent 90%)}
+.signature-presenter-photo{width:104px;height:130px;overflow:hidden;border:1px solid #e9bd54;border-radius:14px;box-shadow:0 0 22px #e7a52b55}
+.signature-presenter-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.signature-presenter-copy{min-width:0}
+.signature-eyebrow{color:#79d7ff;font-size:9px;font-weight:900;letter-spacing:1.3px}
+.signature-presenter-copy h2{margin:5px 0 4px;color:#fff;font-size:clamp(19px,3vw,28px);font-weight:1000;letter-spacing:.5px;text-shadow:0 0 18px #41aaff55}
+.signature-presenter-copy h2 span{color:#ffc84b}
+.signature-presenter-copy p{margin:0 0 10px;color:#c7d5e8;font-size:12px;line-height:1.5}
+.signature-presenter-tags{display:flex;flex-wrap:wrap;gap:7px}
+.signature-presenter-tags span{padding:5px 8px;border:1px solid #317cae;border-radius:999px;background:#0b2540;color:#d8f3ff;font-size:9px;font-weight:850;letter-spacing:.45px}
+.signature-presenter-tags span:first-child{border-color:#11bb77;background:#062b20;color:#5dffb3}
+.signature-presenter-seal{display:grid;place-items:center;width:62px;height:62px;border:1px solid #f3c34d;border-radius:18px;background:linear-gradient(145deg,#1b2636,#060a12);color:#ffd15b;font-size:25px;font-weight:1000;box-shadow:0 0 20px #e4a72f55}
+.signature-presenter-seal span{display:block;margin-top:-13px;color:#e7edf8;font-size:7px;letter-spacing:1px}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"]{color:#f4f7ff!important;border:1px solid #d9a83d!important;background:radial-gradient(ellipse at 10% 0%,#d99b2b24,transparent 32%),radial-gradient(ellipse at 100% 70%,#008eff20,transparent 38%),linear-gradient(145deg,#060b14,#101b2b 56%,#05080e)!important;box-shadow:0 18px 44px #071a3450,inset 0 1px #fff4!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title{border-color:#b98a32!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title strong{color:#f7cb62!important;text-shadow:0 0 12px #f0ad3155}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title small{color:#b9c9dc!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-section{color:#eaf2ff!important;border:1px solid #31577b!important;border-radius:15px!important;background:linear-gradient(145deg,#0d1725,#101f31 65%,#0a111d)!important;box-shadow:0 7px 18px #0005,inset 0 1px #fff1!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-section p,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-section small{color:#bdcce0!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-section-kicker{color:#f2c85c!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-hero,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-table,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-tf-card{background:linear-gradient(145deg,#0b1827,#14273a)!important;color:#f3f7ff!important;border-color:#31658e!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-table-head{background:#13263b!important;color:#f4d37b!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-table-row{background:#0b1522!important;color:#dce9f7!important;border-color:#27425c!important}
+@media(max-width:620px){.signature-presenter-banner{grid-template-columns:76px minmax(0,1fr);gap:11px;padding:10px;border-radius:15px;margin:12px 0 16px}.signature-presenter-photo{width:72px;height:100px}.signature-presenter-seal{display:none}.signature-eyebrow{font-size:7px;letter-spacing:.7px}.signature-presenter-copy h2{font-size:17px}.signature-presenter-copy p{font-size:10px;margin-bottom:7px}.signature-presenter-tags{gap:4px}.signature-presenter-tags span{font-size:7px;padding:4px 6px}}
+@media(prefers-reduced-motion:no-preference){.signature-presenter-banner{animation:signatureEnter .55s ease-out both}@keyframes signatureEnter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}}
+
+
+/* SIGNATURE TRADING — DATA TEKNIKAL light institutional layout */
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"]{color:#17304d!important;border:1px solid #cfe5f8!important;background:linear-gradient(145deg,#f8fcff 0%,#fff 56%,#fff9e9 100%)!important;box-shadow:0 14px 34px rgba(35,91,145,.13)!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title{border-color:#d9e8f5!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title strong{color:#123e70!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title small{color:#71849a!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-card{border:1px solid #cfe4f5!important;background:linear-gradient(145deg,#fff 0%,#f7fbff 58%,#fffaf0 100%)!important;box-shadow:0 9px 24px rgba(35,91,145,.09)!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-section{border-color:#e0edf7!important;background:transparent!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-section-kicker{color:#a7791d!important;font-size:10px!important;font-weight:950!important;letter-spacing:1.05px!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #marketStructure{border:1px solid #d4e7f7!important;background:linear-gradient(110deg,#edf8ff,#fffdf5)!important;color:#173c64!important}
+#marketPage .signature-analysis-layout{display:grid;grid-template-columns:minmax(112px,.38fr) minmax(0,1fr);align-items:stretch;gap:13px;margin-top:4px}
+#marketPage .signature-analysis-presenter{position:relative;display:block;min-width:0;min-height:100%;overflow:hidden;border:1px solid #e3b64f;border-radius:15px;background:linear-gradient(160deg,#eaf7ff,#fff7df 58%,#d9efff);box-shadow:0 8px 22px rgba(27,99,159,.17),inset 0 0 0 3px rgba(255,255,255,.72)}
+#marketPage .signature-analysis-presenter:after{content:"SIGNATURE TRADING 🚀";position:absolute;left:7px;right:7px;bottom:8px;padding:6px 4px;border:1px solid rgba(255,211,105,.8);border-radius:8px;background:rgba(7,31,59,.88);color:#ffdc7d;text-align:center;font-size:clamp(7px,1vw,10px);font-weight:950;letter-spacing:.45px}
+#marketPage .signature-analysis-presenter img{display:block;width:100%;height:100%;min-height:520px;object-fit:cover;object-position:center 23%}
+#marketPage .signature-analysis-trend{min-width:0}
+#marketPage .signature-analysis-trend>.aurum-section-kicker{display:block;margin:2px 0 10px!important;color:#a7791d!important;font-size:10px!important}
+#marketPage #trendMeter .aurum-trend-dashboard{border:1px solid #cfe3f5!important;border-radius:13px!important;background-color:#fafdff!important;background-image:linear-gradient(rgba(27,132,205,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(27,132,205,.055) 1px,transparent 1px)!important;background-size:15px 15px!important;box-shadow:inset 0 1px rgba(255,255,255,.9)!important}
+#marketPage #trendMeter .aurum-trend-hero{border:1px solid #d4e7f7!important;background:linear-gradient(110deg,#eaf7ff,#fff 58%,#fff6df)!important;color:#163b61!important}
+#marketPage #trendMeter .aurum-trend-meter-box{border-color:#d9e8f5!important;background:rgba(255,255,255,.94)!important}
+#marketPage #trendMeter .aurum-tf-card{border:1px solid #cfe1f2!important;background:linear-gradient(155deg,#fff,#edf7ff)!important;box-shadow:0 4px 12px rgba(27,92,150,.09)!important}
+#marketPage #trendMeter .aurum-trend-table-head{background:linear-gradient(90deg,#e3f3ff,#fff4d9)!important;color:#17436e!important}
+#marketPage #trendMeter .aurum-trend-table-row{background:rgba(255,255,255,.94)!important;color:#254766!important;border-color:#e1edf6!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-daily-range-section,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #liquidityAnalysisSection,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #fvgAnalysisSection,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #orderBlockAnalysisSection{background:linear-gradient(145deg,#fff,#f5faff 70%,#fffaf0)!important}
+@media(max-width:620px){
+#marketPage .signature-analysis-layout{grid-template-columns:minmax(88px,.34fr) minmax(0,1fr);gap:8px}
+#marketPage .signature-analysis-presenter{border-radius:11px}
+#marketPage .signature-analysis-presenter img{min-height:470px}
+#marketPage .signature-analysis-presenter:after{font-size:6px;left:3px;right:3px;bottom:5px;padding:5px 2px}
+#marketPage .signature-analysis-trend>.aurum-section-kicker{font-size:8px!important;letter-spacing:.5px!important}
+#marketPage #trendMeter .aurum-trend-dashboard{padding:6px!important}
+}
+@media(prefers-reduced-motion:no-preference){#marketPage .signature-analysis-presenter{animation:signaturePhotoReveal .65s ease-out both}@keyframes signaturePhotoReveal{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}}
