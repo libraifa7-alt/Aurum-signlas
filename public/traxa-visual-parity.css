@@ -1212,3 +1212,48 @@ footer{margin-left:58px!important}
   #homePage .aurum-clock-face{width:218px!important;height:218px!important}
   #homePage .aurum-clock-face .clock-center{width:60px!important;height:60px!important}
 }
+
+
+/* FINAL HERO GLOBE + TRANSPARENT AURUM EMBLEM + GOLD/BTC/WTI TICKER */
+#homePage .aurum-session-clock{
+  width:320px!important;
+  height:320px!important;
+  margin:2px auto 0!important;
+}
+#homePage .aurum-clock-face{
+  width:300px!important;
+  height:300px!important;
+  overflow:visible!important;
+}
+#homePage .aurum-clock-face .clock-center{
+  width:92px!important;
+  height:92px!important;
+  border:0!important;
+  border-radius:0!important;
+  color:transparent!important;
+  font-size:0!important;
+  background:transparent url('/aurum-icon-192.png') center/contain no-repeat!important;
+  box-shadow:none!important;
+  mix-blend-mode:screen!important;
+  filter:drop-shadow(0 3px 10px rgba(190,145,48,.24))!important;
+  z-index:5!important;
+}
+#homePage .aurum-clock-face .clock-hand{z-index:4!important}
+#homePage .aurum-clock-face .clock-orbit{z-index:2!important}
+#homePage .ticker-gold>strong{
+  font-size:0!important;
+}
+#homePage .ticker-gold>strong::after{
+  content:"GOLD";
+  color:#697181!important;
+  font-size:8px!important;
+  font-weight:800!important;
+}
+#homePage .aurum-live-ticker .ticker-track{
+  gap:18px!important;
+}
+@media(max-width:600px){
+  #homePage .aurum-session-clock{width:292px!important;height:292px!important}
+  #homePage .aurum-clock-face{width:276px!important;height:276px!important}
+  #homePage .aurum-clock-face .clock-center{width:82px!important;height:82px!important}
+}
