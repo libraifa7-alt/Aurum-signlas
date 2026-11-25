@@ -1,14 +1,14 @@
 {
   "id": "/",
-  "name": "Aurum Signals AI",
-  "short_name": "Aurum AI",
-  "description": "ICT Smart Money Concepts · Forex Market Analysis",
+  "name": "Signature Trading 🚀",
+  "short_name": "Signature",
+  "description": "Institutional Analysis · Pro Trading Insights",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#080808",
-  "theme_color": "#080808",
+  "background_color": "#080d18",
+  "theme_color": "#080d18",
   "icons": [
     {
       "src": "/aurum-icon-192.png",
