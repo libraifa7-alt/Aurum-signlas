@@ -4231,12 +4231,21 @@ body {
 </footer>
 
 <nav class="aurum-bottom-nav" aria-label="Navigasi Aurum">
-  <a href="#homePage" class="nav-item active" data-page="homePage"><span>⌂</span><small>Dashboard</small></a>
-  <a href="#marketDirectoryPage" class="nav-item" data-page="marketDirectoryPage"><span>ϟ</span><small>Market</small></a>
-  <a href="#chartPage" class="nav-item" data-page="chartPage"><span>▥</span><small>Grafik</small></a>
-  <a href="#newsPage" class="nav-item" data-page="newsPage"><span>▤</span><small>Fundamental</small></a>
-  <a href="#chatPage" class="nav-item" data-page="chatPage"><span>◉</span><small>Obrolan</small></a>
-  <a href="#guidePage" class="nav-item" data-page="guidePage"><span>◇</span><small>Edukasi</small></a>
+  <a href="#homePage" class="nav-item active" data-page="homePage" aria-label="Dashboard" title="Dashboard"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9M9 21v-7h6v7"/></svg></span><small>Dashboard</small></a>
+  <a href="#marketPage" class="nav-item" data-page="marketPage" aria-label="Sinyal" title="Sinyal"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m13 2-3 8H5l6 12 3-9h5L13 2Z"/></svg></span><small>Sinyal</small></a>
+  <a href="#marketDirectoryPage" class="nav-item" data-page="marketDirectoryPage" aria-label="Market" title="Market"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></span><small>Market</small></a>
+  <a href="#chartPage" class="nav-item" data-page="chartPage" aria-label="Grafik" title="Grafik"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-7"/></svg></span><small>Grafik</small></a>
+  <a href="#guidePage" class="nav-item" data-page="guidePage" aria-label="Edukasi" title="Edukasi"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m2 9 10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c4 3 8 3 12 0v-5M22 9v6"/></svg></span><small>Edukasi</small></a>
+  <a href="#chatPage" class="nav-item" data-page="chatPage" aria-label="Obrolan" title="Obrolan"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8 8 0 0 1-3.5-.8L4 20l1.5-4A7 7 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z"/></svg></span><small>Obrolan</small></a>
+  <a href="#pnlPage" class="nav-item" data-page="pnlPage" aria-label="Performa" title="Performa"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h6"/></svg></span><small>Performa</small></a>
+  <a href="#newsPage" class="nav-item" data-page="newsPage" aria-label="Fundamental" title="Fundamental"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><small>Fundamental</small></a>
+  <a href="#announcementsPage" class="nav-item" data-page="announcementsPage" aria-label="Pengumuman" title="Pengumuman"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M17 9a5 5 0 0 1 0 6M19 6a9 9 0 0 1 0 12"/></svg></span><small>Pengumuman</small></a>
+  <a href="#partnerPage" class="nav-item" data-page="partnerPage" aria-label="Partner" title="Partner"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 12 4-4 4 2 3-2 7 4-5 6-4-2-3 2-6-6Z"/><path d="m7 8 3-3 4 2 2-1 4 3M9 14l3 3M12 12l4 4"/></svg></span><small>Partner</small></a>
+  <div class="aurum-rail-utilities" aria-label="Menu tambahan">
+    <button type="button" class="aurum-rail-utility" aria-label="Notifikasi" title="Notifikasi" onclick="document.getElementById('aurumOpenNotifications')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+    <button type="button" class="aurum-rail-utility" aria-label="Bahasa" title="Bahasa dan pengaturan" onclick="document.getElementById('aurumOpenProfile')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+    <button type="button" class="aurum-rail-utility" aria-label="Profil" title="Profil" onclick="document.getElementById('aurumOpenProfile')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+  </div>
 </nav>
 <script>
 (function(){
@@ -4310,11 +4319,14 @@ body {
       const navPageByView = {
         homePage: 'homePage',
         marketDirectoryPage: 'marketDirectoryPage',
-        marketPage: 'marketDirectoryPage',
+        marketPage: 'marketPage',
         chartPage: 'chartPage',
         newsPage: 'newsPage',
         chatPage: 'chatPage',
-        guidePage: 'guidePage'
+        guidePage: 'guidePage',
+        pnlPage: 'pnlPage',
+        partnerPage: 'partnerPage',
+        announcementsPage: 'announcementsPage'
       };
       const activeNavPage = navPageByView[pageId] || '';
       navItems.forEach(function (item) {
