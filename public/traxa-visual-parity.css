@@ -1118,3 +1118,97 @@ footer{margin-left:58px!important}
   #homePage .aurum-trading-section .home-menu-card strong{font-size:10px!important}
   #homePage .aurum-trading-section .home-menu-card small{font-size:7.5px!important}
 }
+
+
+/* HERO CLOCK — align with the supplied TRAXA session-globe reference while
+   retaining the original AURUM name and emblem. */
+#homePage .aurum-home-hero-v2{
+  min-height:0!important;
+  margin:8px 0 18px!important;
+  padding:24px 12px 16px!important;
+  gap:10px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:
+    radial-gradient(circle at 50% 52%,rgba(224,190,105,.16),transparent 34%),
+    radial-gradient(circle,rgba(172,178,190,.25) .65px,transparent .8px)!important;
+  background-size:auto,14px 14px!important;
+  box-shadow:none!important;
+}
+#homePage .aurum-home-hero-v2 .aurum-greeting{
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  gap:0!important;text-align:center!important;
+}
+#homePage .aurum-home-hero-v2 .aurum-greeting span{
+  color:#a4864b!important;font-size:9px!important;font-weight:800!important;
+  letter-spacing:2.8px!important;
+}
+#homePage .aurum-home-hero-v2 .aurum-greeting h1{
+  margin:6px 0 2px!important;color:#626b7b!important;
+  font-size:clamp(25px,4vw,34px)!important;font-weight:850!important;
+  letter-spacing:-1.1px!important;line-height:1.05!important;
+}
+#homePage .aurum-home-hero-v2 .aurum-greeting p{
+  margin:4px 0 0!important;color:#7c8190!important;
+  font-size:10px!important;letter-spacing:2px!important;
+}
+#homePage .aurum-session-clock{
+  width:260px!important;height:260px!important;margin:0 auto!important;
+  position:relative!important;
+}
+#homePage .aurum-clock-face{
+  width:236px!important;height:236px!important;overflow:visible!important;
+  border:1px solid rgba(176,160,125,.5)!important;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(255,255,255,.96) 0 48%,rgba(250,249,245,.9) 70%,rgba(239,237,230,.88) 100%),
+    repeating-linear-gradient(30deg,transparent 0 17px,rgba(218,190,126,.08) 18px,transparent 19px)!important;
+  box-shadow:0 0 0 7px rgba(255,255,255,.46),0 8px 28px rgba(68,57,36,.09),inset 0 0 24px rgba(190,165,111,.12)!important;
+}
+#homePage .aurum-clock-face:before{
+  inset:8px!important;
+  background:repeating-conic-gradient(from 0deg,rgba(143,119,70,.72) 0deg 1deg,transparent 1deg 6deg)!important;
+  mask:radial-gradient(circle,transparent 0 88%,#000 89% 91%,transparent 92%)!important;
+}
+#homePage .aurum-clock-face:after{
+  content:""!important;position:absolute!important;inset:-7px!important;
+  z-index:0!important;border-radius:50%!important;
+  background:conic-gradient(from 218deg,transparent 0deg,#4b91ed 3deg,#4b91ed 82deg,transparent 85deg,transparent 190deg,#e7c45f 193deg,#e7c45f 316deg,transparent 319deg)!important;
+  -webkit-mask:radial-gradient(circle,transparent 0 96%,#000 97% 100%)!important;
+  mask:radial-gradient(circle,transparent 0 96%,#000 97% 100%)!important;
+  filter:drop-shadow(0 0 4px rgba(214,179,92,.24))!important;
+}
+#homePage .aurum-clock-face .clock-mark{z-index:2!important;font-size:8px!important;color:#927a4c!important}
+#homePage .aurum-clock-face .clock-hand{z-index:3!important}
+#homePage .aurum-clock-face .clock-center{
+  width:66px!important;height:66px!important;
+  border:0!important;border-radius:0!important;
+  color:transparent!important;font-size:0!important;
+  background:transparent url('/aurum-icon-192.png') center/contain no-repeat!important;
+  box-shadow:none!important;filter:drop-shadow(0 2px 8px rgba(185,145,57,.22))!important;
+}
+#homePage .aurum-clock-face .clock-orbit{
+  z-index:1!important;width:168px!important;height:72px!important;
+  border-color:rgba(205,170,99,.20)!important;
+}
+#homePage .aurum-session-note{margin-top:0!important;gap:7px!important}
+#homePage .aurum-session-note strong{display:none!important}
+#homePage .aurum-session-note span{
+  position:relative!important;padding-left:13px!important;
+  color:#a4864b!important;font-size:8px!important;font-weight:850!important;
+  letter-spacing:2.2px!important;
+}
+#homePage .aurum-session-note span:before{
+  content:""!important;position:absolute!important;left:0!important;top:50%!important;
+  width:6px!important;height:6px!important;border-radius:50%!important;
+  transform:translateY(-50%)!important;background:#39d9a2!important;
+  box-shadow:0 0 8px rgba(57,217,162,.55)!important;
+}
+#homePage .aurum-session-note small{
+  color:#687181!important;font-size:10px!important;letter-spacing:0!important;
+}
+@media(max-width:600px){
+  #homePage .aurum-home-hero-v2{padding:20px 8px 14px!important;margin:5px 0 12px!important}
+  #homePage .aurum-session-clock{width:238px!important;height:238px!important}
+  #homePage .aurum-clock-face{width:218px!important;height:218px!important}
+  #homePage .aurum-clock-face .clock-center{width:60px!important;height:60px!important}
+}
