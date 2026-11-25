@@ -32,7 +32,7 @@ module.exports = async function handler(req, res) {
     try {
       // Netlify env values can accidentally contain copied whitespace or
       // wrapping quotes. Normalize those harmless formatting errors before fetch.
-      const redisUrl = String(env.KV_REST_API_URL).trim().replace(/^(['"])(.*)\\1$/, '$2');
+      const redisUrl = String(env.KV_REST_API_URL).trim().replace(/^['"]|['"]$/g, '');
       const parsedRedisUrl = new URL(redisUrl);
       if (parsedRedisUrl.protocol !== 'https:') {
         const invalidProtocol = new Error('Redis REST URL must use HTTPS');
