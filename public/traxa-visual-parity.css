@@ -1954,3 +1954,152 @@ body{
     transition:none!important;transform:none!important;
   }
 }
+
+
+/* AURUM PRO HOME — final alignment to the approved reference layout */
+html,body{
+  background-color:#fffdf8!important;
+  background-image:radial-gradient(rgba(190,151,72,.19) .75px,transparent .75px)!important;
+  background-size:14px 14px!important;
+}
+main{max-width:1480px!important}
+#homePage{
+  width:100%!important;
+  max-width:1400px!important;
+  margin:0 auto!important;
+}
+#homePage .home-section{
+  border-color:rgba(203,166,91,.34)!important;
+  border-radius:20px!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.99),rgba(255,251,241,.98))!important;
+  box-shadow:0 8px 24px rgba(115,86,35,.07),inset 0 1px 0 #fff!important;
+}
+#homePage .home-section-heading{
+  border-bottom:1px solid rgba(194,158,82,.24)!important;
+}
+#homePage .home-section-heading h3{color:#875719!important}
+
+/* Market: three equal live instrument cards */
+#homePage .home-market-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:14px!important;
+}
+#homePage .home-market-card{
+  min-height:138px!important;
+  padding:15px 16px!important;
+  border-color:#eadfc9!important;
+  border-radius:18px!important;
+  background:linear-gradient(145deg,#fff 0%,#fffdf8 72%,#fff5df 100%)!important;
+}
+#homePage .home-asset-icon{
+  width:54px!important;height:54px!important;flex-basis:54px!important;
+  font-size:22px!important;
+}
+
+/* Baru di Aurum: all three actions on one equal-width row */
+#homePage .aurum-home-feature-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:14px!important;
+}
+#homePage .aurum-home-feature,
+#homePage .aurum-home-feature.aurum-home-feature-wide{
+  grid-column:auto!important;
+  width:100%!important;min-width:0!important;
+  min-height:104px!important;height:104px!important;
+  display:flex!important;flex-direction:row!important;
+  align-items:center!important;justify-content:flex-start!important;
+  padding:14px 48px 14px 16px!important;gap:14px!important;
+  border:1px solid #eadfc9!important;border-radius:18px!important;
+  background:linear-gradient(135deg,#fff 0%,#fffdf8 72%,#fff5df 100%)!important;
+  box-shadow:0 5px 14px rgba(115,86,35,.055)!important;
+}
+#homePage .aurum-home-feature .home-menu-icon{
+  width:64px!important;height:64px!important;flex:0 0 64px!important;
+  font-size:28px!important;
+}
+#homePage .aurum-home-feature strong{font-size:15px!important}
+#homePage .aurum-home-feature small{font-size:11px!important}
+#homePage .aurum-home-feature em{top:9px!important;right:10px!important}
+
+/* Trading and tools: large luminous icons and gold circular chevrons */
+#homePage .home-menu-grid,
+#homePage .home-tools-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px!important;
+}
+#homePage .home-menu-card{
+  min-height:96px!important;
+  padding:14px 54px 14px 16px!important;
+  gap:16px!important;
+  border:1px solid #eadfc9!important;border-radius:18px!important;
+  background:linear-gradient(135deg,#fff 0%,#fffdf8 72%,#fff5df 100%)!important;
+  box-shadow:0 5px 14px rgba(115,86,35,.055)!important;
+}
+#homePage .home-menu-icon{
+  width:62px!important;height:62px!important;flex:0 0 62px!important;
+  font-size:27px!important;
+}
+#homePage .home-menu-card strong{font-size:15px!important}
+#homePage .home-menu-card small{font-size:11px!important}
+#homePage .home-menu-card:after{
+  content:"›"!important;
+  position:absolute!important;right:15px!important;top:50%!important;
+  transform:translateY(-50%)!important;
+  display:grid!important;place-items:center!important;
+  width:38px!important;height:38px!important;
+  border:1px solid #f0dfb5!important;border-radius:50%!important;
+  background:linear-gradient(145deg,#fff9e9,#ffedbf)!important;
+  color:#a66d13!important;font-size:27px!important;font-weight:700!important;
+  line-height:1!important;opacity:1!important;
+}
+#homePage .home-menu-card > span:last-child{padding-right:0!important}
+
+/* Community: three evenly spaced, prominent icon actions */
+#homePage .home-community-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:18px!important;
+}
+#homePage .home-community-grid a{
+  min-height:112px!important;padding:12px 8px!important;gap:10px!important;
+}
+#homePage .community-icon{
+  width:68px!important;height:68px!important;font-size:28px!important;
+}
+#homePage .home-community-grid strong{font-size:13px!important}
+
+/* Tools section: two balanced controls */
+#homePage .home-tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#homePage .home-tools-grid .home-menu-card{min-height:96px!important}
+#homePage .home-footer{padding:30px 12px 24px!important}
+#homePage .home-footer span{font-size:13px!important;letter-spacing:3px!important}
+#homePage .home-footer small{font-size:10px!important;letter-spacing:1.4px!important}
+
+/* Keep the same composition on Android Chrome desktop-site mode. */
+@media(max-width:600px){
+  #homePage .home-market-grid{gap:5px!important}
+  #homePage .home-market-card{min-height:112px!important;padding:8px 6px!important}
+  #homePage .home-asset-icon{width:25px!important;height:25px!important;flex-basis:25px!important;font-size:12px!important}
+  #homePage .home-market-price{font-size:clamp(12px,3.5vw,16px)!important}
+  #homePage .aurum-home-feature-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+  #homePage .aurum-home-feature,
+  #homePage .aurum-home-feature.aurum-home-feature-wide{
+    min-height:76px!important;height:76px!important;padding:7px 7px!important;
+    flex-direction:column!important;justify-content:center!important;gap:5px!important;
+  }
+  #homePage .aurum-home-feature .home-menu-icon{width:34px!important;height:34px!important;flex-basis:34px!important;font-size:16px!important}
+  #homePage .aurum-home-feature strong{font-size:9px!important}
+  #homePage .aurum-home-feature small{font-size:7px!important}
+  #homePage .aurum-home-feature em{top:4px!important;right:4px!important;font-size:6px!important}
+  #homePage .home-menu-grid,#homePage .home-tools-grid{gap:6px!important}
+  #homePage .home-menu-card{min-height:68px!important;padding:7px 26px 7px 7px!important;gap:6px!important}
+  #homePage .home-menu-icon{width:34px!important;height:34px!important;flex-basis:34px!important;font-size:16px!important}
+  #homePage .home-menu-card strong{font-size:9px!important}
+  #homePage .home-menu-card small{font-size:7px!important}
+  #homePage .home-menu-card:after{right:4px!important;width:19px!important;height:19px!important;font-size:15px!important}
+  #homePage .community-icon{width:40px!important;height:40px!important;font-size:17px!important}
+  #homePage .home-community-grid a{min-height:68px!important;padding:6px 2px!important}
+  #homePage .home-community-grid strong{font-size:8px!important}
+  #homePage .home-tools-grid .home-menu-card{min-height:68px!important}
+}
