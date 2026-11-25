@@ -9813,6 +9813,38 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 </script>
   <link rel="stylesheet" href="/traxa-visual-parity.css?v=10">
   <link rel="stylesheet" href="/signature-trading-brand.css?v=1">
+
+<script id="signature-analysis-placement">
+(function(){
+  function mountSignatureAnalysis(){
+    var market=document.getElementById('marketPage');
+    if(!market || market.querySelector('.signature-analysis-layout')) return;
+    var banner=market.querySelector('.signature-presenter-banner');
+    var trend=market.querySelector('.aurum-signal-panel[data-signal-panel="analysis"] #trendMeter');
+    if(!banner || !trend) return;
+    var section=trend.closest('.aurum-analysis-section');
+    var kicker=section && section.querySelector('.aurum-section-kicker');
+    var photo=banner.querySelector('.signature-presenter-photo');
+    if(!section || !photo || !kicker) return;
+    var layout=document.createElement('div');
+    layout.className='signature-analysis-layout';
+    var trendColumn=document.createElement('div');
+    trendColumn.className='signature-analysis-trend';
+    var heading=document.createElement('div');
+    heading.className='aurum-section-kicker';
+    heading.textContent='META TREND – 7 TIMEFRAME';
+    layout.appendChild(photo);
+    layout.appendChild(trendColumn);
+    section.insertBefore(layout,trend);
+    trendColumn.appendChild(heading);
+    trendColumn.appendChild(trend);
+    banner.remove();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountSignatureAnalysis,{once:true});
+  else mountSignatureAnalysis();
+})();
+</script>
+
 </body>
 </html>
 
