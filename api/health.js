@@ -30,7 +30,16 @@ module.exports = async function handler(req, res) {
   let redisError = null;
   if (checks.redisConfigured) {
     try {
-      const response = await fetch(env.KV_REST_API_URL, {
+      // Netlify env values can accidentally contain copied whitespace or
+      // wrapping quotes. Normalize those harmless formatting errors before fetch.
+      const redisUrl = String(env.KV_REST_API_URL).trim().replace(/^(['"])(.*)\\1$/, '$2');
+      const parsedRedisUrl = new URL(redisUrl);
+      if (parsedRedisUrl.protocol !== 'https:') {
+        const invalidProtocol = new Error('Redis REST URL must use HTTPS');
+        invalidProtocol.code = 'INVALID_REDIS_URL_PROTOCOL';
+        throw invalidProtocol;
+      }
+      const response = await fetch(redisUrl, {
         method: 'POST',
         headers: {
           Authorization: 'Bearer ' + env.KV_REST_API_TOKEN,
@@ -49,7 +58,7 @@ module.exports = async function handler(req, res) {
     } catch (error) {
       redis = 'unreachable';
       const causeCode = error && error.cause && error.cause.code;
-      redisError = causeCode || (error && error.name) || 'fetch_failed';
+      redisError = (error && error.code) || causeCode || (error && error.name) || 'fetch_failed';
       console.error('AURUM Redis health probe failed:', redisError);
     }
   }
