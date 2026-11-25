@@ -28,11 +28,10 @@ exports.handler = async function aurumScheduler(_event, context = {}) {
   const invocationSecret = previousSecret || crypto.randomUUID();
   process.env.CRON_SECRET = invocationSecret;
 
-  // The scanner must read candles from this same Netlify deployment, not the
-  // old Vercel hostname used by the Vercel-only scheduler.
-  if (context.site && context.site.url) {
-    process.env.AURUM_PUBLIC_URL = context.site.url;
-  }
+  // Lambda-compatible Netlify contexts may not expose context.site. Fall back
+  // to Netlify's URL env var and then the canonical site hostname.
+  const publicUrl = context.site?.url || process.env.URL || 'https://aurum-signlas.netlify.app';
+  process.env.AURUM_PUBLIC_URL = publicUrl;
 
   try {
     const bridge = responseBridge();
