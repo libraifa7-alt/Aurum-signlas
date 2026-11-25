@@ -3526,21 +3526,26 @@ body {
     <div class="ticker-live-mark"><i></i> LIVE</div>
     <div class="ticker-item ticker-gold">
       <span class="ticker-coin-logo" aria-label="Gold">Au</span>
-      <strong>XAU</strong>
+      <strong>GOLD</strong>
       <b id="tickerXAU">Memuat...</b>
       <small id="changeXAU">--</small>
+      <svg class="ticker-spark ticker-spark-down" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 5 L10 8 L18 7 L27 15 L35 12 L44 18 L53 15 L62 22 L75 16"/></svg>
     </div>
+    <span class="ticker-divider" aria-hidden="true"></span>
     <div class="ticker-item ticker-bitcoin">
       <span class="ticker-coin-logo" aria-label="Bitcoin">₿</span>
       <strong>BTC</strong>
       <b id="tickerBTC">Memuat...</b>
       <small id="changeBTC">--</small>
+      <svg class="ticker-spark ticker-spark-down" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 4 L10 7 L18 5 L27 13 L36 10 L45 17 L54 14 L64 21 L75 17"/></svg>
     </div>
+    <span class="ticker-divider" aria-hidden="true"></span>
     <div class="ticker-item ticker-oil">
-      <span class="ticker-coin-logo" aria-label="WTI Oil">W</span>
+      <span class="ticker-coin-logo" aria-label="WTI Oil">◉</span>
       <strong>WTI</strong>
       <b id="tickerWTI">Memuat...</b>
       <small id="changeWTI">--</small>
+      <svg class="ticker-spark ticker-spark-up" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 20 L10 16 L18 18 L27 11 L36 14 L45 8 L54 10 L64 3 L75 5"/></svg>
     </div>
   </div>
 </div>
@@ -3556,14 +3561,27 @@ body {
 
     <div class="aurum-session-clock" aria-label="Jam sesi pasar">
       <div class="aurum-clock-face">
-        <span class="clock-mark mark-12">12</span>
+        <span class="clock-mark mark-12">00</span>
         <span class="clock-mark mark-3">06</span>
-        <span class="clock-mark mark-6">18</span>
-        <span class="clock-mark mark-9">00</span>
+        <span class="clock-mark mark-6">12</span>
+        <span class="clock-mark mark-9">18</span>
+        <svg class="aurum-world-map" viewBox="0 0 420 300" aria-hidden="true">
+          <defs><pattern id="aurumMapDots" width="4.2" height="4.2" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.15" fill="#d8aa45"/></pattern></defs>
+          <g fill="url(#aurumMapDots)" opacity=".8">
+            <path d="M42 75l18-23 34-10 18 8 8 18-12 14-5 18-17 12-4 23-17 12-10-15-4-22-15-12z M102 151l19 9 11 25-8 29-13 31-12-18-4-28-11-21z M167 56l22-14 28 5 12 16-14 13-27-3-13 8-17-9z M193 91l27-10 29 9 15 18-5 22-17 12-9 29-19 19-17-11-6-29-17-13-4-23z M248 59l25-19 45 3 24 17 33 5 13 18-19 16-28-3-12 15-23-6-19 10-17-16-26-4-15-19z M284 143l23-10 23 12 10 24-13 22-21-6-15-18z M337 207l22-6 20 14-8 19-24 1-16-13z" />
+          </g>
+          <g fill="none" stroke="#e8c36e" stroke-width="1.1" opacity=".65">
+            <ellipse cx="210" cy="150" rx="166" ry="55" transform="rotate(-18 210 150)"/>
+            <ellipse cx="210" cy="150" rx="166" ry="55" transform="rotate(24 210 150)"/>
+          </g>
+        </svg>
+        <span class="clock-session-pill session-london">LONDON <i></i></span>
+        <span class="clock-session-pill session-asia"><i></i> ASIA</span>
+        <span class="clock-session-pill session-newyork"><i></i> NEW YORK</span>
         <span class="clock-hand clock-hour" id="aurumClockHour"></span>
         <span class="clock-hand clock-minute" id="aurumClockMinute"></span>
         <span class="clock-hand clock-second" id="aurumClockSecond"></span>
-        <span class="clock-center">✦</span>
+        <span class="clock-center" aria-label="Logo Aurum"><img class="aurum-clock-emblem" src="/aurum-icon-512.png" alt="AURUM"></span>
         <span class="clock-orbit orbit-a"></span>
         <span class="clock-orbit orbit-b"></span>
       </div>
@@ -3587,11 +3605,11 @@ body {
 
     <div class="home-market-grid">
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Gold</strong><small>XAU/USD · ● <em id="homeStatusXAU">Memeriksa</em></small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Emas</strong><small>XAU/USD · ● <em id="homeStatusXAU">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceXAU">--</b>
         <small class="home-market-change" id="homeChangeXAU">Memuat data...</small>
         <small id="homeGoldUpdatedAt" class="home-market-updated" aria-live="polite">Waktu pembaruan: memeriksa...</small>
-        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Gold"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Emas"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
         <span class="home-market-top"><span class="home-asset-icon bitcoin-icon">₿</span><span><strong>Bitcoin</strong><small>BTC/USD · ● <em id="homeStatusBTC">Memeriksa</em></small></span></span>
@@ -3600,10 +3618,10 @@ body {
         <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Bitcoin"><path id="homeSparkBTC" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Oil</strong><small>WTI · ● <em id="homeStatusWTI">Memeriksa</em></small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Minyak</strong><small>WTI · ● <em id="homeStatusWTI">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceWTI">--</b>
         <small class="home-market-change" id="homeChangeWTI">Memuat data...</small>
-        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Oil"><path id="homeSparkWTI" d="M0 21 L180 21"/></svg>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Minyak"><path id="homeSparkWTI" d="M0 21 L180 21"/></svg>
       </a>
     </div>
   </section>
@@ -3616,7 +3634,7 @@ body {
 <button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="window.aurumShowPage?.('partnerPage')"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
 </div></section>
 <!-- TRADING MENU -->
-  <section class="home-section">
+  <section class="home-section aurum-trading-section">
     <div class="home-section-heading">
       <h3>TRADING</h3>
     </div>
@@ -3661,7 +3679,11 @@ body {
         <strong>Obrolan</strong>
       </a>
 
-      
+      <a href="#guidePage"
+         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
+        <span class="community-icon green-icon aurum-glow-icon">▶</span>
+        <strong>Edukasi</strong>
+      </a>
 
       <a href="#partnerPage" onclick="window.aurumShowPage?.('partnerPage');return false;">
         <span class="community-icon amber aurum-glow-icon">♧</span>
@@ -3677,23 +3699,15 @@ body {
     </div>
 
     <div class="home-tools-grid">
-      <a href="#announcementsPage" class="home-menu-card" onclick="window.aurumShowPage?.('announcementsPage');return false;">
-        <span class="home-menu-icon amber aurum-glow-icon">▤</span>
-        <span><strong>Pengumuman</strong><small>Informasi dan pembaruan AURUM</small></span>
-      </a>
-
-      <a href="#guidePage" class="home-menu-card"
-         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
-        <span class="home-menu-icon green-icon aurum-glow-icon">▶</span>
-        <span><strong>Edukasi</strong><small>Pelajaran dan cara memakai AURUM</small></span>
-      </a>
-
-      <a href="#pnlPage" class="home-menu-card" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.();return false;"><span class="home-menu-icon teal aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Hasil paper tracking AURUM</small></span></a>
       <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenNotifications')?.click();return false;">
-        <span class="home-menu-icon amber aurum-glow-icon">♟</span><span><strong>Notifikasi</strong><small>Atur peringatan yang diterima</small></span></a>
+        <span class="home-menu-icon amber aurum-glow-icon">♟</span>
+        <span><strong>Notifikasi</strong><small>Apa yang kamu terima</small></span>
+      </a>
 
-      <a href="#homePage" class="home-menu-card home-tool-wide" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
-        <span class="home-menu-icon slate aurum-glow-icon">⚙</span><span><strong>Pengaturan</strong><small>Tampilan, suara, bahasa, akun</small></span></a>
+      <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
+        <span class="home-menu-icon slate aurum-glow-icon">⚙</span>
+        <span><strong>Pengaturan</strong><small>Tampilan, suara, bahasa, kata sandi</small></span>
+      </a>
     </div>
   </section>
 
@@ -3800,7 +3814,7 @@ body {
     </div>
 
     <section class="aurum-signal-panel active" data-signal-panel="setup" role="tabpanel">
-      <div class="aurum-todays-signals-head"><span>●</span><div><strong>TODAY'S SIGNALS</strong><small>Setup pasar AURUM hari ini</small></div></div>
+      <div class="aurum-todays-signals-head"><span>●</span><div><strong>SINYAL HARI INI</strong><small id="aurumSignalWinCount">Menghitung hasil TP…</small></div></div>
       <div class="aurum-signal-feed-status"><span id="aurumFeedServerState">Menghubungkan ke server…</span><span id="aurumFeedUpdated"></span></div>
       <div id="aurumSignalCards" class="aurum-signal-feed" aria-live="polite"></div>
       <div id="aurumNoSignals" class="aurum-no-signals">Belum ada sinyal terkonfirmasi untuk pasar ini.</div>
@@ -4226,17 +4240,28 @@ body {
 
 </main>
 
-<footer>
-  Aurum Signals AI · Educational analysis only · Manual execution
+<footer class="aurum-traxa-footer">
+  <strong>AURUM SIGNALS AI</strong>
+  <p>Sinyal dan analisis hanya untuk informasi dan bukan saran keuangan. Trading dengan risiko Anda sendiri.</p>
+  <span>Ketentuan &amp; Pengungkapan Risiko</span>
 </footer>
 
 <nav class="aurum-bottom-nav" aria-label="Navigasi Aurum">
-  <a href="#homePage" class="nav-item active" data-page="homePage"><span>⌂</span><small>Dashboard</small></a>
-  <a href="#marketDirectoryPage" class="nav-item" data-page="marketDirectoryPage"><span>ϟ</span><small>Market</small></a>
-  <a href="#chartPage" class="nav-item" data-page="chartPage"><span>▥</span><small>Grafik</small></a>
-  <a href="#newsPage" class="nav-item" data-page="newsPage"><span>▤</span><small>Fundamental</small></a>
-  <a href="#chatPage" class="nav-item" data-page="chatPage"><span>◉</span><small>Obrolan</small></a>
-  <a href="#guidePage" class="nav-item" data-page="guidePage"><span>◇</span><small>Edukasi</small></a>
+  <a href="#homePage" class="nav-item active" data-page="homePage" aria-label="Dashboard" title="Dashboard"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9M9 21v-7h6v7"/></svg></span><small>Dashboard</small></a>
+  <a href="#marketPage" class="nav-item" data-page="marketPage" aria-label="Sinyal" title="Sinyal"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m13 2-3 8H5l6 12 3-9h5L13 2Z"/></svg></span><small>Sinyal</small></a>
+  <a href="#marketDirectoryPage" class="nav-item" data-page="marketDirectoryPage" aria-label="Market" title="Market"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></span><small>Market</small></a>
+  <a href="#chartPage" class="nav-item" data-page="chartPage" aria-label="Grafik" title="Grafik"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-7"/></svg></span><small>Grafik</small></a>
+  <a href="#guidePage" class="nav-item" data-page="guidePage" aria-label="Edukasi" title="Edukasi"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m2 9 10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c4 3 8 3 12 0v-5M22 9v6"/></svg></span><small>Edukasi</small></a>
+  <a href="#chatPage" class="nav-item" data-page="chatPage" aria-label="Obrolan" title="Obrolan"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8 8 0 0 1-3.5-.8L4 20l1.5-4A7 7 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z"/></svg></span><small>Obrolan</small></a>
+  <a href="#pnlPage" class="nav-item" data-page="pnlPage" aria-label="Performa" title="Performa"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h6"/></svg></span><small>Performa</small></a>
+  <a href="#newsPage" class="nav-item" data-page="newsPage" aria-label="Fundamental" title="Fundamental"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><small>Fundamental</small></a>
+  <a href="#announcementsPage" class="nav-item" data-page="announcementsPage" aria-label="Pengumuman" title="Pengumuman"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M17 9a5 5 0 0 1 0 6M19 6a9 9 0 0 1 0 12"/></svg></span><small>Pengumuman</small></a>
+  <a href="#partnerPage" class="nav-item" data-page="partnerPage" aria-label="Partner" title="Partner"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 12 4-4 4 2 3-2 7 4-5 6-4-2-3 2-6-6Z"/><path d="m7 8 3-3 4 2 2-1 4 3M9 14l3 3M12 12l4 4"/></svg></span><small>Partner</small></a>
+  <div class="aurum-rail-utilities" aria-label="Menu tambahan">
+    <button type="button" class="aurum-rail-utility" aria-label="Notifikasi" title="Notifikasi" onclick="document.getElementById('aurumOpenNotifications')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+    <button type="button" class="aurum-rail-utility" aria-label="Bahasa" title="Bahasa dan pengaturan" onclick="document.getElementById('aurumOpenProfile')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+    <button type="button" class="aurum-rail-utility" aria-label="Profil" title="Profil" onclick="document.getElementById('aurumOpenProfile')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+  </div>
 </nav>
 <script>
 (function(){
@@ -4310,11 +4335,14 @@ body {
       const navPageByView = {
         homePage: 'homePage',
         marketDirectoryPage: 'marketDirectoryPage',
-        marketPage: 'marketDirectoryPage',
+        marketPage: 'marketPage',
         chartPage: 'chartPage',
         newsPage: 'newsPage',
         chatPage: 'chatPage',
-        guidePage: 'guidePage'
+        guidePage: 'guidePage',
+        pnlPage: 'pnlPage',
+        partnerPage: 'partnerPage',
+        announcementsPage: 'announcementsPage'
       };
       const activeNavPage = navPageByView[pageId] || '';
       navItems.forEach(function (item) {
@@ -8103,7 +8131,15 @@ console.log('STATUS SERVER DIPERIKSA');
       const tickerSuffix=asset.symbol==='XAU/USD'?'XAU':asset.symbol==='BTC/USD'?'BTC':'WTI';
       const tickerPrice=$('ticker'+tickerSuffix),tickerChange=$('change'+tickerSuffix);
       if(tickerPrice)tickerPrice.textContent=formattedPrice;
-      if(tickerChange){tickerChange.textContent=formattedChange;tickerChange.style.color=change>=0?'#159b72':'#e45b63';}
+      if(tickerChange){
+        tickerChange.textContent=formattedChange;
+        tickerChange.style.color=change>=0?'#159b72':'#e45b63';
+        const tickerItem=tickerChange.closest('.ticker-item');
+        if(tickerItem){
+          tickerItem.dataset.direction=change>=0?'up':'down';
+          tickerItem.classList.toggle('is-delayed',asset.symbol==='XAU/USD' && !hasLiveGoldQuote);
+        }
+      }
       if(path){
         // TRAXA-style sparkline: lightly smoothed candles with flowing cubic curves.
         const rawPoints=candles.slice(-30).map(x=>Number(x.close)).filter(Number.isFinite);
@@ -8793,17 +8829,34 @@ body.aurum-user-dark .app-page{background:transparent!important}
       const r=x.record,key=String(r.generatedAt||r.fingerprint||'')+'|'+r.direction;
       if(seen.has(key))return false;seen.add(key);return true;
     }).sort((a,b)=>Date.parse(b.record.generatedAt||b.record.checkedAt||0)-Date.parse(a.record.generatedAt||a.record.checkedAt||0));
+    const outcomeTone=r=>{
+      const key=String(r.outcome||r.outcomeStatus||'').toUpperCase();
+      if(/TP[123]|TARGET_HIT|COMPLETED/.test(key))return 'win';
+      if(/SL|MISSED_ENTRY/.test(key))return 'loss';
+      return 'pending';
+    };
+    const wins=detailRecords.filter(x=>outcomeTone(x.record)==='win').length;
+    const countNode=document.getElementById('aurumSignalWinCount');
+    if(countNode)countNode.textContent=wins+' setup mencapai target TP';
     feed.innerHTML=detailRecords.length?detailRecords.map((x,index)=>{
       const r=x.record,p=r.tradePlan||{},when=r.generatedAt||r.checkedAt;
-      const date=when?new Date(when).toLocaleString('id-ID'):'Waktu tidak tersedia';
-      const direction=r.direction==='SELL'?'sell':'';
+      const stamp=when?new Date(when):null;
+      const age=stamp?Math.max(0,Math.floor((Date.now()-stamp.getTime())/60000)):null;
+      const ago=age===null?'Waktu tidak tersedia':age<1?'Baru saja':age<60?age+' mnt lalu':age<1440?Math.floor(age/60)+' jam lalu':Math.floor(age/1440)+' hari lalu';
+      const date=stamp?stamp.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false}).replace(':','.')+' · '+stamp.toLocaleDateString('id-ID',{day:'2-digit',month:'short'}):'';
+      const tone=outcomeTone(r);
+      const direction=r.direction==='SELL'?'sell':'buy';
+      const directionLabel=r.direction==='SELL'?'JUAL':'BELI';
       const tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'M15';
-      return '<button type="button" class="aurum-signal-feed-card" data-aurum-signal-index="'+index+'">'+
-        '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-name">'+safe(names[x.symbol]||x.symbol)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+safe(r.direction)+'</b></span>'+
-        '<span class="aurum-signal-feed-meta"><span>'+safe(tf)+'</span><span>'+safe(date)+'</span></span>'+
-        '<span class="aurum-signal-feed-entry">Entry '+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</span>'+
-        '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
-        '<span class="aurum-signal-feed-result">Status: '+safe(outcomeLabel(r.outcomeStatus||'WAITING_FOR_ENTRY'))+' · Ketuk untuk analisis lengkap ›</span></button>';
+      const outcome=String(r.outcome||r.outcomeStatus||'WAITING_FOR_ENTRY').toUpperCase();
+      const statusText=/TP[123]|TARGET_HIT/.test(outcome)?'Selesai · '+outcome:outcome==='COMPLETED'?'Selesai':outcomeLabel(outcome);
+      return '<button type="button" class="aurum-signal-feed-card is-'+tone+'" data-aurum-signal-index="'+index+'">'+
+        '<span class="aurum-signal-feed-timeframe"><strong>'+safe(tf)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+directionLabel+'</b></span>'+
+        '<span class="aurum-signal-feed-content">'+
+          '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-entry">'+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</strong><span class="aurum-signal-feed-date"><b>'+safe(ago)+'</b><small>'+safe(date)+'</small></span></span>'+
+          '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
+          '<span class="aurum-signal-feed-result">'+(tone==='win'?'✓':tone==='loss'?'✕':'◷')+' '+safe(statusText)+' · Ketuk untuk analisis lengkap ›</span>'+
+        '</span></button>';
     }).join(''):'<div class="aurum-signal-feed-empty">Belum ada sinyal BUY/SELL terkonfirmasi untuk instrumen ini. Sinyal WAIT tidak ditampilkan sebagai sinyal aktif.</div>';
     if(empty)empty.hidden=detailRecords.length>0;
     const status=document.getElementById('aurumFeedServerState');
@@ -9167,6 +9220,7 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   });
 })();
 </script>
+  <link rel="stylesheet" href="/traxa-visual-parity.css?v=10">
 </body>
 </html>
 
