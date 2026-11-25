@@ -2539,3 +2539,34 @@ main{max-width:1480px!important}
 @media(prefers-reduced-motion:reduce) {
   #marketPage .aurum-signal-feed-card {transition:none!important}
 }
+
+
+/* Restore the Gold / Bitcoin / Oil selector shown in the TRAXA reference.
+   An older directory rule hid it globally on the signal page. */
+#marketPage > .aurum-asset-switch {
+  display:flex!important;
+  width:100%!important;
+  max-width:none!important;
+  justify-content:flex-start!important;
+  align-items:center!important;
+  gap:8px!important;
+  margin:0 0 12px!important;
+  padding:0 2px!important;
+}
+#marketPage > .aurum-asset-switch button {
+  min-height:34px!important;
+  padding:7px 13px!important;
+  border:1px solid #e5e8ef!important;
+  border-radius:22px!important;
+  background:linear-gradient(180deg,#fff,#f5f6f8)!important;
+  color:#566174!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  box-shadow:0 2px 6px rgba(30,42,60,.05)!important;
+}
+#marketPage > .aurum-asset-switch button.active {
+  border-color:#e5ce8d!important;
+  background:linear-gradient(180deg,#fff9e9,#f8edcf)!important;
+  color:#987022!important;
+  box-shadow:0 2px 9px rgba(190,147,52,.12)!important;
+}
