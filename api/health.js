@@ -52,14 +52,14 @@ module.exports = async function handler(req, res) {
 
   // Cloudflare Pages exposes these deployment identifiers at runtime.
   // They help distinguish Preview from Production without revealing secrets.
-  const deploymentBranch = env.CF_PAGES_BRANCH || null;
+  const deploymentBranch = env.BRANCH || env.CF_PAGES_BRANCH || null;
   const deployment = {
-    platform: env.CF_PAGES ? 'Cloudflare Pages' : 'unknown',
+    platform: env.NETLIFY ? 'Netlify' : env.CF_PAGES ? 'Cloudflare Pages' : 'unknown',
     branch: deploymentBranch,
-    environment: deploymentBranch
+    environment: env.CONTEXT || (deploymentBranch
       ? (deploymentBranch === 'main' ? 'production' : 'preview')
-      : 'unknown',
-    url: env.CF_PAGES_URL || null
+      : 'unknown'),
+    url: env.DEPLOY_PRIME_URL || env.CF_PAGES_URL || null
   };
 
   return res.status(200).json({

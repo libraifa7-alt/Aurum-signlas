@@ -31,6 +31,44 @@ jobs:
           node --input-type=module --check < "functions/api.js"
           node --input-type=module --check < "functions/api/[[path]].js"
           node --input-type=module --check < "functions/api/health.js"
+      - name: Check Netlify function syntax
+        run: node --check netlify/functions/aurum-api.js
+      - name: Smoke test Netlify API adapter
+        run: |
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+          const { handler } = require('./netlify/functions/aurum-api.js');
+          (async () => {
+            const health = await handler({
+              path: '/.netlify/functions/aurum-api/health',
+              httpMethod: 'GET',
+              headers: {},
+              queryStringParameters: {}
+            });
+            assert.equal(health.statusCode, 200);
+            const healthBody = JSON.parse(health.body);
+            assert.equal(healthBody.api, 'mounted');
+            assert.equal(healthBody.host, 'Netlify Functions');
+
+            const invalid = await handler({
+              path: '/.netlify/functions/aurum-api',
+              httpMethod: 'GET',
+              headers: {},
+              queryStringParameters: { symbol: 'XAU/USD', interval: 'INVALID' }
+            });
+            assert.equal(invalid.statusCode, 400);
+            assert.equal(JSON.parse(invalid.body).code, 'INVALID_INTERVAL');
+
+            const signals = await handler({
+              path: '/.netlify/functions/aurum-api/signals',
+              httpMethod: 'GET',
+              headers: {},
+              queryStringParameters: {}
+            });
+            assert.ok([200, 503].includes(signals.statusCode));
+            console.log('Netlify adapter health, market validation, and signals route passed.');
+          })().catch(error => { console.error(error); process.exit(1); });
+          NODE
       - name: Smoke test Cloudflare Pages routes
         run: |
           set -eu

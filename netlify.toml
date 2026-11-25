@@ -1,0 +1,28 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Keep API URLs identical across Vercel, Cloudflare Pages, and Netlify.
+[[redirects]]
+  from = "/api"
+  to = "/.netlify/functions/aurum-api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/aurum-api/:splat"
+  status = 200
+  force = true
+
+# Client-side application routes.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
