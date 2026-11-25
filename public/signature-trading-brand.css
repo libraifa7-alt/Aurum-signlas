@@ -69,3 +69,50 @@
 #marketPage #trendMeter .aurum-trend-dashboard{padding:6px!important}
 }
 @media(prefers-reduced-motion:no-preference){#marketPage .signature-analysis-presenter{animation:signaturePhotoReveal .65s ease-out both}@keyframes signaturePhotoReveal{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}}
+
+
+/* QA FIX: presenter portrait + fully light META TREND surface */
+#marketPage .signature-analysis-presenter{
+  width:100%!important;min-height:100%!important;
+  background:linear-gradient(160deg,#eaf7ff,#fff7df 58%,#d9efff)!important;
+}
+#marketPage .signature-analysis-presenter img{
+  display:block!important;width:100%!important;height:100%!important;
+  min-height:520px!important;object-fit:cover!important;object-position:center 23%!important;
+}
+#marketPage .signature-analysis-layout{align-items:stretch!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-dashboard{
+  color:#17304d!important;background:#fff!important;background-image:none!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-hero{
+  background:linear-gradient(110deg,#edf8ff 0%,#fff 58%,#fff8e8 100%)!important;
+  color:#173b60!important;border:1px solid #d5e7f7!important;
+  box-shadow:0 4px 14px rgba(35,91,145,.09)!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-hero-copy small,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-price small,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-hero-copy span{color:#647d98!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-meter-box{
+  background:#fff!important;border:1px solid #dceaf6!important;color:#254766!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-tf-card{
+  background:linear-gradient(180deg,#fff,#f1f8ff)!important;
+  color:#234668!important;border:1px solid #cfe3f5!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-table{
+  background:#fff!important;border:1px solid #cfe3f5!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-table-head{
+  background:linear-gradient(90deg,#e8f5ff,#fff8e8)!important;color:#17436e!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-table-row{
+  background:#fff!important;color:#254766!important;border-color:#e1edf6!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-table-row span[style*="8, 102, 255"],
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-trend-table-row span[style*="8,102,255"]{
+  color:#0866ff!important;
+}
+@media(max-width:620px){
+  #marketPage .signature-analysis-presenter img{min-height:470px!important}
+}
