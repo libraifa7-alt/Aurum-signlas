@@ -151,7 +151,7 @@ module.exports=async function handler(req,res){
     const symbols=['XAU/USD','BTC/USD','WTI'];
     const results=[];
 
-    for(const symbol of symbols){
+    await Promise.all(symbols.map(async symbol=>{
       const candleSets={};
       const feedDiagnostics={};
       const fetchResults=await Promise.all(TIMEFRAMES.map(async tf=>{
@@ -209,7 +209,7 @@ module.exports=async function handler(req,res){
         await redis(['SET',stateKey,JSON.stringify(record),'EX','604800']);
         results.push({symbol,status:'WAIT',reason:record.reason,timeframes:blockingStale,
           contextualTimeframesStale:contextualStale,feedDiagnostics,changed:record.changed});
-        continue;
+        return;
       }
 
       // Update stored signal outcomes only when the execution feed is fresh.
@@ -290,7 +290,7 @@ module.exports=async function handler(req,res){
       results.push({symbol,status:evaluation.status,reason:evaluation.reason||null,changed,push:pushResult,
         direction:evaluation.direction||null,contextualTimeframesStale:contextualStale,feedDiagnostics,
         latestCandleAt:Object.fromEntries(TIMEFRAMES.map(tf=>[tf,feedDiagnostics[tf].lastCandleAt]))});
-    }
+    }));
 
     return res.status(200).json({status:'success',engine:'server-side-ict',checkedAt:new Date().toISOString(),results});
   } catch(error){
