@@ -3587,11 +3587,11 @@ body {
 
     <div class="home-market-grid">
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Gold</strong><small>XAU/USD · ● <em id="homeStatusXAU">Memeriksa</em></small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Emas</strong><small>XAU/USD · ● <em id="homeStatusXAU">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceXAU">--</b>
         <small class="home-market-change" id="homeChangeXAU">Memuat data...</small>
         <small id="homeGoldUpdatedAt" class="home-market-updated" aria-live="polite">Waktu pembaruan: memeriksa...</small>
-        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Gold"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Emas"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
         <span class="home-market-top"><span class="home-asset-icon bitcoin-icon">₿</span><span><strong>Bitcoin</strong><small>BTC/USD · ● <em id="homeStatusBTC">Memeriksa</em></small></span></span>
@@ -3600,10 +3600,10 @@ body {
         <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Bitcoin"><path id="homeSparkBTC" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Oil</strong><small>WTI · ● <em id="homeStatusWTI">Memeriksa</em></small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Minyak</strong><small>WTI · ● <em id="homeStatusWTI">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceWTI">--</b>
         <small class="home-market-change" id="homeChangeWTI">Memuat data...</small>
-        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Oil"><path id="homeSparkWTI" d="M0 21 L180 21"/></svg>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Minyak"><path id="homeSparkWTI" d="M0 21 L180 21"/></svg>
       </a>
     </div>
   </section>
@@ -3661,15 +3661,15 @@ body {
         <strong>Obrolan</strong>
       </a>
 
-      <a href="#partnerPage" onclick="window.aurumShowPage?.('partnerPage');return false;">
-        <span class="community-icon amber aurum-glow-icon">♧</span>
-        <strong>Undang teman</strong>
-      </a>
-
       <a href="#guidePage"
          onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
         <span class="community-icon green-icon aurum-glow-icon">▶</span>
         <strong>Edukasi</strong>
+      </a>
+
+      <a href="#partnerPage" onclick="window.aurumShowPage?.('partnerPage');return false;">
+        <span class="community-icon amber aurum-glow-icon">♧</span>
+        <strong>Undang teman</strong>
       </a>
     </div>
   </section>
@@ -3681,17 +3681,15 @@ body {
     </div>
 
     <div class="home-tools-grid">
-      <a href="#announcementsPage" class="home-menu-card" onclick="window.aurumShowPage?.('announcementsPage');return false;">
-        <span class="home-menu-icon amber aurum-glow-icon">▤</span>
-        <span><strong>Pengumuman</strong><small>Informasi dan pembaruan AURUM</small></span>
+      <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenNotifications')?.click();return false;">
+        <span class="home-menu-icon amber aurum-glow-icon">♟</span>
+        <span><strong>Notifikasi</strong><small>Apa yang kamu terima</small></span>
       </a>
 
-      <a href="#pnlPage" class="home-menu-card" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.();return false;"><span class="home-menu-icon teal aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Hasil paper tracking AURUM</small></span></a>
-      <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenNotifications')?.click();return false;">
-        <span class="home-menu-icon amber aurum-glow-icon">♟</span><span><strong>Notifikasi</strong><small>Atur peringatan yang diterima</small></span></a>
-
-      <a href="#homePage" class="home-menu-card home-tool-wide" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
-        <span class="home-menu-icon slate aurum-glow-icon">⚙</span><span><strong>Pengaturan</strong><small>Tampilan, suara, bahasa, akun</small></span></a>
+      <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
+        <span class="home-menu-icon slate aurum-glow-icon">⚙</span>
+        <span><strong>Pengaturan</strong><small>Tampilan, suara, bahasa, kata sandi</small></span>
+      </a>
     </div>
   </section>
 
@@ -4224,8 +4222,10 @@ body {
 
 </main>
 
-<footer>
-  Aurum Signals AI · Educational analysis only · Manual execution
+<footer class="aurum-traxa-footer">
+  <strong>AURUM SIGNALS AI</strong>
+  <p>Sinyal dan analisis hanya untuk informasi dan bukan saran keuangan. Trading dengan risiko Anda sendiri.</p>
+  <span>Ketentuan &amp; Pengungkapan Risiko</span>
 </footer>
 
 <nav class="aurum-bottom-nav" aria-label="Navigasi Aurum">
