@@ -8194,7 +8194,6 @@ console.log('STATUS SERVER DIPERIKSA');
               : (referencePrice-resistance).toFixed(2)+' pts below')
             : 'Level belum tersedia';
       }
-      syncNearestLevelDistances(latest);
       const old=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
       const direction=latest>=prev?'up':'down';
       priceEl.classList.remove('price-up','price-down','price-flash');
@@ -8206,11 +8205,13 @@ console.log('STATUS SERVER DIPERIKSA');
           const t=Math.min(1,(now-start)/duration),e=1-Math.pow(1-t,3);
           priceEl.textContent=fmt.format(old+(latest-old)*e);
           if(t<1)requestAnimationFrame(step);
+          else syncNearestLevelDistances(Number(String(priceEl.textContent).replace(/[^0-9.]/g,'')));
         }
         requestAnimationFrame(step);
         void priceEl.offsetWidth;priceEl.classList.add('price-flash');
       }else{
         priceEl.textContent=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        syncNearestLevelDistances(Number(String(priceEl.textContent).replace(/[^0-9.]/g,'')));
       }
       const displayCandles=candles.slice();
       if(hasFreshGoldQuote){
