@@ -1,0 +1,133 @@
+name: AURUM mainline QA
+
+on:
+  push:
+    branches:
+      - qa/mainline-market-freshness
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  market-freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Check all API syntax
+        run: |
+          for file in api/*.js; do
+            echo "Checking $file"
+            node --check "$file"
+          done
+      - name: Check Cloudflare Pages function syntax
+        run: |
+          node --input-type=module --check < "functions/api.js"
+          node --input-type=module --check < "functions/api/[[path]].js"
+          node --input-type=module --check < "functions/api/health.js"
+      - name: Check Netlify function syntax
+        run: node --check netlify/functions/aurum-api.js
+      - name: Smoke test Netlify API adapter
+        run: |
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+          const { handler } = require('./netlify/functions/aurum-api.js');
+          (async () => {
+            const health = await handler({
+              path: '/.netlify/functions/aurum-api/health',
+              httpMethod: 'GET',
+              headers: {},
+              queryStringParameters: {}
+            });
+            assert.equal(health.statusCode, 200);
+            const healthBody = JSON.parse(health.body);
+            assert.equal(healthBody.api, 'mounted');
+            assert.equal(healthBody.host, 'Netlify Functions');
+
+            const invalid = await handler({
+              path: '/.netlify/functions/aurum-api',
+              httpMethod: 'GET',
+              headers: {},
+              queryStringParameters: { symbol: 'XAU/USD', interval: 'INVALID' }
+            });
+            assert.equal(invalid.statusCode, 400);
+            assert.equal(JSON.parse(invalid.body).code, 'INVALID_INTERVAL');
+
+            const signals = await handler({
+              path: '/.netlify/functions/aurum-api/signals',
+              httpMethod: 'GET',
+              headers: {},
+              queryStringParameters: {}
+            });
+            assert.ok([200, 503].includes(signals.statusCode));
+            console.log('Netlify adapter health, market validation, and signals route passed.');
+          })().catch(error => { console.error(error); process.exit(1); });
+          NODE
+      - name: Smoke test Cloudflare Pages routes
+        run: |
+          set -eu
+          npx --yes wrangler@4 pages dev ./public --ip 127.0.0.1 --port 8788 > /tmp/aurum-pages.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8788/api/health > /tmp/aurum-health.json; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "FAIL: /api/health did not become ready"
+            cat /tmp/aurum-pages.log
+            exit 1
+          fi
+          echo "CHECK /api/health:"
+          cat /tmp/aurum-health.json
+          node -e "const h=require('/tmp/aurum-health.json'); if(h.api!=='mounted'||h.host!=='Cloudflare Pages') { console.error('Unexpected health metadata:',h); process.exit(1) }"
+          code=$(curl --silent --output /tmp/aurum-invalid.json --write-out '%{http_code}' 'http://127.0.0.1:8788/api?symbol=XAU%2FUSD&interval=INVALID')
+          echo "CHECK /api invalid interval: HTTP $code"
+          cat /tmp/aurum-invalid.json
+          test "$code" = "400" || { echo "FAIL: expected HTTP 400"; exit 1; }
+          node -e "const d=require('/tmp/aurum-invalid.json'); if(d.code!=='INVALID_INTERVAL') { console.error('Unexpected invalid-interval body:',d); process.exit(1) }"
+          code=$(curl --silent --output /tmp/aurum-signals.json --write-out '%{http_code}' 'http://127.0.0.1:8788/api/signals')
+          echo "CHECK /api/signals without Redis: HTTP $code"
+          cat /tmp/aurum-signals.json
+          test "$code" = "503" || { echo "FAIL: expected HTTP 503"; exit 1; }
+          node -e "const d=require('/tmp/aurum-signals.json'); if(d.status!=='not_configured') { console.error('Unexpected signals body:',d); process.exit(1) }"
+          code=$(curl --silent --output /tmp/aurum-cron.json --write-out '%{http_code}' 'http://127.0.0.1:8788/api/cron')
+          echo "CHECK /api/cron without scheduled runtime: HTTP $code"
+          cat /tmp/aurum-cron.json
+          test "$code" = "503" || { echo "FAIL: expected HTTP 503"; exit 1; }
+          node -e "const d=require('/tmp/aurum-cron.json'); if(d.code!=='CRON_RUNTIME_NOT_CONFIGURED') { console.error('Unexpected cron body:',d); process.exit(1) }"
+      - name: Run market data regression tests
+        run: npm test
+      - name: Parse all inline browser scripts
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const html = fs.readFileSync('public/index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
+          let checked = 0;
+          for (let i = 0; i < scripts.length; i++) {
+            const attrs = scripts[i][1];
+            const source = scripts[i][2];
+            if (/\bsrc\s*=/.test(attrs)) continue;
+            const type = (attrs.match(/\btype\s*=\s*["']([^"']+)["']/i) || [])[1] || '';
+            if (/application\/(json|ld\+json)|importmap/i.test(type)) continue;
+            try {
+              new Function(source);
+              checked++;
+            } catch (error) {
+              console.error('Inline script ' + (i + 1) + ' failed to parse:', error.message);
+              process.exitCode = 1;
+            }
+          }
+          console.log('Parsed ' + checked + ' inline browser scripts.');
+          NODE

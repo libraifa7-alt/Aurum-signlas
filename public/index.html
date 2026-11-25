@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aurum Signals AI</title>
+<meta name="description" content="Aurum Signals — dashboard analisis Gold, Bitcoin, dan WTI, grafik pasar, sinyal, fundamental, serta edukasi trading.">
 
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="/aurum-icon-192.png">
@@ -651,7 +652,7 @@ body {
   }
 }
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM DIGITAL NETWORK EFFECT */
 
@@ -726,7 +727,7 @@ body {
   }
 }
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM PREMIUM GOLD AURA */
 
@@ -828,7 +829,7 @@ body {
   }
 }
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM GOLDEN ENERGY PARTICLES */
 
@@ -990,7 +991,7 @@ body {
 /* END AURUM GOLDEN ENERGY TRAIL */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM GOLDEN PARTICLE BURST */
 
@@ -1087,7 +1088,7 @@ body {
 /* END AURUM GOLDEN PARTICLE BURST */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM GOLDEN ORBITAL GLOW */
 
@@ -1109,7 +1110,7 @@ body {
 /* END AURUM GOLDEN ORBITAL GLOW */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM BIGGER DIGITAL ORB */
 
@@ -1164,7 +1165,7 @@ body {
 /* END AURUM BIGGER DIGITAL ORB */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM GIANT DIGITAL ORB - TRAXA INSPIRED */
 
@@ -1295,7 +1296,7 @@ body {
 /* END AURUM GIANT DIGITAL ORB */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM PREMIUM TOP POSITION */
 
@@ -1363,7 +1364,7 @@ body {
 /* END AURUM PREMIUM TOP POSITION */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM MINIMAL PREMIUM LAYOUT */
 
@@ -1432,7 +1433,7 @@ body {
 /* END AURUM MINIMAL PREMIUM LAYOUT */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM PREMIUM SWIPE TRANSITION */
 
@@ -1459,7 +1460,7 @@ body {
 /* END AURUM PREMIUM SWIPE TRANSITION */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM PREMIUM TRAXA-STYLE DASHBOARD */
 
@@ -1521,7 +1522,7 @@ body {
 /* END AURUM PREMIUM TRAXA-STYLE DASHBOARD */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM PREMIUM MARKET OVERVIEW */
 
@@ -1604,7 +1605,7 @@ body {
 /* END AURUM PREMIUM MARKET CONTROLS */
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM PREMIUM ICT AI ANALYSIS */
 
@@ -1650,7 +1651,7 @@ body {
 
 
 
-<style>
+/* AURUM stylesheet section */
 
 /* AURUM PREMIUM TRADING SIGNALS */
 
@@ -3333,6 +3334,8 @@ body {
 #aurumSignalDetailView .aurum-detail-status{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:12px}
 #aurumSignalDetailView .aurum-detail-status span{display:inline-flex;padding:6px 10px;border-radius:20px;background:#eef5f7;color:#758497;font-size:9px;font-weight:900;letter-spacing:.5px}
 #aurumSignalDetailView .aurum-detail-status span:first-child{background:#e8f7ef;color:#19865f}
+#aurumSignalDetailView .aurum-detail-status span:first-child.is-warning{background:#fff0f0!important;color:#bd303d!important;border:1px solid #f1c5ca}
+#aurumSignalDetailView .aurum-detail-status span:first-child.is-warning::before{content:"⚠ ";}
 #aurumSignalDetailView .aurum-detail-live{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;padding:13px 14px;border:1px solid #dce7f3;border-radius:12px;background:#f7fbff}
 #aurumSignalDetailView .aurum-detail-live small{font-size:9px;font-weight:900;letter-spacing:1px;color:#8290a2}
 #aurumSignalDetailView .aurum-detail-live strong{display:block;margin-top:5px;font-size:20px;letter-spacing:-.3px;color:#26364c}
@@ -3373,6 +3376,32 @@ body {
  #aurumSignalDetailView .aurum-detail-orderblocks{gap:5px}
 }
 </style>
+<style id="aurum-mobile-navigation-final">
+/* Final mobile shell overrides: consistent full-width app and safe-area navigation. */
+@media (max-width: 600px) {
+  header, main { width: 100% !important; max-width: 570px !important; }
+  header { margin-left: auto !important; margin-right: auto !important; }
+  main { padding-left: 12px !important; padding-right: 12px !important; }
+  .aurum-bottom-nav {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: 0 !important;
+    width: min(100%, 570px) !important;
+    max-width: 570px !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    padding: 5px 6px calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 16px 16px 0 0 !important;
+    z-index: 99999 !important;
+  }
+  body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurum-live-ticker .ticker-track { animation: none !important; transform: none !important; }
+}
+</style>
 </head>
   
   
@@ -3397,6 +3426,7 @@ body {
 
 
 <body id="top">
+<div id="aurumDebugStatus" hidden aria-hidden="true"></div>
 
 <!-- AURUM PREMIUM SPLASH SCREEN -->
 <div id="aurumSplash" class="aurum-splash">
@@ -3431,7 +3461,7 @@ body {
       <div class="splash-swipe" aria-label="Geser ke kanan untuk masuk">
         <span class="swipe-handle">➜</span><span class="swipe-copy">SWIPE TO ENTER</span>
       </div>
-      <p class="splash-hint">Slide right to enter AURUM Signals AI</p>
+      <p class="splash-hint">Geser ke kanan untuk masuk ke AURUM Signals</p>
       <button id="aurumEnterButton">MASUK KE DASHBOARD</button>
       
     </div>
@@ -3446,7 +3476,7 @@ body {
     <button type="button" class="aurum-header-action aurum-notification-action" id="aurumOpenNotifications" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg><i id="aurumNotificationDot"></i></button>
     <button type="button" class="aurum-header-action aurum-profile-action" id="aurumOpenProfile" aria-label="Profile">A</button>
   </div>
-  <div class="status">● CEK DEPLOY TERBARU</div>
+  <div class="status" role="status" aria-live="polite">● AURUM SIGNALS</div>
 
 </header>
   
@@ -3464,7 +3494,6 @@ body {
     </div>
     <div class="aurum-notice-card"><strong>Notifications <span id="aurumNotificationState">are on</span></strong><small>Izinkan notifikasi perangkat untuk menerima pemberitahuan sinyal.</small><button type="button" id="aurumTestNotification">Send test</button><button type="button" id="aurumEnablePush">Enable background alerts</button><small id="aurumPushStatus">Notifikasi saat aplikasi ditutup memerlukan konfigurasi server.</small></div>
     <div class="aurum-panel-promo"><div><strong>Undang teman</strong><small>Bagikan AURUM Signals AI.</small></div><button type="button" id="aurumInviteButton">Invite</button></div>
-    <div class="aurum-panel-promo"><div><strong>Telegram channel</strong><small>Channel belum dihubungkan.</small></div><span class="aurum-muted-pill">Belum tersedia</span></div>
     <button type="button" class="aurum-setup-guide" id="aurumSetupGuide">Setup guide: home screen & notifications</button>
     <details class="aurum-account-details"><summary>Username & trading accounts</summary><p>AURUM saat ini menyimpan preferensi dan jurnal sinyal di perangkat ini. Tidak terhubung ke akun broker dan tidak mengeksekusi transaksi.</p></details>
     <button type="button" class="aurum-signout" data-aurum-close>Close settings</button>
@@ -3584,7 +3613,7 @@ body {
 <div class="aurum-home-feature-grid">
 <button type="button" class="aurum-home-feature" onclick="document.querySelector('.nav-item[data-page=guidePage]').click()"><span class="home-menu-icon green-icon aurum-glow-icon">▱</span><span><strong>Kelas</strong><small>Pelajaran dan panduan aplikasi</small></span><em>BARU</em></button>
 <button type="button" class="aurum-home-feature" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.()"><span class="home-menu-icon blue aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Jurnal sinyal paper di perangkat ini</small></span><em>JURNAL</em></button>
-<button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="document.getElementById('aurumOpenProfile')?.click()"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
+<button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="window.aurumShowPage?.('partnerPage')"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
 </div></section>
 <!-- TRADING MENU -->
   <section class="home-section">
@@ -3632,12 +3661,9 @@ body {
         <strong>Obrolan</strong>
       </a>
 
-      <a href="#homePage" onclick="alert('Channel Telegram resmi AURUM belum dihubungkan.');return false;">
-        <span class="community-icon sky aurum-glow-icon">➤</span>
-        <strong>Telegram</strong>
-      </a>
+      
 
-      <a href="#homePage" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
+      <a href="#partnerPage" onclick="window.aurumShowPage?.('partnerPage');return false;">
         <span class="community-icon amber aurum-glow-icon">♧</span>
         <strong>Undang teman</strong>
       </a>
@@ -3651,6 +3677,11 @@ body {
     </div>
 
     <div class="home-tools-grid">
+      <a href="#announcementsPage" class="home-menu-card" onclick="window.aurumShowPage?.('announcementsPage');return false;">
+        <span class="home-menu-icon amber aurum-glow-icon">▤</span>
+        <span><strong>Pengumuman</strong><small>Informasi dan pembaruan AURUM</small></span>
+      </a>
+
       <a href="#guidePage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
         <span class="home-menu-icon green-icon aurum-glow-icon">▶</span>
@@ -3857,36 +3888,7 @@ body {
     </section>
   </section>
   <!-- END HALAMAN SINYAL -->
-<script id="aurum-market-directory-actions">
-(function(){
-  function openInstrument(row){
-    var asset=row.getAttribute('data-asset');
-    var pair=document.getElementById('pair');
-    var source=document.querySelector('#marketPage .aurum-asset-switch [data-asset="'+asset+'"]');
-    // Select the actual chart/API symbol directly; do not rely only on a visual shortcut click.
-    if(pair && ['XAU/USD','BTC/USD','WTI'].indexOf(asset)!==-1 && pair.value!==asset){
-      pair.value=asset;
-      pair.dispatchEvent(new Event('change',{bubbles:true}));
-    }
-    document.querySelectorAll('#marketPage .aurum-asset-switch [data-asset]').forEach(function(button){
-      button.classList.toggle('active',button.dataset.asset===asset);
-    });
-    // Keep the existing asset button as a fallback for any related UI listeners.
-    if(source && (!pair || pair.value!==asset)) source.click();
-    document.querySelectorAll('.app-page').forEach(function(page){page.classList.toggle('active',page.id==='marketPage');});
-    document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(function(item){item.classList.toggle('active',item.dataset.page==='marketDirectoryPage');});
-    window.scrollTo({top:0,behavior:'auto'});
-    requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));});
-  }
-  function bindAurumMarketDirectory(){
-    document.querySelectorAll('#aurumMarketDirectory [data-asset]').forEach(function(row){
-      row.addEventListener('click',function(){openInstrument(this);});
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindAurumMarketDirectory);
-  else bindAurumMarketDirectory();
-})();
-</script>
+
 
   <!-- HALAMAN GRAFIK -->
   <section id="chartPage" class="app-page">
@@ -3924,8 +3926,8 @@ body {
   </div>
   <h3>FUNDAMENTAL MONITOR</h3>
   <div class="cards">
-    <div class="card"><small>US DOLLAR INDEX</small><strong class="gold">BELUM TERHUBUNG</strong><small>DXY · Sumber data belum dipasang</small></div>
-    <div class="card"><small>US 10Y YIELD</small><strong class="gold">BELUM TERHUBUNG</strong><small>Treasury Yield · Sumber data belum dipasang</small></div>
+    <div class="card"><small>NOMINAL BROAD U.S. DOLLAR INDEX</small><strong class="gold" id="aurumFundamentalBroadUsd">MEMUAT…</strong><small id="aurumFundamentalBroadUsdMeta">DTWEXBGS · Federal Reserve H.10 via FRED · bukan ICE DXY</small></div>
+    <div class="card"><small>US 10Y TREASURY YIELD</small><strong class="gold" id="aurumFundamentalUs10y">MEMUAT…</strong><small id="aurumFundamentalUs10yMeta">DGS10 · Federal Reserve H.15 via FRED</small></div>
   </div>
   <h3 style="margin-top:20px">ECONOMIC NEWS</h3>
   <div class="signal"><small class="sub">LATEST MARKET NEWS</small><p>Belum ada penyedia berita ekonomi yang terhubung. Berita tidak ditampilkan sebelum sumber dan waktu publikasinya dapat diverifikasi.</p></div>
@@ -3954,11 +3956,11 @@ body {
 <!-- AURUM AI CHAT PAGE -->
 <section id="aurumChat" class="panel" style="margin-top:16px">
   
-  <h3>✦ AURUM AI CHAT</h3>
-  <p class="sub">SMART MONEY CONCEPTS AI ASSISTANT</p>
+  <h3>✦ OBROLAN AURUM</h3>
+  <p class="sub">ASISTEN DATA PASAR & EDUKASI SMC/ICT</p>
 
   <div class="signal" style="margin-top:16px">
-    <h3 class="gold">WELCOME TO AURUM AI</h3>
+    <h3 class="gold">WELCOME TO OBROLAN AURUM</h3>
     <p>
       Asisten analisis pasar untuk membantu memahami
       pergerakan Forex, Gold, Crypto, dan Oil.
@@ -4011,7 +4013,7 @@ body {
     <input id="aurumChatInput" type="text" maxlength="500" autocomplete="off" placeholder="Tulis pertanyaan Anda..." aria-label="Pertanyaan untuk Aurum" style="flex:1;min-width:0">
     <button type="submit" class="gold">Kirim</button>
   </form>
-  <p class="sub" id="aurumChatDisclaimer" style="margin-top:10px">Mode asisten berbasis aturan dan data server. Model AI generatif eksternal belum terhubung.</p>
+  <p class="sub" id="aurumChatDisclaimer" style="margin-top:10px">Asisten menggunakan aturan dan data server; tidak memerlukan layanan AI eksternal.</p>
 
 
 
@@ -4038,6 +4040,43 @@ body {
       </div>
       <h3>RIWAYAT PAPER TRACKING</h3><div id="aurumPnlHistory" class="aurum-pnl-history"><p class="sub">Belum ada riwayat.</p></div>
       <p class="sub">Hasil dihitung dari pemantauan candle oleh AURUM di browser ini. Sinyal yang belum selesai dan candle ambigu tidak dimasukkan ke hasil bersih.</p>
+    </section>
+  </section>
+
+  <!-- HALAMAN PARTNER -->
+  <section id="partnerPage" class="app-page">
+    <section class="panel" style="margin-top:14px;padding:16px;border-radius:18px">
+      <button type="button" class="aurum-detail-back" onclick="window.aurumShowPage?.('homePage')">‹ Kembali ke Dashboard</button>
+      <div style="padding:22px 16px;border-radius:16px;background:radial-gradient(circle at 50% 0%,rgba(181,138,53,.24),transparent 55%),linear-gradient(145deg,#090b12,#1c1b17);color:#f8f5ed;text-align:center;border:1px solid rgba(181,138,53,.42)">
+        <div style="width:58px;height:58px;margin:0 auto 12px;border:1px solid rgba(231,190,91,.65);border-radius:50%;display:grid;place-items:center;color:#e8c46c;font-size:26px">♧</div>
+        <small style="color:#d7b65f;letter-spacing:2px;font-weight:800">AURUM COMMUNITY</small>
+        <h2 style="margin:9px 0;color:#fff">PROGRAM PARTNER</h2>
+        <p style="max-width:360px;margin:0 auto;color:#d7d5ce;font-size:12px;line-height:1.7">Bagikan AURUM Signals AI kepada teman dan komunitas trading Anda.</p>
+        <button type="button" id="aurumPartnerShare" style="width:100%;margin-top:20px;padding:13px;border:0;border-radius:10px;background:linear-gradient(90deg,#d4a83f,#f2d98a);color:#211b0e;font-weight:800">BAGIKAN AURUM</button>
+      </div>
+      <h3 style="margin:18px 0 10px">DASHBOARD PARTNER</h3>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px">
+        <div class="signal"><small class="sub">UNDANGAN TERVERIFIKASI</small><strong style="display:block;font-size:22px">—</strong><small class="sub">Menunggu sistem referral</small></div>
+        <div class="signal"><small class="sub">KOMISI PARTNER</small><strong style="display:block;font-size:22px">—</strong><small class="sub">Belum diaktifkan</small></div>
+      </div>
+      <div class="signal" style="margin-top:12px">
+        <strong>STATUS PROGRAM</strong>
+        <p class="sub" style="margin-bottom:0">Tautan berbagi AURUM dapat digunakan. Pelacakan undangan, dashboard pendapatan, dan pembayaran komisi belum terhubung ke backend partner resmi. Angka referral atau komisi tidak akan dibuat-buat.</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- HALAMAN PENGUMUMAN -->
+  <section id="announcementsPage" class="app-page">
+    <section class="panel" style="margin-top:14px;padding:16px;border-radius:18px">
+      <button type="button" class="aurum-detail-back" onclick="window.aurumShowPage?.('homePage')">‹ Kembali ke Dashboard</button>
+      <h2 style="margin:4px 0 6px">PENGUMUMAN AURUM</h2>
+      <p class="sub">Pusat informasi layanan, pembaruan aplikasi, dan pemberitahuan komunitas.</p>
+      <div class="signal" style="margin-top:14px;padding:20px;text-align:center">
+        <div style="font-size:30px;color:#b58a35">▤</div>
+        <strong>Belum ada pengumuman resmi</strong>
+        <p class="sub" style="margin-bottom:0">Pengumuman akan ditampilkan di sini setelah kanal publikasi AURUM terhubung. Informasi yang belum diterbitkan tidak akan ditampilkan sebagai berita resmi.</p>
+      </div>
     </section>
   </section>
 
@@ -4069,31 +4108,37 @@ body {
       <div style="min-height:112px;border-radius:12px;background:linear-gradient(145deg,#090b13,#171b2b);display:grid;place-items:center;color:#e6bd54;font-weight:800;letter-spacing:1px">PELAJARAN 01</div>
       <small class="gold">PELAJARAN 1</small><h3>Struktur Market</h3>
       <p>High dan low, uptrend, downtrend, range, serta cara trading searah struktur.</p>
+      <details class="aurum-lesson-detail"><summary>Pelajari konsep dan konfirmasi</summary><p>Uptrend membentuk rangkaian higher high dan higher low; downtrend membentuk lower low dan lower high. Range terjadi saat harga bergerak di antara batas atas dan bawah tanpa arah dominan.</p><p>Tandai swing high dan swing low yang jelas pada timeframe lebih tinggi, lalu tunggu struktur terkonfirmasi pada timeframe eksekusi. Jangan menganggap satu candle menembus level sebagai perubahan tren yang pasti.</p><p><strong>Latihan:</strong> tandai tiga swing terakhir dan tentukan apakah struktur sedang naik, turun, atau ranging. Jika tidak jelas, pilih WAIT.</p></details>
     </article>
     <article class="signal aurum-lesson-card">
       <div style="min-height:112px;border-radius:12px;background:linear-gradient(145deg,#090b13,#171b2b);display:grid;place-items:center;color:#e6bd54;font-weight:800;letter-spacing:1px">PELAJARAN 02</div>
       <small class="gold">PELAJARAN 2</small><h3>Support &amp; Resistance</h3>
       <p>Lantai dan atap harga: cara menemukannya, trading pantulan, dan buy saat retest ketika level berbalik.</p>
+      <details class="aurum-lesson-detail"><summary>Pelajari pemetaan level</summary><p>Support dan resistance adalah zona reaksi, bukan garis yang selalu menahan harga tepat di satu angka. Gunakan beberapa reaksi harga dan swing yang terlihat; hindari menggambar terlalu banyak level.</p><p>Pantulan belum terkonfirmasi sebelum ada reaksi harga. Setelah breakout, tunggu retest dan amati apakah level lama berubah fungsi. Level dapat ditembus dan tidak menjamin pembalikan.</p><p><strong>Latihan:</strong> tandai satu zona support dan resistance, lalu catat apakah harga menolak, menembus, atau retest.</p></details>
     </article>
     <article class="signal aurum-lesson-card">
       <div style="min-height:112px;border-radius:12px;background:linear-gradient(145deg,#090b13,#171b2b);display:grid;place-items:center;color:#e6bd54;font-weight:800;letter-spacing:1px">PELAJARAN 03</div>
       <small class="gold">PELAJARAN 3</small><h3>Change of Character</h3>
       <p>Perbedaan break of structure dan change of character sebagai tanda awal potensi perubahan tren.</p>
+      <details class="aurum-lesson-detail"><summary>Pelajari BOS dan CHOCH</summary><p>BOS (Break of Structure) adalah penembusan swing penting yang mendukung arah struktur berjalan. CHOCH (Change of Character) adalah perubahan perilaku struktur yang dapat menjadi peringatan awal bahwa arah sebelumnya melemah.</p><p>Gunakan candle yang sudah tutup dan swing yang bermakna. Satu wick atau penembusan kecil di tengah noise tidak cukup untuk menyimpulkan perubahan tren. Cari konteks timeframe lebih tinggi dan reaksi setelah break.</p><p><strong>Latihan:</strong> tandai swing yang ditembus, arah break, dan apakah break mendukung tren atau melawannya.</p></details>
     </article>
     <article class="signal aurum-lesson-card">
       <div style="min-height:112px;border-radius:12px;background:linear-gradient(145deg,#090b13,#171b2b);display:grid;place-items:center;color:#e6bd54;font-weight:800;letter-spacing:1px">PELAJARAN 04</div>
       <small class="gold">PELAJARAN 4</small><h3>Liquidity Sweep</h3>
       <p>Area stop loss, bagaimana harga mengambil likuiditas, serta konsep sweep dan reclaim.</p>
+      <details class="aurum-lesson-detail"><summary>Pelajari liquidity sweep</summary><p>Likuiditas sering terkumpul di sekitar equal highs/lows, swing high/low, dan batas range karena banyak pelaku menempatkan stop atau pending order di area tersebut.</p><p>Sweep terjadi saat harga melewati area itu lalu kembali masuk (reclaim). Penembusan tidak otomatis sweep: tunggu candle close atau reaksi yang jelas. Hindari entry hanya karena harga menyentuh kumpulan likuiditas.</p><p><strong>Latihan:</strong> tandai equal highs/lows, lalu amati apakah harga hanya menembus atau benar-benar reclaim area.</p></details>
     </article>
     <article class="signal aurum-lesson-card">
       <div style="min-height:112px;border-radius:12px;background:linear-gradient(145deg,#090b13,#171b2b);display:grid;place-items:center;color:#e6bd54;font-weight:800;letter-spacing:1px">PELAJARAN 05</div>
       <small class="gold">PELAJARAN 5</small><h3>Fair Value Gap</h3>
       <p>Ketidakseimbangan tiga candle, cara mengenali fair value gap, dan konsep saat harga kembali mengisinya.</p>
+      <details class="aurum-lesson-detail"><summary>Pelajari Fair Value Gap</summary><p>FVG adalah ketidakseimbangan tiga candle. Bullish FVG terbentuk ketika low candle ketiga berada di atas high candle pertama; bearish FVG ketika high candle ketiga berada di bawah low candle pertama.</p><p>Zona FVG menunjukkan area pergerakan cepat, bukan kewajiban harga untuk kembali mengisinya. Nilai zona bersama arah struktur, lokasi premium/discount, dan liquidity; jangan entry otomatis hanya karena harga masuk zona.</p><p><strong>Latihan:</strong> tandai batas FVG yang valid dan catat apakah zona bertahan, ditembus, atau tidak pernah diuji ulang.</p></details>
     </article>
     <article class="signal aurum-lesson-card">
       <div style="min-height:112px;border-radius:12px;background:linear-gradient(145deg,#090b13,#171b2b);display:grid;place-items:center;color:#e6bd54;font-weight:800;letter-spacing:1px">PELAJARAN 06</div>
       <small class="gold">PELAJARAN 6</small><h3>Order Block</h3>
       <p>Zona supply dan demand, area masuknya pembeli atau penjual besar, serta konsep retest.</p>
+      <details class="aurum-lesson-detail"><summary>Pelajari Order Block</summary><p>Order Block sering dipetakan sebagai candle berlawanan terakhir sebelum displacement yang menembus struktur. Zona harus punya konteks; tidak setiap candle bearish sebelum kenaikan atau bullish sebelum penurunan otomatis menjadi OB.</p><p>Periksa displacement, break struktur, lokasi zona, dan apakah zona sudah diuji berulang. Tentukan invalidasi sebelum mempertimbangkan skenario. OB bukan bukti pasti aktivitas institusi dan tidak menjamin reaksi harga.</p><p><strong>Latihan:</strong> cari satu displacement yang jelas, tandai candle asalnya, lalu tulis alasan validasi dan level invalidasi.</p></details>
     </article>
   </div>
   <p class="sub" style="margin-top:10px">Catatan: video referensi memperlihatkan kartu pelajaran dan durasinya, tetapi tidak menyediakan berkas video pembelajaran. Pemutar video AURUM baru dapat diaktifkan setelah sumber video asli tersedia.</p>
@@ -4250,32 +4295,40 @@ body {
 <script>
 (function () {
   function initAurumNavigation() {
-    const navItems = document.querySelectorAll(
-      '.aurum-bottom-nav .nav-item'
-    );
-
+    const navItems = document.querySelectorAll('.aurum-bottom-nav .nav-item');
     const pages = document.querySelectorAll('.app-page');
+    const validPages = new Set(Array.from(pages, page => page.id));
 
-    function showPage(pageId) {
-      const targetPage = document.getElementById(pageId);
-      if (!targetPage) return;
+    function showPage(pageId, updateAddress) {
+      if (!validPages.has(pageId)) return;
       window.aurumShowPage = showPage;
 
       pages.forEach(function (page) {
         page.classList.toggle('active', page.id === pageId);
       });
 
+      const navPageByView = {
+        homePage: 'homePage',
+        marketDirectoryPage: 'marketDirectoryPage',
+        marketPage: 'marketDirectoryPage',
+        chartPage: 'chartPage',
+        newsPage: 'newsPage',
+        chatPage: 'chatPage',
+        guidePage: 'guidePage'
+      };
+      const activeNavPage = navPageByView[pageId] || '';
       navItems.forEach(function (item) {
-        item.classList.toggle(
-          'active',
-          item.dataset.page === pageId || (pageId === 'pnlPage' && item.dataset.page === 'homePage')
-        );
+        const active = !!activeNavPage && item.dataset.page === activeNavPage;
+        item.classList.toggle('active', active);
+        if (active) item.setAttribute('aria-current', 'page');
+        else item.removeAttribute('aria-current');
       });
 
-      window.scrollTo({
-        top: 0,
-        behavior: 'auto'
-      });
+      if (updateAddress !== false && window.location.hash !== '#' + pageId) {
+        window.history.pushState({ aurumPage: pageId }, '', '#' + pageId);
+      }
+
+      window.scrollTo({ top: 0, behavior: 'auto' });
 
       if (pageId === 'marketPage' || pageId === 'chartPage') {
         requestAnimationFrame(function () {
@@ -4287,18 +4340,27 @@ body {
     navItems.forEach(function (item) {
       item.addEventListener('click', function (event) {
         event.preventDefault();
-        showPage(this.dataset.page);
+        showPage(this.dataset.page, true);
       });
     });
 
-    showPage('homePage');
+    function restorePageFromAddress() {
+      let requestedPage = window.location.hash.slice(1);
+      try {
+        requestedPage = decodeURIComponent(requestedPage);
+      } catch (_) {
+        requestedPage = '';
+      }
+      showPage(validPages.has(requestedPage) ? requestedPage : 'homePage', false);
+    }
+
+    window.addEventListener('hashchange', restorePageFromAddress);
+    window.addEventListener('popstate', restorePageFromAddress);
+    restorePageFromAddress();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener(
-      'DOMContentLoaded',
-      initAurumNavigation
-    );
+    document.addEventListener('DOMContentLoaded', initAurumNavigation, { once: true });
   } else {
     initAurumNavigation();
   }
@@ -4311,13 +4373,13 @@ body {
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 
 <script>
-document.querySelector('.status').textContent = 'TES SCRIPT TERPISAH BERHASIL';
+document.getElementById('aurumDebugStatus').textContent = 'TES SCRIPT TERPISAH BERHASIL';
 </script>
 
 <script>
 const aurumCandleCache = new Map();
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'SCRIPT UTAMA MULAI BERJALAN';
 
 console.log('CEK LOADCHART DIMULAI');
@@ -4328,7 +4390,7 @@ if (el && window.LightweightCharts) {
   console.log('MASUK KE BLOK GRAFIK');
   console.log('UKURAN AREA GRAFIK:', el.clientWidth, el.clientHeight);
 
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'UKURAN GRAFIK: ' + el.clientWidth + ' x ' + el.clientHeight;
 
   const chart = LightweightCharts.createChart(el, {
@@ -4925,13 +4987,13 @@ async function loadChart(interval) {
       window.aurumDisplayedSignalSymbol = symbol;
     }
     try {
-      document.querySelector('.status').textContent =
+      document.getElementById('aurumDebugStatus').textContent =
         'LOADCHART BERJALAN: ' + interval;
 
       
 console.log('SIMBOL YANG DIPILIH:', symbol);
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'PAIR DIPILIH: ' + symbol;
 
 const cacheKey = symbol + ':' + interval;
@@ -4949,7 +5011,7 @@ const response = useBrowserCache
     );
 
 if (response) {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'API HTTP: ' + response.status;
 }
 
@@ -4960,7 +5022,7 @@ if (useBrowserCache) {
   candles = cached.data;
   chartFeedMeta = { fromCache: true };
 
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'CACHE AKTIF | CANDLES: ' + candles.length;
 
 } else {
@@ -4981,14 +5043,14 @@ if (useBrowserCache) {
   };
   if (symbol === 'XAU/USD') updateLiveQuoteTrace(chartFeedMeta);
 
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'API STATUS: ' + data.status +
     ' | CANDLES: ' + (data.candles?.length || 0);
 
   if (data.status !== 'success' || !data.candles?.length) {
     console.log('Data grafik belum tersedia untuk', symbol, data);
     clearSelectedInstrumentView(symbol + ' · Data belum tersedia dari provider');
-    document.querySelector('.status').textContent = 'DATA ' + symbol + ' BELUM TERSEDIA';
+    document.getElementById('aurumDebugStatus').textContent = 'DATA ' + symbol + ' BELUM TERSEDIA';
     return;
   }
 
@@ -5120,14 +5182,14 @@ const hargaValid = candles.every(c =>
   Number.isFinite(c.close)
 );
 if (!waktuValid || !hargaValid) {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'DATA CANDLE TIDAK VALID | WAKTU: ' + waktuValid +
     ' | HARGA: ' + hargaValid;
   return;
   }
 const el = document.getElementById('candleChart');
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'AREA GRAFIK: ' + (el ? el.clientWidth : 'TIDAK ADA') +
   ' x ' + (el ? el.clientHeight : 'TIDAK ADA');
      
@@ -5584,7 +5646,7 @@ if (candles.length === 0) {
 
 
 // DETEKSI SUPPORT & RESISTANCE MULTI TIMEFRAME
-function detectSupportResistance(data) {
+function detectSupportResistance(data, referencePrice) {
   if (!Array.isArray(data) || data.length < 15) {
     return null;
   }
@@ -5606,7 +5668,10 @@ function detectSupportResistance(data) {
     return null;
   }
 
-  const currentPrice = Number(data[data.length - 1].close);
+  const overridePrice = Number(referencePrice);
+  const currentPrice = Number.isFinite(overridePrice) && overridePrice > 0
+    ? overridePrice
+    : Number(data[data.length - 1].close);
 
   if (!Number.isFinite(currentPrice)) {
     return null;
@@ -7115,17 +7180,17 @@ async function analyzeOrderBlockMultiTimeframe(requestedSymbol) {
   }
 }
       
-      document.querySelector('.status').textContent =
+      document.getElementById('aurumDebugStatus').textContent =
   'DATA CANDLE: ' + candles.length;
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'CANDLE SIAP: ' + candles.length;
 
 console.log('CANDLE PERTAMA:', candles[0]);
 console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
 
 if (!candles || candles.length === 0) {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'CANDLE KOSONG';
 
   console.warn('TIDAK ADA DATA CANDLE');
@@ -7133,7 +7198,7 @@ if (!candles || candles.length === 0) {
 }
 
 try {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'MENGIRIM DATA KE GRAFIK...';
 
   console.log('JUMLAH CANDLE:', candles.length);
@@ -7150,11 +7215,11 @@ series.setData(candles);
 
 // Live spot is displayed by the dedicated quote trace above; avoid a duplicate price-line label.
 
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'GRAFIK BERHASIL: ' + candles.length;
 
 } catch (error) {
-  document.querySelector('.status').textContent =
+  document.getElementById('aurumDebugStatus').textContent =
     'ERROR SETDATA: ' + error.message;
 
   console.log('ERROR SETDATA:', error);
@@ -7264,6 +7329,35 @@ if (miniChart && candles.length > 1) {
     '<path class="aurum-setup-line" d="'+curve+'" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
 }
 const priceEl=document.getElementById('goldPrice');
+// One authoritative distance updater observes the exact text shown to users.
+// This prevents async candle analysis from overwriting distances using an
+// older quote or an unrelated range boundary after the live ticker refreshes.
+(function installNearestLevelDistanceObserver(){
+  const priceNode=document.getElementById('goldPrice');
+  const supportNode=document.getElementById('aurumNearestSupport');
+  const resistanceNode=document.getElementById('aurumNearestResistance');
+  const supportDistanceNode=document.getElementById('aurumSupportDistance');
+  const resistanceDistanceNode=document.getElementById('aurumResistanceDistance');
+  if(!priceNode||!supportNode||!resistanceNode||!supportDistanceNode||!resistanceDistanceNode)return;
+  const readNumber=node=>Number(String(node.textContent||'').replace(/,/g,'').replace(/[^0-9.\-]/g,''));
+  const update=()=>{
+    const price=readNumber(priceNode),support=readNumber(supportNode),resistance=readNumber(resistanceNode);
+    if(!Number.isFinite(price)||price<=0)return;
+    supportDistanceNode.textContent=Number.isFinite(support)&&support>0
+      ?(price>=support?(price-support).toFixed(2)+' pts below':(support-price).toFixed(2)+' pts above')
+      :'Level belum tersedia';
+    resistanceDistanceNode.textContent=Number.isFinite(resistance)&&resistance>0
+      ?(resistance>=price?(resistance-price).toFixed(2)+' pts above':(price-resistance).toFixed(2)+' pts below')
+      :'Level belum tersedia';
+  };
+  if(!window.aurumNearestDistanceObserver){
+    window.aurumNearestDistanceObserver=new MutationObserver(update);
+    [priceNode,supportNode,resistanceNode].forEach(node=>
+      window.aurumNearestDistanceObserver.observe(node,{childList:true,characterData:true,subtree:true})
+    );
+  }
+  update();
+})();
 if(priceEl){
   const oldPrice=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
   const newPrice=Number(latestCandle.close);
@@ -7296,22 +7390,55 @@ try {
   // Permintaan Gold yang selesai terlambat tidak boleh menimpa kartu BTC/WTI.
   if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
   const daily = dailyCandles[dailyCandles.length - 1];
-  const rangeLow = daily ? Number(daily.low) : null;
-  const rangeHigh = daily ? Number(daily.high) : null;
-  const rangeWidth = rangeHigh != null && rangeLow != null ? rangeHigh - rangeLow : null;
-  const current = Number(latestCandle.close);
+  // Use intraday M5 candles for the Jakarta trading day, not a possibly
+  // stale D1 candle whose range may no longer contain the live quote.
+  // The live quote updater can refresh the visible price after the chart's
+  // initial candle load. Read the displayed quote at calculation time so
+  // range marker and S/R distances use the exact same reference price.
+  const displayedQuote = Number(String(document.getElementById('goldPrice')?.textContent || '').replace(/[^0-9.]/g, ''));
+  const current = Number.isFinite(displayedQuote) && displayedQuote > 0
+    ? displayedQuote
+    : Number(initialDisplayPrice);
+  const jakartaDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).format(new Date());
+  const todayM5 = m5Candles.filter(c => {
+    const timestamp = Number(c.time);
+    return Number.isFinite(timestamp) &&
+      new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).format(new Date(timestamp * 1000)) === jakartaDate &&
+      Number.isFinite(Number(c.low)) && Number.isFinite(Number(c.high));
+  });
+  let rangeLow = todayM5.length ? Math.min(...todayM5.map(c => Number(c.low))) : null;
+  let rangeHigh = todayM5.length ? Math.max(...todayM5.map(c => Number(c.high))) : null;
+  if (Number.isFinite(current) && current > 0 && rangeLow != null && rangeHigh != null) {
+    rangeLow = Math.min(rangeLow, current);
+    rangeHigh = Math.max(rangeHigh, current);
+  } else if (Number.isFinite(current) && current > 0 && daily) {
+    const dailyLow = Number(daily.low);
+    const dailyHigh = Number(daily.high);
+    if (Number.isFinite(dailyLow) && Number.isFinite(dailyHigh) &&
+        dailyLow <= current && current <= dailyHigh) {
+      rangeLow = dailyLow;
+      rangeHigh = dailyHigh;
+    }
+  }
+  const validRange = rangeLow != null && rangeHigh != null &&
+    Number.isFinite(rangeLow) && Number.isFinite(rangeHigh) && rangeHigh >= rangeLow;
+  const rangeWidth = validRange ? rangeHigh - rangeLow : null;
   const rangeLowEl = document.getElementById('aurumRangeLow');
   const rangeHighEl = document.getElementById('aurumRangeHigh');
   const rangePipsEl = document.getElementById('aurumRangePips');
   const rangeMarker = document.getElementById('aurumRangeMarker');
-  if (rangeLowEl) rangeLowEl.textContent = 'L ' + (rangeLow != null ? rangeLow.toFixed(2) : '--');
-  if (rangeHighEl) rangeHighEl.textContent = 'H ' + (rangeHigh != null ? rangeHigh.toFixed(2) : '--');
+  if (rangeLowEl) rangeLowEl.textContent = 'L ' + (validRange ? rangeLow.toFixed(2) : '--');
+  if (rangeHighEl) rangeHighEl.textContent = 'H ' + (validRange ? rangeHigh.toFixed(2) : '--');
   if (rangePipsEl) rangePipsEl.textContent = rangeWidth != null ? rangeWidth.toFixed(2) + ' pts' : '--';
-  if (rangeMarker && rangeHigh > rangeLow) {
+  if (rangeMarker && validRange && rangeHigh > rangeLow) {
     const position = Math.max(0, Math.min(100, ((current - rangeLow) / (rangeHigh - rangeLow)) * 100));
     rangeMarker.style.left = position + '%';
   }
-  const nearest = detectSupportResistance(m5Candles);
+  const nearest = detectSupportResistance(m5Candles, current);
   const nearSupport = nearest && nearest.support != null ? nearest.support : null;
   const nearResistance = nearest && nearest.resistance != null ? nearest.resistance : null;
   const supportEl = document.getElementById('aurumNearestSupport');
@@ -7320,8 +7447,16 @@ try {
   const resistanceDistanceEl = document.getElementById('aurumResistanceDistance');
   if (supportEl) supportEl.textContent = nearSupport != null ? nearSupport.toFixed(2) : '--';
   if (resistanceEl) resistanceEl.textContent = nearResistance != null ? nearResistance.toFixed(2) : '--';
-  if (supportDistanceEl) supportDistanceEl.textContent = nearSupport != null ? Math.abs(current-nearSupport).toFixed(2) + ' pts below' : 'Level belum tersedia';
-  if (resistanceDistanceEl) resistanceDistanceEl.textContent = nearResistance != null ? Math.abs(nearResistance-current).toFixed(2) + ' pts above' : 'Level belum tersedia';
+  if (supportDistanceEl) supportDistanceEl.textContent = nearSupport != null
+    ? (current >= nearSupport
+      ? (current-nearSupport).toFixed(2) + ' pts below'
+      : (nearSupport-current).toFixed(2) + ' pts above')
+    : 'Level belum tersedia';
+  if (resistanceDistanceEl) resistanceDistanceEl.textContent = nearResistance != null
+    ? (nearResistance >= current
+      ? (nearResistance-current).toFixed(2) + ' pts above'
+      : (current-nearResistance).toFixed(2) + ' pts below')
+    : 'Level belum tersedia';
 } catch (marketCardError) {
   console.warn('Market overview update:', marketCardError);
 }
@@ -7447,8 +7582,7 @@ const signalFreshnessMs = ({
 }[document.getElementById('tf')?.value || 'M15'] || 2700000);
 const signalDataIsFresh = Number.isFinite(signalCandleAgeMs) &&
   signalCandleAgeMs >= -60000 && signalCandleAgeMs <= signalFreshnessMs &&
-  (document.getElementById('pair')?.value !== 'XAU/USD' ||
-    chartFeedMeta?.candleStatus === 'fresh_candles');
+  chartFeedMeta?.candleStatus === 'fresh_candles';
 const validTradePlan =
   tradePlan &&
   signalDataIsFresh &&
@@ -7659,7 +7793,7 @@ setInterval(async function() {
 
 } // Penutup blok IF
 
-document.querySelector('.status').textContent =
+document.getElementById('aurumDebugStatus').textContent =
   'MEMUAT DATA CANDLE... | CHART: ' + !!window.LightweightCharts +
   ' | ELEMENT: ' + !!document.getElementById('candleChart');
 
@@ -7675,7 +7809,13 @@ console.log('STATUS SERVER DIPERIKSA');
   const enterButton = document.getElementById('aurumEnterButton');
   if (!splash || !enterButton) return;
 
-  if (localStorage.getItem('aurumSplashSeen') === 'true') {
+  let splashAlreadySeen = false;
+  try {
+    splashAlreadySeen = localStorage.getItem('aurumSplashSeen') === 'true';
+  } catch (_) {
+    // Private browsing or storage restrictions must not prevent app entry.
+  }
+  if (splashAlreadySeen) {
     splash.classList.add('hidden');
     splash.style.display = 'none';
     return;
@@ -7697,7 +7837,11 @@ console.log('STATUS SERVER DIPERIKSA');
   function enterDashboard() {
     if (splash.classList.contains('hidden')) return;
     stopSplashMusic();
-    localStorage.setItem('aurumSplashSeen', 'true');
+    try {
+      localStorage.setItem('aurumSplashSeen', 'true');
+    } catch (_) {
+      // The splash still closes for this visit when persistent storage is unavailable.
+    }
     splash.classList.add('hidden');
     setTimeout(function () { splash.style.display = 'none'; }, 750);
   }
@@ -7883,8 +8027,10 @@ console.log('STATUS SERVER DIPERIKSA');
         const live=status==='LIVE';
         badge.classList.toggle('delayed',!live);
         badge.textContent=live?'Gold Live':status;
-        const dot=document.createElement('i');
-        badge.prepend(dot);
+        if(!badge.querySelector('i')){
+          const dot=document.createElement('i');
+          badge.prepend(dot);
+        }
         badge.title=detail||status;
       }
       const updated=$('homeGoldUpdatedAt');
@@ -8039,8 +8185,8 @@ console.log('STATUS SERVER DIPERIKSA');
   async function refresh(){
     if(busy||document.hidden)return;
     busy=true;
+    const symbol=pairEl.value||'XAU/USD';
     try{
-      const symbol=pairEl.value||'XAU/USD';
       const res=await fetch('/api?interval=M1&symbol='+encodeURIComponent(symbol),{cache:'no-store'});
       if(!res.ok)throw new Error('HTTP '+res.status);
       const data=await res.json(),candles=data.candles;
@@ -8056,6 +8202,29 @@ console.log('STATUS SERVER DIPERIKSA');
       const latest=Number(hasFreshGoldQuote?data.livePrice:candles[candles.length-1].close);
       const prev=Number(candles[candles.length-2].close);
       if(!Number.isFinite(latest)||!Number.isFinite(prev))throw new Error('Invalid price');
+      // Keep the S/R distance labels synchronized with the exact quote
+      // returned by this refresh, rather than the older candle price used
+      // during the initial market-card calculation.
+      function syncNearestLevelDistances(referencePrice) {
+        const supportNode=document.getElementById('aurumNearestSupport');
+        const resistanceNode=document.getElementById('aurumNearestResistance');
+        const supportDistanceNode=document.getElementById('aurumSupportDistance');
+        const resistanceDistanceNode=document.getElementById('aurumResistanceDistance');
+        const support=Number(String(supportNode?.textContent||'').replace(/,/g,''));
+        const resistance=Number(String(resistanceNode?.textContent||'').replace(/,/g,''));
+        if(supportDistanceNode) supportDistanceNode.textContent =
+          Number.isFinite(support)&&support>0
+            ? (referencePrice>=support
+              ? (referencePrice-support).toFixed(2)+' pts below'
+              : (support-referencePrice).toFixed(2)+' pts above')
+            : 'Level belum tersedia';
+        if(resistanceDistanceNode) resistanceDistanceNode.textContent =
+          Number.isFinite(resistance)&&resistance>0
+            ? (resistance>=referencePrice
+              ? (resistance-referencePrice).toFixed(2)+' pts above'
+              : (referencePrice-resistance).toFixed(2)+' pts below')
+            : 'Level belum tersedia';
+      }
       const old=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
       const direction=latest>=prev?'up':'down';
       priceEl.classList.remove('price-up','price-down','price-flash');
@@ -8067,11 +8236,13 @@ console.log('STATUS SERVER DIPERIKSA');
           const t=Math.min(1,(now-start)/duration),e=1-Math.pow(1-t,3);
           priceEl.textContent=fmt.format(old+(latest-old)*e);
           if(t<1)requestAnimationFrame(step);
+          else syncNearestLevelDistances(Number(String(priceEl.textContent).replace(/[^0-9.]/g,'')));
         }
         requestAnimationFrame(step);
         void priceEl.offsetWidth;priceEl.classList.add('price-flash');
       }else{
         priceEl.textContent=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        syncNearestLevelDistances(Number(String(priceEl.textContent).replace(/[^0-9.]/g,'')));
       }
       const displayCandles=candles.slice();
       if(hasFreshGoldQuote){
@@ -8084,10 +8255,17 @@ console.log('STATUS SERVER DIPERIKSA');
         ? (hasFreshGoldQuote ? 'XAU/USD · LIVE '+new Date(data.livePriceUpdatedAt).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB' : 'XAU/USD · Harga candle terakhir')
         : symbol+' · '+(data.source || 'Data candle')+' · '+new Date(candles[candles.length-1].datetime).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB';
     }catch(e){
-      if(pairEl.value===symbol && String(priceEl.textContent||'').startsWith('Memuat')){
-        priceEl.textContent='--';
+      if(pairEl.value===symbol){
         const timeEl=document.getElementById('goldTime');
-        if(timeEl)timeEl.textContent=symbol+' · Data belum tersedia';
+        if(String(priceEl.textContent||'').startsWith('Memuat'))priceEl.textContent='--';
+        if(timeEl)timeEl.textContent=symbol+' · PEMBARUAN GAGAL · harga terakhir tidak diperbarui';
+        const marketState=document.querySelector('.aurum-market-state');
+        if(marketState){
+          marketState.textContent='● DATA TERTUNDA';
+          marketState.dataset.state='delayed';
+          marketState.title='Pembaruan grafik gagal: '+String(e.message||e);
+          marketState.style.color='#b7791f';
+        }
       }
       console.warn('AURUM setup live tick:',e);
     }
@@ -8170,8 +8348,8 @@ main {
   width: min(100%, 570px);
   left: 50%;
   transform: translateX(-50%);
-  min-height: 64px;
-  padding: 5px 6px;
+  min-height: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding: 5px 6px calc(5px + env(safe-area-inset-bottom, 0px));
   gap: 3px;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   border-radius: 18px 18px 0 0;
@@ -8179,13 +8357,14 @@ main {
 .aurum-bottom-nav .nav-item { min-height: 48px; gap: 3px; padding: 4px 1px; }
 .aurum-bottom-nav .nav-item span { width: 26px; height: 24px; font-size: 18px; }
 .aurum-bottom-nav .nav-item small { font-size: 8px; }
-body { padding-bottom: 70px; }
+body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
 @media (max-width: 479px) {
-  header, main, .aurum-bottom-nav { width: min(84vw, 570px); }
-  header { padding: 8px 7px; }
-  header .brand { font-size: 11px; letter-spacing: 0; }
-  header .status { font-size: 6px; padding: 5px 6px; }
-  main { padding-left: 0; padding-right: 0; }
+  /* Use the available phone width; the previous 84vw rule squeezed every page. */
+  header, main, .aurum-bottom-nav { width: 100%; }
+  header { padding: 8px 12px; }
+  header .brand { font-size: 13px; letter-spacing: 0; }
+  header .status { font-size: 7px; padding: 5px 7px; }
+  main { padding: 8px 12px 22px; }
   #homePage .aurum-home-hero-v2 { min-height: 300px; }
   .aurum-session-clock { width: 194px; height: 194px; }
   .aurum-clock-face { width: 182px; height: 182px; }
@@ -8236,7 +8415,8 @@ header .brand{
 }
 @media (prefers-reduced-motion:reduce){
   .aurum-live-ticker .ticker-track{
-    animation:aurumTickerScroll 24s linear infinite !important;
+    animation:none !important;
+    transform:none !important;
   }
 }
 </style>
@@ -8562,7 +8742,7 @@ body.aurum-user-dark .app-page{background:transparent!important}
     return Math.floor(n/3600)+' jam '+Math.floor(n%3600/60)+' mnt';
   }
   function outcomeLabel(value){
-    const labels={WAITING_FOR_ENTRY:'Menunggu Entry',OPEN:'Posisi Terbuka',TP1:'Target 1 Tercapai',TP2:'Target 2 Tercapai',TP3:'Target 3 Tercapai',SL:'Stop Loss',SL_AFTER_TP1:'SL setelah TP1',SL_AFTER_TP2:'SL setelah TP2',TARGET_HIT:'Target Tercapai',COMPLETED:'Selesai',WAIT:'Menunggu setup'};
+    const labels={WAITING_FOR_ENTRY:'Menunggu Entry',MISSED_ENTRY:'Setup Terlewat',OPEN:'Posisi Terbuka',TP1:'Target 1 Tercapai',TP2:'Target 2 Tercapai',TP3:'Target 3 Tercapai',SL:'Stop Loss',SL_AFTER_TP1:'SL setelah TP1',SL_AFTER_TP2:'SL setelah TP2',TARGET_HIT:'Target Tercapai',COMPLETED:'Selesai',WAIT:'Menunggu setup'};
     const key=String(value||'WAITING_FOR_ENTRY');
     return labels[key]||key.replaceAll('_',' ');
   }
@@ -8689,6 +8869,9 @@ body.aurum-user-dark .app-page{background:transparent!important}
         const active=button.dataset.detailRisk===String(profile.key||profile.label||'RISK');
         button.classList.toggle('selected',active);button.setAttribute('aria-pressed',active?'true':'false');
       });
+      // Keep the selected risk profile consistent across the header, levels,
+      // map and outcome label. The server's base tradePlan is the HIGH profile.
+      document.getElementById('aurumDetailEntry').textContent=fmtDetail(profile.entryLow)+' – '+fmtDetail(profile.entryHigh);
       document.getElementById('aurumDetailLevels').innerHTML=[['SL',profile.sl],['TP 1',profile.tp1],['TP 2',profile.tp2],['TP 3',profile.tp3]].map(x=>'<div class="aurum-detail-level"><small>'+x[0]+'</small><b>'+fmtDetail(x[1])+'</b></div>').join('');
       const vals=[Number(profile.tp3),Number(profile.tp2),Number(profile.tp1),(Number(profile.entryLow)+Number(profile.entryHigh))/2,Number(profile.sl)];
       const low=Number(profile.entryLow),high=Number(profile.entryHigh);
@@ -8703,6 +8886,22 @@ body.aurum-user-dark .app-page{background:transparent!important}
         liveText=decimals>0&&decimals<=2?liveText.replace(',','.'):liveText.replace(/,/g,'');
       }
       const live=Number(liveText),liveOk=Number.isFinite(live)&&live>0;
+      const profileState=profile.outcomeStatus||cur.outcomeStatus||'WAITING_FOR_ENTRY';
+      const passedTargets=liveOk&&profileState==='WAITING_FOR_ENTRY'&&(
+        cur.direction==='SELL'?live<Math.min(Number(profile.tp1),Number(profile.tp2),Number(profile.tp3)):
+        cur.direction==='BUY'?live>Math.max(Number(profile.tp1),Number(profile.tp2),Number(profile.tp3)):false
+      );
+      const outcomeNode=document.getElementById('aurumDetailOutcome');
+      if(outcomeNode){
+        const missedEntry=profileState==='MISSED_ENTRY';
+        outcomeNode.textContent=missedEntry
+          ?'SETUP TERLEWAT — HARGA SUDAH MELEWATI TP3 SEBELUM ENTRY'
+          :passedTargets
+            ?'HARGA LIVE SUDAH MELEWATI TP3 — MENUNGGU PEMBARUAN STATUS SERVER'
+            :outcomeLabel(profileState).toUpperCase();
+        outcomeNode.classList.toggle('is-warning',passedTargets||missedEntry);
+        outcomeNode.setAttribute('role',passedTargets||missedEntry?'alert':'status');
+      }
       const min=Math.min(...vals,low,high,...(liveOk?[live]:[])),max=Math.max(...vals,low,high,...(liveOk?[live]:[])),range=Math.max(max-min,.000001);
       const y=v=>Math.round(22+(max-v)/range*198),top=y(Math.max(low,high)),bottom=y(Math.min(low,high));
       const mapLabels=[['TP 3',vals[0],'#2997dc'],['TP 2',vals[1],'#2997dc'],['TP 1',vals[2],'#20a66b'],['ENTRY',vals[3],'#d5a72e'],['STOP LOSS',vals[4],'#e0525b']];
@@ -8737,8 +8936,19 @@ body.aurum-user-dark .app-page{background:transparent!important}
       pairSelect.value=choice.dataset.asset;
       pairSelect.dispatchEvent(new Event('change',{bubbles:true}));
     }
-    document.querySelectorAll('.app-page').forEach(page=>page.classList.toggle('active',page.id==='marketPage'));
-    document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(item=>item.classList.toggle('active',item.dataset.page==='marketDirectoryPage'));
+    // Use the shared page router so the URL, active tab, and aria-current
+    // stay synchronized when an instrument is opened from the market directory.
+    if (typeof window.aurumShowPage === 'function') {
+      window.aurumShowPage('marketPage');
+    } else {
+      document.querySelectorAll('.app-page').forEach(page=>page.classList.toggle('active',page.id==='marketPage'));
+      document.querySelectorAll('.aurum-bottom-nav .nav-item').forEach(item=>{
+        const active=item.dataset.page==='marketDirectoryPage';
+        item.classList.toggle('active',active);
+        if(active)item.setAttribute('aria-current','page');
+        else item.removeAttribute('aria-current');
+      });
+    }
     document.querySelectorAll('#marketPage > .aurum-asset-switch,#marketPage > .aurum-signal-summary,#marketPage > .aurum-signal-tabs').forEach(node=>node.hidden=false);
     document.querySelectorAll('#marketPage > .aurum-signal-panel').forEach(node=>{node.hidden=node.dataset.signalPanel!=='setup';});
     detailView.hidden=true;panel.hidden=true;
@@ -8856,6 +9066,31 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
    if(history)history.innerHTML='<div class="signal"><p class="sub">Riwayat belum dapat dimuat.</p></div>';
   }
  }
+ async function refreshMacro(){
+  const cards=[
+   {key:'broadUsd',value:'aurumFundamentalBroadUsd',meta:'aurumFundamentalBroadUsdMeta',digits:2},
+   {key:'us10y',value:'aurumFundamentalUs10y',meta:'aurumFundamentalUs10yMeta',digits:2}
+  ];
+  try{
+   const response=await fetch('/api/fundamental',{cache:'no-store',headers:{Accept:'application/json'}});
+   const data=await response.json();
+   if(!response.ok||data.status!=='success')throw new Error(data.message||'Data fundamental belum tersedia');
+   cards.forEach(item=>{
+    const record=data.results?.[item.key],valueNode=$(item.value),metaNode=$(item.meta);
+    if(!valueNode||!metaNode)return;
+    if(record?.status==='available'){
+     valueNode.textContent=Number(record.value).toLocaleString('id-ID',{minimumFractionDigits:item.digits,maximumFractionDigits:item.digits})+(record.unit==='%'?'%':'');
+     metaNode.textContent=record.seriesId+' · Observasi '+record.observationDate+' · '+record.source+(record.note?' · '+record.note:'');
+    }else{
+     valueNode.textContent='TIDAK TERSEDIA';
+     metaNode.textContent=(record?.seriesId||item.key)+' · '+(record?.message||'Data belum dapat diverifikasi');
+    }
+   });
+  }catch(error){
+   cards.forEach(item=>{const valueNode=$(item.value),metaNode=$(item.meta);if(valueNode)valueNode.textContent='TIDAK TERSEDIA';if(metaNode)metaNode.textContent='Data makro gagal dimuat; coba lagi otomatis.';});
+  }
+ }
+ refreshMacro();setInterval(refreshMacro,30*60*1000);
  refresh();setInterval(refresh,60000);
 })();
 </script>
@@ -8872,6 +9107,9 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   {keys:['liquidity sweep','sweep','sapu likuiditas'],answer:'Liquidity Sweep terjadi ketika harga melewati area swing high/low atau level likuiditas lalu kembali masuk ke area sebelumnya. Penembusan sesaat saja belum cukup; amati penutupan candle dan perubahan struktur setelah sweep.'},
   {keys:['fair value gap','fvg'],answer:'Fair Value Gap (FVG) adalah ketidakseimbangan tiga candle: rentang candle pertama dan ketiga tidak saling tumpang tindih pada sisi tertentu. Area ini dapat menjadi zona reaksi, tetapi tidak wajib diisi dan bukan sinyal entry tunggal.'},
   {keys:['order block','ob'],answer:'Order Block biasanya merujuk pada candle berlawanan terakhir sebelum impuls yang menyebabkan perpindahan struktur. Tandai zona candle tersebut, lalu nilai apakah impulsnya kuat, apakah struktur terkonfirmasi, dan apakah zona masih valid.'},
+  {keys:['bos','break of structure'],answer:'Break of Structure (BOS) terjadi ketika harga menembus swing penting yang searah dengan struktur dominan. Perhatikan penutupan candle dan konteks timeframe; wick yang menembus level saja belum tentu konfirmasi BOS.'},
+  {keys:['inducement','inducement liquidity'],answer:'Inducement adalah pergerakan atau level yang dapat menarik trader masuk terlalu awal sebelum harga bergerak menuju likuiditas yang lebih besar. Ini konsep interpretatif, bukan pola yang selalu muncul; konfirmasi tetap perlu dari struktur dan reaksi harga.'},
+  {keys:['premium discount','premium','discount'],answer:'Dalam dealing range, area di atas titik tengah (50%) disebut premium dan area di bawahnya discount. Konsep ini membantu memberi konteks lokasi harga, tetapi tidak cukup menjadi alasan entry tanpa struktur, konfirmasi, dan rencana risiko.'},
   {keys:['risk','risiko','stop loss','position size'],answer:'Batasi risiko per transaksi sesuai rencana pribadi. Tentukan invalidasi dan Stop Loss sebelum entry, hitung ukuran posisi dari jarak SL dan batas risiko, serta jangan memperlebar SL hanya untuk menghindari kerugian.'}
  ];
  function add(who,text){
@@ -8893,10 +9131,10 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
     }).join('\n')+'\n\nData diambil dari API sinyal AURUM. Periksa waktu pembaruan dan chart sebelum mengambil keputusan.';
    }catch(e){return 'Saya belum dapat mengambil status sinyal: '+e.message+'. Coba lagi setelah server tersedia.';}
   }
-  const found=knowledge.find(k=>k.keys.some(x=>text.includes(x)));
+  const found=knowledge.find(k=>k.keys.some(x=>x.length<=3?new RegExp('\\b'+x+'\\b','i').test(text):text.includes(x)));
   if(found)return found.answer;
   if(/halo|hai|hello|selamat/.test(text))return 'Halo! Silakan tanyakan status sinyal Gold/BTC/WTI atau konsep Market Structure, Support & Resistance, CHOCH, Liquidity Sweep, FVG, Order Block, dan manajemen risiko.';
-  return 'Saya belum memiliki jawaban terverifikasi untuk pertanyaan itu. Saat ini saya mendukung pemeriksaan status sinyal server dan topik edukasi SMC/ICT yang tercantum. Model AI generatif belum terhubung, jadi saya tidak akan mengarang analisis atau berita.';
+  return 'Saya belum memiliki jawaban terverifikasi untuk pertanyaan itu. Saat ini saya mendukung pemeriksaan status sinyal server dan topik edukasi SMC/ICT yang tercantum. Saya menggunakan aturan dan data server yang tersedia; saya tidak akan mengarang analisis atau berita.';
  }
  async function send(q){
   q=String(q||'').trim();if(!q)return;
@@ -8908,6 +9146,27 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 })();
 </script>
 
+<script id="aurum-partner-share">
+(function(){
+  var button=document.getElementById('aurumPartnerShare');
+  if(!button)return;
+  button.addEventListener('click',async function(){
+    var inviteUrl=window.location.origin+window.location.pathname;
+    try{
+      if(navigator.share){
+        await navigator.share({title:'AURUM Signals AI',text:'Mari lihat AURUM Signals AI.',url:inviteUrl});
+      }else if(navigator.clipboard&&navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(inviteUrl);
+        button.textContent='✓ TAUTAN AURUM DISALIN';
+      }else{
+        window.prompt('Salin tautan AURUM:',inviteUrl);
+      }
+    }catch(error){
+      if(error&&error.name!=='AbortError')button.textContent='TAUTAN BELUM DAPAT DIBAGIKAN';
+    }
+  });
+})();
+</script>
 </body>
 </html>
 

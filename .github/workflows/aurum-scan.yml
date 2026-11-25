@@ -1,19 +1,7 @@
 name: AURUM Signal Scanner
-# Scanner heartbeat: run every 5 minutes and immediately after workflow maintenance.
+# Vercel Cron is the single daily scheduler; this workflow is manual smoke-test only.
 
 on:
-  push:
-    paths:
-      - '.github/workflows/aurum-scan.yml'
-      - 'api/cron.js'
-      - 'api/engine.js'
-      - 'api/index.js'
-      - 'api/signals.js'
-      - 'api/push-subscribe.js'
-      - 'public/index.html'
-      - 'public/sw.js'
-  schedule:
-    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -55,4 +43,3 @@ jobs:
             all(.results[]; (.symbol != null) and has("current") and has("history"))
           ' >/dev/null
           echo "API signals smoke test: OK (3 instruments)"
-

@@ -1,6 +1,94 @@
-module.exports = function handler(req, res) {
+'use strict';
+
+// Readiness diagnostics for Aurum. Never return secret values to the client.
+module.exports = async function handler(req, res) {
+  // Apply security/cache headers to both successful and rejected responses.
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
+  if (req.method !== 'GET') {
+    return res.status(405).json({ status: 'error', message: 'Method not allowed' });
+  }
+
+  const env = req.env || process.env;
+
+  const checks = {
+    marketApi: 'not_probed',
+    cronSecret: Boolean(env.CRON_SECRET),
+    redisConfigured: Boolean(env.KV_REST_API_URL && env.KV_REST_API_TOKEN),
+    pushConfigured: Boolean(
+      env.VAPID_PUBLIC_KEY &&
+      env.VAPID_PRIVATE_KEY &&
+      env.VAPID_SUBJECT
+    ),
+    naifConfigured: Boolean(env.NAIF_KEY),
+    twelveDataConfigured: Boolean(env.TWELVE_DATA_API_KEY)
+  };
+
+  let redis = 'not_configured';
+  let redisError = null;
+  if (checks.redisConfigured) {
+    try {
+      // Netlify env values can accidentally contain copied whitespace or
+      // wrapping quotes. Normalize those harmless formatting errors before fetch.
+      const redisUrl = String(env.KV_REST_API_URL).trim().replace(/^['"]|['"]$/g, '');
+      const parsedRedisUrl = new URL(redisUrl);
+      if (parsedRedisUrl.protocol !== 'https:') {
+        const invalidProtocol = new Error('Redis REST URL must use HTTPS');
+        invalidProtocol.code = 'INVALID_REDIS_URL_PROTOCOL';
+        throw invalidProtocol;
+      }
+      const response = await fetch(redisUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + env.KV_REST_API_TOKEN,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(['PING']),
+        signal: AbortSignal.timeout(5000)
+      });
+      const body = await response.json();
+      redis = response.ok && body.result === 'PONG' && !body.error
+        ? 'connected'
+        : 'error';
+      if (redis === 'error') {
+        redisError = 'http_' + response.status;
+      }
+    } catch (error) {
+      redis = 'unreachable';
+      const causeCode = error && error.cause && error.cause.code;
+      redisError = (error && error.code) || causeCode || (error && error.name) || 'fetch_failed';
+      console.error('AURUM Redis health probe failed:', redisError);
+    }
+  }
+  checks.redis = redis;
+  if (redisError) checks.redisError = redisError;
+
+  // Netlify does not run the Vercel cron route in this deployment, so its
+  // readiness must depend on Redis rather than a cron-only secret.
+  const isNetlify = Boolean(env.NETLIFY);
+  const ready = checks.redisConfigured && redis === 'connected' && (isNetlify || checks.cronSecret);
+
+  // Cloudflare Pages exposes these deployment identifiers at runtime.
+  // They help distinguish Preview from Production without revealing secrets.
+  const deploymentBranch = env.BRANCH || env.CF_PAGES_BRANCH || null;
+  const deployment = {
+    platform: env.NETLIFY ? 'Netlify' : env.CF_PAGES ? 'Cloudflare Pages' : 'unknown',
+    branch: deploymentBranch,
+    environment: env.CONTEXT || (deploymentBranch
+      ? (deploymentBranch === 'main' ? 'production' : 'preview')
+      : 'unknown'),
+    url: env.DEPLOY_PRIME_URL || env.CF_PAGES_URL || null
+  };
+
   return res.status(200).json({
-    status: "ok",
-    message: "Aurum Signals server connected"
+    status: ready ? 'ok' : 'degraded',
+    message: ready
+      ? 'Aurum Signals core services are configured'
+      : 'Aurum Signals is available, but some services need configuration',
+    deployment,
+    checks,
+    checkedAt: new Date().toISOString()
   });
 };

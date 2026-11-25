@@ -1,0 +1,4 @@
+name = "aurum-signals-ai"
+compatibility_date = "2026-11-20"
+compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
+pages_build_output_dir = "./public"

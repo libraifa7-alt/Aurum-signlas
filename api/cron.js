@@ -67,6 +67,13 @@ async function updateSignalOutcomes(symbol, candles) {
             ? Number(candle.low) <= Number(profile.sl)
             : Number(candle.high) >= Number(profile.sl);
           nextState = stopTouchedAtEntry ? 'SL' : 'OPEN';
+        } else if (state === 'WAITING_FOR_ENTRY') {
+          // If price reaches the final target without ever touching the entry
+          // zone, the setup was missed; it must not remain pending indefinitely.
+          const finalTargetPassed = bullish
+            ? Number(candle.high) >= Number(profile.tp3)
+            : Number(candle.low) <= Number(profile.tp3);
+          if (finalTargetPassed) nextState = 'MISSED_ENTRY';
         } else if (['OPEN','TP1','TP2'].includes(state)) {
           // If stop and target occur in one OHLC bar, conservatively count the stop first.
           const stopTouched = bullish
@@ -102,12 +109,13 @@ async function updateSignalOutcomes(symbol, candles) {
     }
 
     if (checkpoint > Number(record.lastOutcomeCandleAt || 0) || changed) {
-      const terminal = ['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2'];
+      const terminal = ['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2','MISSED_ENTRY'];
+      const allTerminal = profiles.every(p => terminal.includes(p.outcomeStatus));
       const updated = {
         ...record,
         riskProfiles: profiles,
-        outcomeStatus: profiles.every(p => terminal.includes(p.outcomeStatus))
-          ? 'COMPLETED'
+        outcomeStatus: allTerminal
+          ? (profiles.every(p => p.outcomeStatus === 'MISSED_ENTRY') ? 'MISSED_ENTRY' : 'COMPLETED')
           : profiles.some(p => p.outcomeStatus === 'OPEN') ? 'OPEN'
           : profiles.some(p => ['TP1','TP2','TP3'].includes(p.outcomeStatus)) ? 'TARGET_HIT'
           : 'WAITING_FOR_ENTRY',
@@ -131,6 +139,10 @@ async function updateSignalOutcomes(symbol, candles) {
 }
 
 module.exports=async function handler(req,res){
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
   if(req.method!=='GET'&&req.method!=='POST') return res.status(405).json({status:'error',message:'Method not allowed'});
   const secret=process.env.CRON_SECRET;
   if(!secret) return res.status(503).json({status:'not_configured',message:'CRON_SECRET belum dikonfigurasi'});
@@ -147,7 +159,7 @@ module.exports=async function handler(req,res){
     const symbols=['XAU/USD','BTC/USD','WTI'];
     const results=[];
 
-    for(const symbol of symbols){
+    await Promise.all(symbols.map(async symbol=>{
       const candleSets={};
       const feedDiagnostics={};
       const fetchResults=await Promise.all(TIMEFRAMES.map(async tf=>{
@@ -205,7 +217,7 @@ module.exports=async function handler(req,res){
         await redis(['SET',stateKey,JSON.stringify(record),'EX','604800']);
         results.push({symbol,status:'WAIT',reason:record.reason,timeframes:blockingStale,
           contextualTimeframesStale:contextualStale,feedDiagnostics,changed:record.changed});
-        continue;
+        return;
       }
 
       // Update stored signal outcomes only when the execution feed is fresh.
@@ -286,7 +298,7 @@ module.exports=async function handler(req,res){
       results.push({symbol,status:evaluation.status,reason:evaluation.reason||null,changed,push:pushResult,
         direction:evaluation.direction||null,contextualTimeframesStale:contextualStale,feedDiagnostics,
         latestCandleAt:Object.fromEntries(TIMEFRAMES.map(tf=>[tf,feedDiagnostics[tf].lastCandleAt]))});
-    }
+    }));
 
     return res.status(200).json({status:'success',engine:'server-side-ict',checkedAt:new Date().toISOString(),results});
   } catch(error){

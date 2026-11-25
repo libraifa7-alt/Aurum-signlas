@@ -1,9 +1,11 @@
 'use strict';
 
-async function redis(command) {
-  const url=process.env.KV_REST_API_URL;
-  const token=process.env.KV_REST_API_TOKEN;
+async function redis(command, env) {
+  const url=String(env.KV_REST_API_URL || '').trim().replace(/^['\"]|['\"]$/g, '');
+  const token=String(env.KV_REST_API_TOKEN || '').trim().replace(/^['\"]|['\"]$/g, '');
   if(!url||!token) throw new Error('Redis KV belum dikonfigurasi');
+  const parsedUrl = new URL(url);
+  if (parsedUrl.protocol !== 'https:') throw new Error('Redis REST URL harus menggunakan HTTPS');
   const response=await fetch(url,{
     method:'POST',
     headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
@@ -15,20 +17,37 @@ async function redis(command) {
   return body.result;
 }
 
+function parseSignalRecord(raw) {
+  if (typeof raw !== 'string' || !raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? parsed
+      : null;
+  } catch (_) {
+    // A damaged Redis record must not take down the whole signals response.
+    return null;
+  }
+}
+
 module.exports=async function handler(req,res){
-  res.setHeader('Cache-Control','no-store');
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
+  const env = req.env || process.env;
   if(req.method!=='GET') return res.status(405).json({status:'error',message:'Method not allowed'});
-  if(!process.env.KV_REST_API_URL||!process.env.KV_REST_API_TOKEN)
+  if(!env.KV_REST_API_URL||!env.KV_REST_API_TOKEN)
     return res.status(503).json({status:'not_configured',message:'Redis KV belum dikonfigurasi'});
   try{
     const symbols=['XAU/USD','BTC/USD','WTI'];
     const results=await Promise.all(symbols.map(async symbol=>{
       const key='aurum:server-signal:'+encodeURIComponent(symbol);
-      const raw=await redis(['GET',key]);
-      const history=await redis(['LRANGE','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','19']);
+      const raw=await redis(['GET',key],env);
+      const history=await redis(['LRANGE','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','19'],env);
       return {
         symbol,
-        current:raw?JSON.parse(raw):null,
+        current:parseSignalRecord(raw),
         history:Array.isArray(history)?history.map(item=>{try{return JSON.parse(item)}catch{return null}}).filter(Boolean):[]
       };
     }));
