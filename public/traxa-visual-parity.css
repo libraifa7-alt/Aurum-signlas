@@ -2303,3 +2303,129 @@ main{max-width:1480px!important}
     will-change:auto!important;
   }
 }
+
+
+/* AURUM premium illustrated icon finish — closer to the supplied reference.
+   CSS-only treatment keeps the existing navigation targets and app functions intact. */
+#homePage .home-menu-icon,
+#homePage .community-icon,
+#homePage .home-asset-icon{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:visible!important;
+  border:1px solid rgba(255,255,255,.96)!important;
+  text-shadow:0 1px 1px rgba(255,255,255,.8),0 2px 3px rgba(45,35,15,.18)!important;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.82),
+    0 0 0 5px rgba(205,166,76,.17),
+    inset 0 2px 3px rgba(255,255,255,.98),
+    inset 0 -5px 9px rgba(75,55,20,.12),
+    0 5px 13px rgba(85,67,32,.16)!important;
+}
+#homePage .home-menu-icon::before,
+#homePage .community-icon::before,
+#homePage .home-asset-icon::before{
+  content:""!important;
+  position:absolute!important;
+  inset:-6px!important;
+  z-index:-1!important;
+  border-radius:50%!important;
+  border:1px solid rgba(255,255,255,.9)!important;
+  box-shadow:0 0 0 2px rgba(196,157,65,.12),0 0 15px currentColor!important;
+  pointer-events:none!important;
+}
+#homePage .home-menu-icon::after,
+#homePage .community-icon::after,
+#homePage .home-asset-icon::after{
+  content:""!important;
+  position:absolute!important;
+  inset:2px!important;
+  z-index:1!important;
+  border-radius:inherit!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.68),transparent 38%,transparent 70%,rgba(255,255,255,.22))!important;
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.9)!important;
+  pointer-events:none!important;
+}
+#homePage .home-menu-icon.purple{
+  color:#6534d4!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#e8ddff 22%,#a77bff 48%,#7138dc 72%,#4b22a8 100%)!important;
+}
+#homePage .home-menu-icon.teal{
+  color:#007f72!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#d5fff4 22%,#79e4d0 49%,#20bda9 73%,#087f78 100%)!important;
+}
+#homePage .home-menu-icon.coral{
+  color:#cf3546!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#ffe4e5 22%,#ffaaa9 48%,#f26c70 72%,#c83c4b 100%)!important;
+}
+#homePage .home-menu-icon.blue{
+  color:#1465c7!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#e3f3ff 22%,#9bd3ff 48%,#4b9ff0 72%,#1761c1 100%)!important;
+}
+#homePage .home-menu-icon.green-icon,
+#homePage .community-icon.green-icon{
+  color:#348c35!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#edffe6 22%,#b5f29b 48%,#78d85e 72%,#319b42 100%)!important;
+}
+#homePage .home-menu-icon.amber,
+#homePage .community-icon.amber{
+  color:#9b690e!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#fff5ce 22%,#ffdf83 48%,#edbd4d 72%,#bd8420 100%)!important;
+}
+#homePage .home-menu-icon.slate{
+  color:#526175!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#f1f5fa 22%,#cbd5e3 48%,#9aa9bc 72%,#66758b 100%)!important;
+}
+#homePage .community-icon.pink{
+  color:#b82e80!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#ffe9f6 22%,#ffb6df 48%,#ed75bc 72%,#bc398d 100%)!important;
+}
+#homePage .home-asset-icon.gold-icon{
+  color:#8e620c!important;
+  background:radial-gradient(circle at 34% 25%,#fff 0,#fff2b7 24%,#f6d46a 50%,#dba92e 76%,#a97515 100%)!important;
+}
+#homePage .home-asset-icon.bitcoin-icon{
+  color:#fff!important;
+  background:radial-gradient(circle at 34% 25%,#fff2d4 0,#ffbd56 23%,#f28a19 54%,#d96b0a 78%,#a94808 100%)!important;
+}
+#homePage .home-asset-icon.oil-icon{
+  color:#fff!important;
+  background:radial-gradient(circle at 34% 25%,#efffff 0,#b5eee8 23%,#45bdb4 54%,#168b87 78%,#075d65 100%)!important;
+}
+@media (prefers-reduced-motion:no-preference){
+  #homePage .home-menu-icon,
+  #homePage .community-icon,
+  #homePage .home-asset-icon{
+    animation:aurumReferenceFloat 4.6s ease-in-out infinite,
+              aurumReferenceGlow 3.2s ease-in-out infinite!important;
+    will-change:transform,filter!important;
+  }
+  #homePage .home-menu-card:nth-child(2n) .home-menu-icon,
+  #homePage .home-community-grid a:nth-child(2) .community-icon,
+  #homePage .home-market-card:nth-child(2) .home-asset-icon{
+    animation-delay:-1.4s,-1s!important;
+  }
+  #homePage .home-menu-card:nth-child(3n) .home-menu-icon,
+  #homePage .home-community-grid a:nth-child(3) .community-icon,
+  #homePage .home-market-card:nth-child(3) .home-asset-icon{
+    animation-delay:-2.7s,-1.8s!important;
+  }
+  #homePage .home-menu-icon:hover,
+  #homePage .community-icon:hover,
+  #homePage .home-asset-icon:hover{
+    animation-play-state:paused!important;
+    transform:translateY(-4px) scale(1.08)!important;
+  }
+}
+@keyframes aurumReferenceFloat{
+  0%,100%{transform:translate3d(0,0,0) rotate(0) scale(1)}
+  50%{transform:translate3d(0,-4px,0) rotate(-1deg) scale(1.035)}
+}
+@keyframes aurumReferenceGlow{
+  0%,100%{filter:brightness(1) drop-shadow(0 3px 6px rgba(176,132,42,.15))}
+  50%{filter:brightness(1.09) drop-shadow(0 5px 14px rgba(196,150,55,.34))}
+}
+@media(max-width:600px){
+  #homePage .home-menu-icon,
+  #homePage .community-icon{box-shadow:0 0 0 2px rgba(255,255,255,.9),0 0 0 4px rgba(205,166,76,.16),inset 0 2px 3px rgba(255,255,255,.95),0 4px 10px rgba(85,67,32,.14)!important}
+}
