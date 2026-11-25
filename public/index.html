@@ -2551,6 +2551,45 @@ body {
 
 </style>
 
+<style id="aurum-traxa-signal-feed-parity">
+/* Only Today's Signals cards are restyled; preserve the premium dashboard layout */
+#marketPage .aurum-signal-feed{gap:6px}
+#marketPage .aurum-signal-feed-card{
+ display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;gap:8px;
+ min-height:68px;width:100%;padding:8px 10px;border-radius:12px;text-align:left;
+ border:1px solid #b8e5c9;background-color:#f0fff5;color:#173b2a;
+ background-image:linear-gradient(rgba(55,160,103,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(55,160,103,.045) 1px,transparent 1px),linear-gradient(110deg,rgba(219,255,231,.92),rgba(255,255,255,.96));
+ background-size:12px 12px,12px 12px,100% 100%;
+ box-shadow:0 2px 7px rgba(28,90,55,.06)
+}
+#marketPage .aurum-signal-feed-card.sell{
+ border-color:#efbdc2;background-color:#fff1f2;color:#5a252b;
+ background-image:linear-gradient(rgba(204,83,96,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(204,83,96,.045) 1px,transparent 1px),linear-gradient(110deg,rgba(255,225,228,.94),rgba(255,255,255,.97));
+ box-shadow:0 2px 7px rgba(130,48,58,.06)
+}
+#marketPage .aurum-signal-feed-timeframe{display:grid;justify-items:start;gap:5px}
+#marketPage .aurum-signal-feed-timeframe>strong{font-size:18px;line-height:1;font-weight:900;letter-spacing:-.5px;color:#132d20}
+#marketPage .aurum-signal-feed-card.sell .aurum-signal-feed-timeframe>strong{color:#4b2026}
+#marketPage .aurum-signal-feed-direction{font-size:8px;font-weight:900;padding:3px 9px;border-radius:20px;background:#2398e8;color:#fff;line-height:1.2;box-shadow:0 1px 3px #1686d333}
+#marketPage .aurum-signal-feed-direction.sell{background:#ff5261;color:#fff;box-shadow:0 1px 3px #e34c5c33}
+#marketPage .aurum-signal-feed-content{display:grid;gap:4px;min-width:0}
+#marketPage .aurum-signal-feed-top{align-items:center}
+#marketPage .aurum-signal-feed-entry{font-size:12px;font-weight:900;color:#2476a9;line-height:1.25}
+#marketPage .aurum-signal-feed-card.sell .aurum-signal-feed-entry{color:#b64c55}
+#marketPage .aurum-signal-feed-date{display:grid;justify-items:end;gap:2px;color:#66766e;font-size:9px}
+#marketPage .aurum-signal-feed-date small{font-size:8px;color:#8b9690}
+#marketPage .aurum-signal-feed-levels{font-size:9px;line-height:1.35;color:#657a70}
+#marketPage .aurum-signal-feed-card.sell .aurum-signal-feed-levels{color:#89666a}
+#marketPage .aurum-signal-feed-result{font-size:9px;line-height:1.35;color:#9a792d;font-weight:800}
+#marketPage .aurum-signal-feed-card.is-win .aurum-signal-feed-result{color:#21865c}
+#marketPage .aurum-signal-feed-card.is-loss .aurum-signal-feed-result{color:#d34d58}
+@media(max-width:390px){
+ #marketPage .aurum-signal-feed-card{grid-template-columns:45px minmax(0,1fr);padding:8px;gap:7px}
+ #marketPage .aurum-signal-feed-timeframe>strong{font-size:16px}
+ #marketPage .aurum-signal-feed-entry{font-size:11px}
+}
+</style>
+
 <style id="aurum-traxa-performance">
 #marketPage .aurum-performance-panel{padding:14px;background:linear-gradient(135deg,#f1fbff 0%,#f6f0ff 100%);border:1px solid #dce7f6;border-radius:15px}
 #marketPage .aurum-performance-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
@@ -3283,7 +3322,7 @@ body {
 #aurumMarketDirectory .aurum-directory-running{padding:4px 9px;border-radius:20px;background:#e7f8fa;color:#3195a1;font-size:9px;font-weight:700;white-space:nowrap}
 #aurumMarketDirectory .aurum-directory-disclaimer{margin:13px 5px 0;color:#8b929e;font-size:9px;line-height:1.5;text-align:center}
 #marketDirectoryPage{max-width:100%;}
-#marketPage>.aurum-asset-switch{display:none!important;}
+/* Asset selector is intentionally visible above the live instrument card. */
 @media(max-width:420px){#aurumMarketDirectory .aurum-market-row{min-height:68px;padding:9px 12px}}
 </style>
 <style id="aurum-traxa-signal-detail">
@@ -3402,6 +3441,549 @@ body {
   .aurum-live-ticker .ticker-track { animation: none !important; transform: none !important; }
 }
 </style>
+<style id="aurum-market-instrument-visual-parity">
+/* Market instrument header inspired by the supplied Gold / BTC / WTI reference */
+#marketPage .aurum-asset-switch{
+ display:flex!important;align-items:center;gap:7px;max-width:none;width:100%;
+ margin:0 auto 10px;padding:4px;border:1px solid #e9e6df;border-radius:16px;
+ background:rgba(255,255,255,.94);box-shadow:0 3px 12px rgba(35,42,56,.035);
+ overflow-x:auto;scrollbar-width:none
+}
+#marketPage .aurum-asset-switch::-webkit-scrollbar{display:none}
+#marketPage .aurum-asset-switch button{
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:31px;
+ padding:5px 11px;border:1px solid #e7e9ed;border-radius:20px;
+ background:linear-gradient(180deg,#fff,#f7f8fa);color:#596171;
+ font-size:10px;font-weight:800;white-space:nowrap;transition:background .2s,border-color .2s,box-shadow .2s
+}
+#marketPage .aurum-asset-switch button.active{
+ color:#745416;background:linear-gradient(135deg,#fff8df,#f6e6b5);
+ border-color:#e6d29a;box-shadow:0 2px 6px rgba(170,130,39,.12)
+}
+#marketPage .aurum-asset-switch-icon{
+ width:19px;height:19px;flex:0 0 19px;display:grid;place-items:center;
+ border-radius:50%;font-size:9px;font-weight:950;color:#fff;
+ background:linear-gradient(145deg,#f6df91,#b88726);box-shadow:inset 0 1px 2px #fff8,0 1px 3px #9c762533
+}
+#marketPage .aurum-asset-bitcoin .aurum-asset-switch-icon{background:linear-gradient(145deg,#ffc36b,#dc7917);font-size:13px}
+#marketPage .aurum-asset-oil .aurum-asset-switch-icon{background:linear-gradient(145deg,#65cfc3,#08786e);font-size:7px}
+#marketPage .aurum-asset-bitcoin.active{color:#9b5c12;background:linear-gradient(135deg,#fff5e7,#ffe4bf);border-color:#f0cf9e}
+#marketPage .aurum-asset-oil.active{color:#08786e;background:linear-gradient(135deg,#edfffc,#c9f2eb);border-color:#a8ded5}
+#marketPage .aurum-traxa-market-card{
+ padding:17px 16px 14px;border:1px solid #e8dfcd;border-radius:17px;
+ background:linear-gradient(145deg,#fffefa 0%,#fff 65%,#fffdf7 100%);
+ box-shadow:0 9px 25px rgba(40,43,52,.075)
+}
+#marketPage .aurum-asset-row{gap:9px;min-height:31px}
+#marketPage .aurum-asset-mark{
+ width:34px;height:34px;flex:0 0 34px;border-radius:50%;font-size:11px;
+ background:linear-gradient(145deg,#fff0b7,#bd8e2e);color:#775416;
+ box-shadow:inset 0 1px 2px #fff9,0 2px 7px #9c762533
+}
+#marketPage .aurum-asset-mark.is-bitcoin{background:linear-gradient(145deg,#ffd18a,#e78318);color:#fff;font-size:18px}
+#marketPage .aurum-asset-mark.is-oil{background:linear-gradient(145deg,#68d2c5,#08766d);color:#fff;font-size:9px}
+#marketPage .aurum-asset-row div small{font-size:7px;letter-spacing:1.35px}
+#marketPage .aurum-asset-row div strong{font-size:12px;letter-spacing:1px}
+#marketPage .aurum-market-state{font-size:8px;letter-spacing:1px;color:#199c79}
+#marketPage .aurum-price-row{padding:13px 0 8px;gap:4px}
+#marketPage .aurum-price-row strong{
+ font-size:clamp(32px,8.3vw,43px);letter-spacing:-1.5px;line-height:1.05;
+ color:#9c7623;font-variant-numeric:tabular-nums
+}
+#marketPage .aurum-price-row small{font-size:8px;letter-spacing:.3px;color:#9297a1}
+#marketPage .aurum-mini-chart{height:68px;margin:0 0 8px}
+#marketPage .aurum-trend-pill{margin:0 0 10px;padding:4px 9px;font-size:8px}
+#marketPage .aurum-range-head{margin-bottom:6px}
+#marketPage .aurum-range-head span{font-size:7px;letter-spacing:1.15px}
+#marketPage .aurum-range-head strong{font-size:8px;letter-spacing:.6px}
+#marketPage .aurum-range-track{height:5px;margin-bottom:7px;background:linear-gradient(90deg,#e9f2e8,#f1e9d8,#f6e5e5)}
+#marketPage .aurum-range-track span{width:4px;height:14px;top:-5px;background:#27313e}
+#marketPage .aurum-range-values{margin-bottom:11px;font-size:8px}
+#marketPage .aurum-nearest-levels{gap:8px}
+#marketPage .aurum-nearest-levels>div{padding:9px 10px;border-radius:10px;background:linear-gradient(145deg,#fbfdfc,#f8fafb)}
+#marketPage .aurum-nearest-levels small{font-size:7px;letter-spacing:.8px}
+#marketPage .aurum-nearest-levels strong{font-size:13px;font-variant-numeric:tabular-nums}
+#marketPage .aurum-nearest-levels span{font-size:8px}
+#marketPage .aurum-summary-foot{padding-top:9px;font-size:7px;letter-spacing:1px}
+@media(max-width:390px){
+ #marketPage .aurum-traxa-market-card{padding:14px 12px 12px}
+ #marketPage .aurum-mini-chart{height:62px}
+ #marketPage .aurum-asset-switch button{padding:5px 9px;font-size:9px}
+}
+</style>
+<style id="aurum-color-price-and-tabs">
+/* Rich instrument colors for the live quote */
+#marketPage .aurum-price-row strong{
+ display:inline-block;
+ font-weight:950;
+ background:linear-gradient(100deg,#e7b83f 0%,#a97712 48%,#f0cd70 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ text-shadow:0 3px 12px rgba(174,128,27,.13);
+}
+#marketPage .aurum-traxa-market-card.is-gold .aurum-price-row strong{
+ background-image:linear-gradient(100deg,#f0c75a 0%,#a97917 48%,#e4b84e 100%);
+}
+#marketPage .aurum-traxa-market-card.is-bitcoin .aurum-price-row strong{
+ background-image:linear-gradient(100deg,#ffc36b 0%,#df7915 52%,#f4a638 100%);
+ text-shadow:0 3px 12px rgba(224,126,24,.16);
+}
+#marketPage .aurum-traxa-market-card.is-oil .aurum-price-row strong{
+ background-image:linear-gradient(100deg,#65cfc2 0%,#08786e 52%,#35b9a9 100%);
+ text-shadow:0 3px 12px rgba(8,120,110,.15);
+}
+/* Directional tick color remains readable while the asset gradient is the default */
+#marketPage .aurum-price-row strong.price-up{
+ background-image:linear-gradient(100deg,#27b879,#087b52 55%,#49c98f);
+ text-shadow:0 3px 12px rgba(8,140,88,.15)
+}
+#marketPage .aurum-price-row strong.price-down{
+ background-image:linear-gradient(100deg,#ff8790,#cf334d 55%,#e95b70);
+ text-shadow:0 3px 12px rgba(207,51,77,.15)
+}
+/* Distinct colors for the three navigation tabs */
+#marketPage .aurum-signal-tabs button[data-signal-tab="setup"]{
+ color:#1685a6;background:linear-gradient(135deg,#e8fbff,#d7f4f5);border:1px solid #b9e8ed
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="performance"]{
+ color:#7045bd;background:linear-gradient(135deg,#f4edff,#e8ddff);border:1px solid #d9c9fa
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="analysis"]{
+ color:#a66b13;background:linear-gradient(135deg,#fff7df,#ffebbd);border:1px solid #f0d79b
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="setup"].active{
+ color:#fff;background:linear-gradient(105deg,#10a9c5,#277be0);border-color:transparent;box-shadow:0 4px 12px #168dc433
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="performance"].active{
+ color:#fff;background:linear-gradient(105deg,#9a50e8,#5635c8);border-color:transparent;box-shadow:0 4px 12px #7545d633
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="analysis"].active{
+ color:#fff;background:linear-gradient(105deg,#f0b53b,#e47b19);border-color:transparent;box-shadow:0 4px 12px #df9b2733
+}
+</style>
+<script id="aurum-color-price-asset-sync">
+(function(){
+ const card=document.querySelector('#marketPage .aurum-traxa-market-card');
+ const pair=document.getElementById('pair');
+ if(!card||!pair)return;
+ function sync(){
+  card.classList.remove('is-gold','is-bitcoin','is-oil');
+  card.classList.add(pair.value==='BTC/USD'?'is-bitcoin':pair.value==='WTI'?'is-oil':'is-gold');
+ }
+ pair.addEventListener('change',sync);
+ sync();
+})();
+</script>
+<style id="aurum-reference-market-design-v2">
+/* Reference-matched market panel. Scoped to Market only; dashboard remains untouched. */
+#marketPage{
+  width:100%;max-width:1240px!important;margin:0 auto!important;
+  padding:20px clamp(14px,4.6vw,58px) 110px!important;
+  box-sizing:border-box;
+  background:linear-gradient(145deg,#f1f2f7 0%,#faf9f5 48%,#f3f4f8 100%)!important;
+}
+#marketPage .aurum-asset-switch{
+  max-width:none!important;justify-content:flex-start;gap:14px;margin:0 0 30px!important;
+  overflow:visible;padding:0 2px;
+}
+#marketPage .aurum-asset-switch button{
+  min-height:66px;display:inline-flex;align-items:center;gap:12px;
+  padding:10px 20px!important;border:2px solid #e0e2e9!important;border-radius:40px!important;
+  background:linear-gradient(145deg,#f8f8fb,#e9eaf0)!important;color:#202b49!important;
+  font-size:clamp(14px,2vw,22px)!important;font-weight:850!important;
+  box-shadow:inset 0 1px 2px #fff,0 2px 5px #25314a0b;
+}
+#marketPage .aurum-asset-switch button.active.aurum-asset-gold{
+  background:linear-gradient(145deg,#effaff,#dff3ff)!important;border-color:#9bdfff!important;color:#0869bd!important;
+}
+#marketPage .aurum-asset-switch button.active.aurum-asset-bitcoin{
+  background:linear-gradient(145deg,#fff8ed,#ffedcf)!important;border-color:#ffc46f!important;color:#a95d0a!important;
+}
+#marketPage .aurum-asset-switch button.active.aurum-asset-oil{
+  background:linear-gradient(145deg,#edfffb,#d7f7f1)!important;border-color:#9bdfd5!important;color:#08786e!important;
+}
+#marketPage .aurum-asset-switch-icon{
+  width:48px!important;height:48px!important;flex-basis:48px!important;border-radius:50%!important;
+  font-size:16px!important;box-shadow:inset 0 2px 4px #fff9,0 3px 7px #9c762544!important;
+}
+#marketPage .aurum-asset-bitcoin .aurum-asset-switch-icon{font-size:28px!important}
+#marketPage .aurum-asset-oil .aurum-asset-switch-icon{font-size:11px!important}
+#marketPage .aurum-traxa-market-card{
+  max-width:none!important;width:100%;box-sizing:border-box;
+  padding:28px 30px 26px!important;border:1px solid #e8dfcb!important;border-radius:28px!important;
+  background-color:#fffefa!important;
+  background-image:linear-gradient(rgba(188,160,99,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(188,160,99,.075) 1px,transparent 1px),linear-gradient(135deg,#fff 0%,#fffdf6 100%)!important;
+  background-size:25px 25px,25px 25px,100% 100%!important;
+  box-shadow:0 18px 42px rgba(40,48,68,.13)!important;
+}
+#marketPage .aurum-asset-row{gap:16px;min-height:72px}
+#marketPage .aurum-asset-mark{
+  width:76px!important;height:76px!important;flex-basis:76px!important;font-size:23px!important;
+  box-shadow:inset 0 2px 4px #fff9,0 5px 14px #bd922f33!important;
+}
+#marketPage .aurum-asset-mark.is-bitcoin{font-size:38px!important}
+#marketPage .aurum-asset-mark.is-oil{font-size:18px!important}
+#marketPage .aurum-asset-row div strong{font-size:clamp(22px,3vw,36px)!important;letter-spacing:.2px!important;color:#17213c!important}
+#marketPage .aurum-market-state{font-size:clamp(12px,1.6vw,19px)!important;font-weight:900;color:#16833c!important}
+#marketPage .aurum-price-row{padding:22px 0 16px!important;gap:6px!important}
+#marketPage #goldPrice{
+  font-size:clamp(52px,8.5vw,104px)!important;line-height:1.02!important;letter-spacing:-3px!important;
+  font-weight:950!important;font-variant-numeric:tabular-nums;
+  color:transparent!important;-webkit-text-fill-color:transparent!important;
+  background-image:linear-gradient(100deg,#f4d36b 0%,#c58a12 48%,#e5aa28 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  text-shadow:0 5px 15px rgba(180,132,27,.12)!important;
+}
+#marketPage:has(.aurum-asset-bitcoin.active) #goldPrice{
+  background-image:linear-gradient(100deg,#ffc76d,#e47b12 52%,#f4a52d)!important;
+}
+#marketPage:has(.aurum-asset-oil.active) #goldPrice{
+  background-image:linear-gradient(100deg,#70d9cc,#078274 52%,#35bba9)!important;
+}
+#marketPage #goldPrice.price-up::after{color:#079b70!important}
+#marketPage #goldPrice.price-down::after{color:#e84a58!important}
+#marketPage .aurum-price-row small{font-size:clamp(10px,1.2vw,14px)!important;color:#778092!important}
+#marketPage .aurum-mini-chart{height:clamp(95px,12vw,150px)!important;margin:0 0 18px!important}
+#marketPage .aurum-trend-pill{font-size:12px!important;padding:6px 12px!important;border-radius:20px!important}
+#marketPage .aurum-range-head{margin:16px 0 12px!important}
+#marketPage .aurum-range-head span,#marketPage .aurum-range-head strong{font-size:clamp(12px,1.5vw,19px)!important;font-weight:900!important}
+#marketPage .aurum-range-head span{letter-spacing:.5px!important;color:#747986!important}
+#marketPage .aurum-range-head strong{color:#727887!important}
+#marketPage .aurum-range-track{
+  height:16px!important;border-radius:20px!important;margin:0 0 10px!important;
+  background:linear-gradient(90deg,#ffe89c 0%,#f6bd2f 52%,#e6a400 100%)!important;
+}
+#marketPage .aurum-range-track span{
+  top:-9px!important;width:11px!important;height:34px!important;border-radius:6px!important;
+  background:#202b49!important;box-shadow:0 0 0 3px #fff,0 3px 7px #2228!important;
+}
+#marketPage .aurum-range-values{margin-bottom:26px!important;font-size:clamp(13px,1.8vw,21px)!important;font-weight:850!important;color:#1a2540!important}
+#marketPage .aurum-nearest-levels{gap:18px!important}
+#marketPage .aurum-nearest-levels>div{
+  min-height:145px;padding:22px 24px!important;border-radius:26px!important;
+  background-image:linear-gradient(rgba(42,126,93,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(42,126,93,.045) 1px,transparent 1px),linear-gradient(135deg,#f1fff8,#e8f8f0)!important;
+  background-size:18px 18px,18px 18px,100% 100%!important;
+}
+#marketPage .aurum-nearest-support{border:2px solid #b8efd8!important}
+#marketPage .aurum-nearest-resistance{
+  border:2px solid #f5b9c1!important;
+  background-image:linear-gradient(rgba(189,70,83,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(189,70,83,.045) 1px,transparent 1px),linear-gradient(135deg,#fff0f1,#fde9eb)!important;
+}
+#marketPage .aurum-nearest-levels small{font-size:clamp(11px,1.5vw,18px)!important;color:#364057!important;letter-spacing:.5px!important}
+#marketPage .aurum-nearest-levels strong{font-size:clamp(27px,3.4vw,43px)!important;font-weight:950!important;margin-top:10px!important;color:#078a36!important}
+#marketPage .aurum-nearest-resistance strong{color:#e11e32!important}
+#marketPage .aurum-nearest-levels span{font-size:clamp(13px,1.8vw,21px)!important;font-weight:800;color:#1263a6!important;margin-top:7px!important}
+#marketPage .aurum-nearest-resistance span{color:#d91f32!important}
+#marketPage .aurum-signal-tabs{
+  max-width:none!important;width:100%;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:18px!important;padding:0!important;margin:26px 0 20px!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+}
+#marketPage .aurum-signal-tabs button{
+  min-height:100px!important;border-radius:30px!important;padding:18px 12px!important;
+  font-size:clamp(18px,2.3vw,29px)!important;font-weight:900!important;color:#fff!important;
+  border:2px solid transparent!important;box-shadow:0 8px 17px rgba(37,46,68,.14)!important;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  transition:transform .18s ease,filter .18s ease;
+}
+#marketPage .aurum-signal-tabs button:active{transform:translateY(2px);filter:brightness(.96)}
+#marketPage .aurum-signal-tabs button::before{font-size:1.25em;line-height:1}
+#marketPage .aurum-signal-tabs button[data-signal-tab="setup"]{
+  background:linear-gradient(115deg,#05c95b 0%,#05a9e8 55%,#2362ff 100%)!important;
+  box-shadow:0 8px 20px rgba(17,140,220,.24)!important;
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="setup"]::before{content:"⚙"}
+#marketPage .aurum-signal-tabs button[data-signal-tab="performance"]{
+  background:linear-gradient(115deg,#b52ce8 0%,#8c12d5 55%,#6200b8 100%)!important;
+  box-shadow:0 8px 20px rgba(129,30,201,.24)!important;
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="performance"]::before{content:"▥"}
+#marketPage .aurum-signal-tabs button[data-signal-tab="analysis"]{
+  background:linear-gradient(115deg,#ffca18 0%,#ff9e08 55%,#ee7900 100%)!important;
+  box-shadow:0 8px 20px rgba(230,151,15,.24)!important;
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="analysis"]::before{content:"▤"}
+#marketPage .aurum-signal-tabs button.active{filter:saturate(1.12) brightness(1.02)}
+@media(max-width:700px){
+ #marketPage{padding:15px 13px 105px!important}
+ #marketPage .aurum-asset-switch{gap:7px;margin-bottom:16px!important}
+ #marketPage .aurum-asset-switch button{min-height:48px;padding:6px 10px!important;gap:7px;font-size:12px!important}
+ #marketPage .aurum-asset-switch-icon{width:32px!important;height:32px!important;flex-basis:32px!important;font-size:11px!important}
+ #marketPage .aurum-asset-bitcoin .aurum-asset-switch-icon{font-size:19px!important}
+ #marketPage .aurum-traxa-market-card{padding:17px 15px 16px!important;border-radius:19px!important}
+ #marketPage .aurum-asset-row{min-height:45px;gap:10px}
+ #marketPage .aurum-asset-mark{width:46px!important;height:46px!important;flex-basis:46px!important;font-size:15px!important}
+ #marketPage .aurum-asset-mark.is-bitcoin{font-size:24px!important}
+ #marketPage .aurum-asset-mark.is-oil{font-size:12px!important}
+ #marketPage .aurum-price-row{padding:17px 0 12px!important}
+ #marketPage #goldPrice{font-size:clamp(43px,11vw,66px)!important;letter-spacing:-2px!important}
+ #marketPage .aurum-mini-chart{height:82px!important;margin-bottom:12px!important}
+ #marketPage .aurum-range-head{margin:11px 0 9px!important}
+ #marketPage .aurum-range-track{height:10px!important}
+ #marketPage .aurum-range-track span{height:24px!important;top:-7px!important;width:8px!important}
+ #marketPage .aurum-range-values{margin-bottom:15px!important}
+ #marketPage .aurum-nearest-levels{gap:8px!important}
+ #marketPage .aurum-nearest-levels>div{min-height:106px;padding:12px 10px!important;border-radius:16px!important}
+ #marketPage .aurum-nearest-levels small{font-size:9px!important}
+ #marketPage .aurum-nearest-levels strong{font-size:clamp(21px,6vw,29px)!important}
+ #marketPage .aurum-nearest-levels span{font-size:10px!important}
+ #marketPage .aurum-signal-tabs{gap:7px!important;margin:17px 0 15px!important}
+ #marketPage .aurum-signal-tabs button{min-height:65px!important;border-radius:17px!important;padding:9px 4px!important;font-size:clamp(11px,3.2vw,16px)!important;gap:5px;flex-direction:column}
+ #marketPage .aurum-signal-tabs button::before{font-size:1.15em}
+}
+@media(max-width:370px){
+ #marketPage .aurum-asset-switch button{padding:5px 7px!important;font-size:10px!important}
+ #marketPage .aurum-asset-switch-icon{width:27px!important;height:27px!important;flex-basis:27px!important}
+ #marketPage .aurum-nearest-levels{grid-template-columns:1fr!important}
+}
+</style>
+<style id="aurum-technical-4d-elite">
+/* AURUM DATA TEKNIKAL — 4D ELITE: presentation-only, scoped to Analysis panel */
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"]{
+  max-width:1120px;width:100%;padding:clamp(12px,2vw,22px);
+  border:1px solid rgba(224,174,55,.72);border-radius:22px;
+  color:#f7f4e9;background:
+    radial-gradient(ellipse at 12% 0%,rgba(185,132,22,.18),transparent 34%),
+    radial-gradient(ellipse at 100% 55%,rgba(0,190,112,.10),transparent 38%),
+    linear-gradient(145deg,#080a0d 0%,#111318 54%,#050607 100%);
+  box-shadow:0 18px 48px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,225,142,.24);
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title{
+  display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:0 0 14px;
+  border-bottom:1px solid rgba(227,181,68,.35);
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-heading-icon{
+  display:grid;place-items:center;width:46px;height:46px;flex:0 0 46px;
+  border-radius:14px;color:#171006;background:linear-gradient(145deg,#fff0a8,#d49a20 58%,#8b5b09);
+  border:1px solid #ffe59a;box-shadow:0 0 22px rgba(236,177,43,.28),inset 0 1px 2px #fff8;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title strong{
+  color:#fff;font-size:clamp(17px,2vw,22px);font-weight:950;letter-spacing:1.5px;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title small{
+  display:block;margin-top:4px;color:#c7b98f;font-size:10px;letter-spacing:.35px;
+}
+#marketPage .aurum-analysis-card{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:12px;overflow:visible;
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+}
+#marketPage .aurum-analysis-section{
+  min-width:0;padding:15px;border:1px solid rgba(221,174,61,.42);
+  border-radius:16px;background:linear-gradient(145deg,rgba(25,27,30,.97),rgba(7,9,11,.98));
+  box-shadow:0 8px 22px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.055);
+}
+#marketPage .aurum-section-kicker{
+  color:#e5bd62;font-size:10px;font-weight:950;letter-spacing:1.2px;
+}
+#marketPage #marketStructure{
+  margin:8px 0 0;padding:14px 15px;border:1px solid rgba(0,230,118,.38);
+  border-radius:12px;color:#f5f2e8;
+  background:linear-gradient(110deg,rgba(0,120,66,.28),rgba(13,16,18,.96) 70%);
+  box-shadow:inset 0 0 22px rgba(0,230,118,.055);
+  font-size:12px;line-height:1.8;font-weight:650;overflow-wrap:anywhere;
+}
+#marketPage #trendMeter{padding:0;color:#f6f2e7}
+#marketPage #trendMeter .aurum-trend-dashboard{
+  padding:0;border:0;border-radius:0;background:transparent;background-image:none;color:#f6f2e7;
+}
+#marketPage #trendMeter .aurum-trend-hero{
+  display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:16px;
+  min-height:126px;padding:18px;border:1px solid rgba(224,178,64,.65);border-radius:16px;
+  background:radial-gradient(ellipse at 0% 50%,rgba(0,230,118,.2),transparent 48%),linear-gradient(115deg,#101a16,#090b0d 58%,#17140c);
+  box-shadow:inset 0 0 26px rgba(0,230,118,.08),0 0 18px rgba(219,166,45,.1);
+}
+#marketPage #trendMeter .aurum-trend-hero-copy{display:flex;flex-direction:column;gap:6px}
+#marketPage #trendMeter .aurum-trend-hero-copy small,
+#marketPage #trendMeter .aurum-trend-price small{color:#c9b77f;font-size:9px;font-weight:900;letter-spacing:1.1px}
+#marketPage #trendMeter .aurum-trend-hero-copy strong{font-size:clamp(27px,4vw,42px);font-weight:1000;letter-spacing:.5px;text-shadow:0 0 20px currentColor}
+#marketPage #trendMeter .aurum-trend-dashboard[data-direction="BULLISH"] .aurum-trend-hero-copy strong{color:#00ef83!important}
+#marketPage #trendMeter .aurum-trend-dashboard[data-direction="BEARISH"] .aurum-trend-hero-copy strong{color:#ff4057!important}
+#marketPage #trendMeter .aurum-trend-dashboard[data-direction="MIXED"] .aurum-trend-hero-copy strong,
+#marketPage #trendMeter .aurum-trend-dashboard[data-direction="RANGE"] .aurum-trend-hero-copy strong{color:#e4bd59!important}
+#marketPage #trendMeter .aurum-trend-hero-copy span{color:#d0d0c7;font-size:10px;font-weight:750}
+#marketPage #trendMeter .aurum-trend-price{text-align:right;display:flex;flex-direction:column;gap:8px}
+#marketPage #trendMeter .aurum-trend-price b{color:#f4c34f;font-size:clamp(20px,3vw,29px);font-weight:950;text-shadow:0 0 16px rgba(255,191,48,.3)}
+#marketPage #trendMeter .aurum-trend-strength{
+  width:104px;height:104px;display:grid;place-items:center;border-radius:50%;
+  background:conic-gradient(#00e676 var(--trend-value),#ff4057 0);
+  box-shadow:0 0 20px rgba(0,230,118,.17);
+  position:relative;
+}
+#marketPage #trendMeter .aurum-trend-strength:before{
+  content:"";position:absolute;inset:7px;border-radius:50%;background:#090d0d;border:1px solid rgba(233,191,81,.35);
+}
+#marketPage #trendMeter .aurum-trend-strength>div{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px}
+#marketPage #trendMeter .aurum-trend-strength b{font-size:21px;color:#fff}
+#marketPage #trendMeter .aurum-trend-strength small{font-size:7px;color:#d6c58e;font-weight:900;text-align:center}
+#marketPage #trendMeter .aurum-trend-meter-box{
+  margin-top:12px;padding:14px;border:1px solid rgba(214,170,59,.38);border-radius:14px;
+  background:linear-gradient(145deg,#151719,#090b0d);
+}
+#marketPage #trendMeter .aurum-trend-meter-label{color:#d4c99f;font-size:9px}
+#marketPage #trendMeter .aurum-trend-meter-label b{color:#f5d47c;font-size:10px}
+#marketPage #trendMeter .aurum-trend-segments{gap:4px;margin:12px 0 9px}
+#marketPage #trendMeter .aurum-meter-segment{height:11px;border-radius:4px;box-shadow:0 0 7px rgba(255,255,255,.07)}
+#marketPage #trendMeter .aurum-trend-percentages{color:#c7c4b9;font-size:9px;font-weight:800}
+#marketPage #trendMeter .aurum-trend-percentages span:first-child{color:#ff6475}
+#marketPage #trendMeter .aurum-trend-percentages span:last-child{color:#00ef83}
+#marketPage #trendMeter .aurum-tf-grid{grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:12px}
+#marketPage #trendMeter .aurum-tf-card{
+  min-width:0;min-height:112px;padding:10px 4px;border:1px solid color-mix(in srgb,var(--tf-color) 65%,#d5a83b);
+  border-radius:13px;background:linear-gradient(160deg,rgba(20,25,23,.98),rgba(5,8,9,.98));
+  box-shadow:inset 0 0 16px color-mix(in srgb,var(--tf-color) 14%,transparent),0 5px 14px #0008;
+}
+#marketPage #trendMeter .aurum-tf-card-head{color:#fff;font-size:10px}
+#marketPage #trendMeter .aurum-tf-card-head span{font-size:14px}
+#marketPage #trendMeter .aurum-tf-card>small{font-size:8px;color:var(--tf-color)}
+#marketPage #trendMeter .aurum-tf-ring{
+  width:39px;height:39px;border:2px solid var(--tf-color);color:var(--tf-color);
+  background:radial-gradient(circle,#202721,#080a0b);box-shadow:0 0 12px color-mix(in srgb,var(--tf-color) 38%,transparent);
+}
+#marketPage #trendMeter .aurum-tf-card>b{font-size:8px;color:var(--tf-color);white-space:normal}
+#marketPage #trendMeter .aurum-trend-table{margin-top:12px;overflow:hidden;border:1px solid rgba(214,170,59,.35);border-radius:13px;background:#090c0e}
+#marketPage #trendMeter .aurum-trend-table-head,
+#marketPage #trendMeter .aurum-trend-table-row{
+  display:grid;grid-template-columns:.65fr 1fr 1.2fr 1.2fr;gap:8px;align-items:center;
+  padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.075);background:transparent;color:#eee8d8;
+  font-size:9px;
+}
+#marketPage #trendMeter .aurum-trend-table-head{color:#e9c76c;font-weight:950;letter-spacing:.7px;background:#17150f}
+#marketPage #trendMeter .aurum-trend-table-row:last-child{border-bottom:0}
+#marketPage #trendMeter .aurum-table-support{color:#00e676!important;font-weight:850}
+#marketPage #trendMeter .aurum-table-resistance{color:#ff5368!important;font-weight:850}
+#marketPage #trendMeter .aurum-trend-footnote{display:block;margin:10px 2px 0;color:#9d9a8d;font-size:8px;line-height:1.55}
+#marketPage #aurumDailyRange{color:#f5f0e3}
+#marketPage #aurumDailyRange .aurum-between-level{
+  margin:0 0 12px;padding:15px;border:1px solid rgba(218,173,62,.5);border-radius:14px;
+  background:linear-gradient(145deg,#171811,#090b0c);
+}
+#marketPage #aurumDailyRange .aurum-daily-heading{color:#e9c76c;font-size:10px;font-weight:950;letter-spacing:1px}
+#marketPage #aurumDailyRange .aurum-between-labels{font-size:10px;color:#00e676}
+#marketPage #aurumDailyRange .aurum-between-labels span:last-child{color:#ff5368}
+#marketPage #aurumDailyRange .aurum-between-track{
+  height:12px;margin:16px 0 10px;border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(90deg,#00c96b 0%,#c5a83a 52%,#ff334f 100%);
+  box-shadow:0 0 13px rgba(224,180,55,.2);
+}
+#marketPage #aurumDailyRange .aurum-between-marker{
+  width:7px;height:23px;background:#fff3b0;border:1px solid #f3c74e;
+  box-shadow:0 0 13px #ffc52d,0 0 25px #ffc52d;
+}
+#marketPage #aurumDailyRange .aurum-between-caption{color:#c9c2ae;font-size:9px}
+#marketPage #aurumDailyRange .aurum-range-row{
+  padding:12px 3px;border-bottom:1px solid rgba(222,184,85,.17);color:#cfc8b6;font-size:10px;
+}
+#marketPage #aurumDailyRange .aurum-range-row b{font-size:10px}
+#marketPage #aurumDailyRange .aurum-range-row i{color:#ff6575}
+#marketPage #aurumDailyRange .aurum-range-row em{color:#38bfff}
+#marketPage #marketStructure,#marketPage #trendMeter,#marketPage #aurumDailyRange{overflow-wrap:anywhere}
+#marketPage .aurum-disclaimer{color:#c9b77f}
+@media(min-width:760px){
+ #marketPage .aurum-analysis-card{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)}
+ #marketPage .aurum-analysis-card>.aurum-analysis-section:first-child{grid-column:1/-1}
+ #marketPage .aurum-analysis-card>.aurum-analysis-section:nth-child(2){grid-column:1/-1}
+ #marketPage .aurum-analysis-card>.aurum-analysis-section:nth-child(3){grid-column:1/-1}
+}
+@media(max-width:620px){
+ #marketPage .aurum-signal-panel[data-signal-panel="analysis"]{padding:10px;border-radius:16px}
+ #marketPage .aurum-analysis-section{padding:11px;border-radius:13px}
+ #marketPage #trendMeter .aurum-trend-hero{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:13px}
+ #marketPage #trendMeter .aurum-trend-price{grid-column:1;text-align:left}
+ #marketPage #trendMeter .aurum-trend-strength{grid-column:2;grid-row:1/3;width:82px;height:82px}
+ #marketPage #trendMeter .aurum-trend-strength b{font-size:17px}
+ #marketPage #trendMeter .aurum-tf-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+ #marketPage #trendMeter .aurum-tf-card{min-height:100px}
+ #marketPage #trendMeter .aurum-trend-table-head,#marketPage #trendMeter .aurum-trend-table-row{grid-template-columns:.55fr .9fr 1fr 1fr;padding:9px 7px;font-size:8px}
+}
+@media(max-width:360px){
+ #marketPage #trendMeter .aurum-tf-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #marketPage #trendMeter .aurum-trend-hero-copy strong{font-size:25px}
+}
+@media(prefers-reduced-motion:no-preference){
+ #marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-section{animation:aurumEliteRise .38s ease-out both}
+ @keyframes aurumEliteRise{from{opacity:.72;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+}
+</style>
+
+<style id="aurum-technical-bright-4d">
+/* Bright 4D DATA TEKNIKAL: scoped visual layer only; no data or trading logic changed. */
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"]{
+ color:#183454!important;border:1px solid #c6e2fa!important;border-radius:22px!important;
+ background:radial-gradient(ellipse at 5% 0%,#ffe8a855,transparent 32%),radial-gradient(ellipse at 100% 40%,#52baff28,transparent 35%),linear-gradient(145deg,#fbfdff,#edf6ff 55%,#fffaf0)!important;
+ box-shadow:0 16px 38px #205b991f,inset 0 1px #fff!important
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title{border-bottom:1px solid #cfe2f6!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-heading-icon{color:#fff!important;background:linear-gradient(145deg,#40caff,#1265df 72%,#e9bd50)!important;border:1px solid #a9ddff!important;box-shadow:0 5px 15px #1885e240,inset 0 1px #fff!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title strong{color:#123d78!important;font-size:clamp(14px,2vw,19px)!important;font-weight:950!important;letter-spacing:1.1px!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title small{color:#617b9c!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-card{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;overflow:visible!important;background:transparent!important;border:0!important;box-shadow:none!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-section{min-width:0!important;padding:clamp(12px,2vw,18px)!important;border:1px solid #d8e9fb!important;border-radius:17px!important;background:linear-gradient(145deg,#fff,#eff7ff 62%,#fffcf2)!important;box-shadow:0 8px 20px #20589117,inset 0 1px #fff!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-section-kicker{color:#956813!important;font-size:10px!important;font-weight:950!important;letter-spacing:1.15px!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-section p{color:#435a78!important}
+#marketPage #marketStructure{margin:8px 0 0!important;padding:15px!important;border:1px solid #b9defb!important;border-radius:13px!important;color:#17457b!important;background:linear-gradient(110deg,#e5f7ff,#fff 52%,#fff5d9)!important;box-shadow:inset 0 1px #fff,0 5px 14px #2188cb17!important;font-size:clamp(11px,1.4vw,13px)!important;font-weight:750!important;line-height:1.8!important}
+#marketPage #trendMeter{color:#1b3559!important}
+#marketPage #trendMeter .aurum-trend-dashboard{padding:11px!important;border:1px solid #b9dcfb!important;border-radius:17px!important;color:#17345a!important;background:linear-gradient(#348fda0e 1px,transparent 1px),linear-gradient(90deg,#348fda0e 1px,transparent 1px),linear-gradient(145deg,#fff,#f0f8ff 58%,#fffaf0)!important;background-size:18px 18px,18px 18px,auto!important;box-shadow:0 9px 22px #256fb01f,inset 0 1px #fff!important}
+#marketPage #trendMeter .aurum-trend-hero{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;align-items:center!important;gap:clamp(8px,2vw,18px)!important;min-height:112px!important;padding:clamp(12px,2vw,19px)!important;border:1px solid #c8e3fa!important;border-radius:14px!important;background:linear-gradient(110deg,#e5f6ff,#fff 49%,#fff5d9)!important;box-shadow:inset 0 1px #fff,0 5px 15px #287ec114!important}
+#marketPage #trendMeter .aurum-trend-hero-copy small,#marketPage #trendMeter .aurum-trend-price small{color:#67809e!important;font-weight:900!important;letter-spacing:1px!important}
+#marketPage #trendMeter .aurum-trend-hero-copy strong{font-size:clamp(24px,4vw,40px)!important;font-weight:1000!important;text-shadow:0 2px #fff,0 5px 14px #008c5024!important}
+#marketPage #trendMeter .aurum-trend-hero-copy span{color:#49627f!important;font-size:10px!important;font-weight:800!important}
+#marketPage #trendMeter .aurum-trend-price b{color:#bd850d!important;font-size:clamp(18px,3vw,29px)!important;font-weight:1000!important;text-shadow:0 2px #fff,0 4px 12px #dfa62333!important}
+#marketPage #trendMeter .aurum-trend-strength{background:conic-gradient(#08c878 var(--trend-value),#168be9 0,#e9f0f8 0)!important;box-shadow:0 0 0 5px #fff,0 0 0 7px #c8e3fa,0 6px 17px #1181c62e!important}
+#marketPage #trendMeter .aurum-trend-strength:before{background:linear-gradient(145deg,#fff,#eaf5ff)!important;border:1px solid #d2e7fa!important}
+#marketPage #trendMeter .aurum-trend-strength b{color:#17477f!important;font-weight:1000!important}
+#marketPage #trendMeter .aurum-trend-strength small{color:#607d9d!important}
+#marketPage #trendMeter .aurum-trend-meter-box{margin-top:11px!important;padding:13px!important;border:1px solid #d1e4f6!important;border-radius:13px!important;background:linear-gradient(110deg,#fff4f3,#fff 48%,#eaf7ff)!important;box-shadow:inset 0 1px #fff!important}
+#marketPage #trendMeter .aurum-trend-meter-label b{color:#203b60!important}
+#marketPage #trendMeter .aurum-trend-meter-label span:first-child,#marketPage #trendMeter .aurum-trend-percentages span:first-child{color:#e64b5b!important}
+#marketPage #trendMeter .aurum-trend-meter-label span:last-child,#marketPage #trendMeter .aurum-trend-percentages span:last-child{color:#079c68!important}
+#marketPage #trendMeter .aurum-trend-percentages span:nth-child(2){color:#617d9d!important}
+#marketPage #trendMeter .aurum-tf-grid{gap:7px!important}
+#marketPage #trendMeter .aurum-tf-card{min-height:100px!important;padding:9px 4px!important;border:1px solid #cfe4f8!important;border-radius:13px!important;background:linear-gradient(180deg,#fff,#eef7ff)!important;box-shadow:0 5px 13px #2068a51c,inset 0 1px #fff!important}
+#marketPage #trendMeter .aurum-tf-card[style*="239, 83, 91"]{border-color:#ffc5cb!important;background:linear-gradient(180deg,#fff,#fff0f1)!important}
+#marketPage #trendMeter .aurum-tf-card-head{color:#24466e!important}
+#marketPage #trendMeter .aurum-trend-table{overflow:hidden!important;margin-top:12px!important;border:1px solid #c9dff4!important;border-radius:13px!important;background:#fff!important;box-shadow:0 5px 14px #235c9214!important}
+#marketPage #trendMeter .aurum-trend-table-head,#marketPage #trendMeter .aurum-trend-table-row{display:grid!important;grid-template-columns:.55fr .9fr 1fr 1fr!important;align-items:center!important;gap:5px!important;padding:10px 11px!important;background:linear-gradient(90deg,#eaf5ff,#fff 55%,#fff8e8)!important;border-bottom:1px solid #e1ebf5!important;color:#274363!important;font-size:10px!important}
+#marketPage #trendMeter .aurum-trend-table-head{color:#164b83!important;font-weight:950!important;background:linear-gradient(90deg,#dcedff,#f8fbff,#fff1ce)!important}
+#marketPage #trendMeter .aurum-trend-table-row:last-child{border-bottom:0!important}
+#marketPage #trendMeter .aurum-trend-table-row strong{color:#1c3c63!important}
+#marketPage #trendMeter .aurum-table-support{color:#079b61!important;font-weight:950!important}
+#marketPage #trendMeter .aurum-table-resistance{color:#e44355!important;font-weight:950!important}
+#marketPage #trendMeter .aurum-trend-footnote{color:#7488a1!important}
+#marketPage #supportResistanceMTF{color:#294665!important}
+#marketPage #supportResistanceMTF>div{padding:12px!important;margin:7px 0!important;border:1px solid #d5e6f7!important;border-radius:12px!important;background:linear-gradient(100deg,#f0f9ff,#fff 55%,#fff8e8)!important;box-shadow:0 4px 11px #266aa512!important;color:#34516f!important}
+#marketPage #aurumDailyRange{color:#284767!important}
+#marketPage #aurumDailyRange .aurum-between-level{margin:0 0 10px!important;padding:15px!important;border:1px solid #d5e4f5!important;border-radius:15px!important;background:linear-gradient(130deg,#fff,#edf7ff 55%,#fff8e6)!important;box-shadow:0 6px 16px #2369a517,inset 0 1px #fff!important}
+#marketPage #aurumDailyRange .aurum-daily-heading{color:#a27312!important;font-size:11px!important;font-weight:1000!important}
+#marketPage #aurumDailyRange .aurum-between-labels{color:#079d63!important;font-weight:900!important}
+#marketPage #aurumDailyRange .aurum-between-labels span:last-child{color:#e34758!important}
+#marketPage #aurumDailyRange .aurum-between-track{height:14px!important;margin:16px 0 12px!important;border:1px solid #c9d9e9!important;border-radius:30px!important;background:linear-gradient(90deg,#08bd76,#f5d34d 52%,#ed465b)!important;box-shadow:inset 0 2px 4px #13304b1f,0 3px 9px #2668a11f!important}
+#marketPage #aurumDailyRange .aurum-between-marker{width:10px!important;height:25px!important;border:2px solid #fff!important;border-radius:8px!important;background:#1676df!important;box-shadow:0 0 0 2px #1676df,0 0 13px #1676df73!important}
+#marketPage #aurumDailyRange .aurum-between-caption{color:#607995!important}
+#marketPage #aurumDailyRange .aurum-range-row{padding:12px 5px!important;border-bottom:1px solid #dce8f4!important;color:#617894!important}
+#marketPage #aurumDailyRange .aurum-range-row b{color:#28496d!important}
+#marketPage #aurumDailyRange .aurum-range-row i{color:#e34b5b!important}
+#marketPage #aurumDailyRange .aurum-range-row em{color:#168bd0!important}
+#marketPage .aurum-disclaimer{color:#7287a0!important}
+#marketPage .aurum-signal-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;padding:5px!important;border:1px solid #d9e7f5!important;border-radius:17px!important;background:linear-gradient(110deg,#fff,#edf6ff,#fff9e9)!important;box-shadow:0 7px 18px #24649e17!important}
+#marketPage .aurum-signal-tabs button{min-height:52px!important;border:1px solid transparent!important;border-radius:13px!important;color:#fff!important;font-weight:950!important;font-size:clamp(12px,1.6vw,15px)!important;box-shadow:0 5px 13px #1e4e8229,inset 0 1px #ffffffa6!important;transition:transform .2s,filter .2s!important}
+#marketPage .aurum-signal-tabs button:nth-child(1){background:linear-gradient(110deg,#05c9dc,#1267ed)!important}
+#marketPage .aurum-signal-tabs button:nth-child(2){background:linear-gradient(110deg,#d51cf0,#6410ce)!important}
+#marketPage .aurum-signal-tabs button:nth-child(3){background:linear-gradient(110deg,#ffd323,#ff8b00)!important}
+#marketPage .aurum-signal-tabs button.active{filter:saturate(1.2) brightness(1.04)!important;outline:2px solid #ffffffeb!important;outline-offset:-4px!important}
+@media(max-width:620px){
+ #marketPage #trendMeter .aurum-trend-hero{grid-template-columns:minmax(0,1fr) auto!important;gap:9px!important;padding:12px!important}
+ #marketPage #trendMeter .aurum-trend-price{grid-column:1!important;text-align:left!important}
+ #marketPage #trendMeter .aurum-trend-strength{grid-column:2!important;grid-row:1/3!important;width:78px!important;height:78px!important}
+ #marketPage #trendMeter .aurum-trend-strength b{font-size:17px!important}
+ #marketPage #trendMeter .aurum-tf-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+ #marketPage #trendMeter .aurum-tf-card{min-height:91px!important}
+ #marketPage #trendMeter .aurum-trend-table-head,#marketPage #trendMeter .aurum-trend-table-row{grid-template-columns:.48fr .8fr 1fr 1fr!important;padding:9px 6px!important;font-size:8px!important}
+ #marketPage .aurum-signal-tabs{gap:5px!important}
+ #marketPage .aurum-signal-tabs button{min-height:46px!important;padding:9px 4px!important}
+}
+@media(max-width:360px){#marketPage #trendMeter .aurum-tf-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(prefers-reduced-motion:no-preference){#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-section{animation:aurumBrightPanelIn .35s ease-out both}@keyframes aurumBrightPanelIn{from{opacity:.8;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}}
+</style>
+
 </head>
   
   
@@ -3526,21 +4108,26 @@ body {
     <div class="ticker-live-mark"><i></i> LIVE</div>
     <div class="ticker-item ticker-gold">
       <span class="ticker-coin-logo" aria-label="Gold">Au</span>
-      <strong>XAU</strong>
+      <strong>GOLD</strong>
       <b id="tickerXAU">Memuat...</b>
       <small id="changeXAU">--</small>
+      <svg class="ticker-spark ticker-spark-down" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 5 L10 8 L18 7 L27 15 L35 12 L44 18 L53 15 L62 22 L75 16"/></svg>
     </div>
+    <span class="ticker-divider" aria-hidden="true"></span>
     <div class="ticker-item ticker-bitcoin">
       <span class="ticker-coin-logo" aria-label="Bitcoin">₿</span>
       <strong>BTC</strong>
       <b id="tickerBTC">Memuat...</b>
       <small id="changeBTC">--</small>
+      <svg class="ticker-spark ticker-spark-down" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 4 L10 7 L18 5 L27 13 L36 10 L45 17 L54 14 L64 21 L75 17"/></svg>
     </div>
+    <span class="ticker-divider" aria-hidden="true"></span>
     <div class="ticker-item ticker-oil">
-      <span class="ticker-coin-logo" aria-label="WTI Oil">W</span>
+      <span class="ticker-coin-logo" aria-label="WTI Oil">◉</span>
       <strong>WTI</strong>
       <b id="tickerWTI">Memuat...</b>
       <small id="changeWTI">--</small>
+      <svg class="ticker-spark ticker-spark-up" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 20 L10 16 L18 18 L27 11 L36 14 L45 8 L54 10 L64 3 L75 5"/></svg>
     </div>
   </div>
 </div>
@@ -3556,14 +4143,27 @@ body {
 
     <div class="aurum-session-clock" aria-label="Jam sesi pasar">
       <div class="aurum-clock-face">
-        <span class="clock-mark mark-12">12</span>
+        <span class="clock-mark mark-12">00</span>
         <span class="clock-mark mark-3">06</span>
-        <span class="clock-mark mark-6">18</span>
-        <span class="clock-mark mark-9">00</span>
+        <span class="clock-mark mark-6">12</span>
+        <span class="clock-mark mark-9">18</span>
+        <svg class="aurum-world-map" viewBox="0 0 420 300" aria-hidden="true">
+          <defs><pattern id="aurumMapDots" width="4.2" height="4.2" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.15" fill="#d8aa45"/></pattern></defs>
+          <g fill="url(#aurumMapDots)" opacity=".8">
+            <path d="M42 75l18-23 34-10 18 8 8 18-12 14-5 18-17 12-4 23-17 12-10-15-4-22-15-12z M102 151l19 9 11 25-8 29-13 31-12-18-4-28-11-21z M167 56l22-14 28 5 12 16-14 13-27-3-13 8-17-9z M193 91l27-10 29 9 15 18-5 22-17 12-9 29-19 19-17-11-6-29-17-13-4-23z M248 59l25-19 45 3 24 17 33 5 13 18-19 16-28-3-12 15-23-6-19 10-17-16-26-4-15-19z M284 143l23-10 23 12 10 24-13 22-21-6-15-18z M337 207l22-6 20 14-8 19-24 1-16-13z" />
+          </g>
+          <g fill="none" stroke="#e8c36e" stroke-width="1.1" opacity=".65">
+            <ellipse cx="210" cy="150" rx="166" ry="55" transform="rotate(-18 210 150)"/>
+            <ellipse cx="210" cy="150" rx="166" ry="55" transform="rotate(24 210 150)"/>
+          </g>
+        </svg>
+        <span class="clock-session-pill session-london">LONDON <i></i></span>
+        <span class="clock-session-pill session-asia"><i></i> ASIA</span>
+        <span class="clock-session-pill session-newyork"><i></i> NEW YORK</span>
         <span class="clock-hand clock-hour" id="aurumClockHour"></span>
         <span class="clock-hand clock-minute" id="aurumClockMinute"></span>
         <span class="clock-hand clock-second" id="aurumClockSecond"></span>
-        <span class="clock-center">✦</span>
+        <span class="clock-center" aria-label="Logo Aurum"><img class="aurum-clock-emblem" src="/aurum-icon-512.png" alt="AURUM"></span>
         <span class="clock-orbit orbit-a"></span>
         <span class="clock-orbit orbit-b"></span>
       </div>
@@ -3587,11 +4187,11 @@ body {
 
     <div class="home-market-grid">
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Gold</strong><small>XAU/USD · ● <em id="homeStatusXAU">Memeriksa</em></small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Emas</strong><small>XAU/USD · ● <em id="homeStatusXAU">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceXAU">--</b>
         <small class="home-market-change" id="homeChangeXAU">Memuat data...</small>
         <small id="homeGoldUpdatedAt" class="home-market-updated" aria-live="polite">Waktu pembaruan: memeriksa...</small>
-        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Gold"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Emas"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
         <span class="home-market-top"><span class="home-asset-icon bitcoin-icon">₿</span><span><strong>Bitcoin</strong><small>BTC/USD · ● <em id="homeStatusBTC">Memeriksa</em></small></span></span>
@@ -3600,10 +4200,10 @@ body {
         <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Bitcoin"><path id="homeSparkBTC" d="M0 21 L180 21"/></svg>
       </a>
       <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
-        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Oil</strong><small>WTI · ● <em id="homeStatusWTI">Memeriksa</em></small></span></span>
+        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Minyak</strong><small>WTI · ● <em id="homeStatusWTI">Memeriksa</em></small></span></span>
         <b class="home-market-price" id="homePriceWTI">--</b>
         <small class="home-market-change" id="homeChangeWTI">Memuat data...</small>
-        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Oil"><path id="homeSparkWTI" d="M0 21 L180 21"/></svg>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Minyak"><path id="homeSparkWTI" d="M0 21 L180 21"/></svg>
       </a>
     </div>
   </section>
@@ -3616,7 +4216,7 @@ body {
 <button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="window.aurumShowPage?.('partnerPage')"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
 </div></section>
 <!-- TRADING MENU -->
-  <section class="home-section">
+  <section class="home-section aurum-trading-section">
     <div class="home-section-heading">
       <h3>TRADING</h3>
     </div>
@@ -3661,7 +4261,11 @@ body {
         <strong>Obrolan</strong>
       </a>
 
-      
+      <a href="#guidePage"
+         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
+        <span class="community-icon green-icon aurum-glow-icon">▶</span>
+        <strong>Edukasi</strong>
+      </a>
 
       <a href="#partnerPage" onclick="window.aurumShowPage?.('partnerPage');return false;">
         <span class="community-icon amber aurum-glow-icon">♧</span>
@@ -3677,23 +4281,15 @@ body {
     </div>
 
     <div class="home-tools-grid">
-      <a href="#announcementsPage" class="home-menu-card" onclick="window.aurumShowPage?.('announcementsPage');return false;">
-        <span class="home-menu-icon amber aurum-glow-icon">▤</span>
-        <span><strong>Pengumuman</strong><small>Informasi dan pembaruan AURUM</small></span>
-      </a>
-
-      <a href="#guidePage" class="home-menu-card"
-         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
-        <span class="home-menu-icon green-icon aurum-glow-icon">▶</span>
-        <span><strong>Edukasi</strong><small>Pelajaran dan cara memakai AURUM</small></span>
-      </a>
-
-      <a href="#pnlPage" class="home-menu-card" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.();return false;"><span class="home-menu-icon teal aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Hasil paper tracking AURUM</small></span></a>
       <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenNotifications')?.click();return false;">
-        <span class="home-menu-icon amber aurum-glow-icon">♟</span><span><strong>Notifikasi</strong><small>Atur peringatan yang diterima</small></span></a>
+        <span class="home-menu-icon amber aurum-glow-icon">♟</span>
+        <span><strong>Notifikasi</strong><small>Apa yang kamu terima</small></span>
+      </a>
 
-      <a href="#homePage" class="home-menu-card home-tool-wide" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
-        <span class="home-menu-icon slate aurum-glow-icon">⚙</span><span><strong>Pengaturan</strong><small>Tampilan, suara, bahasa, akun</small></span></a>
+      <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
+        <span class="home-menu-icon slate aurum-glow-icon">⚙</span>
+        <span><strong>Pengaturan</strong><small>Tampilan, suara, bahasa, kata sandi</small></span>
+      </a>
     </div>
   </section>
 
@@ -3765,9 +4361,9 @@ body {
       <div class="aurum-detail-feedback"><div class="aurum-detail-feedback-head"><strong>YOUR FEEDBACK</strong><small>Bagikan pengalaman Anda melihat setup ini</small></div><textarea id="aurumDetailFeedbackText" rows="3" maxlength="1200" placeholder="Bagaimana hasil setup ini menurut Anda?"></textarea><div class="aurum-detail-feedback-actions"><label><input type="checkbox" id="aurumDetailFeedbackShare"> Boleh digunakan sebagai masukan AURUM</label><button type="button" id="aurumDetailFeedbackSend">Kirim feedback</button></div><small id="aurumDetailFeedbackStatus" aria-live="polite">Feedback disimpan lokal pada perangkat ini; pengiriman ke tim belum terhubung.</small></div><p class="aurum-detail-disclaimer">Informasi ini berasal dari hasil pemindaian server AURUM. Bukan saran keuangan atau jaminan hasil trading.</p>
     </section>
     <div class="aurum-asset-switch" aria-label="Pilih instrumen pasar">
-      <button type="button" class="active" data-asset="XAU/USD">🟡 Gold</button>
-      <button type="button" data-asset="BTC/USD">₿ Bitcoin</button>
-      <button type="button" data-asset="WTI">◉ Oil</button>
+      <button type="button" class="active aurum-asset-gold" data-asset="XAU/USD"><span class="aurum-asset-switch-icon">Au</span><span>Gold</span></button>
+      <button type="button" class="aurum-asset-bitcoin" data-asset="BTC/USD"><span class="aurum-asset-switch-icon">₿</span><span>Bitcoin</span></button>
+      <button type="button" class="aurum-asset-oil" data-asset="WTI"><span class="aurum-asset-switch-icon">WTI</span><span>WTI</span></button>
     </div>
     <section class="aurum-signal-summary aurum-traxa-market-card">
       <div class="aurum-asset-row">
@@ -3800,7 +4396,7 @@ body {
     </div>
 
     <section class="aurum-signal-panel active" data-signal-panel="setup" role="tabpanel">
-      <div class="aurum-todays-signals-head"><span>●</span><div><strong>TODAY'S SIGNALS</strong><small>Setup pasar AURUM hari ini</small></div></div>
+      <div class="aurum-todays-signals-head"><span>●</span><div><strong>SINYAL HARI INI</strong><small id="aurumSignalWinCount">Menghitung hasil TP…</small></div></div>
       <div class="aurum-signal-feed-status"><span id="aurumFeedServerState">Menghubungkan ke server…</span><span id="aurumFeedUpdated"></span></div>
       <div id="aurumSignalCards" class="aurum-signal-feed" aria-live="polite"></div>
       <div id="aurumNoSignals" class="aurum-no-signals">Belum ada sinyal terkonfirmasi untuk pasar ini.</div>
@@ -4226,17 +4822,28 @@ body {
 
 </main>
 
-<footer>
-  Aurum Signals AI · Educational analysis only · Manual execution
+<footer class="aurum-traxa-footer">
+  <strong>AURUM SIGNALS AI</strong>
+  <p>Sinyal dan analisis hanya untuk informasi dan bukan saran keuangan. Trading dengan risiko Anda sendiri.</p>
+  <span>Ketentuan &amp; Pengungkapan Risiko</span>
 </footer>
 
 <nav class="aurum-bottom-nav" aria-label="Navigasi Aurum">
-  <a href="#homePage" class="nav-item active" data-page="homePage"><span>⌂</span><small>Dashboard</small></a>
-  <a href="#marketDirectoryPage" class="nav-item" data-page="marketDirectoryPage"><span>ϟ</span><small>Market</small></a>
-  <a href="#chartPage" class="nav-item" data-page="chartPage"><span>▥</span><small>Grafik</small></a>
-  <a href="#newsPage" class="nav-item" data-page="newsPage"><span>▤</span><small>Fundamental</small></a>
-  <a href="#chatPage" class="nav-item" data-page="chatPage"><span>◉</span><small>Obrolan</small></a>
-  <a href="#guidePage" class="nav-item" data-page="guidePage"><span>◇</span><small>Edukasi</small></a>
+  <a href="#homePage" class="nav-item active" data-page="homePage" aria-label="Dashboard" title="Dashboard"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9M9 21v-7h6v7"/></svg></span><small>Dashboard</small></a>
+  <a href="#marketPage" class="nav-item" data-page="marketPage" aria-label="Sinyal" title="Sinyal"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m13 2-3 8H5l6 12 3-9h5L13 2Z"/></svg></span><small>Sinyal</small></a>
+  <a href="#marketDirectoryPage" class="nav-item" data-page="marketDirectoryPage" aria-label="Market" title="Market"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></span><small>Market</small></a>
+  <a href="#chartPage" class="nav-item" data-page="chartPage" aria-label="Grafik" title="Grafik"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-7"/></svg></span><small>Grafik</small></a>
+  <a href="#guidePage" class="nav-item" data-page="guidePage" aria-label="Edukasi" title="Edukasi"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m2 9 10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c4 3 8 3 12 0v-5M22 9v6"/></svg></span><small>Edukasi</small></a>
+  <a href="#chatPage" class="nav-item" data-page="chatPage" aria-label="Obrolan" title="Obrolan"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8 8 0 0 1-3.5-.8L4 20l1.5-4A7 7 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z"/></svg></span><small>Obrolan</small></a>
+  <a href="#pnlPage" class="nav-item" data-page="pnlPage" aria-label="Performa" title="Performa"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h6"/></svg></span><small>Performa</small></a>
+  <a href="#newsPage" class="nav-item" data-page="newsPage" aria-label="Fundamental" title="Fundamental"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><small>Fundamental</small></a>
+  <a href="#announcementsPage" class="nav-item" data-page="announcementsPage" aria-label="Pengumuman" title="Pengumuman"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M17 9a5 5 0 0 1 0 6M19 6a9 9 0 0 1 0 12"/></svg></span><small>Pengumuman</small></a>
+  <a href="#partnerPage" class="nav-item" data-page="partnerPage" aria-label="Partner" title="Partner"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 12 4-4 4 2 3-2 7 4-5 6-4-2-3 2-6-6Z"/><path d="m7 8 3-3 4 2 2-1 4 3M9 14l3 3M12 12l4 4"/></svg></span><small>Partner</small></a>
+  <div class="aurum-rail-utilities" aria-label="Menu tambahan">
+    <button type="button" class="aurum-rail-utility" aria-label="Notifikasi" title="Notifikasi" onclick="document.getElementById('aurumOpenNotifications')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+    <button type="button" class="aurum-rail-utility" aria-label="Bahasa" title="Bahasa dan pengaturan" onclick="document.getElementById('aurumOpenProfile')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+    <button type="button" class="aurum-rail-utility" aria-label="Profil" title="Profil" onclick="document.getElementById('aurumOpenProfile')?.click()"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+  </div>
 </nav>
 <script>
 (function(){
@@ -4310,11 +4917,14 @@ body {
       const navPageByView = {
         homePage: 'homePage',
         marketDirectoryPage: 'marketDirectoryPage',
-        marketPage: 'marketDirectoryPage',
+        marketPage: 'marketPage',
         chartPage: 'chartPage',
         newsPage: 'newsPage',
         chatPage: 'chatPage',
-        guidePage: 'guidePage'
+        guidePage: 'guidePage',
+        pnlPage: 'pnlPage',
+        partnerPage: 'partnerPage',
+        announcementsPage: 'announcementsPage'
       };
       const activeNavPage = navPageByView[pageId] || '';
       navItems.forEach(function (item) {
@@ -5956,10 +6566,10 @@ const direction = signal =>
         total
       };
       const overallColor = overall === 'BULLISH'
-        ? '#269bd2'
+        ? '#00e676'
         : overall === 'BEARISH'
-          ? '#ef535b'
-          : '#8994a5';
+          ? '#ff4057'
+          : '#c7a34b';
 
       const latestPrice = document.getElementById('goldPrice')?.textContent || '--';
 
@@ -5968,20 +6578,20 @@ const direction = signal =>
       const neutralBlocks = Math.max(0, 21 - bullishBlocks - bearishBlocks);
       const segments = Array.from({length:21}, (_, index) => {
         const color = index < bearishBlocks
-          ? '#ef535b'
+          ? '#ff4057'
           : index < bearishBlocks + neutralBlocks
-            ? '#e5e7eb'
-            : '#269bd2';
+            ? '#34302a'
+            : '#00e676';
         return '<span class="aurum-meter-segment" style="background:' + color + '"></span>';
       }).join('');
 
       const timeframeCards = results.map(item => {
         const state = trends[item.timeframe];
         const color = state === 'BULLISH'
-          ? '#269bd2'
+          ? '#00e676'
           : state === 'BEARISH'
-            ? '#ef535b'
-            : '#9aa3b1';
+            ? '#ff4057'
+            : '#c7a34b';
         const shortLabel = state === 'UNKNOWN' ? 'N/A' : state;
         const symbol = state === 'BULLISH' ? '▲' : state === 'BEARISH' ? '▼' : '—';
         return `
@@ -5999,7 +6609,7 @@ const direction = signal =>
         const support = sr && sr.support != null ? sr.support.toFixed(2) : '--';
         const resistance = sr && sr.resistance != null ? sr.resistance.toFixed(2) : '--';
         const state = trends[item.timeframe];
-        const color = state === 'BULLISH' ? '#269bd2' : state === 'BEARISH' ? '#ef535b' : '#8994a5';
+        const color = state === 'BULLISH' ? '#00e676' : state === 'BEARISH' ? '#ff4057' : '#c7a34b';
         return `
           <div class="aurum-trend-table-row">
             <strong>${item.timeframe}</strong>
@@ -6011,7 +6621,7 @@ const direction = signal =>
       }).join('');
 
       trendMeter.innerHTML = `
-        <div class="aurum-trend-dashboard">
+        <div class="aurum-trend-dashboard" data-direction="${overall}">
           <div class="aurum-trend-hero">
             <div class="aurum-trend-hero-copy">
               <small>${document.getElementById('signalAssetName')?.textContent || 'INSTRUMEN AKTIF'}</small>
@@ -6021,6 +6631,9 @@ const direction = signal =>
             <div class="aurum-trend-price">
               <small>HARGA TERKINI</small>
               <b>${latestPrice}</b>
+            </div>
+            <div class="aurum-trend-strength" style="--trend-value:${bullishPercent.toFixed(1)}%">
+              <div><b>${bullishPercent.toFixed(0)}%</b><small>BULLISH ALIGNMENT</small></div>
             </div>
           </div>
 
@@ -7285,7 +7898,11 @@ if (setupResistanceEl) setupResistanceEl.textContent =
 // KARTU MARKET TRAXA-INSPIRED: SEMUA NILAI BERASAL DARI CANDLE AURUM
 const assetSymbol = document.getElementById('pair')?.value || 'XAU/USD';
 const assetMark = document.getElementById('marketAssetMark');
-if (assetMark) assetMark.textContent = assetSymbol === 'XAU/USD' ? 'Au' : assetSymbol === 'BTC/USD' ? '₿' : 'OIL';
+if (assetMark) {
+  assetMark.textContent = assetSymbol === 'XAU/USD' ? 'Au' : assetSymbol === 'BTC/USD' ? '₿' : 'WTI';
+  assetMark.classList.toggle('is-bitcoin', assetSymbol === 'BTC/USD');
+  assetMark.classList.toggle('is-oil', assetSymbol === 'WTI');
+}
 const headerTrend = document.getElementById('aurumHeaderTrend');
 const mtfTrend = window.aurumMultiTimeframeTrend;
 const headerDirection = mtfTrend?.direction === 'BULLISH' ? 'Bullish' :
@@ -8103,7 +8720,15 @@ console.log('STATUS SERVER DIPERIKSA');
       const tickerSuffix=asset.symbol==='XAU/USD'?'XAU':asset.symbol==='BTC/USD'?'BTC':'WTI';
       const tickerPrice=$('ticker'+tickerSuffix),tickerChange=$('change'+tickerSuffix);
       if(tickerPrice)tickerPrice.textContent=formattedPrice;
-      if(tickerChange){tickerChange.textContent=formattedChange;tickerChange.style.color=change>=0?'#159b72':'#e45b63';}
+      if(tickerChange){
+        tickerChange.textContent=formattedChange;
+        tickerChange.style.color=change>=0?'#159b72':'#e45b63';
+        const tickerItem=tickerChange.closest('.ticker-item');
+        if(tickerItem){
+          tickerItem.dataset.direction=change>=0?'up':'down';
+          tickerItem.classList.toggle('is-delayed',asset.symbol==='XAU/USD' && !hasLiveGoldQuote);
+        }
+      }
       if(path){
         // TRAXA-style sparkline: lightly smoothed candles with flowing cubic curves.
         const rawPoints=candles.slice(-30).map(x=>Number(x.close)).filter(Number.isFinite);
@@ -8793,17 +9418,34 @@ body.aurum-user-dark .app-page{background:transparent!important}
       const r=x.record,key=String(r.generatedAt||r.fingerprint||'')+'|'+r.direction;
       if(seen.has(key))return false;seen.add(key);return true;
     }).sort((a,b)=>Date.parse(b.record.generatedAt||b.record.checkedAt||0)-Date.parse(a.record.generatedAt||a.record.checkedAt||0));
+    const outcomeTone=r=>{
+      const key=String(r.outcome||r.outcomeStatus||'').toUpperCase();
+      if(/TP[123]|TARGET_HIT|COMPLETED/.test(key))return 'win';
+      if(/SL|MISSED_ENTRY/.test(key))return 'loss';
+      return 'pending';
+    };
+    const wins=detailRecords.filter(x=>outcomeTone(x.record)==='win').length;
+    const countNode=document.getElementById('aurumSignalWinCount');
+    if(countNode)countNode.textContent=wins+' setup mencapai target TP';
     feed.innerHTML=detailRecords.length?detailRecords.map((x,index)=>{
       const r=x.record,p=r.tradePlan||{},when=r.generatedAt||r.checkedAt;
-      const date=when?new Date(when).toLocaleString('id-ID'):'Waktu tidak tersedia';
-      const direction=r.direction==='SELL'?'sell':'';
+      const stamp=when?new Date(when):null;
+      const age=stamp?Math.max(0,Math.floor((Date.now()-stamp.getTime())/60000)):null;
+      const ago=age===null?'Waktu tidak tersedia':age<1?'Baru saja':age<60?age+' mnt lalu':age<1440?Math.floor(age/60)+' jam lalu':Math.floor(age/1440)+' hari lalu';
+      const date=stamp?stamp.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false}).replace(':','.')+' · '+stamp.toLocaleDateString('id-ID',{day:'2-digit',month:'short'}):'';
+      const tone=outcomeTone(r);
+      const direction=r.direction==='SELL'?'sell':'buy';
+      const directionLabel=r.direction==='SELL'?'JUAL':'BELI';
       const tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'M15';
-      return '<button type="button" class="aurum-signal-feed-card" data-aurum-signal-index="'+index+'">'+
-        '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-name">'+safe(names[x.symbol]||x.symbol)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+safe(r.direction)+'</b></span>'+
-        '<span class="aurum-signal-feed-meta"><span>'+safe(tf)+'</span><span>'+safe(date)+'</span></span>'+
-        '<span class="aurum-signal-feed-entry">Entry '+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</span>'+
-        '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
-        '<span class="aurum-signal-feed-result">Status: '+safe(outcomeLabel(r.outcomeStatus||'WAITING_FOR_ENTRY'))+' · Ketuk untuk analisis lengkap ›</span></button>';
+      const outcome=String(r.outcome||r.outcomeStatus||'WAITING_FOR_ENTRY').toUpperCase();
+      const statusText=/TP[123]|TARGET_HIT/.test(outcome)?'Selesai · '+outcome:outcome==='COMPLETED'?'Selesai':outcomeLabel(outcome);
+      return '<button type="button" class="aurum-signal-feed-card '+direction+' is-'+tone+'" data-aurum-signal-index="'+index+'">'+
+        '<span class="aurum-signal-feed-timeframe"><strong>'+safe(tf)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+directionLabel+'</b></span>'+
+        '<span class="aurum-signal-feed-content">'+
+          '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-entry">'+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</strong><span class="aurum-signal-feed-date"><b>'+safe(ago)+'</b><small>'+safe(date)+'</small></span></span>'+
+          '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
+          '<span class="aurum-signal-feed-result">'+(tone==='win'?'✓':tone==='loss'?'✕':'◷')+' '+safe(statusText)+' · Ketuk untuk analisis lengkap ›</span>'+
+        '</span></button>';
     }).join(''):'<div class="aurum-signal-feed-empty">Belum ada sinyal BUY/SELL terkonfirmasi untuk instrumen ini. Sinyal WAIT tidak ditampilkan sebagai sinyal aktif.</div>';
     if(empty)empty.hidden=detailRecords.length>0;
     const status=document.getElementById('aurumFeedServerState');
@@ -9167,6 +9809,7 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   });
 })();
 </script>
+  <link rel="stylesheet" href="/traxa-visual-parity.css?v=10">
 </body>
 </html>
 
