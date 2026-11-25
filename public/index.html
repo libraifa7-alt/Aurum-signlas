@@ -3814,7 +3814,7 @@ body {
     </div>
 
     <section class="aurum-signal-panel active" data-signal-panel="setup" role="tabpanel">
-      <div class="aurum-todays-signals-head"><span>●</span><div><strong>TODAY'S SIGNALS</strong><small>Setup pasar AURUM hari ini</small></div></div>
+      <div class="aurum-todays-signals-head"><span>●</span><div><strong>SINYAL HARI INI</strong><small id="aurumSignalWinCount">Menghitung hasil TP…</small></div></div>
       <div class="aurum-signal-feed-status"><span id="aurumFeedServerState">Menghubungkan ke server…</span><span id="aurumFeedUpdated"></span></div>
       <div id="aurumSignalCards" class="aurum-signal-feed" aria-live="polite"></div>
       <div id="aurumNoSignals" class="aurum-no-signals">Belum ada sinyal terkonfirmasi untuk pasar ini.</div>
@@ -8829,17 +8829,34 @@ body.aurum-user-dark .app-page{background:transparent!important}
       const r=x.record,key=String(r.generatedAt||r.fingerprint||'')+'|'+r.direction;
       if(seen.has(key))return false;seen.add(key);return true;
     }).sort((a,b)=>Date.parse(b.record.generatedAt||b.record.checkedAt||0)-Date.parse(a.record.generatedAt||a.record.checkedAt||0));
+    const outcomeTone=r=>{
+      const key=String(r.outcome||r.outcomeStatus||'').toUpperCase();
+      if(/TP[123]|TARGET_HIT|COMPLETED/.test(key))return 'win';
+      if(/SL|MISSED_ENTRY/.test(key))return 'loss';
+      return 'pending';
+    };
+    const wins=detailRecords.filter(x=>outcomeTone(x.record)==='win').length;
+    const countNode=document.getElementById('aurumSignalWinCount');
+    if(countNode)countNode.textContent=wins+' setup mencapai target TP';
     feed.innerHTML=detailRecords.length?detailRecords.map((x,index)=>{
       const r=x.record,p=r.tradePlan||{},when=r.generatedAt||r.checkedAt;
-      const date=when?new Date(when).toLocaleString('id-ID'):'Waktu tidak tersedia';
-      const direction=r.direction==='SELL'?'sell':'';
+      const stamp=when?new Date(when):null;
+      const age=stamp?Math.max(0,Math.floor((Date.now()-stamp.getTime())/60000)):null;
+      const ago=age===null?'Waktu tidak tersedia':age<1?'Baru saja':age<60?age+' mnt lalu':age<1440?Math.floor(age/60)+' jam lalu':Math.floor(age/1440)+' hari lalu';
+      const date=stamp?stamp.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false}).replace(':','.')+' · '+stamp.toLocaleDateString('id-ID',{day:'2-digit',month:'short'}):'';
+      const tone=outcomeTone(r);
+      const direction=r.direction==='SELL'?'sell':'buy';
+      const directionLabel=r.direction==='SELL'?'JUAL':'BELI';
       const tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'M15';
-      return '<button type="button" class="aurum-signal-feed-card" data-aurum-signal-index="'+index+'">'+
-        '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-name">'+safe(names[x.symbol]||x.symbol)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+safe(r.direction)+'</b></span>'+
-        '<span class="aurum-signal-feed-meta"><span>'+safe(tf)+'</span><span>'+safe(date)+'</span></span>'+
-        '<span class="aurum-signal-feed-entry">Entry '+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</span>'+
-        '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
-        '<span class="aurum-signal-feed-result">Status: '+safe(outcomeLabel(r.outcomeStatus||'WAITING_FOR_ENTRY'))+' · Ketuk untuk analisis lengkap ›</span></button>';
+      const outcome=String(r.outcome||r.outcomeStatus||'WAITING_FOR_ENTRY').toUpperCase();
+      const statusText=/TP[123]|TARGET_HIT/.test(outcome)?'Selesai · '+outcome:outcome==='COMPLETED'?'Selesai':outcomeLabel(outcome);
+      return '<button type="button" class="aurum-signal-feed-card is-'+tone+'" data-aurum-signal-index="'+index+'">'+
+        '<span class="aurum-signal-feed-timeframe"><strong>'+safe(tf)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+directionLabel+'</b></span>'+
+        '<span class="aurum-signal-feed-content">'+
+          '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-entry">'+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</strong><span class="aurum-signal-feed-date"><b>'+safe(ago)+'</b><small>'+safe(date)+'</small></span></span>'+
+          '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
+          '<span class="aurum-signal-feed-result">'+(tone==='win'?'✓':tone==='loss'?'✕':'◷')+' '+safe(statusText)+' · Ketuk untuk analisis lengkap ›</span>'+
+        '</span></button>';
     }).join(''):'<div class="aurum-signal-feed-empty">Belum ada sinyal BUY/SELL terkonfirmasi untuk instrumen ini. Sinyal WAIT tidak ditampilkan sebagai sinyal aktif.</div>';
     if(empty)empty.hidden=detailRecords.length>0;
     const status=document.getElementById('aurumFeedServerState');
