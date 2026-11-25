@@ -3526,21 +3526,26 @@ body {
     <div class="ticker-live-mark"><i></i> LIVE</div>
     <div class="ticker-item ticker-gold">
       <span class="ticker-coin-logo" aria-label="Gold">Au</span>
-      <strong>XAU</strong>
+      <strong>GOLD</strong>
       <b id="tickerXAU">Memuat...</b>
       <small id="changeXAU">--</small>
+      <svg class="ticker-spark ticker-spark-down" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 5 L10 8 L18 7 L27 15 L35 12 L44 18 L53 15 L62 22 L75 16"/></svg>
     </div>
+    <span class="ticker-divider" aria-hidden="true"></span>
     <div class="ticker-item ticker-bitcoin">
       <span class="ticker-coin-logo" aria-label="Bitcoin">₿</span>
       <strong>BTC</strong>
       <b id="tickerBTC">Memuat...</b>
       <small id="changeBTC">--</small>
+      <svg class="ticker-spark ticker-spark-down" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 4 L10 7 L18 5 L27 13 L36 10 L45 17 L54 14 L64 21 L75 17"/></svg>
     </div>
+    <span class="ticker-divider" aria-hidden="true"></span>
     <div class="ticker-item ticker-oil">
-      <span class="ticker-coin-logo" aria-label="WTI Oil">W</span>
+      <span class="ticker-coin-logo" aria-label="WTI Oil">◉</span>
       <strong>WTI</strong>
       <b id="tickerWTI">Memuat...</b>
       <small id="changeWTI">--</small>
+      <svg class="ticker-spark ticker-spark-up" viewBox="0 0 76 26" aria-hidden="true"><path d="M1 20 L10 16 L18 18 L27 11 L36 14 L45 8 L54 10 L64 3 L75 5"/></svg>
     </div>
   </div>
 </div>
@@ -3556,10 +3561,23 @@ body {
 
     <div class="aurum-session-clock" aria-label="Jam sesi pasar">
       <div class="aurum-clock-face">
-        <span class="clock-mark mark-12">12</span>
+        <span class="clock-mark mark-12">00</span>
         <span class="clock-mark mark-3">06</span>
-        <span class="clock-mark mark-6">18</span>
-        <span class="clock-mark mark-9">00</span>
+        <span class="clock-mark mark-6">12</span>
+        <span class="clock-mark mark-9">18</span>
+        <svg class="aurum-world-map" viewBox="0 0 420 300" aria-hidden="true">
+          <defs><pattern id="aurumMapDots" width="4.2" height="4.2" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.15" fill="#d8aa45"/></pattern></defs>
+          <g fill="url(#aurumMapDots)" opacity=".8">
+            <path d="M42 75l18-23 34-10 18 8 8 18-12 14-5 18-17 12-4 23-17 12-10-15-4-22-15-12z M102 151l19 9 11 25-8 29-13 31-12-18-4-28-11-21z M167 56l22-14 28 5 12 16-14 13-27-3-13 8-17-9z M193 91l27-10 29 9 15 18-5 22-17 12-9 29-19 19-17-11-6-29-17-13-4-23z M248 59l25-19 45 3 24 17 33 5 13 18-19 16-28-3-12 15-23-6-19 10-17-16-26-4-15-19z M284 143l23-10 23 12 10 24-13 22-21-6-15-18z M337 207l22-6 20 14-8 19-24 1-16-13z" />
+          </g>
+          <g fill="none" stroke="#e8c36e" stroke-width="1.1" opacity=".65">
+            <ellipse cx="210" cy="150" rx="166" ry="55" transform="rotate(-18 210 150)"/>
+            <ellipse cx="210" cy="150" rx="166" ry="55" transform="rotate(24 210 150)"/>
+          </g>
+        </svg>
+        <span class="clock-session-pill session-london">LONDON <i></i></span>
+        <span class="clock-session-pill session-asia"><i></i> ASIA</span>
+        <span class="clock-session-pill session-newyork"><i></i> NEW YORK</span>
         <span class="clock-hand clock-hour" id="aurumClockHour"></span>
         <span class="clock-hand clock-minute" id="aurumClockMinute"></span>
         <span class="clock-hand clock-second" id="aurumClockSecond"></span>
