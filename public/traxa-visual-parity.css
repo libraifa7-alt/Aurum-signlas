@@ -1776,3 +1776,10 @@ body{
   #homePage .aurum-clock-face:after{animation:none!important}
   #homePage .aurum-live-ticker .ticker-track{animation:none!important}
 }
+
+#homePage .ticker-item[data-direction="up"] .ticker-spark path{stroke:#12b981!important}
+#homePage .ticker-item[data-direction="down"] .ticker-spark path{stroke:#e34d4d!important}
+#homePage .ticker-item[data-direction="up"] small{background:rgba(18,185,129,.10)!important}
+#homePage .ticker-item[data-direction="down"] small{background:rgba(227,77,77,.10)!important}
+#homePage .ticker-item[data-direction="up"] small:before{content:"▲ ";font-size:.8em}
+#homePage .ticker-item[data-direction="down"] small:before{content:"▼ ";font-size:.8em}
