@@ -2570,3 +2570,50 @@ main{max-width:1480px!important}
   color:#987022!important;
   box-shadow:0 2px 9px rgba(190,147,52,.12)!important;
 }
+
+
+/* Signal cards: TRAXA-style timeframe rail, result-based colors and fine grid. */
+#marketPage .aurum-signal-feed{gap:7px!important}
+#marketPage .aurum-signal-feed-card{
+ display:grid!important;grid-template-columns:46px minmax(0,1fr)!important;align-items:stretch!important;
+ gap:9px!important;min-height:74px!important;padding:8px 10px!important;
+ border:1px solid #b9e6c8!important;border-radius:12px!important;background-color:#f7fff9!important;
+ background-image:linear-gradient(rgba(41,160,95,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(41,160,95,.045) 1px,transparent 1px)!important;
+ background-size:10px 10px!important;box-shadow:0 2px 6px rgba(34,130,82,.045)!important;
+ text-align:left!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important;
+}
+#marketPage .aurum-signal-feed-card.is-loss{
+ border-color:#efbdc2!important;background-color:#fff7f8!important;
+ background-image:linear-gradient(rgba(207,72,86,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(207,72,86,.05) 1px,transparent 1px)!important;
+ box-shadow:0 2px 6px rgba(190,67,79,.04)!important;
+}
+#marketPage .aurum-signal-feed-card.is-pending{
+ border-color:#ead9a9!important;background-color:#fffdf5!important;
+ background-image:linear-gradient(rgba(185,143,48,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(185,143,48,.045) 1px,transparent 1px)!important;
+}
+#marketPage .aurum-signal-feed-card:active{transform:scale(.997)!important}
+#marketPage .aurum-signal-feed-timeframe{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:7px!important;min-width:0!important}
+#marketPage .aurum-signal-feed-timeframe>strong{color:#101d19!important;font-size:17px!important;font-weight:900!important;line-height:1!important}
+#marketPage .aurum-signal-feed-direction{min-width:31px!important;padding:3px 6px!important;border-radius:7px!important;font-size:8px!important;line-height:1!important;font-weight:900!important}
+#marketPage .aurum-signal-feed-direction.buy{color:#075caa!important;background:#cce8ff!important}
+#marketPage .aurum-signal-feed-direction.sell{color:#9f1725!important;background:#ff5967!important}
+#marketPage .aurum-signal-feed-content{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:5px!important;min-width:0!important}
+#marketPage .aurum-signal-feed-top{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:8px!important}
+#marketPage .aurum-signal-feed-entry{color:#287fba!important;font-size:13px!important;font-weight:900!important;line-height:1.25!important}
+#marketPage .aurum-signal-feed-card.is-loss .aurum-signal-feed-entry{color:#bd4651!important}
+#marketPage .aurum-signal-feed-date{display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:2px!important;flex:0 0 auto!important;color:#7e8793!important;text-align:right!important}
+#marketPage .aurum-signal-feed-date b{font-size:8px!important;font-weight:650!important;white-space:nowrap!important}
+#marketPage .aurum-signal-feed-date small{font-size:7px!important;white-space:nowrap!important}
+#marketPage .aurum-signal-feed-levels{color:#778291!important;font-size:8px!important;line-height:1.35!important}
+#marketPage .aurum-signal-feed-result{color:#26915c!important;font-size:9px!important;font-weight:800!important;line-height:1.25!important}
+#marketPage .aurum-signal-feed-card.is-loss .aurum-signal-feed-result{color:#d34c58!important}
+#marketPage .aurum-signal-feed-card.is-pending .aurum-signal-feed-result{color:#a27a25!important}
+#marketPage .aurum-todays-signals-head{align-items:center!important}
+#marketPage .aurum-todays-signals-head>div{display:flex!important;flex-direction:column!important;gap:3px!important}
+#marketPage .aurum-todays-signals-head strong{font-size:12px!important;letter-spacing:.7px!important}
+#marketPage .aurum-todays-signals-head small{font-size:8px!important;color:#8b96a4!important}
+@media(max-width:420px){
+ #marketPage .aurum-signal-feed-card{grid-template-columns:42px minmax(0,1fr)!important;padding:7px 8px!important;min-height:70px!important}
+ #marketPage .aurum-signal-feed-timeframe>strong{font-size:16px!important}
+ #marketPage .aurum-signal-feed-entry{font-size:12px!important}
+}
