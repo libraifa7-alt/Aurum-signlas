@@ -8742,7 +8742,7 @@ body.aurum-user-dark .app-page{background:transparent!important}
     return Math.floor(n/3600)+' jam '+Math.floor(n%3600/60)+' mnt';
   }
   function outcomeLabel(value){
-    const labels={WAITING_FOR_ENTRY:'Menunggu Entry',OPEN:'Posisi Terbuka',TP1:'Target 1 Tercapai',TP2:'Target 2 Tercapai',TP3:'Target 3 Tercapai',SL:'Stop Loss',SL_AFTER_TP1:'SL setelah TP1',SL_AFTER_TP2:'SL setelah TP2',TARGET_HIT:'Target Tercapai',COMPLETED:'Selesai',WAIT:'Menunggu setup'};
+    const labels={WAITING_FOR_ENTRY:'Menunggu Entry',MISSED_ENTRY:'Setup Terlewat',OPEN:'Posisi Terbuka',TP1:'Target 1 Tercapai',TP2:'Target 2 Tercapai',TP3:'Target 3 Tercapai',SL:'Stop Loss',SL_AFTER_TP1:'SL setelah TP1',SL_AFTER_TP2:'SL setelah TP2',TARGET_HIT:'Target Tercapai',COMPLETED:'Selesai',WAIT:'Menunggu setup'};
     const key=String(value||'WAITING_FOR_ENTRY');
     return labels[key]||key.replaceAll('_',' ');
   }
@@ -8893,11 +8893,14 @@ body.aurum-user-dark .app-page{background:transparent!important}
       );
       const outcomeNode=document.getElementById('aurumDetailOutcome');
       if(outcomeNode){
-        outcomeNode.textContent=passedTargets
-          ?'HARGA LIVE SUDAH MELEWATI TP3 — STATUS SERVER MASIH MENUNGGU ENTRY'
-          :outcomeLabel(profileState).toUpperCase();
-        outcomeNode.classList.toggle('is-warning',passedTargets);
-        outcomeNode.setAttribute('role',passedTargets?'alert':'status');
+        const missedEntry=profileState==='MISSED_ENTRY';
+        outcomeNode.textContent=missedEntry
+          ?'SETUP TERLEWAT — HARGA SUDAH MELEWATI TP3 SEBELUM ENTRY'
+          :passedTargets
+            ?'HARGA LIVE SUDAH MELEWATI TP3 — MENUNGGU PEMBARUAN STATUS SERVER'
+            :outcomeLabel(profileState).toUpperCase();
+        outcomeNode.classList.toggle('is-warning',passedTargets||missedEntry);
+        outcomeNode.setAttribute('role',passedTargets||missedEntry?'alert':'status');
       }
       const min=Math.min(...vals,low,high,...(liveOk?[live]:[])),max=Math.max(...vals,low,high,...(liveOk?[live]:[])),range=Math.max(max-min,.000001);
       const y=v=>Math.round(22+(max-v)/range*198),top=y(Math.max(low,high)),bottom=y(Math.min(low,high));
