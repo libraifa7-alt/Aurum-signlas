@@ -3402,6 +3402,43 @@ body {
   .aurum-live-ticker .ticker-track { animation: none !important; transform: none !important; }
 }
 </style>
+<style id="aurum-traxa-signal-feed-parity">
+/* Signal history cards: TRAXA visual language, while retaining AURUM data and detail action */
+#marketPage .aurum-signal-feed{gap:6px}
+#marketPage .aurum-signal-feed-card{
+ display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center;gap:8px;
+ min-height:66px;width:100%;padding:8px 10px;border-radius:12px;text-align:left;
+ border:1px solid #b8e5c9;background-color:#f0fff5;color:#173b2a;
+ background-image:linear-gradient(rgba(55,160,103,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(55,160,103,.045) 1px,transparent 1px),linear-gradient(110deg,rgba(219,255,231,.92),rgba(255,255,255,.96));
+ background-size:12px 12px,12px 12px,100% 100%;
+ box-shadow:0 2px 7px rgba(28,90,55,.06)
+}
+#marketPage .aurum-signal-feed-card.sell{
+ border-color:#efbdc2;background-color:#fff1f2;color:#5a252b;
+ background-image:linear-gradient(rgba(204,83,96,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(204,83,96,.045) 1px,transparent 1px),linear-gradient(110deg,rgba(255,225,228,.94),rgba(255,255,255,.97));
+ box-shadow:0 2px 7px rgba(130,48,58,.06)
+}
+#marketPage .aurum-signal-feed-timeframe{font-size:18px;line-height:1;font-weight:900;letter-spacing:-.5px;color:#132d20}
+#marketPage .aurum-signal-feed-card.sell .aurum-signal-feed-timeframe{color:#4b2026}
+#marketPage .aurum-signal-feed-main{display:grid;gap:4px;min-width:0}
+#marketPage .aurum-signal-feed-top{gap:6px}
+#marketPage .aurum-signal-feed-name{font-size:10px;letter-spacing:.2px}
+#marketPage .aurum-signal-feed-direction{padding:3px 9px;font-size:9px;line-height:1.2;background:#2398e8;color:#fff;border-radius:20px;box-shadow:0 1px 3px #1686d333}
+#marketPage .aurum-signal-feed-direction.sell{background:#ff5261;color:#fff;box-shadow:0 1px 3px #e34c5c33}
+#marketPage .aurum-signal-feed-entry{font-size:12px;font-weight:900;color:#2476a9;line-height:1.25}
+#marketPage .aurum-signal-feed-card.sell .aurum-signal-feed-entry{color:#b64c55}
+#marketPage .aurum-signal-feed-levels{font-size:9px;line-height:1.35;color:#657a70}
+#marketPage .aurum-signal-feed-card.sell .aurum-signal-feed-levels{color:#89666a}
+#marketPage .aurum-signal-feed-result{font-size:9px;line-height:1.35;color:#8a6b21;font-weight:800}
+#marketPage .aurum-signal-feed-result.win{color:#21865c}
+#marketPage .aurum-signal-feed-result.loss{color:#d34d58}
+#marketPage .aurum-signal-feed-result.pending{color:#9a792d}
+@media(max-width:390px){
+ #marketPage .aurum-signal-feed-card{grid-template-columns:43px minmax(0,1fr);padding:8px;gap:7px}
+ #marketPage .aurum-signal-feed-timeframe{font-size:16px}
+ #marketPage .aurum-signal-feed-entry{font-size:11px}
+}
+</style>
 </head>
   
   
@@ -8796,14 +8833,18 @@ body.aurum-user-dark .app-page{background:transparent!important}
     feed.innerHTML=detailRecords.length?detailRecords.map((x,index)=>{
       const r=x.record,p=r.tradePlan||{},when=r.generatedAt||r.checkedAt;
       const date=when?new Date(when).toLocaleString('id-ID'):'Waktu tidak tersedia';
-      const direction=r.direction==='SELL'?'sell':'';
+      const direction=r.direction==='SELL'?'sell':'buy';
       const tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'M15';
-      return '<button type="button" class="aurum-signal-feed-card" data-aurum-signal-index="'+index+'">'+
-        '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-name">'+safe(names[x.symbol]||x.symbol)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+safe(r.direction)+'</b></span>'+
-        '<span class="aurum-signal-feed-meta"><span>'+safe(tf)+'</span><span>'+safe(date)+'</span></span>'+
-        '<span class="aurum-signal-feed-entry">Entry '+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</span>'+
-        '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
-        '<span class="aurum-signal-feed-result">Status: '+safe(outcomeLabel(r.outcomeStatus||'WAITING_FOR_ENTRY'))+' · Ketuk untuk analisis lengkap ›</span></button>';
+      const outcome=r.outcomeStatus||'WAITING_FOR_ENTRY';
+      const outcomeClass=['TP1','TP2','TP3','COMPLETED'].includes(outcome)?'win':['SL','SL_AFTER_TP1','SL_AFTER_TP2','MISSED_ENTRY'].includes(outcome)?'loss':'pending';
+      return '<button type="button" class="aurum-signal-feed-card '+direction+'" data-aurum-signal-index="'+index+'">'+
+        '<span class="aurum-signal-feed-timeframe">'+safe(tf)+'</span>'+
+        '<span class="aurum-signal-feed-main">'+
+          '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-name">'+safe(names[x.symbol]||x.symbol)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+safe(r.direction)+'</b></span>'+
+          '<span class="aurum-signal-feed-entry">Entry '+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</span>'+
+          '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
+          '<span class="aurum-signal-feed-result '+outcomeClass+'">'+safe(outcomeLabel(outcome))+' · '+safe(date)+' · Ketuk untuk analisis lengkap ›</span>'+
+        '</span></button>';
     }).join(''):'<div class="aurum-signal-feed-empty">Belum ada sinyal BUY/SELL terkonfirmasi untuk instrumen ini. Sinyal WAIT tidak ditampilkan sebagai sinyal aktif.</div>';
     if(empty)empty.hidden=detailRecords.length>0;
     const status=document.getElementById('aurumFeedServerState');
