@@ -48,11 +48,24 @@ module.exports = async function handler(req, res) {
 
   const ready = checks.cronSecret && checks.redisConfigured && redis === 'connected';
 
+  // Cloudflare Pages exposes these deployment identifiers at runtime.
+  // They help distinguish Preview from Production without revealing secrets.
+  const deploymentBranch = process.env.CF_PAGES_BRANCH || null;
+  const deployment = {
+    platform: process.env.CF_PAGES ? 'Cloudflare Pages' : 'unknown',
+    branch: deploymentBranch,
+    environment: deploymentBranch
+      ? (deploymentBranch === 'main' ? 'production' : 'preview')
+      : 'unknown',
+    url: process.env.CF_PAGES_URL || null
+  };
+
   return res.status(200).json({
     status: ready ? 'ok' : 'degraded',
     message: ready
       ? 'Aurum Signals core services are configured'
       : 'Aurum Signals is available, but some services need configuration',
+    deployment,
     checks,
     checkedAt: new Date().toISOString()
   });
