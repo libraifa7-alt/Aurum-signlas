@@ -3322,7 +3322,7 @@ body {
 #aurumMarketDirectory .aurum-directory-running{padding:4px 9px;border-radius:20px;background:#e7f8fa;color:#3195a1;font-size:9px;font-weight:700;white-space:nowrap}
 #aurumMarketDirectory .aurum-directory-disclaimer{margin:13px 5px 0;color:#8b929e;font-size:9px;line-height:1.5;text-align:center}
 #marketDirectoryPage{max-width:100%;}
-#marketPage>.aurum-asset-switch{display:none!important;}
+/* Asset selector is intentionally visible above the live instrument card. */
 @media(max-width:420px){#aurumMarketDirectory .aurum-market-row{min-height:68px;padding:9px 12px}}
 </style>
 <style id="aurum-traxa-signal-detail">
@@ -3439,6 +3439,76 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .aurum-live-ticker .ticker-track { animation: none !important; transform: none !important; }
+}
+</style>
+<style id="aurum-market-instrument-visual-parity">
+/* Market instrument header inspired by the supplied Gold / BTC / WTI reference */
+#marketPage .aurum-asset-switch{
+ display:flex!important;align-items:center;gap:7px;max-width:none;width:100%;
+ margin:0 auto 10px;padding:4px;border:1px solid #e9e6df;border-radius:16px;
+ background:rgba(255,255,255,.94);box-shadow:0 3px 12px rgba(35,42,56,.035);
+ overflow-x:auto;scrollbar-width:none
+}
+#marketPage .aurum-asset-switch::-webkit-scrollbar{display:none}
+#marketPage .aurum-asset-switch button{
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:31px;
+ padding:5px 11px;border:1px solid #e7e9ed;border-radius:20px;
+ background:linear-gradient(180deg,#fff,#f7f8fa);color:#596171;
+ font-size:10px;font-weight:800;white-space:nowrap;transition:background .2s,border-color .2s,box-shadow .2s
+}
+#marketPage .aurum-asset-switch button.active{
+ color:#745416;background:linear-gradient(135deg,#fff8df,#f6e6b5);
+ border-color:#e6d29a;box-shadow:0 2px 6px rgba(170,130,39,.12)
+}
+#marketPage .aurum-asset-switch-icon{
+ width:19px;height:19px;flex:0 0 19px;display:grid;place-items:center;
+ border-radius:50%;font-size:9px;font-weight:950;color:#fff;
+ background:linear-gradient(145deg,#f6df91,#b88726);box-shadow:inset 0 1px 2px #fff8,0 1px 3px #9c762533
+}
+#marketPage .aurum-asset-bitcoin .aurum-asset-switch-icon{background:linear-gradient(145deg,#ffc36b,#dc7917);font-size:13px}
+#marketPage .aurum-asset-oil .aurum-asset-switch-icon{background:linear-gradient(145deg,#65cfc3,#08786e);font-size:7px}
+#marketPage .aurum-asset-bitcoin.active{color:#9b5c12;background:linear-gradient(135deg,#fff5e7,#ffe4bf);border-color:#f0cf9e}
+#marketPage .aurum-asset-oil.active{color:#08786e;background:linear-gradient(135deg,#edfffc,#c9f2eb);border-color:#a8ded5}
+#marketPage .aurum-traxa-market-card{
+ padding:17px 16px 14px;border:1px solid #e8dfcd;border-radius:17px;
+ background:linear-gradient(145deg,#fffefa 0%,#fff 65%,#fffdf7 100%);
+ box-shadow:0 9px 25px rgba(40,43,52,.075)
+}
+#marketPage .aurum-asset-row{gap:9px;min-height:31px}
+#marketPage .aurum-asset-mark{
+ width:34px;height:34px;flex:0 0 34px;border-radius:50%;font-size:11px;
+ background:linear-gradient(145deg,#fff0b7,#bd8e2e);color:#775416;
+ box-shadow:inset 0 1px 2px #fff9,0 2px 7px #9c762533
+}
+#marketPage .aurum-asset-mark.is-bitcoin{background:linear-gradient(145deg,#ffd18a,#e78318);color:#fff;font-size:18px}
+#marketPage .aurum-asset-mark.is-oil{background:linear-gradient(145deg,#68d2c5,#08766d);color:#fff;font-size:9px}
+#marketPage .aurum-asset-row div small{font-size:7px;letter-spacing:1.35px}
+#marketPage .aurum-asset-row div strong{font-size:12px;letter-spacing:1px}
+#marketPage .aurum-market-state{font-size:8px;letter-spacing:1px;color:#199c79}
+#marketPage .aurum-price-row{padding:13px 0 8px;gap:4px}
+#marketPage .aurum-price-row strong{
+ font-size:clamp(32px,8.3vw,43px);letter-spacing:-1.5px;line-height:1.05;
+ color:#9c7623;font-variant-numeric:tabular-nums
+}
+#marketPage .aurum-price-row small{font-size:8px;letter-spacing:.3px;color:#9297a1}
+#marketPage .aurum-mini-chart{height:68px;margin:0 0 8px}
+#marketPage .aurum-trend-pill{margin:0 0 10px;padding:4px 9px;font-size:8px}
+#marketPage .aurum-range-head{margin-bottom:6px}
+#marketPage .aurum-range-head span{font-size:7px;letter-spacing:1.15px}
+#marketPage .aurum-range-head strong{font-size:8px;letter-spacing:.6px}
+#marketPage .aurum-range-track{height:5px;margin-bottom:7px;background:linear-gradient(90deg,#e9f2e8,#f1e9d8,#f6e5e5)}
+#marketPage .aurum-range-track span{width:4px;height:14px;top:-5px;background:#27313e}
+#marketPage .aurum-range-values{margin-bottom:11px;font-size:8px}
+#marketPage .aurum-nearest-levels{gap:8px}
+#marketPage .aurum-nearest-levels>div{padding:9px 10px;border-radius:10px;background:linear-gradient(145deg,#fbfdfc,#f8fafb)}
+#marketPage .aurum-nearest-levels small{font-size:7px;letter-spacing:.8px}
+#marketPage .aurum-nearest-levels strong{font-size:13px;font-variant-numeric:tabular-nums}
+#marketPage .aurum-nearest-levels span{font-size:8px}
+#marketPage .aurum-summary-foot{padding-top:9px;font-size:7px;letter-spacing:1px}
+@media(max-width:390px){
+ #marketPage .aurum-traxa-market-card{padding:14px 12px 12px}
+ #marketPage .aurum-mini-chart{height:62px}
+ #marketPage .aurum-asset-switch button{padding:5px 9px;font-size:9px}
 }
 </style>
 </head>
@@ -3818,9 +3888,9 @@ body {
       <div class="aurum-detail-feedback"><div class="aurum-detail-feedback-head"><strong>YOUR FEEDBACK</strong><small>Bagikan pengalaman Anda melihat setup ini</small></div><textarea id="aurumDetailFeedbackText" rows="3" maxlength="1200" placeholder="Bagaimana hasil setup ini menurut Anda?"></textarea><div class="aurum-detail-feedback-actions"><label><input type="checkbox" id="aurumDetailFeedbackShare"> Boleh digunakan sebagai masukan AURUM</label><button type="button" id="aurumDetailFeedbackSend">Kirim feedback</button></div><small id="aurumDetailFeedbackStatus" aria-live="polite">Feedback disimpan lokal pada perangkat ini; pengiriman ke tim belum terhubung.</small></div><p class="aurum-detail-disclaimer">Informasi ini berasal dari hasil pemindaian server AURUM. Bukan saran keuangan atau jaminan hasil trading.</p>
     </section>
     <div class="aurum-asset-switch" aria-label="Pilih instrumen pasar">
-      <button type="button" class="active" data-asset="XAU/USD">🟡 Gold</button>
-      <button type="button" data-asset="BTC/USD">₿ Bitcoin</button>
-      <button type="button" data-asset="WTI">◉ Oil</button>
+      <button type="button" class="active aurum-asset-gold" data-asset="XAU/USD"><span class="aurum-asset-switch-icon">Au</span><span>Gold</span></button>
+      <button type="button" class="aurum-asset-bitcoin" data-asset="BTC/USD"><span class="aurum-asset-switch-icon">₿</span><span>Bitcoin</span></button>
+      <button type="button" class="aurum-asset-oil" data-asset="WTI"><span class="aurum-asset-switch-icon">WTI</span><span>WTI</span></button>
     </div>
     <section class="aurum-signal-summary aurum-traxa-market-card">
       <div class="aurum-asset-row">
@@ -7352,7 +7422,11 @@ if (setupResistanceEl) setupResistanceEl.textContent =
 // KARTU MARKET TRAXA-INSPIRED: SEMUA NILAI BERASAL DARI CANDLE AURUM
 const assetSymbol = document.getElementById('pair')?.value || 'XAU/USD';
 const assetMark = document.getElementById('marketAssetMark');
-if (assetMark) assetMark.textContent = assetSymbol === 'XAU/USD' ? 'Au' : assetSymbol === 'BTC/USD' ? '₿' : 'OIL';
+if (assetMark) {
+  assetMark.textContent = assetSymbol === 'XAU/USD' ? 'Au' : assetSymbol === 'BTC/USD' ? '₿' : 'WTI';
+  assetMark.classList.toggle('is-bitcoin', assetSymbol === 'BTC/USD');
+  assetMark.classList.toggle('is-oil', assetSymbol === 'WTI');
+}
 const headerTrend = document.getElementById('aurumHeaderTrend');
 const mtfTrend = window.aurumMultiTimeframeTrend;
 const headerDirection = mtfTrend?.direction === 'BULLISH' ? 'Bullish' :
