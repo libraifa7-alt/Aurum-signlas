@@ -429,3 +429,107 @@ footer{background:transparent!important;border-top:1px solid #e6e8ee!important}
   .aurum-home-feature { padding:10px!important; }
   .aurum-home-feature small { font-size:9px!important; }
 }
+
+
+/* Navigation layout requested: centered bottom bar on desktop and mobile,
+   including Android Chrome's "Desktop site" mode. Keep all six destinations visible. */
+header{
+  width:100%!important;
+  margin:0!important;
+}
+header .brand{
+  position:static!important;
+  flex:0 0 34px!important;
+  width:34px!important;height:34px!important;
+  margin:0!important;
+}
+main{
+  width:100%!important;
+  max-width:1120px!important;
+  margin:0 auto!important;
+  padding:12px 16px 112px!important;
+}
+.app-page{
+  width:100%!important;
+  max-width:980px!important;
+  margin:0 auto!important;
+}
+.aurum-bottom-nav{
+  position:fixed!important;
+  z-index:13000!important;
+  left:50%!important;right:auto!important;
+  top:auto!important;bottom:12px!important;
+  transform:translateX(-50%)!important;
+  width:min(720px,calc(100% - 28px))!important;
+  height:auto!important;min-height:68px!important;
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  grid-template-rows:1fr!important;
+  flex-direction:row!important;
+  align-items:center!important;justify-content:center!important;
+  gap:4px!important;
+  padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))!important;
+  overflow:visible!important;
+  border:1px solid #e5e7ed!important;
+  border-radius:18px!important;
+  background:rgba(255,255,255,.97)!important;
+  box-shadow:0 8px 28px rgba(31,41,55,.13)!important;
+  backdrop-filter:blur(14px)!important;
+}
+.aurum-bottom-nav .nav-item{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  width:100%!important;min-width:0!important;
+  min-height:54px!important;height:54px!important;
+  padding:4px 2px!important;gap:3px!important;
+  border-radius:11px!important;
+  text-align:center!important;
+}
+.aurum-bottom-nav .nav-item span{
+  display:flex!important;flex:0 0 auto!important;
+  align-items:center!important;justify-content:center!important;
+  width:26px!important;height:25px!important;
+  font-size:19px!important;
+}
+.aurum-bottom-nav .nav-item small{
+  display:block!important;
+  max-width:100%!important;overflow:hidden!important;
+  white-space:nowrap!important;text-overflow:clip!important;
+  font-size:10px!important;line-height:1.15!important;
+  font-weight:650!important;letter-spacing:0!important;
+}
+@media(max-width:600px){
+  main{padding:8px 9px 100px!important}
+  .aurum-bottom-nav{
+    bottom:0!important;
+    width:100%!important;
+    min-height:68px!important;
+    border-radius:15px 15px 0 0!important;
+    border-left:0!important;border-right:0!important;border-bottom:0!important;
+  }
+  .aurum-bottom-nav .nav-item small{font-size:8px!important}
+}
+@media (pointer:coarse) and (max-device-width:900px){
+  header{width:100%!important;margin:0!important}
+  main{width:100%!important;max-width:1120px!important;margin:0 auto!important;padding:12px 14px 112px!important}
+  .app-page{width:100%!important;max-width:980px!important;margin:0 auto!important}
+  .aurum-bottom-nav{
+    left:50%!important;right:auto!important;top:auto!important;bottom:12px!important;
+    transform:translateX(-50%)!important;width:min(720px,calc(100% - 28px))!important;
+    height:auto!important;min-height:68px!important;
+    display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    grid-template-rows:1fr!important;flex-direction:row!important;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))!important;
+    border:1px solid #e5e7ed!important;border-radius:18px!important;
+  }
+  .aurum-bottom-nav .nav-item{
+    display:flex!important;flex-direction:column!important;align-items:center!important;
+    justify-content:center!important;min-height:54px!important;height:54px!important;
+    gap:3px!important;padding:4px 2px!important;
+  }
+  .aurum-bottom-nav .nav-item span{
+    flex:0 0 auto!important;width:26px!important;height:25px!important;font-size:19px!important;
+  }
+  .aurum-bottom-nav .nav-item small{display:block!important;font-size:10px!important}
+}
