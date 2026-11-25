@@ -5644,7 +5644,7 @@ if (candles.length === 0) {
 
 
 // DETEKSI SUPPORT & RESISTANCE MULTI TIMEFRAME
-function detectSupportResistance(data) {
+function detectSupportResistance(data, referencePrice) {
   if (!Array.isArray(data) || data.length < 15) {
     return null;
   }
@@ -5666,7 +5666,10 @@ function detectSupportResistance(data) {
     return null;
   }
 
-  const currentPrice = Number(data[data.length - 1].close);
+  const overridePrice = Number(referencePrice);
+  const currentPrice = Number.isFinite(overridePrice) && overridePrice > 0
+    ? overridePrice
+    : Number(data[data.length - 1].close);
 
   if (!Number.isFinite(currentPrice)) {
     return null;
@@ -7356,22 +7359,49 @@ try {
   // Permintaan Gold yang selesai terlambat tidak boleh menimpa kartu BTC/WTI.
   if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
   const daily = dailyCandles[dailyCandles.length - 1];
-  const rangeLow = daily ? Number(daily.low) : null;
-  const rangeHigh = daily ? Number(daily.high) : null;
-  const rangeWidth = rangeHigh != null && rangeLow != null ? rangeHigh - rangeLow : null;
-  const current = Number(latestCandle.close);
+  // Use intraday M5 candles for the Jakarta trading day, not a possibly
+  // stale D1 candle whose range may no longer contain the live quote.
+  const current = Number(initialDisplayPrice);
+  const jakartaDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).format(new Date());
+  const todayM5 = m5Candles.filter(c => {
+    const timestamp = Number(c.time);
+    return Number.isFinite(timestamp) &&
+      new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).format(new Date(timestamp * 1000)) === jakartaDate &&
+      Number.isFinite(Number(c.low)) && Number.isFinite(Number(c.high));
+  });
+  let rangeLow = todayM5.length ? Math.min(...todayM5.map(c => Number(c.low))) : null;
+  let rangeHigh = todayM5.length ? Math.max(...todayM5.map(c => Number(c.high))) : null;
+  if (Number.isFinite(current) && current > 0 && rangeLow != null && rangeHigh != null) {
+    rangeLow = Math.min(rangeLow, current);
+    rangeHigh = Math.max(rangeHigh, current);
+  } else if (Number.isFinite(current) && current > 0 && daily) {
+    const dailyLow = Number(daily.low);
+    const dailyHigh = Number(daily.high);
+    if (Number.isFinite(dailyLow) && Number.isFinite(dailyHigh) &&
+        dailyLow <= current && current <= dailyHigh) {
+      rangeLow = dailyLow;
+      rangeHigh = dailyHigh;
+    }
+  }
+  const validRange = rangeLow != null && rangeHigh != null &&
+    Number.isFinite(rangeLow) && Number.isFinite(rangeHigh) && rangeHigh >= rangeLow;
+  const rangeWidth = validRange ? rangeHigh - rangeLow : null;
   const rangeLowEl = document.getElementById('aurumRangeLow');
   const rangeHighEl = document.getElementById('aurumRangeHigh');
   const rangePipsEl = document.getElementById('aurumRangePips');
   const rangeMarker = document.getElementById('aurumRangeMarker');
-  if (rangeLowEl) rangeLowEl.textContent = 'L ' + (rangeLow != null ? rangeLow.toFixed(2) : '--');
-  if (rangeHighEl) rangeHighEl.textContent = 'H ' + (rangeHigh != null ? rangeHigh.toFixed(2) : '--');
+  if (rangeLowEl) rangeLowEl.textContent = 'L ' + (validRange ? rangeLow.toFixed(2) : '--');
+  if (rangeHighEl) rangeHighEl.textContent = 'H ' + (validRange ? rangeHigh.toFixed(2) : '--');
   if (rangePipsEl) rangePipsEl.textContent = rangeWidth != null ? rangeWidth.toFixed(2) + ' pts' : '--';
-  if (rangeMarker && rangeHigh > rangeLow) {
+  if (rangeMarker && validRange && rangeHigh > rangeLow) {
     const position = Math.max(0, Math.min(100, ((current - rangeLow) / (rangeHigh - rangeLow)) * 100));
     rangeMarker.style.left = position + '%';
   }
-  const nearest = detectSupportResistance(m5Candles);
+  const nearest = detectSupportResistance(m5Candles, current);
   const nearSupport = nearest && nearest.support != null ? nearest.support : null;
   const nearResistance = nearest && nearest.resistance != null ? nearest.resistance : null;
   const supportEl = document.getElementById('aurumNearestSupport');
@@ -7380,8 +7410,16 @@ try {
   const resistanceDistanceEl = document.getElementById('aurumResistanceDistance');
   if (supportEl) supportEl.textContent = nearSupport != null ? nearSupport.toFixed(2) : '--';
   if (resistanceEl) resistanceEl.textContent = nearResistance != null ? nearResistance.toFixed(2) : '--';
-  if (supportDistanceEl) supportDistanceEl.textContent = nearSupport != null ? Math.abs(current-nearSupport).toFixed(2) + ' pts below' : 'Level belum tersedia';
-  if (resistanceDistanceEl) resistanceDistanceEl.textContent = nearResistance != null ? Math.abs(nearResistance-current).toFixed(2) + ' pts above' : 'Level belum tersedia';
+  if (supportDistanceEl) supportDistanceEl.textContent = nearSupport != null
+    ? (current >= nearSupport
+      ? (current-nearSupport).toFixed(2) + ' pts below'
+      : (nearSupport-current).toFixed(2) + ' pts above')
+    : 'Level belum tersedia';
+  if (resistanceDistanceEl) resistanceDistanceEl.textContent = nearResistance != null
+    ? (nearResistance >= current
+      ? (nearResistance-current).toFixed(2) + ' pts above'
+      : (current-nearResistance).toFixed(2) + ' pts below')
+    : 'Level belum tersedia';
 } catch (marketCardError) {
   console.warn('Market overview update:', marketCardError);
 }
