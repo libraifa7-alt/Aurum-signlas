@@ -10,6 +10,7 @@ export async function onRequest(context) {
   let response = null;
   const req = {
     method: context.request.method,
+    env: context.env,
     headers: Object.fromEntries(context.request.headers.entries())
   };
   const res = {

@@ -95,6 +95,7 @@ export async function onRequest(context) {
 
   const req = {
     method: request.method,
+    env: context.env,
     query: Object.fromEntries(url.searchParams.entries()),
     headers: Object.fromEntries(request.headers.entries()),
     body

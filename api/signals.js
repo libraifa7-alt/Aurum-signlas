@@ -1,8 +1,8 @@
 'use strict';
 
-async function redis(command) {
-  const url=process.env.KV_REST_API_URL;
-  const token=process.env.KV_REST_API_TOKEN;
+async function redis(command, env) {
+  const url=env.KV_REST_API_URL;
+  const token=env.KV_REST_API_TOKEN;
   if(!url||!token) throw new Error('Redis KV belum dikonfigurasi');
   const response=await fetch(url,{
     method:'POST',
@@ -33,15 +33,16 @@ module.exports=async function handler(req,res){
     res.setHeader('Cache-Control', 'no-store, max-age=0');
     res.setHeader('X-Content-Type-Options', 'nosniff');
   }
+  const env = req.env || process.env;
   if(req.method!=='GET') return res.status(405).json({status:'error',message:'Method not allowed'});
-  if(!process.env.KV_REST_API_URL||!process.env.KV_REST_API_TOKEN)
+  if(!env.KV_REST_API_URL||!env.KV_REST_API_TOKEN)
     return res.status(503).json({status:'not_configured',message:'Redis KV belum dikonfigurasi'});
   try{
     const symbols=['XAU/USD','BTC/USD','WTI'];
     const results=await Promise.all(symbols.map(async symbol=>{
       const key='aurum:server-signal:'+encodeURIComponent(symbol);
-      const raw=await redis(['GET',key]);
-      const history=await redis(['LRANGE','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','19']);
+      const raw=await redis(['GET',key],env);
+      const history=await redis(['LRANGE','aurum:server-signal-history:'+encodeURIComponent(symbol),'0','19'],env);
       return {
         symbol,
         current:parseSignalRecord(raw),

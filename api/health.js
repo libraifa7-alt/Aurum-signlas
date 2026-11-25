@@ -11,26 +11,28 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ status: 'error', message: 'Method not allowed' });
   }
 
+  const env = req.env || process.env;
+
   const checks = {
     marketApi: 'not_probed',
-    cronSecret: Boolean(process.env.CRON_SECRET),
-    redisConfigured: Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN),
+    cronSecret: Boolean(env.CRON_SECRET),
+    redisConfigured: Boolean(env.KV_REST_API_URL && env.KV_REST_API_TOKEN),
     pushConfigured: Boolean(
-      process.env.VAPID_PUBLIC_KEY &&
-      process.env.VAPID_PRIVATE_KEY &&
-      process.env.VAPID_SUBJECT
+      env.VAPID_PUBLIC_KEY &&
+      env.VAPID_PRIVATE_KEY &&
+      env.VAPID_SUBJECT
     ),
-    naifConfigured: Boolean(process.env.NAIF_KEY),
-    twelveDataConfigured: Boolean(process.env.TWELVE_DATA_API_KEY)
+    naifConfigured: Boolean(env.NAIF_KEY),
+    twelveDataConfigured: Boolean(env.TWELVE_DATA_API_KEY)
   };
 
   let redis = 'not_configured';
   if (checks.redisConfigured) {
     try {
-      const response = await fetch(process.env.KV_REST_API_URL, {
+      const response = await fetch(env.KV_REST_API_URL, {
         method: 'POST',
         headers: {
-          Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN,
+          Authorization: 'Bearer ' + env.KV_REST_API_TOKEN,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(['PING']),
@@ -50,14 +52,14 @@ module.exports = async function handler(req, res) {
 
   // Cloudflare Pages exposes these deployment identifiers at runtime.
   // They help distinguish Preview from Production without revealing secrets.
-  const deploymentBranch = process.env.CF_PAGES_BRANCH || null;
+  const deploymentBranch = env.CF_PAGES_BRANCH || null;
   const deployment = {
-    platform: process.env.CF_PAGES ? 'Cloudflare Pages' : 'unknown',
+    platform: env.CF_PAGES ? 'Cloudflare Pages' : 'unknown',
     branch: deploymentBranch,
     environment: deploymentBranch
       ? (deploymentBranch === 'main' ? 'production' : 'preview')
       : 'unknown',
-    url: process.env.CF_PAGES_URL || null
+    url: env.CF_PAGES_URL || null
   };
 
   return res.status(200).json({

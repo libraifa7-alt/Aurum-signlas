@@ -1,6 +1,7 @@
 
 
 module.exports = async function handler(req, res) {
+  const env = req.env || process.env;
   if (typeof res.setHeader === "function") {
     res.setHeader("Cache-Control", "no-store, max-age=0");
     res.setHeader("X-Content-Type-Options", "nosniff");
@@ -20,8 +21,8 @@ module.exports = async function handler(req, res) {
 
   // AURUM REDIS CONNECTION
   async function aurumRedis(command) {
-    const redisUrl = process.env.KV_REST_API_URL;
-    const redisToken = process.env.KV_REST_API_TOKEN;
+    const redisUrl = env.KV_REST_API_URL;
+    const redisToken = env.KV_REST_API_TOKEN;
 
     if (!redisUrl || !redisToken) {
       return null;
@@ -269,7 +270,7 @@ module.exports = async function handler(req, res) {
 
         // NAIF Free fallback: rates refresh every 60 seconds.
         // Keep this quote separate from OHLC candles; never synthesize candles from spot prices.
-        if (!quote && process.env.NAIF_KEY) {
+        if (!quote && env.NAIF_KEY) {
           try {
             let naifQuote = null;
             const cachedNaifRaw = await aurumRedis(["GET", naifQuoteKey]);
@@ -287,7 +288,7 @@ module.exports = async function handler(req, res) {
               const naifResponse = await fetch(naifUrl, {
                 headers: {
                   "Accept": "application/json",
-                  "Authorization": "Bearer " + process.env.NAIF_KEY,
+                  "Authorization": "Bearer " + env.NAIF_KEY,
                   "Origin": "https://aurum-signals-ai.vercel.app",
                   "Referer": "https://aurum-signals-ai.vercel.app/"
                 },
@@ -890,7 +891,7 @@ module.exports = async function handler(req, res) {
 
 // JALUR DATA XAU/USD DAN BTC/USD DARI TWELVE DATA
 
-const twelveApiKey = process.env.TWELVE_DATA_API_KEY;
+const twelveApiKey = env.TWELVE_DATA_API_KEY;
 
 if (!twelveApiKey) {
   if (redisCached && redisCached.data) {
