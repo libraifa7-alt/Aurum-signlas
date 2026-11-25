@@ -37,10 +37,10 @@ function routeFromEventPath(pathname) {
   const marker = '/.netlify/functions/aurum-api';
   const markerIndex = pathname.indexOf(marker);
   if (markerIndex >= 0) {
-    return pathname.slice(markerIndex + marker.length).replace(/^\\/+|\\/+$/g, '');
+    return pathname.slice(markerIndex + marker.length).split('/').filter(Boolean).join('/');
   }
   // Netlify may preserve the original request path in event.path during rewrites.
-  return pathname.replace(/^\\/api\\/?/, '').replace(/^\\/+|\\/+$/g, '');
+  return (pathname === '/api' ? '' : pathname.startsWith('/api/') ? pathname.slice(5) : pathname).split('/').filter(Boolean).join('/');
 }
 
 exports.handler = async function handler(event) {
