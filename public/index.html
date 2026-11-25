@@ -8171,6 +8171,30 @@ console.log('STATUS SERVER DIPERIKSA');
       const latest=Number(hasFreshGoldQuote?data.livePrice:candles[candles.length-1].close);
       const prev=Number(candles[candles.length-2].close);
       if(!Number.isFinite(latest)||!Number.isFinite(prev))throw new Error('Invalid price');
+      // Keep the S/R distance labels synchronized with the exact quote
+      // returned by this refresh, rather than the older candle price used
+      // during the initial market-card calculation.
+      function syncNearestLevelDistances(referencePrice) {
+        const supportNode=document.getElementById('aurumNearestSupport');
+        const resistanceNode=document.getElementById('aurumNearestResistance');
+        const supportDistanceNode=document.getElementById('aurumSupportDistance');
+        const resistanceDistanceNode=document.getElementById('aurumResistanceDistance');
+        const support=Number(String(supportNode?.textContent||'').replace(/,/g,''));
+        const resistance=Number(String(resistanceNode?.textContent||'').replace(/,/g,''));
+        if(supportDistanceNode) supportDistanceNode.textContent =
+          Number.isFinite(support)&&support>0
+            ? (referencePrice>=support
+              ? (referencePrice-support).toFixed(2)+' pts below'
+              : (support-referencePrice).toFixed(2)+' pts above')
+            : 'Level belum tersedia';
+        if(resistanceDistanceNode) resistanceDistanceNode.textContent =
+          Number.isFinite(resistance)&&resistance>0
+            ? (resistance>=referencePrice
+              ? (resistance-referencePrice).toFixed(2)+' pts above'
+              : (referencePrice-resistance).toFixed(2)+' pts below')
+            : 'Level belum tersedia';
+      }
+      syncNearestLevelDistances(latest);
       const old=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
       const direction=latest>=prev?'up':'down';
       priceEl.classList.remove('price-up','price-down','price-flash');
