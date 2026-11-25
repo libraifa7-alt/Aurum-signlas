@@ -27,6 +27,7 @@ module.exports = async function handler(req, res) {
   };
 
   let redis = 'not_configured';
+  let redisError = null;
   if (checks.redisConfigured) {
     try {
       const response = await fetch(env.KV_REST_API_URL, {
@@ -42,11 +43,18 @@ module.exports = async function handler(req, res) {
       redis = response.ok && body.result === 'PONG' && !body.error
         ? 'connected'
         : 'error';
-    } catch (_) {
+      if (redis === 'error') {
+        redisError = 'http_' + response.status;
+      }
+    } catch (error) {
       redis = 'unreachable';
+      const causeCode = error && error.cause && error.cause.code;
+      redisError = causeCode || (error && error.name) || 'fetch_failed';
+      console.error('AURUM Redis health probe failed:', redisError);
     }
   }
   checks.redis = redis;
+  if (redisError) checks.redisError = redisError;
 
   // Netlify does not run the Vercel cron route in this deployment, so its
   // readiness must depend on Redis rather than a cron-only secret.
