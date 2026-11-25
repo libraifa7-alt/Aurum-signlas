@@ -1,0 +1,189 @@
+/* AURUM x TRAXA visual parity layer
+   Brand, data sources, navigation actions and analysis logic remain AURUM-owned. */
+:root{
+  --bg:#f2f3f7;
+  --panel:#fff;
+  --line:#e7e9ef;
+  --gold:#c7a13c;
+  --text:#252b38;
+  --muted:#81899a;
+}
+html,body{min-height:100%;background:#f2f3f7!important}
+body{
+  color:#252b38!important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif!important;
+  background-color:#f2f3f7!important;
+  background-image:radial-gradient(rgba(176,181,194,.25) .7px,transparent .7px)!important;
+  background-size:13px 13px!important;
+  padding-bottom:0!important;
+}
+header{
+  position:sticky!important;top:0!important;z-index:12000!important;
+  min-height:48px!important;height:48px!important;
+  width:calc(100% - 54px)!important;margin:0 0 0 54px!important;
+  padding:6px 10px!important;
+  background:rgba(255,255,255,.94)!important;
+  border:1px solid #e8e9ee!important;border-top:0!important;
+  border-radius:0 0 13px 13px!important;
+  box-shadow:0 3px 14px rgba(31,41,55,.055)!important;
+  backdrop-filter:blur(12px);
+}
+header .brand{
+  position:absolute!important;left:-46px!important;top:7px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:34px!important;height:34px!important;margin:0!important;
+  padding:2px!important;border:1px solid #d9c17d!important;border-radius:8px!important;
+  background:#101014!important;box-shadow:0 2px 9px rgba(0,0,0,.12)!important;
+}
+header .brand span{display:none!important}
+header .aurum-header-logo{width:29px!important;height:29px!important;object-fit:contain!important}
+header .status{display:none!important}
+.header-actions{margin-left:auto!important;gap:7px!important}
+.aurum-header-action{
+  width:32px!important;height:32px!important;
+  border-radius:50%!important;background:#f8fafc!important;
+  border:1px solid #e5e8ef!important;box-shadow:none!important;
+}
+.aurum-notification-action{background:#eff8fc!important;border-color:#dceef5!important}
+.aurum-profile-action{background:#fffaf0!important;border-color:#ddc77f!important;color:#9b782a!important}
+main{
+  width:calc(100% - 54px)!important;max-width:600px!important;
+  margin:0 0 0 54px!important;padding:10px 10px 34px!important;
+}
+.app-page{width:100%!important;max-width:560px!important;margin:0 auto!important;background:transparent!important}
+.aurum-bottom-nav{
+  position:fixed!important;z-index:13000!important;
+  left:0!important;top:0!important;bottom:0!important;
+  width:46px!important;height:100dvh!important;min-height:100dvh!important;
+  display:grid!important;grid-template-columns:1fr!important;
+  grid-template-rows:repeat(6,minmax(0,1fr))!important;
+  align-content:start!important;align-items:center!important;
+  gap:2px!important;padding:52px 4px 12px!important;
+  border:0!important;border-right:1px solid #e4e6ec!important;
+  border-radius:0!important;background:rgba(255,255,255,.96)!important;
+  box-shadow:2px 0 12px rgba(31,41,55,.035)!important;
+}
+.aurum-bottom-nav .nav-item{
+  min-width:0!important;width:100%!important;min-height:34px!important;
+  height:34px!important;padding:4px 2px!important;gap:0!important;
+  border-radius:9px!important;color:#87909e!important;
+}
+.aurum-bottom-nav .nav-item span{
+  width:27px!important;height:26px!important;
+  border-radius:8px!important;font-size:18px!important;
+  background:transparent!important;
+}
+.aurum-bottom-nav .nav-item small{display:none!important}
+.aurum-bottom-nav .nav-item.active{
+  color:#aa842d!important;background:#fbf5e5!important;
+  box-shadow:inset 0 0 0 1px #f0e4c5!important;
+}
+.aurum-bottom-nav .nav-item.active span{background:transparent!important;color:#bd983c!important}
+.aurum-live-ticker{
+  overflow:hidden!important;border:1px solid #e8e2cf!important;
+  border-radius:18px!important;background:#fffdf7!important;
+  box-shadow:0 2px 9px rgba(31,41,55,.035)!important;
+}
+.aurum-home-hero-v2{
+  min-height:250px!important;margin:10px 0 14px!important;padding:14px 12px!important;
+  border:1px solid #e7e8ed!important;border-radius:15px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(247,248,251,.85))!important;
+  box-shadow:0 4px 15px rgba(31,41,55,.045)!important;
+}
+.aurum-session-clock{margin:6px auto!important}
+.aurum-clock-face{
+  border-color:#d6d1c4!important;background:radial-gradient(circle,#fff 0,#fbfaf6 70%,#f4f1e9 100%)!important;
+  box-shadow:0 0 0 5px rgba(211,190,133,.09),inset 0 0 22px rgba(193,164,89,.08)!important;
+}
+.home-section,.panel,.card,.home-market-card,.aurum-home-feature,.aurum-pnl-page,
+.aurum-signal-panel,.aurum-detail-feedback,.aurum-guide-live-card{
+  border:1px solid #e6e8ee!important;border-radius:13px!important;
+  box-shadow:0 5px 17px rgba(31,41,55,.055)!important;
+}
+.home-section{background:rgba(255,255,255,.96)!important;padding:12px!important;margin:10px 0!important}
+.home-section-heading h3,.panel h3,.home-section h3{
+  letter-spacing:1.1px!important;font-size:12px!important;font-weight:850!important;
+}
+.home-market-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+.home-market-card{
+  min-width:0!important;padding:10px 8px!important;background:#fff!important;
+  border-radius:11px!important;
+}
+.home-market-top{gap:6px!important}
+.home-market-top strong{font-size:10px!important}
+.home-market-top small{font-size:7px!important}
+.home-asset-icon{width:21px!important;height:21px!important;flex:0 0 21px!important}
+.home-market-price{font-size:15px!important;letter-spacing:-.4px!important}
+.home-market-change,.home-market-updated{font-size:7px!important}
+.home-market-spark{height:26px!important}
+.aurum-home-feature-grid{gap:7px!important}
+.aurum-home-feature{border-radius:11px!important;padding:9px!important;box-shadow:none!important}
+.aurum-home-feature strong{font-size:10px!important}
+.aurum-home-feature small{font-size:8px!important}
+.aurum-signal-panel,.aurum-server-signal-card,.aurum-market-card,.aurum-chart-card{
+  background:#fff!important;border-color:#e5e8ef!important;border-radius:13px!important;
+  box-shadow:0 5px 16px rgba(31,41,55,.06)!important;
+}
+#marketPage,#marketDirectoryPage,#chartPage,#newsPage,#chatPage,#pnlPage,#partnerPage,#announcementsPage,#guidePage{
+  padding:8px 0 18px!important;
+}
+#marketPage .panel,#marketDirectoryPage .panel,#chartPage .panel,#newsPage .panel,
+#chatPage .panel,#guidePage .panel{margin:9px 0!important}
+button,select,input,textarea{font-family:inherit!important}
+button{border-radius:8px}
+.aurum-guide-tabs{border-radius:10px!important;background:#fff!important}
+.aurum-guide-tabs button.active,.aurum-pnl-periods button.active{
+  background:linear-gradient(100deg,#1aa9c4,#6949d8)!important;
+}
+.aurum-panel-backdrop{backdrop-filter:blur(7px)!important}
+.aurum-side-panel{
+  border:1px solid #e8dfc9!important;border-radius:14px!important;
+  box-shadow:0 16px 45px rgba(25,29,38,.2)!important;
+}
+.aurum-profile-head{padding-bottom:12px!important}
+.aurum-notification-tabs button.active{background:#d6b13e!important}
+.aurum-splash{
+  background:
+    radial-gradient(ellipse at 50% 42%,rgba(181,133,42,.22),transparent 34%),
+    radial-gradient(circle at 50% 50%,#14110b 0,#070707 54%,#020202 100%)!important;
+}
+.aurum-splash .aurum-orb{filter:drop-shadow(0 0 18px rgba(218,173,73,.28))}
+.aurum-splash .orb-core{
+  background:radial-gradient(circle at 35% 30%,#fff0bd,#d9a441 30%,#8a5b12 65%,#160f05 100%)!important;
+  border:1px solid rgba(255,220,145,.55)!important;
+}
+.aurum-splash .splash-brand-block h1{letter-spacing:6px!important}
+.aurum-splash .splash-stats{
+  border:1px solid rgba(214,176,91,.28)!important;border-radius:9px!important;
+  background:rgba(13,13,13,.7)!important;box-shadow:0 0 18px rgba(213,166,69,.08)!important;
+}
+.aurum-splash .splash-swipe{
+  border-color:rgba(218,165,55,.6)!important;
+  background:linear-gradient(90deg,rgba(218,165,55,.12),rgba(0,0,0,.4))!important;
+  box-shadow:0 0 18px rgba(218,165,55,.17)!important;
+}
+.aurum-splash #aurumEnterButton{
+  background:linear-gradient(135deg,#f1d17b,#a87922)!important;color:#181208!important;
+  border:1px solid #e5c56d!important;
+}
+footer{background:transparent!important;border-top:1px solid #e6e8ee!important}
+@media(min-width:901px){
+  main{max-width:1120px!important;width:calc(100% - 72px)!important;margin-left:60px!important}
+  header{width:calc(100% - 60px)!important;margin-left:60px!important}
+  .aurum-bottom-nav{width:52px!important;padding-left:6px!important;padding-right:6px!important}
+}
+@media(max-width:520px){
+  header{width:calc(100% - 50px)!important;margin-left:50px!important;padding:5px 8px!important}
+  header .brand{left:-43px!important;width:31px!important;height:31px!important}
+  header .aurum-header-logo{width:26px!important;height:26px!important}
+  main{width:calc(100% - 50px)!important;margin-left:50px!important;padding:8px 7px 28px!important}
+  .aurum-bottom-nav{width:43px!important;padding-left:3px!important;padding-right:3px!important}
+  .aurum-bottom-nav .nav-item span{font-size:17px!important}
+  .aurum-home-hero-v2{min-height:220px!important;padding:10px 8px!important}
+  .home-market-grid{gap:5px!important}
+  .home-market-card{padding:8px 5px!important}
+  .home-market-price{font-size:13px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
