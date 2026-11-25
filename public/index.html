@@ -6611,11 +6611,11 @@ const direction = signal =>
         const support = sr && sr.support != null ? sr.support.toFixed(2) : '--';
         const resistance = sr && sr.resistance != null ? sr.resistance.toFixed(2) : '--';
         const state = trends[item.timeframe];
-        const color = state === 'BULLISH' ? '#00e676' : state === 'BEARISH' ? '#ff4057' : '#c7a34b';
+        const color = state === 'BULLISH' ? '#0866ff' : state === 'BEARISH' ? '#ff4057' : '#c7a34b';
         return `
           <div class="aurum-trend-table-row">
             <strong>${item.timeframe}</strong>
-            <span style="color:${color}">${state === 'UNKNOWN' ? '—' : state}</span>
+            <span style="color:${color} !important">${state === 'UNKNOWN' ? '—' : state}</span>
             <span class="aurum-table-support">${support}</span>
             <span class="aurum-table-resistance">${resistance}</span>
           </div>
