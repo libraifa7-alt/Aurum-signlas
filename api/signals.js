@@ -1,9 +1,11 @@
 'use strict';
 
 async function redis(command, env) {
-  const url=env.KV_REST_API_URL;
-  const token=env.KV_REST_API_TOKEN;
+  const url=String(env.KV_REST_API_URL || '').trim().replace(/^['\"]|['\"]$/g, '');
+  const token=String(env.KV_REST_API_TOKEN || '').trim().replace(/^['\"]|['\"]$/g, '');
   if(!url||!token) throw new Error('Redis KV belum dikonfigurasi');
+  const parsedUrl = new URL(url);
+  if (parsedUrl.protocol !== 'https:') throw new Error('Redis REST URL harus menggunakan HTTPS');
   const response=await fetch(url,{
     method:'POST',
     headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
