@@ -67,6 +67,13 @@ async function updateSignalOutcomes(symbol, candles) {
             ? Number(candle.low) <= Number(profile.sl)
             : Number(candle.high) >= Number(profile.sl);
           nextState = stopTouchedAtEntry ? 'SL' : 'OPEN';
+        } else if (state === 'WAITING_FOR_ENTRY') {
+          // If price reaches the final target without ever touching the entry
+          // zone, the setup was missed; it must not remain pending indefinitely.
+          const finalTargetPassed = bullish
+            ? Number(candle.high) >= Number(profile.tp3)
+            : Number(candle.low) <= Number(profile.tp3);
+          if (finalTargetPassed) nextState = 'MISSED_ENTRY';
         } else if (['OPEN','TP1','TP2'].includes(state)) {
           // If stop and target occur in one OHLC bar, conservatively count the stop first.
           const stopTouched = bullish
@@ -102,12 +109,13 @@ async function updateSignalOutcomes(symbol, candles) {
     }
 
     if (checkpoint > Number(record.lastOutcomeCandleAt || 0) || changed) {
-      const terminal = ['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2'];
+      const terminal = ['TP3','SL','SL_AFTER_TP1','SL_AFTER_TP2','MISSED_ENTRY'];
+      const allTerminal = profiles.every(p => terminal.includes(p.outcomeStatus));
       const updated = {
         ...record,
         riskProfiles: profiles,
-        outcomeStatus: profiles.every(p => terminal.includes(p.outcomeStatus))
-          ? 'COMPLETED'
+        outcomeStatus: allTerminal
+          ? (profiles.every(p => p.outcomeStatus === 'MISSED_ENTRY') ? 'MISSED_ENTRY' : 'COMPLETED')
           : profiles.some(p => p.outcomeStatus === 'OPEN') ? 'OPEN'
           : profiles.some(p => ['TP1','TP2','TP3'].includes(p.outcomeStatus)) ? 'TARGET_HIT'
           : 'WAITING_FOR_ENTRY',
