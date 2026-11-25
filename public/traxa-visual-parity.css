@@ -533,3 +533,269 @@ main{
   }
   .aurum-bottom-nav .nav-item small{display:block!important;font-size:10px!important}
 }
+
+
+/* Full-page TRAXA visual alignment — shared component system for every AURUM view. */
+:root{
+  --aurum-traxa-bg:#f2f3f7;
+  --aurum-traxa-card:#fff;
+  --aurum-traxa-border:#e6e8ee;
+  --aurum-traxa-gold:#c6a044;
+  --aurum-traxa-gold-soft:#fbf6e9;
+  --aurum-traxa-ink:#283142;
+  --aurum-traxa-muted:#8790a0;
+  --aurum-traxa-shadow:0 5px 18px rgba(31,41,55,.055);
+}
+.app-page{color:var(--aurum-traxa-ink)!important}
+.app-page>section,.app-page>.panel,.app-page .panel,
+.app-page .signal,.app-page .card,.app-page .aurum-analysis-card,
+.app-page .aurum-detail-context,.app-page .aurum-detail-map,
+.app-page .aurum-detail-strength,.app-page .aurum-performance-main,
+.app-page .aurum-performance-stats,.app-page .aurum-chart-shell{
+  color:var(--aurum-traxa-ink)!important;
+  background:var(--aurum-traxa-card)!important;
+  border:1px solid var(--aurum-traxa-border)!important;
+  border-radius:14px!important;
+  box-shadow:var(--aurum-traxa-shadow)!important;
+}
+.app-page h1,.app-page h2,.app-page h3,.app-page h4{
+  color:var(--aurum-traxa-ink)!important;
+  letter-spacing:.035em;
+}
+.app-page .sub,.app-page small,.app-page .muted{color:var(--aurum-traxa-muted)}
+.app-page .gold{color:#a78332!important}
+.app-page button:not(.nav-item){
+  transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.app-page button:not(.nav-item):focus-visible,
+.aurum-bottom-nav .nav-item:focus-visible,
+.header-actions button:focus-visible{
+  outline:2px solid #c7a34e!important;outline-offset:2px!important;
+}
+
+/* Market directory and instrument detail */
+#marketDirectoryPage .aurum-market-directory,
+.aurum-market-directory{
+  padding:15px!important;background:#fff!important;border:1px solid var(--aurum-traxa-border)!important;
+  border-radius:15px!important;box-shadow:var(--aurum-traxa-shadow)!important;
+}
+.aurum-market-directory h2{font-size:15px!important;font-weight:850!important;color:#9b7a35!important}
+.aurum-market-list{display:grid!important;gap:8px!important}
+.aurum-market-row{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:12px!important;min-height:64px!important;padding:11px 13px!important;
+  color:var(--aurum-traxa-ink)!important;background:#fff!important;
+  border:1px solid #eceef2!important;border-radius:12px!important;
+}
+.aurum-market-row:active{background:var(--aurum-traxa-gold-soft)!important}
+.aurum-asset-switch{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:7px!important;padding:5px!important;background:#fff!important;
+  border:1px solid var(--aurum-traxa-border)!important;border-radius:13px!important;
+}
+.aurum-asset-switch button{
+  min-height:42px!important;border:1px solid transparent!important;border-radius:9px!important;
+  background:#f7f8fa!important;color:#727d8e!important;font-weight:750!important;
+}
+.aurum-asset-switch button.active{
+  color:#8f6d25!important;background:#fbf5e5!important;border-color:#ead9ad!important;
+  box-shadow:inset 0 0 0 1px rgba(198,160,68,.12)!important;
+}
+.aurum-signal-summary{
+  padding:15px!important;background:#fff!important;border:1px solid var(--aurum-traxa-border)!important;
+  border-radius:15px!important;box-shadow:var(--aurum-traxa-shadow)!important;
+}
+.aurum-price-row strong,.aurum-price-row b{color:var(--aurum-traxa-ink)!important}
+.aurum-range-track{background:#edf0f4!important;border-radius:20px!important}
+.aurum-nearest-support,.aurum-nearest-resistance{
+  padding:11px!important;border:1px solid #e9ebef!important;border-radius:11px!important;background:#fafbfc!important;
+}
+.aurum-signal-tabs{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;
+  padding:5px!important;background:#fff!important;border:1px solid var(--aurum-traxa-border)!important;
+  border-radius:12px!important;
+}
+.aurum-signal-tabs button{
+  min-height:39px!important;border:0!important;border-radius:8px!important;
+  color:#788293!important;background:transparent!important;font-weight:750!important;
+}
+.aurum-signal-tabs button.active{
+  color:#8f6d25!important;background:#fbf5e5!important;box-shadow:inset 0 0 0 1px #eee0bd!important;
+}
+.aurum-signal-panel{padding:14px!important;background:#fff!important}
+.aurum-server-signals{padding:14px!important;background:#fff!important}
+.aurum-server-head,.aurum-todays-signals-head,.aurum-panel-heading{
+  border-bottom:1px solid #eef0f3!important;padding-bottom:10px!important;
+}
+.aurum-detail-hero{
+  padding:22px 16px!important;text-align:center!important;
+  background:linear-gradient(180deg,#fff 0%,#f8f9fb 100%)!important;
+  border:1px solid #e4e8ef!important;border-radius:17px!important;
+  box-shadow:var(--aurum-traxa-shadow)!important;
+}
+.aurum-detail-hero h2{font-size:30px!important;font-weight:900!important;letter-spacing:-.04em!important}
+.aurum-detail-status{color:#8a93a2!important;letter-spacing:.12em!important}
+.aurum-detail-live{
+  margin-top:14px!important;padding:13px 15px!important;background:#f7f9fc!important;
+  border:1px solid #e1e7ef!important;border-radius:13px!important;
+}
+.aurum-detail-context,.aurum-detail-map,.aurum-detail-strength,.aurum-detail-feedback{
+  margin-top:12px!important;padding:14px!important;background:#fff!important;
+  border:1px solid var(--aurum-traxa-border)!important;border-radius:14px!important;
+}
+.aurum-detail-context h3,.aurum-detail-map h3,.aurum-detail-strength h3{
+  font-size:13px!important;font-weight:850!important;letter-spacing:.06em!important;
+}
+.aurum-detail-risk-grid{gap:8px!important}
+.aurum-detail-risk{
+  border:1px solid #e8e9ed!important;border-radius:11px!important;background:#fff!important;
+  color:var(--aurum-traxa-ink)!important;
+}
+.aurum-detail-risk[aria-pressed="true"]{
+  border:2px solid #cfad4d!important;background:#fffdf7!important;
+  box-shadow:0 2px 10px rgba(198,160,68,.13)!important;
+}
+.aurum-detail-level{
+  padding:13px!important;background:#f7f9fc!important;border:1px solid #e2e7ef!important;
+  border-radius:12px!important;
+}
+.aurum-detail-back{
+  border:1px solid #e7dfca!important;background:#fbf7ed!important;color:#92722e!important;
+  border-radius:9px!important;padding:9px 12px!important;font-weight:750!important;
+}
+
+/* Performance, analysis and chart */
+.aurum-performance-top,.aurum-performance-filters,.aurum-performance-stats{gap:7px!important}
+.aurum-performance-filters button,.aurum-pnl-periods button{
+  border:1px solid #e7e9ee!important;border-radius:9px!important;
+  background:#f7f8fa!important;color:#758092!important;font-weight:750!important;
+}
+.aurum-performance-filters button.active,.aurum-pnl-periods button.active{
+  background:#fbf5e5!important;color:#98772f!important;border-color:#ead9ad!important;
+}
+.aurum-pips-card,.aurum-winrate-card,.aurum-stat-tile{
+  border:1px solid #e7e9ee!important;border-radius:12px!important;background:#fff!important;
+  box-shadow:none!important;
+}
+.aurum-analysis-card{padding:13px!important}
+.aurum-analysis-section{
+  padding:12px!important;margin:8px 0!important;background:#fafbfc!important;
+  border:1px solid #eaecf0!important;border-radius:11px!important;
+}
+.aurum-section-kicker{color:#9b7b39!important;letter-spacing:.08em!important;font-weight:850!important}
+.aurum-chart-shell{padding:14px!important}
+.aurum-chart-heading{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:10px!important;padding-bottom:12px!important;border-bottom:1px solid #edf0f3!important;
+}
+.market-controls{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin:12px 0!important}
+.market-controls select,.aurum-chart-timeframes button{
+  min-height:39px!important;border:1px solid #e3e7ed!important;border-radius:9px!important;
+  background:#f8f9fb!important;color:#465164!important;padding:7px 10px!important;
+}
+.aurum-chart-timeframes{display:flex!important;flex-wrap:wrap!important;gap:5px!important}
+.aurum-chart-timeframes button.active{
+  color:#8f6d25!important;background:#fbf5e5!important;border-color:#e8d7aa!important;
+}
+
+/* Fundamental/news, local rule-based chat, P&L, partner, announcements and education */
+#newsPage .panel,#chatPage .panel,#guidePage .panel,#pnlPage .panel,
+#partnerPage .panel,#announcementsPage .panel{padding:15px!important}
+#newsPage .cards,#chatPage .cards{gap:8px!important}
+#newsPage .card,#chatPage .card{
+  padding:12px!important;background:#fafbfc!important;border:1px solid #e8ebf0!important;
+  border-radius:11px!important;box-shadow:none!important;
+}
+#chatPage .signal,#pnlPage .signal,#partnerPage .signal,#announcementsPage .signal,
+#guidePage .signal{
+  padding:12px!important;background:#fafbfc!important;border:1px solid #e8ebf0!important;
+  border-radius:11px!important;box-shadow:none!important;
+}
+#chatPage #aurumChatForm{
+  display:flex!important;gap:8px!important;align-items:center!important;
+  padding:8px!important;background:#fff!important;border:1px solid #e5e8ee!important;
+  border-radius:13px!important;
+}
+#chatPage #aurumChatInput{
+  min-height:42px!important;padding:10px 12px!important;background:#f7f8fa!important;
+  border:1px solid #e5e8ee!important;border-radius:9px!important;color:#283142!important;
+}
+#chatPage #aurumChatForm button{
+  min-height:42px!important;padding:0 15px!important;background:#c6a044!important;
+  color:#fff!important;border:0!important;border-radius:9px!important;font-weight:800!important;
+}
+.aurum-pnl-page h2{color:#9a7934!important}
+.aurum-pnl-main{
+  padding:16px!important;background:#f8f9fc!important;border:1px solid #e5e9ef!important;
+  border-radius:13px!important;
+}
+.aurum-pnl-stats{gap:8px!important}
+.aurum-pnl-stats>*{
+  padding:11px!important;background:#fff!important;border:1px solid #e7e9ee!important;
+  border-radius:11px!important;
+}
+.aurum-guide-tabs{
+  display:flex!important;flex-wrap:wrap!important;gap:5px!important;padding:5px!important;
+  border:1px solid #e6e8ee!important;border-radius:12px!important;background:#f8f9fb!important;
+}
+.aurum-guide-tabs button{
+  border:0!important;border-radius:8px!important;background:transparent!important;
+  color:#788293!important;padding:9px 11px!important;font-weight:750!important;
+}
+.aurum-guide-tabs button.active{
+  color:#8f6d25!important;background:#fbf5e5!important;box-shadow:inset 0 0 0 1px #eee0bd!important;
+}
+.aurum-guide-live-card{
+  padding:18px!important;background:linear-gradient(180deg,#fff,#f8f9fb)!important;
+  border:1px solid #e5e8ef!important;border-radius:13px!important;
+}
+.aurum-lesson-grid>*{
+  padding:13px!important;background:#fff!important;border:1px solid #e7e9ee!important;
+  border-radius:12px!important;box-shadow:var(--aurum-traxa-shadow)!important;
+}
+
+/* Profile and notification drawers use the same clean floating-card language. */
+.aurum-panel-backdrop{background:rgba(31,37,49,.28)!important;backdrop-filter:blur(5px)!important}
+.aurum-side-panel{
+  color:var(--aurum-traxa-ink)!important;background:#fff!important;
+  border:1px solid #e7e0cf!important;border-radius:16px!important;
+  box-shadow:0 18px 55px rgba(31,41,55,.2)!important;
+}
+.aurum-side-panel h2,.aurum-side-panel h3{color:#30394a!important}
+.aurum-side-panel button{
+  border-radius:9px!important;border:1px solid #e8ebf0!important;
+}
+.aurum-notification-tabs{background:#f4f5f7!important;border:1px solid #e8ebef!important}
+.aurum-notification-tabs button.active{
+  color:#8f6d25!important;background:#fbf5e5!important;border:1px solid #ead9ad!important;
+}
+.aurum-notification-content>*{
+  padding:11px!important;background:#fafbfc!important;border:1px solid #e8ebf0!important;
+  border-radius:11px!important;
+}
+
+/* Responsive polish: keep all six destinations readable and avoid horizontal overflow. */
+@media(max-width:600px){
+  .app-page{max-width:none!important}
+  .aurum-detail-hero{padding:17px 11px!important}
+  .aurum-detail-hero h2{font-size:26px!important}
+  .aurum-detail-levels{gap:7px!important}
+  .market-controls{grid-template-columns:1fr 1fr!important}
+  .aurum-chart-shell{padding:10px!important}
+  #newsPage .panel,#chatPage .panel,#guidePage .panel,#pnlPage .panel,
+  #partnerPage .panel,#announcementsPage .panel{padding:11px!important}
+  .aurum-lesson-grid{grid-template-columns:1fr!important}
+  .aurum-bottom-nav .nav-item small{font-size:8px!important}
+}
+@media(min-width:601px){
+  .app-page{max-width:980px!important}
+  #marketPage,#marketDirectoryPage,#chartPage,#newsPage,#chatPage,#pnlPage,
+  #partnerPage,#announcementsPage,#guidePage{max-width:980px!important}
+}
+@media(prefers-reduced-motion:no-preference){
+  .aurum-splash .aurum-orb{animation:aurumTraxaOrbGlow 5s ease-in-out infinite}
+  @keyframes aurumTraxaOrbGlow{
+    0%,100%{filter:drop-shadow(0 0 12px rgba(214,174,80,.18))}
+    50%{filter:drop-shadow(0 0 24px rgba(214,174,80,.34))}
+  }
+}
