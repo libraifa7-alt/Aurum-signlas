@@ -48,7 +48,10 @@ module.exports = async function handler(req, res) {
   }
   checks.redis = redis;
 
-  const ready = checks.cronSecret && checks.redisConfigured && redis === 'connected';
+  // Netlify does not run the Vercel cron route in this deployment, so its
+  // readiness must depend on Redis rather than a cron-only secret.
+  const isNetlify = Boolean(env.NETLIFY);
+  const ready = checks.redisConfigured && redis === 'connected' && (isNetlify || checks.cronSecret);
 
   // Cloudflare Pages exposes these deployment identifiers at runtime.
   // They help distinguish Preview from Production without revealing secrets.
