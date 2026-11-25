@@ -1257,3 +1257,148 @@ footer{margin-left:58px!important}
   #homePage .aurum-clock-face{width:276px!important;height:276px!important}
   #homePage .aurum-clock-face .clock-center{width:82px!important;height:82px!important}
 }
+
+
+/* FINAL REFERENCE MATCH — warm TRAXA palette, clear ticker and session globe */
+:root{
+  --bg:#f7f6f2;
+  --panel:#fffefa;
+  --line:#ece7da;
+  --gold:#c7a34b;
+  --text:#303544;
+  --muted:#858b96;
+}
+html,body,body{background-color:#f7f6f2!important}
+body{
+  background-image:radial-gradient(rgba(184,174,151,.22) .65px,transparent .8px)!important;
+  background-size:14px 14px!important;
+}
+#homePage .aurum-live-ticker{
+  display:block!important;
+  min-height:32px!important;
+  height:32px!important;
+  margin:0 0 12px!important;
+  padding:5px 12px!important;
+  border:1px solid #e8dfc8!important;
+  border-radius:18px!important;
+  background:linear-gradient(180deg,#fffef9 0%,#f8f4e9 100%)!important;
+  box-shadow:0 2px 8px rgba(130,108,60,.07)!important;
+}
+#homePage .aurum-live-ticker .ticker-track{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:16px!important;
+  width:max-content!important;
+  min-width:100%!important;
+  min-height:20px!important;
+}
+#homePage .aurum-live-ticker .ticker-live-mark{
+  display:flex!important;align-items:center!important;gap:5px!important;
+  color:#249d79!important;font-size:8px!important;font-weight:900!important;
+  letter-spacing:1px!important;white-space:nowrap!important;
+}
+#homePage .ticker-live-mark i{
+  width:6px!important;height:6px!important;border-radius:50%!important;
+  background:#39c99a!important;box-shadow:0 0 7px rgba(57,201,154,.5)!important;
+}
+#homePage .aurum-live-ticker .ticker-item{
+  display:flex!important;align-items:center!important;gap:5px!important;
+  position:relative!important;padding-right:38px!important;
+  min-height:18px!important;white-space:nowrap!important;
+}
+#homePage .aurum-live-ticker .ticker-coin-logo{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  width:16px!important;height:16px!important;flex:0 0 16px!important;
+  border-radius:50%!important;background:#f5e8c4!important;color:#9a762c!important;
+  font-size:8px!important;font-weight:900!important;
+}
+#homePage .aurum-live-ticker .ticker-bitcoin .ticker-coin-logo{
+  background:#fff0d8!important;color:#e69a31!important;
+}
+#homePage .aurum-live-ticker .ticker-oil .ticker-coin-logo{
+  background:#dff4ef!important;color:#229c8d!important;
+}
+#homePage .aurum-live-ticker .ticker-item strong{
+  color:#9a7a39!important;font-size:8px!important;font-weight:900!important;
+  letter-spacing:.6px!important;
+}
+#homePage .aurum-live-ticker .ticker-item b{
+  color:#414654!important;font-size:9px!important;font-weight:800!important;
+}
+#homePage .aurum-live-ticker .ticker-item small{
+  font-size:8px!important;font-weight:800!important;
+}
+#homePage .aurum-live-ticker .ticker-item:after{
+  content:""!important;position:absolute!important;right:0!important;top:50%!important;
+  width:31px!important;height:11px!important;transform:translateY(-50%)!important;
+  background:linear-gradient(165deg,transparent 0 16%,#55b98f 17% 21%,transparent 22% 37%,#55b98f 38% 43%,transparent 44% 55%,#55b98f 56% 61%,transparent 62%)!important;
+  opacity:.9!important;
+}
+#homePage .aurum-live-ticker .ticker-gold:after{filter:hue-rotate(115deg) saturate(.8)!important}
+#homePage .aurum-home-hero-v2{
+  margin:8px 0 16px!important;padding:22px 10px 12px!important;
+  background:
+    radial-gradient(circle at 50% 48%,rgba(233,202,127,.17),transparent 42%),
+    radial-gradient(circle,rgba(184,174,151,.2) .65px,transparent .8px)!important;
+  background-size:auto,14px 14px!important;
+}
+#homePage .aurum-home-hero-v2 .aurum-greeting h1{
+  color:#596171!important;font-weight:850!important;
+  letter-spacing:-.8px!important;
+}
+#homePage .aurum-clock-face{
+  border:1px solid rgba(174,155,111,.55)!important;
+  background:
+    radial-gradient(circle at 50% 50%,#fffefa 0 58%,#fbf9f2 78%,#f1eee4 100%)!important;
+  box-shadow:0 0 0 6px rgba(255,255,255,.65),0 8px 24px rgba(100,82,43,.09),inset 0 0 24px rgba(196,169,104,.12)!important;
+}
+#homePage .aurum-clock-face:before{
+  inset:7px!important;
+  background:repeating-conic-gradient(from 0deg,rgba(147,121,69,.72) 0deg 1deg,transparent 1deg 6deg)!important;
+  mask:radial-gradient(circle,transparent 0 87%,#000 88% 91%,transparent 92%)!important;
+  -webkit-mask:radial-gradient(circle,transparent 0 87%,#000 88% 91%,transparent 92%)!important;
+}
+#homePage .aurum-clock-face:after{
+  content:""!important;position:absolute!important;inset:-7px!important;
+  border-radius:50%!important;z-index:1!important;pointer-events:none!important;
+  background:conic-gradient(from 218deg,transparent 0deg,#4b91ed 4deg,#4b91ed 83deg,transparent 87deg,transparent 190deg,#e4bf58 194deg,#e4bf58 316deg,transparent 320deg)!important;
+  -webkit-mask:radial-gradient(circle,transparent 0 96%,#000 97% 100%)!important;
+  mask:radial-gradient(circle,transparent 0 96%,#000 97% 100%)!important;
+  filter:drop-shadow(0 0 4px rgba(211,176,83,.25))!important;
+}
+#homePage .aurum-clock-face .clock-mark{z-index:3!important;color:#927b4d!important}
+#homePage .aurum-clock-face .clock-orbit{
+  border-color:rgba(203,172,105,.22)!important;z-index:2!important;
+}
+#homePage .aurum-clock-face .clock-center{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  overflow:visible!important;background:transparent!important;
+  width:88px!important;height:88px!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;z-index:6!important;mix-blend-mode:normal!important;
+}
+#homePage .aurum-clock-face .clock-center .aurum-clock-emblem{
+  display:block!important;width:82px!important;height:82px!important;
+  object-fit:contain!important;mix-blend-mode:screen!important;
+  filter:drop-shadow(0 3px 9px rgba(177,132,37,.28))!important;
+}
+#homePage .aurum-clock-face .clock-hand{z-index:4!important}
+#homePage .aurum-session-note{margin-top:0!important;gap:6px!important}
+#homePage .aurum-session-note strong{display:none!important}
+#homePage .aurum-session-note span{
+  color:#9c7d3d!important;font-size:8px!important;
+  letter-spacing:2px!important;font-weight:900!important;
+}
+#homePage .aurum-session-note small{
+  color:#707887!important;font-size:10px!important;
+}
+@media(max-width:600px){
+  #homePage .aurum-live-ticker{height:31px!important;min-height:31px!important;padding:5px 8px!important}
+  #homePage .aurum-live-ticker .ticker-track{gap:11px!important}
+  #homePage .aurum-live-ticker .ticker-item{padding-right:30px!important}
+  #homePage .aurum-live-ticker .ticker-item:after{width:25px!important}
+  #homePage .aurum-session-clock{width:252px!important;height:252px!important}
+  #homePage .aurum-clock-face{width:236px!important;height:236px!important}
+  #homePage .aurum-clock-face .clock-center{width:78px!important;height:78px!important}
+  #homePage .aurum-clock-face .clock-center .aurum-clock-emblem{width:74px!important;height:74px!important}
+}
