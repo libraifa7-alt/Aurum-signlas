@@ -7327,6 +7327,35 @@ if (miniChart && candles.length > 1) {
     '<path class="aurum-setup-line" d="'+curve+'" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
 }
 const priceEl=document.getElementById('goldPrice');
+// One authoritative distance updater observes the exact text shown to users.
+// This prevents async candle analysis from overwriting distances using an
+// older quote or an unrelated range boundary after the live ticker refreshes.
+(function installNearestLevelDistanceObserver(){
+  const priceNode=document.getElementById('goldPrice');
+  const supportNode=document.getElementById('aurumNearestSupport');
+  const resistanceNode=document.getElementById('aurumNearestResistance');
+  const supportDistanceNode=document.getElementById('aurumSupportDistance');
+  const resistanceDistanceNode=document.getElementById('aurumResistanceDistance');
+  if(!priceNode||!supportNode||!resistanceNode||!supportDistanceNode||!resistanceDistanceNode)return;
+  const readNumber=node=>Number(String(node.textContent||'').replace(/,/g,'').replace(/[^0-9.\-]/g,''));
+  const update=()=>{
+    const price=readNumber(priceNode),support=readNumber(supportNode),resistance=readNumber(resistanceNode);
+    if(!Number.isFinite(price)||price<=0)return;
+    supportDistanceNode.textContent=Number.isFinite(support)&&support>0
+      ?(price>=support?(price-support).toFixed(2)+' pts below':(support-price).toFixed(2)+' pts above')
+      :'Level belum tersedia';
+    resistanceDistanceNode.textContent=Number.isFinite(resistance)&&resistance>0
+      ?(resistance>=price?(resistance-price).toFixed(2)+' pts above':(price-resistance).toFixed(2)+' pts below')
+      :'Level belum tersedia';
+  };
+  if(!window.aurumNearestDistanceObserver){
+    window.aurumNearestDistanceObserver=new MutationObserver(update);
+    [priceNode,supportNode,resistanceNode].forEach(node=>
+      window.aurumNearestDistanceObserver.observe(node,{childList:true,characterData:true,subtree:true})
+    );
+  }
+  update();
+})();
 if(priceEl){
   const oldPrice=Number(String(priceEl.textContent).replace(/[^0-9.]/g,''));
   const newPrice=Number(latestCandle.close);
