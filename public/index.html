@@ -8867,6 +8867,9 @@ body.aurum-user-dark .app-page{background:transparent!important}
         const active=button.dataset.detailRisk===String(profile.key||profile.label||'RISK');
         button.classList.toggle('selected',active);button.setAttribute('aria-pressed',active?'true':'false');
       });
+      // Keep the selected risk profile consistent across the header, levels,
+      // map and outcome label. The server's base tradePlan is the HIGH profile.
+      document.getElementById('aurumDetailEntry').textContent=fmtDetail(profile.entryLow)+' – '+fmtDetail(profile.entryHigh);
       document.getElementById('aurumDetailLevels').innerHTML=[['SL',profile.sl],['TP 1',profile.tp1],['TP 2',profile.tp2],['TP 3',profile.tp3]].map(x=>'<div class="aurum-detail-level"><small>'+x[0]+'</small><b>'+fmtDetail(x[1])+'</b></div>').join('');
       const vals=[Number(profile.tp3),Number(profile.tp2),Number(profile.tp1),(Number(profile.entryLow)+Number(profile.entryHigh))/2,Number(profile.sl)];
       const low=Number(profile.entryLow),high=Number(profile.entryHigh);
@@ -8881,6 +8884,15 @@ body.aurum-user-dark .app-page{background:transparent!important}
         liveText=decimals>0&&decimals<=2?liveText.replace(',','.'):liveText.replace(/,/g,'');
       }
       const live=Number(liveText),liveOk=Number.isFinite(live)&&live>0;
+      const profileState=profile.outcomeStatus||cur.outcomeStatus||'WAITING_FOR_ENTRY';
+      const passedTargets=liveOk&&profileState==='WAITING_FOR_ENTRY'&&(
+        cur.direction==='SELL'?live<Math.min(Number(profile.tp1),Number(profile.tp2),Number(profile.tp3)):
+        cur.direction==='BUY'?live>Math.max(Number(profile.tp1),Number(profile.tp2),Number(profile.tp3)):false
+      );
+      const outcomeNode=document.getElementById('aurumDetailOutcome');
+      if(outcomeNode)outcomeNode.textContent=passedTargets
+        ?'PERINGATAN: HARGA LIVE SUDAH MELEWATI TP3 — STATUS SERVER MASIH MENUNGGU ENTRY'
+        :outcomeLabel(profileState).toUpperCase();
       const min=Math.min(...vals,low,high,...(liveOk?[live]:[])),max=Math.max(...vals,low,high,...(liveOk?[live]:[])),range=Math.max(max-min,.000001);
       const y=v=>Math.round(22+(max-v)/range*198),top=y(Math.max(low,high)),bottom=y(Math.min(low,high));
       const mapLabels=[['TP 3',vals[0],'#2997dc'],['TP 2',vals[1],'#2997dc'],['TP 1',vals[2],'#20a66b'],['ENTRY',vals[3],'#d5a72e'],['STOP LOSS',vals[4],'#e0525b']];
