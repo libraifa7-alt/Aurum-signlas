@@ -3334,6 +3334,8 @@ body {
 #aurumSignalDetailView .aurum-detail-status{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:12px}
 #aurumSignalDetailView .aurum-detail-status span{display:inline-flex;padding:6px 10px;border-radius:20px;background:#eef5f7;color:#758497;font-size:9px;font-weight:900;letter-spacing:.5px}
 #aurumSignalDetailView .aurum-detail-status span:first-child{background:#e8f7ef;color:#19865f}
+#aurumSignalDetailView .aurum-detail-status span:first-child.is-warning{background:#fff0f0!important;color:#bd303d!important;border:1px solid #f1c5ca}
+#aurumSignalDetailView .aurum-detail-status span:first-child.is-warning::before{content:"⚠ ";}
 #aurumSignalDetailView .aurum-detail-live{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;padding:13px 14px;border:1px solid #dce7f3;border-radius:12px;background:#f7fbff}
 #aurumSignalDetailView .aurum-detail-live small{font-size:9px;font-weight:900;letter-spacing:1px;color:#8290a2}
 #aurumSignalDetailView .aurum-detail-live strong{display:block;margin-top:5px;font-size:20px;letter-spacing:-.3px;color:#26364c}
@@ -8890,9 +8892,13 @@ body.aurum-user-dark .app-page{background:transparent!important}
         cur.direction==='BUY'?live>Math.max(Number(profile.tp1),Number(profile.tp2),Number(profile.tp3)):false
       );
       const outcomeNode=document.getElementById('aurumDetailOutcome');
-      if(outcomeNode)outcomeNode.textContent=passedTargets
-        ?'PERINGATAN: HARGA LIVE SUDAH MELEWATI TP3 — STATUS SERVER MASIH MENUNGGU ENTRY'
-        :outcomeLabel(profileState).toUpperCase();
+      if(outcomeNode){
+        outcomeNode.textContent=passedTargets
+          ?'HARGA LIVE SUDAH MELEWATI TP3 — STATUS SERVER MASIH MENUNGGU ENTRY'
+          :outcomeLabel(profileState).toUpperCase();
+        outcomeNode.classList.toggle('is-warning',passedTargets);
+        outcomeNode.setAttribute('role',passedTargets?'alert':'status');
+      }
       const min=Math.min(...vals,low,high,...(liveOk?[live]:[])),max=Math.max(...vals,low,high,...(liveOk?[live]:[])),range=Math.max(max-min,.000001);
       const y=v=>Math.round(22+(max-v)/range*198),top=y(Math.max(low,high)),bottom=y(Math.min(low,high));
       const mapLabels=[['TP 3',vals[0],'#2997dc'],['TP 2',vals[1],'#2997dc'],['TP 1',vals[2],'#20a66b'],['ENTRY',vals[3],'#d5a72e'],['STOP LOSS',vals[4],'#e0525b']];
