@@ -3511,6 +3511,68 @@ body {
  #marketPage .aurum-asset-switch button{padding:5px 9px;font-size:9px}
 }
 </style>
+<style id="aurum-color-price-and-tabs">
+/* Rich instrument colors for the live quote */
+#marketPage .aurum-price-row strong{
+ display:inline-block;
+ font-weight:950;
+ background:linear-gradient(100deg,#e7b83f 0%,#a97712 48%,#f0cd70 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ text-shadow:0 3px 12px rgba(174,128,27,.13);
+}
+#marketPage .aurum-traxa-market-card.is-gold .aurum-price-row strong{
+ background-image:linear-gradient(100deg,#f0c75a 0%,#a97917 48%,#e4b84e 100%);
+}
+#marketPage .aurum-traxa-market-card.is-bitcoin .aurum-price-row strong{
+ background-image:linear-gradient(100deg,#ffc36b 0%,#df7915 52%,#f4a638 100%);
+ text-shadow:0 3px 12px rgba(224,126,24,.16);
+}
+#marketPage .aurum-traxa-market-card.is-oil .aurum-price-row strong{
+ background-image:linear-gradient(100deg,#65cfc2 0%,#08786e 52%,#35b9a9 100%);
+ text-shadow:0 3px 12px rgba(8,120,110,.15);
+}
+/* Directional tick color remains readable while the asset gradient is the default */
+#marketPage .aurum-price-row strong.price-up{
+ background-image:linear-gradient(100deg,#27b879,#087b52 55%,#49c98f);
+ text-shadow:0 3px 12px rgba(8,140,88,.15)
+}
+#marketPage .aurum-price-row strong.price-down{
+ background-image:linear-gradient(100deg,#ff8790,#cf334d 55%,#e95b70);
+ text-shadow:0 3px 12px rgba(207,51,77,.15)
+}
+/* Distinct colors for the three navigation tabs */
+#marketPage .aurum-signal-tabs button[data-signal-tab="setup"]{
+ color:#1685a6;background:linear-gradient(135deg,#e8fbff,#d7f4f5);border:1px solid #b9e8ed
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="performance"]{
+ color:#7045bd;background:linear-gradient(135deg,#f4edff,#e8ddff);border:1px solid #d9c9fa
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="analysis"]{
+ color:#a66b13;background:linear-gradient(135deg,#fff7df,#ffebbd);border:1px solid #f0d79b
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="setup"].active{
+ color:#fff;background:linear-gradient(105deg,#10a9c5,#277be0);border-color:transparent;box-shadow:0 4px 12px #168dc433
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="performance"].active{
+ color:#fff;background:linear-gradient(105deg,#9a50e8,#5635c8);border-color:transparent;box-shadow:0 4px 12px #7545d633
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="analysis"].active{
+ color:#fff;background:linear-gradient(105deg,#f0b53b,#e47b19);border-color:transparent;box-shadow:0 4px 12px #df9b2733
+}
+</style>
+<script id="aurum-color-price-asset-sync">
+(function(){
+ const card=document.querySelector('#marketPage .aurum-traxa-market-card');
+ const pair=document.getElementById('pair');
+ if(!card||!pair)return;
+ function sync(){
+  card.classList.remove('is-gold','is-bitcoin','is-oil');
+  card.classList.add(pair.value==='BTC/USD'?'is-bitcoin':pair.value==='WTI'?'is-oil':'is-gold');
+ }
+ pair.addEventListener('change',sync);
+ sync();
+})();
+</script>
 </head>
   
   
