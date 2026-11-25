@@ -8131,7 +8131,15 @@ console.log('STATUS SERVER DIPERIKSA');
       const tickerSuffix=asset.symbol==='XAU/USD'?'XAU':asset.symbol==='BTC/USD'?'BTC':'WTI';
       const tickerPrice=$('ticker'+tickerSuffix),tickerChange=$('change'+tickerSuffix);
       if(tickerPrice)tickerPrice.textContent=formattedPrice;
-      if(tickerChange){tickerChange.textContent=formattedChange;tickerChange.style.color=change>=0?'#159b72':'#e45b63';}
+      if(tickerChange){
+        tickerChange.textContent=formattedChange;
+        tickerChange.style.color=change>=0?'#159b72':'#e45b63';
+        const tickerItem=tickerChange.closest('.ticker-item');
+        if(tickerItem){
+          tickerItem.dataset.direction=change>=0?'up':'down';
+          tickerItem.classList.toggle('is-delayed',asset.symbol==='XAU/USD' && !hasLiveGoldQuote);
+        }
+      }
       if(path){
         // TRAXA-style sparkline: lightly smoothed candles with flowing cubic curves.
         const rawPoints=candles.slice(-30).map(x=>Number(x.close)).filter(Number.isFinite);
