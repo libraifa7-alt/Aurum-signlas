@@ -3573,6 +3573,169 @@ body {
  sync();
 })();
 </script>
+<style id="aurum-reference-market-design-v2">
+/* Reference-matched market panel. Scoped to Market only; dashboard remains untouched. */
+#marketPage{
+  width:100%;max-width:1240px!important;margin:0 auto!important;
+  padding:20px clamp(14px,4.6vw,58px) 110px!important;
+  box-sizing:border-box;
+  background:linear-gradient(145deg,#f1f2f7 0%,#faf9f5 48%,#f3f4f8 100%)!important;
+}
+#marketPage .aurum-asset-switch{
+  max-width:none!important;justify-content:flex-start;gap:14px;margin:0 0 30px!important;
+  overflow:visible;padding:0 2px;
+}
+#marketPage .aurum-asset-switch button{
+  min-height:66px;display:inline-flex;align-items:center;gap:12px;
+  padding:10px 20px!important;border:2px solid #e0e2e9!important;border-radius:40px!important;
+  background:linear-gradient(145deg,#f8f8fb,#e9eaf0)!important;color:#202b49!important;
+  font-size:clamp(14px,2vw,22px)!important;font-weight:850!important;
+  box-shadow:inset 0 1px 2px #fff,0 2px 5px #25314a0b;
+}
+#marketPage .aurum-asset-switch button.active.aurum-asset-gold{
+  background:linear-gradient(145deg,#effaff,#dff3ff)!important;border-color:#9bdfff!important;color:#0869bd!important;
+}
+#marketPage .aurum-asset-switch button.active.aurum-asset-bitcoin{
+  background:linear-gradient(145deg,#fff8ed,#ffedcf)!important;border-color:#ffc46f!important;color:#a95d0a!important;
+}
+#marketPage .aurum-asset-switch button.active.aurum-asset-oil{
+  background:linear-gradient(145deg,#edfffb,#d7f7f1)!important;border-color:#9bdfd5!important;color:#08786e!important;
+}
+#marketPage .aurum-asset-switch-icon{
+  width:48px!important;height:48px!important;flex-basis:48px!important;border-radius:50%!important;
+  font-size:16px!important;box-shadow:inset 0 2px 4px #fff9,0 3px 7px #9c762544!important;
+}
+#marketPage .aurum-asset-bitcoin .aurum-asset-switch-icon{font-size:28px!important}
+#marketPage .aurum-asset-oil .aurum-asset-switch-icon{font-size:11px!important}
+#marketPage .aurum-traxa-market-card{
+  max-width:none!important;width:100%;box-sizing:border-box;
+  padding:28px 30px 26px!important;border:1px solid #e8dfcb!important;border-radius:28px!important;
+  background-color:#fffefa!important;
+  background-image:linear-gradient(rgba(188,160,99,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(188,160,99,.075) 1px,transparent 1px),linear-gradient(135deg,#fff 0%,#fffdf6 100%)!important;
+  background-size:25px 25px,25px 25px,100% 100%!important;
+  box-shadow:0 18px 42px rgba(40,48,68,.13)!important;
+}
+#marketPage .aurum-asset-row{gap:16px;min-height:72px}
+#marketPage .aurum-asset-mark{
+  width:76px!important;height:76px!important;flex-basis:76px!important;font-size:23px!important;
+  box-shadow:inset 0 2px 4px #fff9,0 5px 14px #bd922f33!important;
+}
+#marketPage .aurum-asset-mark.is-bitcoin{font-size:38px!important}
+#marketPage .aurum-asset-mark.is-oil{font-size:18px!important}
+#marketPage .aurum-asset-row div strong{font-size:clamp(22px,3vw,36px)!important;letter-spacing:.2px!important;color:#17213c!important}
+#marketPage .aurum-market-state{font-size:clamp(12px,1.6vw,19px)!important;font-weight:900;color:#16833c!important}
+#marketPage .aurum-price-row{padding:22px 0 16px!important;gap:6px!important}
+#marketPage #goldPrice{
+  font-size:clamp(52px,8.5vw,104px)!important;line-height:1.02!important;letter-spacing:-3px!important;
+  font-weight:950!important;font-variant-numeric:tabular-nums;
+  color:transparent!important;-webkit-text-fill-color:transparent!important;
+  background-image:linear-gradient(100deg,#f4d36b 0%,#c58a12 48%,#e5aa28 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  text-shadow:0 5px 15px rgba(180,132,27,.12)!important;
+}
+#marketPage:has(.aurum-asset-bitcoin.active) #goldPrice{
+  background-image:linear-gradient(100deg,#ffc76d,#e47b12 52%,#f4a52d)!important;
+}
+#marketPage:has(.aurum-asset-oil.active) #goldPrice{
+  background-image:linear-gradient(100deg,#70d9cc,#078274 52%,#35bba9)!important;
+}
+#marketPage #goldPrice.price-up::after{color:#079b70!important}
+#marketPage #goldPrice.price-down::after{color:#e84a58!important}
+#marketPage .aurum-price-row small{font-size:clamp(10px,1.2vw,14px)!important;color:#778092!important}
+#marketPage .aurum-mini-chart{height:clamp(95px,12vw,150px)!important;margin:0 0 18px!important}
+#marketPage .aurum-trend-pill{font-size:12px!important;padding:6px 12px!important;border-radius:20px!important}
+#marketPage .aurum-range-head{margin:16px 0 12px!important}
+#marketPage .aurum-range-head span,#marketPage .aurum-range-head strong{font-size:clamp(12px,1.5vw,19px)!important;font-weight:900!important}
+#marketPage .aurum-range-head span{letter-spacing:.5px!important;color:#747986!important}
+#marketPage .aurum-range-head strong{color:#727887!important}
+#marketPage .aurum-range-track{
+  height:16px!important;border-radius:20px!important;margin:0 0 10px!important;
+  background:linear-gradient(90deg,#ffe89c 0%,#f6bd2f 52%,#e6a400 100%)!important;
+}
+#marketPage .aurum-range-track span{
+  top:-9px!important;width:11px!important;height:34px!important;border-radius:6px!important;
+  background:#202b49!important;box-shadow:0 0 0 3px #fff,0 3px 7px #2228!important;
+}
+#marketPage .aurum-range-values{margin-bottom:26px!important;font-size:clamp(13px,1.8vw,21px)!important;font-weight:850!important;color:#1a2540!important}
+#marketPage .aurum-nearest-levels{gap:18px!important}
+#marketPage .aurum-nearest-levels>div{
+  min-height:145px;padding:22px 24px!important;border-radius:26px!important;
+  background-image:linear-gradient(rgba(42,126,93,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(42,126,93,.045) 1px,transparent 1px),linear-gradient(135deg,#f1fff8,#e8f8f0)!important;
+  background-size:18px 18px,18px 18px,100% 100%!important;
+}
+#marketPage .aurum-nearest-support{border:2px solid #b8efd8!important}
+#marketPage .aurum-nearest-resistance{
+  border:2px solid #f5b9c1!important;
+  background-image:linear-gradient(rgba(189,70,83,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(189,70,83,.045) 1px,transparent 1px),linear-gradient(135deg,#fff0f1,#fde9eb)!important;
+}
+#marketPage .aurum-nearest-levels small{font-size:clamp(11px,1.5vw,18px)!important;color:#364057!important;letter-spacing:.5px!important}
+#marketPage .aurum-nearest-levels strong{font-size:clamp(27px,3.4vw,43px)!important;font-weight:950!important;margin-top:10px!important;color:#078a36!important}
+#marketPage .aurum-nearest-resistance strong{color:#e11e32!important}
+#marketPage .aurum-nearest-levels span{font-size:clamp(13px,1.8vw,21px)!important;font-weight:800;color:#1263a6!important;margin-top:7px!important}
+#marketPage .aurum-nearest-resistance span{color:#d91f32!important}
+#marketPage .aurum-signal-tabs{
+  max-width:none!important;width:100%;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:18px!important;padding:0!important;margin:26px 0 20px!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+}
+#marketPage .aurum-signal-tabs button{
+  min-height:100px!important;border-radius:30px!important;padding:18px 12px!important;
+  font-size:clamp(18px,2.3vw,29px)!important;font-weight:900!important;color:#fff!important;
+  border:2px solid transparent!important;box-shadow:0 8px 17px rgba(37,46,68,.14)!important;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  transition:transform .18s ease,filter .18s ease;
+}
+#marketPage .aurum-signal-tabs button:active{transform:translateY(2px);filter:brightness(.96)}
+#marketPage .aurum-signal-tabs button::before{font-size:1.25em;line-height:1}
+#marketPage .aurum-signal-tabs button[data-signal-tab="setup"]{
+  background:linear-gradient(115deg,#05c95b 0%,#05a9e8 55%,#2362ff 100%)!important;
+  box-shadow:0 8px 20px rgba(17,140,220,.24)!important;
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="setup"]::before{content:"⚙"}
+#marketPage .aurum-signal-tabs button[data-signal-tab="performance"]{
+  background:linear-gradient(115deg,#b52ce8 0%,#8c12d5 55%,#6200b8 100%)!important;
+  box-shadow:0 8px 20px rgba(129,30,201,.24)!important;
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="performance"]::before{content:"▥"}
+#marketPage .aurum-signal-tabs button[data-signal-tab="analysis"]{
+  background:linear-gradient(115deg,#ffca18 0%,#ff9e08 55%,#ee7900 100%)!important;
+  box-shadow:0 8px 20px rgba(230,151,15,.24)!important;
+}
+#marketPage .aurum-signal-tabs button[data-signal-tab="analysis"]::before{content:"▤"}
+#marketPage .aurum-signal-tabs button.active{filter:saturate(1.12) brightness(1.02)}
+@media(max-width:700px){
+ #marketPage{padding:15px 13px 105px!important}
+ #marketPage .aurum-asset-switch{gap:7px;margin-bottom:16px!important}
+ #marketPage .aurum-asset-switch button{min-height:48px;padding:6px 10px!important;gap:7px;font-size:12px!important}
+ #marketPage .aurum-asset-switch-icon{width:32px!important;height:32px!important;flex-basis:32px!important;font-size:11px!important}
+ #marketPage .aurum-asset-bitcoin .aurum-asset-switch-icon{font-size:19px!important}
+ #marketPage .aurum-traxa-market-card{padding:17px 15px 16px!important;border-radius:19px!important}
+ #marketPage .aurum-asset-row{min-height:45px;gap:10px}
+ #marketPage .aurum-asset-mark{width:46px!important;height:46px!important;flex-basis:46px!important;font-size:15px!important}
+ #marketPage .aurum-asset-mark.is-bitcoin{font-size:24px!important}
+ #marketPage .aurum-asset-mark.is-oil{font-size:12px!important}
+ #marketPage .aurum-price-row{padding:17px 0 12px!important}
+ #marketPage #goldPrice{font-size:clamp(43px,11vw,66px)!important;letter-spacing:-2px!important}
+ #marketPage .aurum-mini-chart{height:82px!important;margin-bottom:12px!important}
+ #marketPage .aurum-range-head{margin:11px 0 9px!important}
+ #marketPage .aurum-range-track{height:10px!important}
+ #marketPage .aurum-range-track span{height:24px!important;top:-7px!important;width:8px!important}
+ #marketPage .aurum-range-values{margin-bottom:15px!important}
+ #marketPage .aurum-nearest-levels{gap:8px!important}
+ #marketPage .aurum-nearest-levels>div{min-height:106px;padding:12px 10px!important;border-radius:16px!important}
+ #marketPage .aurum-nearest-levels small{font-size:9px!important}
+ #marketPage .aurum-nearest-levels strong{font-size:clamp(21px,6vw,29px)!important}
+ #marketPage .aurum-nearest-levels span{font-size:10px!important}
+ #marketPage .aurum-signal-tabs{gap:7px!important;margin:17px 0 15px!important}
+ #marketPage .aurum-signal-tabs button{min-height:65px!important;border-radius:17px!important;padding:9px 4px!important;font-size:clamp(11px,3.2vw,16px)!important;gap:5px;flex-direction:column}
+ #marketPage .aurum-signal-tabs button::before{font-size:1.15em}
+}
+@media(max-width:370px){
+ #marketPage .aurum-asset-switch button{padding:5px 7px!important;font-size:10px!important}
+ #marketPage .aurum-asset-switch-icon{width:27px!important;height:27px!important;flex-basis:27px!important}
+ #marketPage .aurum-nearest-levels{grid-template-columns:1fr!important}
+}
+</style>
 </head>
   
   
