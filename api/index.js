@@ -21,11 +21,15 @@ module.exports = async function handler(req, res) {
 
   // AURUM REDIS CONNECTION
   async function aurumRedis(command) {
-    const redisUrl = env.KV_REST_API_URL;
-    const redisToken = env.KV_REST_API_TOKEN;
+    const redisUrl = String(env.KV_REST_API_URL || '').trim().replace(/^['\"]|['\"]$/g, '');
+    const redisToken = String(env.KV_REST_API_TOKEN || '').trim().replace(/^['\"]|['\"]$/g, '');
 
     if (!redisUrl || !redisToken) {
       return null;
+    }
+    const parsedRedisUrl = new URL(redisUrl);
+    if (parsedRedisUrl.protocol !== 'https:') {
+      throw new Error('Redis REST URL must use HTTPS');
     }
 
     const response = await fetch(redisUrl, {
