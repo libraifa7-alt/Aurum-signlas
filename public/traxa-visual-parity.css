@@ -2244,3 +2244,62 @@ main{max-width:1480px!important}
   #homePage .home-footer span{font-size:11px!important;letter-spacing:2px!important}
   #homePage .home-footer small{font-size:9px!important}
 }
+
+/* AURUM premium icon motion — soft luminous float and breathing halos.
+   Keep motion on icon artwork only; cards and text remain steady. */
+@media (prefers-reduced-motion: no-preference) {
+  #homePage .home-menu-icon,
+  #homePage .community-icon,
+  #homePage .home-asset-icon,
+  #homePage .aurum-home-feature .home-menu-icon {
+    transform-origin:50% 50%;
+    animation:aurumIconFloat 4.2s ease-in-out infinite,
+              aurumIconHalo 3.4s ease-in-out infinite;
+    will-change:transform,filter;
+  }
+  #homePage .home-menu-card:nth-child(2n) .home-menu-icon,
+  #homePage .home-community-grid a:nth-child(2) .community-icon,
+  #homePage .home-market-card:nth-child(2) .home-asset-icon {
+    animation-delay:-1.1s,-.8s;
+  }
+  #homePage .home-menu-card:nth-child(3n) .home-menu-icon,
+  #homePage .home-community-grid a:nth-child(3) .community-icon,
+  #homePage .home-market-card:nth-child(3) .home-asset-icon {
+    animation-delay:-2.2s,-1.6s;
+  }
+  #homePage .aurum-trading-section .home-menu-icon {
+    animation-duration:3.6s,2.8s;
+  }
+  #homePage .home-menu-card:after,
+  #homePage .aurum-home-feature:after {
+    animation:aurumChevronNudge 2.8s ease-in-out infinite;
+  }
+  #homePage .home-menu-card:hover .home-menu-icon,
+  #homePage .home-community-grid a:hover .community-icon,
+  #homePage .aurum-home-feature:hover .home-menu-icon {
+    animation-play-state:paused;
+    transform:translateY(-3px) scale(1.07);
+  }
+}
+@keyframes aurumIconFloat {
+  0%,100% { transform:translate3d(0,0,0) scale(1); }
+  50% { transform:translate3d(0,-3px,0) scale(1.035); }
+}
+@keyframes aurumIconHalo {
+  0%,100% { filter:drop-shadow(0 2px 5px rgba(183,139,49,.12)); }
+  50% { filter:drop-shadow(0 4px 11px rgba(193,151,60,.30)); }
+}
+@keyframes aurumChevronNudge {
+  0%,100% { margin-right:0; }
+  50% { margin-right:-2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #homePage .home-menu-icon,
+  #homePage .community-icon,
+  #homePage .home-asset-icon,
+  #homePage .home-menu-card:after,
+  #homePage .aurum-home-feature:after {
+    animation:none!important;
+    will-change:auto!important;
+  }
+}
