@@ -7361,7 +7361,13 @@ try {
   const daily = dailyCandles[dailyCandles.length - 1];
   // Use intraday M5 candles for the Jakarta trading day, not a possibly
   // stale D1 candle whose range may no longer contain the live quote.
-  const current = Number(initialDisplayPrice);
+  // The live quote updater can refresh the visible price after the chart's
+  // initial candle load. Read the displayed quote at calculation time so
+  // range marker and S/R distances use the exact same reference price.
+  const displayedQuote = Number(String(document.getElementById('goldPrice')?.textContent || '').replace(/[^0-9.]/g, ''));
+  const current = Number.isFinite(displayedQuote) && displayedQuote > 0
+    ? displayedQuote
+    : Number(initialDisplayPrice);
   const jakartaDate = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'
   }).format(new Date());
