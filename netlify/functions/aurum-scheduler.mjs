@@ -1,9 +1,8 @@
-'use strict';
+import { createRequire } from 'node:module';
+import { randomUUID } from 'node:crypto';
 
-// Netlify scheduled trigger for the existing server-side ICT scanner.
-// Netlify schedules run only on published deploys and use UTC.
+const require = createRequire(import.meta.url);
 const cronHandler = require('../../api/cron.js');
-const crypto = require('node:crypto');
 
 function responseBridge() {
   let statusCode = 200;
@@ -19,19 +18,12 @@ function responseBridge() {
   };
 }
 
-exports.handler = async function aurumScheduler(_event, context = {}) {
+export default async function aurumScheduler(_request, context = {}) {
   const previousSecret = process.env.CRON_SECRET;
   const previousPublicUrl = process.env.AURUM_PUBLIC_URL;
-
-  // The scheduled invocation is authenticated by Netlify itself. Supply a
-  // one-invocation credential to the shared Vercel-compatible HTTP handler.
-  const invocationSecret = previousSecret || crypto.randomUUID();
+  const invocationSecret = previousSecret || randomUUID();
   process.env.CRON_SECRET = invocationSecret;
-
-  // Lambda-compatible Netlify contexts may not expose context.site. Fall back
-  // to Netlify's URL env var and then the canonical site hostname.
-  const publicUrl = context.site?.url || process.env.URL || 'https://aurum-signlas.netlify.app';
-  process.env.AURUM_PUBLIC_URL = publicUrl;
+  process.env.AURUM_PUBLIC_URL = context.site?.url || process.env.URL || 'https://aurum-signlas.netlify.app';
 
   try {
     const bridge = responseBridge();
@@ -45,15 +37,16 @@ exports.handler = async function aurumScheduler(_event, context = {}) {
       throw new Error('Aurum scanner returned HTTP ' + response.statusCode + ': ' + response.body);
     }
     console.log('AURUM scheduled scan completed:', response.body);
-    return { statusCode: response.statusCode, body: response.body };
+    return new Response(response.body, {
+      status: response.statusCode,
+      headers: { 'content-type': 'application/json', ...response.headers }
+    });
   } finally {
     if (previousSecret === undefined) delete process.env.CRON_SECRET;
     else process.env.CRON_SECRET = previousSecret;
-
     if (previousPublicUrl === undefined) delete process.env.AURUM_PUBLIC_URL;
     else process.env.AURUM_PUBLIC_URL = previousPublicUrl;
   }
-};
+}
 
-// Every five minutes. Netlify evaluates this schedule in UTC.
-exports.config = { schedule: '*/5 * * * *' };
+export const config = { schedule: '*/5 * * * *' };
