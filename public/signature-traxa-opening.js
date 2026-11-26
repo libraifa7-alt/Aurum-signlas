@@ -35,13 +35,13 @@
     function end(){if(!dragging)return;dragging=false;if(progress<.92)setProgress(0);}
     function enter(){
       if(done)return;done=true;dragging=false;root.classList.add('is-loading');
-      var began=performance.now(),duration=5200;
+      var began=performance.now(),duration=4800;
       function tick(now){
         var p=Math.min(1,(now-began)/duration);
         pct.textContent=String(Math.round(p*100));
         fill.style.width=(p*100)+'%';
         if(p<1){requestAnimationFrame(tick);return;}
-        setTimeout(function(){root.classList.add('is-leaving');setTimeout(function(){root.remove();},800);},450);
+        setTimeout(function(){root.classList.add('is-leaving');setTimeout(function(){root.remove();},800);},3000);
       }
       requestAnimationFrame(tick);
     }
