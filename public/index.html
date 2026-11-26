@@ -3402,6 +3402,44 @@ body {
   .aurum-live-ticker .ticker-track { animation: none !important; transform: none !important; }
 }
 </style>
+<style id="signature-photo-splash">
+/* Signature Trading Club opening artwork — splash only */
+#aurumSplash.aurum-splash{
+  position:fixed!important;inset:0!important;z-index:99999!important;
+  width:100vw!important;height:100dvh!important;min-height:100dvh!important;
+  padding:0!important;margin:0!important;overflow:hidden!important;
+  background:#030916 url('/signature-club-splash.webp') center center/100% 100% no-repeat!important;
+}
+#aurumSplash .splash-live-pill{display:none!important}
+#aurumSplash .splash-content{position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;
+  padding:0!important;margin:0!important;display:block!important}
+#aurumSplash .splash-content>*:not(#aurumSwipeEnter){display:none!important}
+#aurumSplash #aurumSwipeEnter{
+  display:block!important;pointer-events:auto!important;
+  position:absolute!important;left:10%!important;right:10%!important;bottom:10.5%!important;
+  width:80%!important;height:8.8%!important;min-height:0!important;
+  margin:0!important;padding:0!important;border:0!important;border-radius:999px!important;
+  background:transparent!important;box-shadow:none!important;opacity:1!important;
+  touch-action:pan-y!important;cursor:grab!important;z-index:20!important
+}
+#aurumSplash #aurumSwipeEnter .swipe-handle{
+  display:grid!important;visibility:visible!important;opacity:1!important;
+  position:absolute!important;left:34px!important;top:21px!important;
+  width:76px!important;height:76px!important;border-radius:50%!important;
+  background:rgba(255,203,76,.92)!important;color:#241600!important;
+  border:3px solid #fff0ad!important;box-shadow:0 0 18px rgba(255,190,45,.9),inset 0 0 8px #fff!important;
+  font-size:40px!important;line-height:1!important;z-index:21!important;
+  animation:swipeNudge 1.7s ease-in-out infinite!important
+}
+#aurumSplash #aurumSwipeEnter .swipe-copy{opacity:0!important;visibility:hidden!important;display:none!important}
+@media(max-aspect-ratio:9/16){
+ #aurumSplash.aurum-splash{background-size:auto 100%!important}
+}
+@media(min-aspect-ratio:9/16){
+ #aurumSplash.aurum-splash{background-size:100% auto!important;background-color:#030916!important}
+}
+</style>
 </head>
   
   
@@ -3429,7 +3467,7 @@ body {
 <div id="aurumDebugStatus" hidden aria-hidden="true"></div>
 
 <!-- AURUM PREMIUM SPLASH SCREEN -->
-<div id="aurumSplash" class="aurum-splash">
+<div id="aurumSplash" class="aurum-splash aurum-traxa-intro">
   <div class="splash-live-pill"><i></i> AURUM NETWORK · LIVE</div>
   <div class="splash-content">
     <div class="aurum-orb aurum-network-globe" aria-label="Animasi jaringan digital AURUM">
@@ -3448,22 +3486,25 @@ body {
       <div class="orb-core"><span class="aurum-core-mark">A</span></div>
       <div class="orb-particle particle-one"></div><div class="orb-particle particle-two"></div><div class="orb-particle particle-three"></div><div class="orb-particle particle-four"></div><div class="orb-particle particle-five"></div>
     </div>
-    <div class="splash-brand-block">
-      <h1>✦ AURUM</h1><h2>SIGNALS AI</h2>
-      <p class="splash-subtitle">INTELLIGENT MARKET ANALYSIS</p>
-    </div>
+    <div class="splash-brand-block"><strong>AURUM</strong><span>S I G N A L S</span><small>INTELLIGENT MARKET ANALYSIS</small></div>
     <div class="splash-bottom-block">
-      <div class="splash-stats" aria-label="Fitur AURUM">
-        <div><strong>7</strong><span>TIMEFRAMES</span></div>
-        <div><strong>3</strong><span>MARKETS</span></div>
-        <div><strong>AI</strong><span>ANALYSIS</span></div>
-      </div>
-      <div class="splash-swipe" aria-label="Geser ke kanan untuk masuk">
-        <span class="swipe-handle">➜</span><span class="swipe-copy">SWIPE TO ENTER</span>
-      </div>
-      <p class="splash-hint">Geser ke kanan untuk masuk ke AURUM Signals</p>
-      <button id="aurumEnterButton">MASUK KE DASHBOARD</button>
-      
+      <div class="splash-stats" aria-label="Fitur AURUM"><div><strong>7</strong><span>TIMEFRAMES</span></div><div><strong>3</strong><span>MARKETS</span></div><div><strong>AI</strong><span>ANALYSIS</span></div></div>
+      <div class="splash-progress" role="progressbar" aria-label="Memuat dashboard AURUM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+      <div class="splash-loading-label">INITIALIZING <strong>0%</strong></div>
+      <section class="aurum-secure-terminal" aria-live="polite" aria-label="Status koneksi AURUM">
+        <div class="aurum-terminal-head"><span>✦ AURUM · SECURE LINK</span><i></i></div>
+        <div class="aurum-terminal-lines">
+          <p><span>&gt; Verifying member</span><b>OK</b></p>
+          <p><span>&gt; Preparing your settings</span><b>OK</b></p>
+          <p><span>&gt; Syncing live prices</span><b>OK</b></p>
+          <p><span>&gt; Loading signals Gold · Bitcoin · Oil</span><b>OK</b></p>
+          <p><span>&gt; Connecting AURUM core <i class="aurum-terminal-cursor"></i></span><b>LIVE</b></p>
+        </div>
+      </section>
+      <div class="splash-welcome-block"><span>WELCOME BACK</span><strong>TRADER</strong></div>
+    </div>
+    <div class="splash-swipe" id="aurumSwipeEnter" role="slider" tabindex="0" aria-label="Geser untuk masuk ke dashboard AURUM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span class="swipe-handle" aria-hidden="true">➜</span><span class="swipe-copy">SWIPE TO POWER UP</span>
     </div>
   </div>
 </div>
@@ -7805,76 +7846,62 @@ console.log('STATUS SERVER DIPERIKSA');
 <!-- AURUM SPLASH SCREEN INTERACTION -->
 <script>
 (function () {
-  const splash = document.getElementById('aurumSplash');
-  const enterButton = document.getElementById('aurumEnterButton');
-  if (!splash || !enterButton) return;
-
-  let splashAlreadySeen = false;
-  try {
-    splashAlreadySeen = localStorage.getItem('aurumSplashSeen') === 'true';
-  } catch (_) {
-    // Private browsing or storage restrictions must not prevent app entry.
+  const splash=document.getElementById('aurumSplash');
+  const track=document.getElementById('aurumSwipeEnter');
+  const handle=track&&track.querySelector('.swipe-handle');
+  const progress=splash&&splash.querySelector('.splash-progress');
+  const label=splash&&splash.querySelector('.splash-loading-label strong');
+  if(!splash||!track||!handle)return;
+  splash.classList.remove('hidden');splash.style.display='flex';
+  let startX=0,dragging=false,offset=0,started=false;
+  const max=()=>Math.max(0,track.clientWidth-handle.offsetWidth-10);
+  function reset(){handle.style.transform='translateX(0)';track.setAttribute('aria-valuenow','0');}
+  function launch(){
+    if(started)return;
+    started=true;
+    splash.classList.add('aurum-loading');
+    track.setAttribute('aria-valuenow','100');
+    const startedAt=performance.now(),duration=250;
+    const tick=now=>{
+      const pct=Math.min(100,Math.round((now-startedAt)/duration*100));
+      if(progress)progress.setAttribute('aria-valuenow',String(pct));
+      if(label)label.textContent=pct+'%';
+      if(pct<100){requestAnimationFrame(tick);return;}
+      splash.classList.add('aurum-terminal-ready');
+      window.setTimeout(()=>{
+        splash.classList.add('hidden');
+        window.setTimeout(()=>{splash.style.display='none';},100);
+      },100);
+    };
+    requestAnimationFrame(tick);
   }
-  if (splashAlreadySeen) {
-    splash.classList.add('hidden');
-    splash.style.display = 'none';
-    return;
-  }
-
-  let startX = 0;
-  let startY = 0;
-  const splashMusic = new Audio('/aurum-splash-music.mp3');
-  splashMusic.preload = 'auto';
-  splashMusic.loop = true;
-  splashMusic.volume = 0.55;
-  splashMusic.setAttribute('playsinline', '');
-
-  function stopSplashMusic() {
-    splashMusic.pause();
-    splashMusic.currentTime = 0;
-  }
-
-  function enterDashboard() {
-    if (splash.classList.contains('hidden')) return;
-    stopSplashMusic();
-    try {
-      localStorage.setItem('aurumSplashSeen', 'true');
-    } catch (_) {
-      // The splash still closes for this visit when persistent storage is unavailable.
-    }
-    splash.classList.add('hidden');
-    setTimeout(function () { splash.style.display = 'none'; }, 750);
-  }
-
-  // Try audible autoplay on opening. If the browser blocks it, unlock
-  // playback on the visitor's first real touch without showing a music button.
-  function startSplashMusic() {
-    if (!splashMusic.paused) return;
-    splashMusic.play().catch(function (error) {
-      console.info('AURUM splash music requires a browser-approved gesture:', error);
-    });
-  }
-  startSplashMusic();
-
-  enterButton.addEventListener('click', enterDashboard);
-  splash.addEventListener('touchstart', function (event) {
-    startSplashMusic();
-    const touch = event.changedTouches[0];
-    startX = touch.clientX;
-    startY = touch.clientY;
-  }, { passive: true });
-  splash.addEventListener('touchend', function (event) {
-    const touch = event.changedTouches[0];
-    if ((touch.clientX - startX) > 70 && Math.abs(touch.clientY - startY) < 100) enterDashboard();
-  }, { passive: true });
-  splash.addEventListener('pointerdown', function (event) {
-    startSplashMusic();
-    startX = event.clientX;
-    startY = event.clientY;
+  track.addEventListener('pointerdown',e=>{
+    if(started)return;
+    dragging=true;startX=e.clientX;
+    const m=handle.style.transform.match(/translateX\(([\d.]+)px\)/);
+    offset=m?Number(m[1]):0;
+    try{track.setPointerCapture(e.pointerId)}catch(_){}
+    e.preventDefault();
   });
-  splash.addEventListener('pointerup', function (event) {
-    if ((event.clientX - startX) > 70 && Math.abs(event.clientY - startY) < 100) enterDashboard();
+  track.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const x=Math.max(0,Math.min(max(),offset+e.clientX-startX));
+    handle.style.transform='translateX('+x+'px)';
+    track.setAttribute('aria-valuenow',String(Math.round(x/Math.max(1,max())*100)));
   });
+  function finish(){
+    if(!dragging)return;
+    dragging=false;
+    const m=handle.style.transform.match(/translateX\(([\d.]+)px\)/),x=m?Number(m[1]):0;
+    if(x>=max()*.72){handle.style.transform='translateX('+max()+'px)';launch();}
+    else reset();
+  }
+  track.addEventListener('pointerup',finish);
+  track.addEventListener('pointercancel',finish);
+  track.addEventListener('keydown',e=>{
+    if(['Enter',' ','ArrowRight'].includes(e.key)){e.preventDefault();launch();}
+  });
+  track.addEventListener('click',e=>{if(!started&&e.detail===0)launch();});
 })();
 </script>
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
