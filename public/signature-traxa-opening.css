@@ -340,3 +340,64 @@
  #signature-traxa-opening .sto-welcome strong,
  #signature-traxa-opening .sto-welcome strong:after{animation:none!important;opacity:1;transform:none;filter:none}
 }
+
+
+/* TRAXA-style RGB glitch name: scrambled multicolor glyphs resolve to REZZA ON */
+#signature-traxa-opening .sto-welcome strong{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:0;
+  white-space:pre;
+  padding:5px 9px 8px;
+  background:none;
+  -webkit-text-fill-color:initial;
+  color:#fff;
+  filter:none;
+  text-shadow:0 0 8px rgba(255,255,255,.45);
+}
+#signature-traxa-opening .sto-welcome strong .sto-char{
+  display:inline-block;
+  min-width:.58em;
+  font-weight:950;
+  background:linear-gradient(180deg,#fff8d5 0%,#ffd85c 38%,#f5a623 70%,#fff1bd 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 7px rgba(255,210,83,.62);
+  animation:stoCharSettle .42s ease-out both;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char:nth-child(4n+1){
+  background:linear-gradient(180deg,#ffb5b5,#ff424d 55%,#a90031);
+  -webkit-background-clip:text;background-clip:text;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char:nth-child(4n+2){
+  background:linear-gradient(180deg,#b9f5ff,#31baff 55%,#2453df);
+  -webkit-background-clip:text;background-clip:text;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char:nth-child(4n+3){
+  background:linear-gradient(180deg,#fff5ad,#ffd32f 55%,#f07819);
+  -webkit-background-clip:text;background-clip:text;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char:nth-child(4n){
+  background:linear-gradient(180deg,#f5d9ff,#b17cff 55%,#5842df);
+  -webkit-background-clip:text;background-clip:text;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char.is-space{min-width:.38em}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char{
+  animation:stoRgbFlicker .12s steps(2,end) infinite;
+  filter:drop-shadow(2px 0 #ff315b) drop-shadow(-2px 0 #20baff);
+}
+#signature-traxa-opening .sto-welcome strong.is-resolved .sto-char{
+  animation:stoCharSettle .55s cubic-bezier(.2,.9,.25,1) both;
+}
+@keyframes stoRgbFlicker{
+  0%{opacity:.55;transform:translate(1px,-1px) skewX(-8deg)}
+  50%{opacity:1;transform:translate(-1px,1px) skewX(6deg)}
+  100%{opacity:.8;transform:translate(0,0)}
+}
+@keyframes stoCharSettle{
+  0%{opacity:0;transform:translateY(8px) scale(1.22);filter:blur(4px)}
+  65%{opacity:1;filter:blur(0)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 8px rgba(255,213,92,.68))}
+}
