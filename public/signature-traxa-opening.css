@@ -627,3 +627,43 @@
     width:46px!important;height:46px!important;
   }
 }
+
+
+/* Stage two: tighten the initializing-to-welcome composition, matching the compact TRAXA layout. */
+#signature-traxa-opening .sto-stage-two .sto-orb{
+  top:11vh!important;
+  width:min(300px,78vw)!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-loading{
+  top:calc(11vh + min(300px,78vw) + 6px)!important;
+  gap:6px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-percent{
+  font-size:clamp(36px,10vw,44px)!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-log{
+  top:calc(11vh + min(300px,78vw) + 76px)!important;
+  width:min(340px,88vw)!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{
+  top:59%!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome{
+  top:62%!important;
+  gap:10px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{
+  font-size:clamp(20px,5.8vw,25px)!important;
+  letter-spacing:3px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{
+  font-size:clamp(54px,16vw,70px)!important;
+  letter-spacing:3px!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-stage-two .sto-orb{top:9vh!important;width:min(250px,70vw)!important}
+  #signature-traxa-opening .sto-stage-two .sto-loading{top:calc(9vh + min(250px,70vw) + 5px)!important}
+  #signature-traxa-opening .sto-stage-two .sto-log{top:calc(9vh + min(250px,70vw) + 68px)!important}
+  #signature-traxa-opening .sto-stage-two .sto-footer-line{top:57%!important}
+  #signature-traxa-opening .sto-stage-two .sto-welcome{top:60%!important}
+}
