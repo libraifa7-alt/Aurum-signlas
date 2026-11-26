@@ -142,7 +142,7 @@
  #signature-traxa-opening .sto-orb{top:clamp(50px,9vh,85px);width:min(210px,58vw)}
  #signature-traxa-opening .sto-brand{top:calc(clamp(50px,9vh,85px) + min(210px,58vw) + 5px)}
  #signature-traxa-opening .sto-markets{bottom:calc(env(safe-area-inset-bottom) + 92px)}
- #signature-traxa-opening .sto-swipe{bottom:calc(env(safe-area-inset-bottom) + 26px)}
+ #signature-traxa-opening .sto-swipe{bottom:calc(env(safe-area-inset-bottom) + 36px)}
  #signature-traxa-opening .sto-stage-two .sto-orb{top:48px;width:min(205px,56vw)}
  #signature-traxa-opening .sto-loading{top:calc(48px + min(205px,56vw) + 7px)}
  #signature-traxa-opening .sto-log{top:calc(48px + min(205px,56vw) + 70px)}
