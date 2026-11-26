@@ -3402,32 +3402,6 @@ body {
   .aurum-live-ticker .ticker-track { animation: none !important; transform: none !important; }
 }
 </style>
-<style id="aurum-traxa-welcome-sequence">
-#aurumBootSequence{position:fixed;inset:0;z-index:100001;display:none;align-items:center;justify-content:center;overflow:hidden;padding:24px 18px;background:radial-gradient(circle at 50% 30%,rgba(165,119,35,.18),transparent 34%),linear-gradient(145deg,#090a0e,#11131a 55%,#050609);color:#f5e4b2;font-family:Arial,sans-serif;text-align:center}
-#aurumBootSequence.active{display:flex;animation:aurumBootFade .35s ease both}
-#aurumBootSequence:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(224,190,115,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(224,190,115,.08) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,black,transparent 92%)}
-.aurum-boot-inner{position:relative;width:min(100%,440px);display:flex;flex-direction:column;align-items:center}
-.aurum-boot-mark{width:116px;height:116px;border:1px solid rgba(234,202,132,.75);border-radius:50%;display:grid;place-items:center;margin-bottom:22px;box-shadow:0 0 0 10px rgba(222,180,90,.045),0 0 45px rgba(220,177,85,.2);background:radial-gradient(circle at 35% 28%,#fff0bc,#d9aa4c 48%,#49300e 100%);color:#172b4a;font-size:54px;font-weight:900;text-shadow:0 1px 0 #fff}
-.aurum-boot-kicker{font-size:9px;letter-spacing:4px;color:#c7a85f;margin:0 0 8px}
-.aurum-boot-percent{font-size:42px;line-height:1;font-weight:900;letter-spacing:2px;color:#f6d98e;text-shadow:0 0 20px rgba(242,204,117,.35)}
-.aurum-boot-track{width:min(100%,260px);height:5px;margin:14px auto 22px;border-radius:9px;background:#25242a;overflow:hidden}
-.aurum-boot-track span{display:block;width:0;height:100%;background:linear-gradient(90deg,#377bd2,#d5b35c,#e7d18d);box-shadow:0 0 12px #d4b56d;transition:width .12s linear}
-.aurum-boot-terminal{width:100%;padding:16px 15px;border:1px solid rgba(211,177,105,.35);border-radius:15px;background:rgba(17,18,23,.92);box-shadow:0 14px 45px rgba(0,0,0,.35);text-align:left}
-.aurum-boot-terminal-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:10px;border-bottom:1px solid rgba(211,177,105,.18);font-size:8px;letter-spacing:2px;color:#d9bd7e}
-.aurum-boot-terminal-head i{width:6px;height:6px;border-radius:50%;background:#55d8a0;box-shadow:0 0 9px #55d8a0}
-.aurum-boot-line{display:flex;justify-content:space-between;gap:10px;padding:5px 0;color:#d5d3cc;font:10px/1.35 ui-monospace,SFMono-Regular,monospace}
-.aurum-boot-line b{color:#65d7a2;font-weight:700}
-.aurum-boot-line.pending b{color:#d8b968}
-.aurum-boot-welcome{display:none;width:100%;padding:26px 18px 23px;border:1px solid rgba(224,190,115,.42);border-radius:18px;background:linear-gradient(145deg,rgba(31,32,38,.98),rgba(12,14,20,.98));box-shadow:0 16px 48px rgba(0,0,0,.4),0 0 35px rgba(211,174,94,.1)}
-.aurum-boot-welcome.show{display:block;animation:aurumWelcomeIn .65s cubic-bezier(.2,.8,.2,1) both}
-.aurum-boot-welcome small{display:block;color:#c9ad70;font-size:9px;letter-spacing:4px;margin-bottom:12px}
-.aurum-boot-welcome h2{margin:0;color:#f7e7bd;font-size:clamp(25px,7vw,36px);letter-spacing:3px;font-weight:900;text-shadow:0 0 20px rgba(236,202,128,.22)}
-.aurum-boot-welcome strong{display:block;margin-top:10px;color:#e2bd69;font-size:13px;letter-spacing:4px}
-.aurum-boot-welcome p{margin:13px 0 0;color:#aaa7a0;font-size:9px;letter-spacing:2px}
-@keyframes aurumBootFade{from{opacity:0}to{opacity:1}}
-@keyframes aurumWelcomeIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-@media(prefers-reduced-motion:reduce){#aurumBootSequence.active,.aurum-boot-welcome.show{animation:none}}
-</style>
 </head>
   
   
@@ -3494,30 +3468,6 @@ body {
   </div>
 </div>
 <!-- END AURUM PREMIUM SPLASH SCREEN -->
-<section id="aurumBootSequence" aria-live="polite" aria-label="AURUM secure initialization">
-  <div class="aurum-boot-inner">
-    <div class="aurum-boot-mark" aria-hidden="true">A</div>
-    <p class="aurum-boot-kicker">AURUM SECURE NETWORK</p>
-    <div id="aurumBootLoading">
-      <div class="aurum-boot-percent" id="aurumBootPercent">00%</div>
-      <div class="aurum-boot-track"><span id="aurumBootProgress"></span></div>
-      <div class="aurum-boot-terminal">
-        <div class="aurum-boot-terminal-head"><span>✦ AURUM · SECURE LINK</span><i></i></div>
-        <div class="aurum-boot-line" data-boot-line="0"><span>&gt; Verifying member</span><b>WAIT</b></div>
-        <div class="aurum-boot-line" data-boot-line="1"><span>&gt; Preparing your settings</span><b>WAIT</b></div>
-        <div class="aurum-boot-line" data-boot-line="2"><span>&gt; Syncing live markets</span><b>WAIT</b></div>
-        <div class="aurum-boot-line" data-boot-line="3"><span>&gt; Loading Gold · Bitcoin · Oil</span><b>WAIT</b></div>
-        <div class="aurum-boot-line" data-boot-line="4"><span>&gt; Connecting signal engine</span><b>WAIT</b></div>
-      </div>
-    </div>
-    <div class="aurum-boot-welcome" id="aurumBootWelcome">
-      <small>SECURE SESSION ESTABLISHED</small>
-      <h2>WELCOME BACK</h2>
-      <strong>AURUM TRADER</strong>
-      <p>YOUR INTELLIGENT MARKET ANALYSIS IS READY</p>
-    </div>
-  </div>
-</section>
 
 <header>
 
@@ -7857,19 +7807,22 @@ console.log('STATUS SERVER DIPERIKSA');
 (function () {
   const splash = document.getElementById('aurumSplash');
   const enterButton = document.getElementById('aurumEnterButton');
-  const boot = document.getElementById('aurumBootSequence');
-  if (!splash || !enterButton || !boot) return;
+  if (!splash || !enterButton) return;
 
-  let alreadySeen = false;
-  try { alreadySeen = localStorage.getItem('aurumSplashSeenV2') === 'true'; } catch (_) {}
-  if (alreadySeen) {
+  let splashAlreadySeen = false;
+  try {
+    splashAlreadySeen = localStorage.getItem('aurumSplashSeen') === 'true';
+  } catch (_) {
+    // Private browsing or storage restrictions must not prevent app entry.
+  }
+  if (splashAlreadySeen) {
     splash.classList.add('hidden');
     splash.style.display = 'none';
-    boot.style.display = 'none';
     return;
   }
 
-  let startX = 0, startY = 0, transitionStarted = false;
+  let startX = 0;
+  let startY = 0;
   const splashMusic = new Audio('/aurum-splash-music.mp3');
   splashMusic.preload = 'auto';
   splashMusic.loop = true;
@@ -7880,78 +7833,47 @@ console.log('STATUS SERVER DIPERIKSA');
     splashMusic.pause();
     splashMusic.currentTime = 0;
   }
+
+  function enterDashboard() {
+    if (splash.classList.contains('hidden')) return;
+    stopSplashMusic();
+    try {
+      localStorage.setItem('aurumSplashSeen', 'true');
+    } catch (_) {
+      // The splash still closes for this visit when persistent storage is unavailable.
+    }
+    splash.classList.add('hidden');
+    setTimeout(function () { splash.style.display = 'none'; }, 750);
+  }
+
+  // Try audible autoplay on opening. If the browser blocks it, unlock
+  // playback on the visitor's first real touch without showing a music button.
   function startSplashMusic() {
     if (!splashMusic.paused) return;
     splashMusic.play().catch(function (error) {
       console.info('AURUM splash music requires a browser-approved gesture:', error);
     });
   }
-  function finishAndEnter() {
-    try { localStorage.setItem('aurumSplashSeenV2', 'true'); } catch (_) {}
-    boot.classList.remove('active');
-    splash.classList.add('hidden');
-    window.setTimeout(function () {
-      splash.style.display = 'none';
-      boot.style.display = 'none';
-    }, 750);
-  }
-  function beginInitialization() {
-    if (transitionStarted) return;
-    transitionStarted = true;
-    stopSplashMusic();
-    boot.classList.add('active');
-    splash.classList.add('hidden');
-
-    const percent = document.getElementById('aurumBootPercent');
-    const bar = document.getElementById('aurumBootProgress');
-    const loading = document.getElementById('aurumBootLoading');
-    const welcome = document.getElementById('aurumBootWelcome');
-    const lines = Array.from(boot.querySelectorAll('[data-boot-line]'));
-    let value = 0;
-    const duration = 3600;
-    const startedAt = performance.now();
-
-    function tick(now) {
-      value = Math.min(100, Math.round(((now - startedAt) / duration) * 100));
-      if (percent) percent.textContent = String(value).padStart(2, '0') + '%';
-      if (bar) bar.style.width = value + '%';
-      const activeCount = Math.min(lines.length, Math.floor(value / 20) + (value > 0 ? 1 : 0));
-      lines.forEach(function (line, index) {
-        const status = line.querySelector('b');
-        if (!status) return;
-        status.textContent = index < activeCount ? 'OK' : 'WAIT';
-        line.classList.toggle('pending', index >= activeCount);
-      });
-      if (value < 100) {
-        window.requestAnimationFrame(tick);
-      } else {
-        window.setTimeout(function () {
-          if (loading) loading.style.display = 'none';
-          if (welcome) welcome.classList.add('show');
-          window.setTimeout(finishAndEnter, 2100);
-        }, 450);
-      }
-    }
-    window.requestAnimationFrame(tick);
-  }
-
   startSplashMusic();
-  enterButton.addEventListener('click', beginInitialization);
+
+  enterButton.addEventListener('click', enterDashboard);
   splash.addEventListener('touchstart', function (event) {
     startSplashMusic();
     const touch = event.changedTouches[0];
-    startX = touch.clientX; startY = touch.clientY;
+    startX = touch.clientX;
+    startY = touch.clientY;
   }, { passive: true });
   splash.addEventListener('touchend', function (event) {
     const touch = event.changedTouches[0];
-    if ((touch.clientX - startX) > 70 && Math.abs(touch.clientY - startY) < 100) beginInitialization();
+    if ((touch.clientX - startX) > 70 && Math.abs(touch.clientY - startY) < 100) enterDashboard();
   }, { passive: true });
   splash.addEventListener('pointerdown', function (event) {
     startSplashMusic();
-    startX = event.clientX; startY = event.clientY;
+    startX = event.clientX;
+    startY = event.clientY;
   });
   splash.addEventListener('pointerup', function (event) {
-    if ((event.clientX - startX) > 70 && Math.abs(event.clientY - startY) < 100) beginInitialization();
+    if ((event.clientX - startX) > 70 && Math.abs(event.clientY - startY) < 100) enterDashboard();
   });
 })();
 </script>
