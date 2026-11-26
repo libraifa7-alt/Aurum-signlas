@@ -411,6 +411,7 @@ body {
 }
 
 .aurum-splash.hidden {
+  display: none !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -7860,15 +7861,8 @@ console.log('STATUS SERVER DIPERIKSA');
   const boot = document.getElementById('aurumBootSequence');
   if (!splash || !enterButton || !boot) return;
 
-  let alreadySeen = false;
-  try { alreadySeen = localStorage.getItem('aurumSplashSeenV2') === 'true'; } catch (_) {}
-  if (alreadySeen) {
-    splash.classList.add('hidden');
-    splash.style.display = 'none';
-    boot.style.display = 'none';
-    return;
-  }
-
+  // Show the intro on every fresh page visit. Do not persist an "already seen"
+  // flag: that previously caused the intro/dashboard flow to become inconsistent.
   let startX = 0, startY = 0, transitionStarted = false;
   const splashMusic = new Audio('/aurum-splash-music.mp3');
   splashMusic.preload = 'auto';
@@ -7887,12 +7881,23 @@ console.log('STATUS SERVER DIPERIKSA');
     });
   }
   function finishAndEnter() {
-    try { localStorage.setItem('aurumSplashSeenV2', 'true'); } catch (_) {}
     boot.classList.remove('active');
     splash.classList.add('hidden');
     window.setTimeout(function () {
       splash.style.display = 'none';
       boot.style.display = 'none';
+      // Always land on the real dashboard home after the welcome sequence.
+      try {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      } catch (_) {}
+      if (typeof window.aurumShowPage === 'function') {
+        window.aurumShowPage('homePage', false);
+      } else {
+        document.querySelectorAll('.app-page').forEach(function (page) {
+          page.classList.toggle('active', page.id === 'homePage');
+        });
+      }
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }, 750);
   }
   function beginInitialization() {
