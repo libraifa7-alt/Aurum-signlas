@@ -4369,14 +4369,23 @@ html,body{min-height:100%;}
   padding:0!important;margin:0!important;display:block!important}
 #aurumSplash .splash-content>*:not(#aurumSwipeEnter){display:none!important}
 #aurumSplash #aurumSwipeEnter{
+  display:block!important;pointer-events:auto!important;
   position:absolute!important;left:10%!important;right:10%!important;bottom:10.5%!important;
   width:80%!important;height:8.8%!important;min-height:0!important;
   margin:0!important;padding:0!important;border:0!important;border-radius:999px!important;
   background:transparent!important;box-shadow:none!important;opacity:1!important;
-  touch-action:pan-y!important;cursor:grab!important;z-index:2!important
+  touch-action:pan-y!important;cursor:grab!important;z-index:20!important
 }
-#aurumSplash #aurumSwipeEnter .swipe-handle,
-#aurumSplash #aurumSwipeEnter .swipe-copy{opacity:0!important;visibility:hidden!important}
+#aurumSplash #aurumSwipeEnter .swipe-handle{
+  display:grid!important;visibility:visible!important;opacity:1!important;
+  position:absolute!important;left:34px!important;top:21px!important;
+  width:76px!important;height:76px!important;border-radius:50%!important;
+  background:rgba(255,203,76,.92)!important;color:#241600!important;
+  border:3px solid #fff0ad!important;box-shadow:0 0 18px rgba(255,190,45,.9),inset 0 0 8px #fff!important;
+  font-size:40px!important;line-height:1!important;z-index:21!important;
+  animation:swipeNudge 1.7s ease-in-out infinite!important
+}
+#aurumSplash #aurumSwipeEnter .swipe-copy{opacity:0!important;visibility:hidden!important;display:none!important}
 @media(max-aspect-ratio:9/16){
  #aurumSplash.aurum-splash{background-size:auto 100%!important}
 }
