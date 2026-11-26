@@ -2549,6 +2549,44 @@ body {
 .aurum-strength-notes small{font-size:10px;line-height:1.5;color:#7c8797}
 @media(max-width:380px){.aurum-strength-gauge{width:94px;height:94px;flex-basis:94px}.aurum-strength-gauge strong{font-size:19px}}
 
+
+/* AURUM SIGNATURE INTRO — TRAXA-inspired orbital sequence, bright edition */
+#aurumSplash.aurum-splash{align-items:center!important;justify-content:center!important;overflow:hidden!important;color:#183b66!important;background:radial-gradient(ellipse at 50% 42%,rgba(255,255,255,.98) 0%,rgba(255,255,255,.96) 27%,rgba(244,248,253,.97) 62%,#edf2f8 100%)!important}
+#aurumSplash .splash-content{min-height:100dvh!important;height:100dvh!important;max-width:520px!important;width:100%!important;padding:max(18px,env(safe-area-inset-top)) 22px max(20px,env(safe-area-inset-bottom))!important;justify-content:center!important;gap:0!important}
+#aurumSplash .splash-live-pill{position:absolute;top:max(18px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);color:#54708e!important;background:rgba(255,255,255,.82)!important;border:1px solid rgba(197,157,75,.25)!important;box-shadow:0 5px 18px rgba(45,78,118,.07)}
+#aurumSplash .aurum-network-globe{width:min(270px,68vw)!important;height:min(270px,68vw)!important;margin:0 auto 2px!important;flex-shrink:0;border-radius:50%;background:radial-gradient(circle,#fff9e8 0%,rgba(255,255,255,.95) 34%,rgba(225,238,250,.4) 62%,transparent 73%)!important;box-shadow:0 0 35px rgba(211,169,82,.20),0 0 90px rgba(54,137,206,.10)!important}
+#aurumSplash .aurum-network-globe:before,#aurumSplash .aurum-network-globe:after{content:"";position:absolute;inset:4%;border-radius:50%;pointer-events:none;border:1px solid rgba(191,151,67,.54);box-shadow:0 0 14px rgba(205,164,78,.16),inset 0 0 18px rgba(60,139,205,.08)}
+#aurumSplash .aurum-network-globe:before{inset:0;border-style:dashed;animation:aurumOrbitSpin 22s linear infinite}
+#aurumSplash .aurum-network-globe:after{inset:12%;border-color:rgba(46,137,207,.45);transform:rotateX(66deg) rotate(-28deg);animation:aurumOrbitTilt 12s linear infinite}
+#aurumSplash .network-globe-svg{filter:drop-shadow(0 2px 8px rgba(46,137,207,.12))}
+#aurumSplash .globe-outline,#aurumSplash .globe-lat,#aurumSplash .globe-lon{stroke:rgba(183,143,61,.52)!important;stroke-width:1.2!important;fill:none}
+#aurumSplash .globe-link{stroke:rgba(49,135,204,.48)!important;stroke-width:1.1!important;fill:none}
+#aurumSplash .globe-dots circle{fill:#d2a94e!important}
+#aurumSplash .orb-core{background:radial-gradient(circle at 35% 28%,#fffdf4 0%,#f0d58c 27%,#c99b3e 58%,#8b6728 100%)!important;border:1px solid rgba(255,255,255,.9);box-shadow:0 0 22px rgba(215,174,86,.58),0 0 58px rgba(64,142,207,.20),inset -8px -8px 18px rgba(112,81,24,.16)!important}
+#aurumSplash .aurum-core-mark{color:#fff!important;text-shadow:0 2px 10px rgba(33,76,121,.48)!important}
+#aurumSplash .orb-particle{background:#2e91d5!important;box-shadow:0 0 10px 3px rgba(46,145,213,.3)!important}
+#aurumSplash .splash-brand-block{margin:4px 0 0!important;animation:aurumIntroReveal .9s 2.2s both!important}
+#aurumSplash .splash-brand-block h1{margin:0!important;color:#173f70!important;font-size:clamp(29px,8vw,38px)!important;letter-spacing:7px!important;text-shadow:0 2px 0 #fff,0 8px 22px rgba(40,104,166,.13)!important}
+#aurumSplash .splash-brand-block h2{margin:5px 0 0!important;color:#b78b36!important;font-size:13px!important;letter-spacing:7px!important}
+#aurumSplash .splash-subtitle{display:block!important;margin:10px 0 0!important;color:#75869b!important;font-size:8px!important;letter-spacing:2.5px!important}
+#aurumSplash .splash-bottom-block{width:100%;margin:clamp(20px,4vh,36px) 0 0!important;display:flex;flex-direction:column;align-items:center}
+#aurumSplash .splash-welcome-block{order:1;display:flex!important;min-width:min(88%,300px)!important;margin:0 0 16px!important;padding:15px 20px!important;background:rgba(255,255,255,.9)!important;border:1px solid rgba(197,157,75,.34)!important;box-shadow:0 9px 28px rgba(42,78,119,.08),inset 0 1px 0 #fff!important;animation:aurumWelcomeCinematic .95s 7.8s both!important}
+#aurumSplash .splash-welcome-block span{color:#77899e!important;letter-spacing:3px!important}
+#aurumSplash .splash-welcome-block strong{color:#174a82!important;font-size:17px!important;letter-spacing:3px!important}
+#aurumSplash .splash-stats{order:0!important;width:min(100%,330px)!important;margin:0 0 18px!important;background:rgba(255,255,255,.9)!important;border:1px solid rgba(56,130,193,.18)!important;box-shadow:0 7px 22px rgba(38,82,127,.07)!important;animation:aurumIntroReveal .8s 5.1s both!important}
+#aurumSplash .splash-stats strong{color:#b78b36!important}
+#aurumSplash .splash-stats span{color:#62758c!important}
+#aurumSplash .splash-swipe{display:none!important}
+#aurumSplash .splash-hint{order:2;margin:0 0 10px!important;color:#7c8da1!important;font-size:9px!important;animation:aurumIntroReveal .7s 8.7s both!important}
+#aurumSplash #aurumEnterButton{order:3;display:inline-flex!important;align-items:center;justify-content:center;min-width:205px!important;margin:0!important;padding:14px 26px!important;border:1px solid #b8d3ed!important;border-radius:28px!important;color:#fff!important;background:linear-gradient(110deg,#247fca,#174c89)!important;box-shadow:0 8px 22px rgba(35,105,177,.22)!important;font-size:10px!important;letter-spacing:1.5px!important;opacity:0;animation:aurumIntroReveal .75s 9.3s both!important}
+#aurumSplash #aurumEnterButton:disabled{opacity:.45!important;filter:grayscale(.3)}
+#aurumSplash .splash-progress{order:4;display:block!important;width:min(260px,72vw)!important;height:4px!important;margin:18px auto 0!important;border-radius:8px!important;overflow:hidden;background:#dce7f2!important}
+#aurumSplash .splash-progress span{display:block;width:100%;height:100%;border-radius:8px;background:linear-gradient(90deg,#248bd4,#d5aa4d,#248bd4)!important;transform:scaleX(0);transform-origin:left;animation:aurumIntroProgress 12s linear forwards!important}
+@keyframes aurumOrbitSpin{to{transform:rotate(360deg)}}
+@keyframes aurumOrbitTilt{to{transform:rotateX(66deg) rotate(332deg)}}
+@keyframes aurumWelcomeCinematic{from{opacity:0;transform:translateY(20px) scale(.96);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@media(max-height:700px){#aurumSplash .aurum-network-globe{width:min(205px,54vw)!important;height:min(205px,54vw)!important}#aurumSplash .splash-bottom-block{margin-top:12px!important}#aurumSplash .splash-stats{margin-bottom:10px!important}#aurumSplash .splash-welcome-block{margin-bottom:9px!important;padding:10px 16px!important}#aurumSplash .splash-progress{margin-top:10px!important}}
+@media(prefers-reduced-motion:reduce){#aurumSplash .aurum-network-globe:before,#aurumSplash .aurum-network-globe:after{animation:none!important}#aurumSplash .splash-brand-block,#aurumSplash .splash-welcome-block,#aurumSplash .splash-stats,#aurumSplash .splash-hint,#aurumSplash #aurumEnterButton{animation:none!important;opacity:1!important;filter:none!important;transform:none!important}#aurumSplash .splash-progress span{animation:none!important;transform:scaleX(1)!important}}
 </style>
 
 <style id="aurum-traxa-signal-feed-parity">
@@ -4146,7 +4184,7 @@ body {
         <span class="swipe-handle">➜</span><span class="swipe-copy">SWIPE TO ENTER</span>
       </div>
       <p class="splash-hint">Animasi pembuka · Dashboard siap dalam beberapa detik</p>
-      <button id="aurumEnterButton">LEWATI INTRO</button>
+      <button id="aurumEnterButton" type="button">MASUK KE DASHBOARD</button>
       <div class="splash-progress" role="progressbar" aria-label="Intro menuju dashboard"><span></span></div>
       
     </div>
@@ -8530,67 +8568,21 @@ console.log('STATUS SERVER DIPERIKSA');
   const splash = document.getElementById('aurumSplash');
   const enterButton = document.getElementById('aurumEnterButton');
   if (!splash || !enterButton) return;
-
-  // Always show the welcome intro on a fresh page load; never skip it
-  // because of a previously saved localStorage flag.
   splash.classList.remove('hidden');
   splash.style.display = 'flex';
-  let hasEntered = false;
-  let startX = 0;
-  let startY = 0;
-  let introTimer = null;
-
-  const splashMusic = new Audio('/aurum-splash-music.mp3');
-  splashMusic.preload = 'none';
-  splashMusic.loop = true;
-  splashMusic.volume = 0.35;
-  splashMusic.setAttribute('playsinline', '');
-
-  function stopSplashMusic() {
-    splashMusic.pause();
-    try { splashMusic.currentTime = 0; } catch (_) {}
-  }
-
+  enterButton.disabled = true;
   function enterDashboard() {
-    if (hasEntered || splash.classList.contains('hidden')) return;
-    hasEntered = true;
-    if (introTimer) clearTimeout(introTimer);
-    stopSplashMusic();
+    if (enterButton.disabled || splash.classList.contains('hidden')) return;
     splash.classList.add('hidden');
-    window.setTimeout(function () {
-      splash.style.display = 'none';
-    }, 750);
+    window.setTimeout(function () { splash.style.display = 'none'; }, 750);
   }
-
-  // Audio is optional and only starts after a user gesture, avoiding
-  // browser autoplay interruptions during the intro.
-  function startSplashMusic() {
-    if (!splashMusic.paused) return;
-    splashMusic.play().catch(function () {});
-  }
-
   enterButton.addEventListener('click', enterDashboard);
-  splash.addEventListener('touchstart', function (event) {
-    const touch = event.changedTouches[0];
-    startX = touch.clientX;
-    startY = touch.clientY;
-    startSplashMusic();
-  }, { passive: true });
-  splash.addEventListener('touchend', function (event) {
-    const touch = event.changedTouches[0];
-    if ((touch.clientX - startX) > 70 && Math.abs(touch.clientY - startY) < 100) enterDashboard();
-  }, { passive: true });
-  splash.addEventListener('pointerdown', function (event) {
-    startX = event.clientX;
-    startY = event.clientY;
-    startSplashMusic();
-  });
-  splash.addEventListener('pointerup', function (event) {
-    if ((event.clientX - startX) > 70 && Math.abs(event.clientY - startY) < 100) enterDashboard();
-  });
-
-  // Let the complete logo/orbit/welcome sequence play before opening the dashboard.
-  introTimer = window.setTimeout(enterDashboard, 6200);
+  // No automatic redirect: wait for the user to choose when to enter.
+  window.setTimeout(function () {
+    enterButton.disabled = false;
+    const hint = splash.querySelector('.splash-hint');
+    if (hint) hint.textContent = 'AURUM SIAP · SENTUH UNTUK MASUK';
+  }, 10000);
 })();
 </script>
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
