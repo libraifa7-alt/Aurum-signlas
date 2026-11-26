@@ -245,3 +245,23 @@
  #signature-traxa-opening .sto-footer-line{top:78%}
  #signature-traxa-opening .sto-welcome{top:81%}
 }
+
+
+/* Match the reference video's glowing, widely tracked member-name reveal */
+#signature-traxa-opening .sto-welcome{gap:9px}
+#signature-traxa-opening .sto-welcome span{
+  font-size:clamp(11px,3vw,14px);letter-spacing:2.6px;font-weight:800;
+  color:#f4f0e7;text-shadow:0 0 8px rgba(255,244,220,.18);
+}
+#signature-traxa-opening .sto-welcome strong{
+  display:block;text-transform:uppercase;font-weight:800;
+  font-size:clamp(27px,8vw,36px);letter-spacing:7px;line-height:1.2;
+  color:#ffe49a;
+  text-shadow:0 0 5px rgba(255,229,157,.95),0 0 15px rgba(239,190,84,.8),0 0 28px rgba(224,167,61,.48);
+  animation:stoNameReveal 1.15s 8s cubic-bezier(.16,.84,.24,1) both;
+}
+@keyframes stoNameReveal{
+  0%{opacity:0;transform:translateY(12px) scale(.96);filter:blur(7px);letter-spacing:13px}
+  65%{opacity:1;filter:blur(0);letter-spacing:5px}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);letter-spacing:7px}
+}
