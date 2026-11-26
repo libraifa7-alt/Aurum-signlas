@@ -442,3 +442,18 @@
   55%{opacity:1;transform:translateY(-2px) scale(1.06);filter:blur(0) brightness(1.5)}
   100%{opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 7px rgba(255,220,130,.72))}
 }
+
+
+/* Increase REZZA ON to a bold headline scale while keeping it centered on mobile */
+#signature-traxa-opening .sto-welcome strong{
+  font-size:clamp(48px,14vw,68px)!important;
+  letter-spacing:4px!important;
+  line-height:1.08;
+  padding:3px 6px 8px;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-welcome strong{
+    font-size:clamp(44px,12.5vw,60px)!important;
+    letter-spacing:3px!important;
+  }
+}
