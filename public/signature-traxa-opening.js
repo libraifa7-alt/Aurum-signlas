@@ -23,6 +23,44 @@
         '<div class="sto-footer-line"></div><div class="sto-welcome"><span>WELCOME BACK</span><strong>REZZA ON</strong></div>'+
       '</section>';
     document.body.appendChild(root);
+    // Recreate the reference TRAXA sequence: colorful scrambled glyphs lock into the member name.
+    var memberName=root.querySelector('.sto-welcome strong');
+    if(memberName){
+      var finalName='REZZA ON';
+      var glyphs='RZEXAON$%#&@!?=<>0123456789';
+      memberName.setAttribute('aria-label',finalName);
+      memberName.innerHTML='';
+      for(var ci=0;ci<finalName.length;ci++){
+        var ch=document.createElement('span');
+        ch.className='sto-char'+(finalName[ci]===' '?' is-space':'');
+        ch.setAttribute('aria-hidden','true');
+        ch.textContent=finalName[ci]===' '?' ':glyphs[Math.floor(Math.random()*glyphs.length)];
+        memberName.appendChild(ch);
+      }
+      setTimeout(function(){
+        var chars=Array.prototype.slice.call(memberName.querySelectorAll('.sto-char'));
+        var started=performance.now(),scrambleDuration=1850;
+        memberName.classList.add('is-glitching');
+        function scramble(now){
+          var p=Math.min(1,(now-started)/scrambleDuration);
+          chars.forEach(function(node,index){
+            var lockAt=(index+1)/(chars.length+1);
+            if(p>=lockAt){
+              node.textContent=finalName[index]===' '?' ':finalName[index];
+            }else if(Math.random()>.16){
+              node.textContent=finalName[index]===' '?' ':glyphs[Math.floor(Math.random()*glyphs.length)];
+            }
+          });
+          if(p<1){requestAnimationFrame(scramble);}
+          else{
+            chars.forEach(function(node,index){node.textContent=finalName[index]===' '?' ':finalName[index];});
+            memberName.classList.remove('is-glitching');
+            memberName.classList.add('is-resolved');
+          }
+        }
+        requestAnimationFrame(scramble);
+      },7900);
+    }
     var bar=root.querySelector('.sto-swipe');
     var handle=root.querySelector('.sto-handle');
     var pct=root.querySelector('.sto-percent span');
