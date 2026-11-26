@@ -4160,6 +4160,57 @@ body {
 }
 </style>
 
+<style id="aurum-swipe-entry-final-layout">
+/* Bright, large orbital globe placed immediately above the bottom swipe control. */
+#aurumSplash .splash-content{
+  justify-content:flex-end!important;
+  gap:clamp(9px,1.7vh,16px)!important;
+  padding: max(18px,env(safe-area-inset-top)) 18px max(22px,env(safe-area-inset-bottom))!important;
+}
+#aurumSplash .splash-bottom-block{display:contents!important}
+#aurumSplash .splash-stats{order:1!important;width:min(100%,330px)!important;margin:0 auto!important}
+#aurumSplash .splash-welcome-block{order:2!important;min-width:min(88%,300px)!important;margin:0 auto!important;padding:10px 18px!important}
+#aurumSplash .splash-progress{display:none!important}
+#aurumSplash .aurum-network-globe{
+  order:3!important;
+  width:min(350px,90vw)!important;height:min(350px,90vw)!important;
+  max-width:350px!important;max-height:350px!important;
+  margin:0 auto!important;flex:0 0 auto!important;
+}
+#aurumSplash .aurum-network-globe .orb-core{
+  width:94px!important;height:94px!important;
+  top:calc(50% - 47px)!important;left:calc(50% - 47px)!important;
+}
+#aurumSplash .aurum-core-mark{font-size:59px!important}
+#aurumSplash .splash-swipe{
+  order:4!important;position:relative!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  width:min(100%,330px)!important;height:54px!important;min-height:54px!important;
+  margin:0 auto!important;padding:0 54px!important;flex:0 0 auto!important;
+  border:1px solid rgba(40,125,202,.34)!important;border-radius:30px!important;
+  background:linear-gradient(180deg,#fff,#edf5ff)!important;
+  box-shadow:inset 0 1px 5px rgba(255,255,255,.95),0 8px 22px rgba(39,91,150,.12)!important;
+  touch-action:pan-y!important;user-select:none!important;-webkit-user-select:none!important;
+  cursor:grab!important;overflow:hidden!important;
+}
+#aurumSplash .swipe-copy{color:#365d87!important;font-size:9px!important;font-weight:900!important;letter-spacing:2.5px!important;white-space:nowrap!important;pointer-events:none!important}
+#aurumSplash .swipe-handle{
+  position:absolute!important;left:5px!important;top:5px!important;
+  width:42px!important;height:42px!important;display:grid!important;place-items:center!important;
+  border-radius:50%!important;background:radial-gradient(circle at 35% 28%,#fff,#e9c66e 65%,#b8892e)!important;
+  color:#174b8b!important;font-size:23px!important;
+  box-shadow:0 0 0 4px rgba(230,188,91,.14),0 0 18px rgba(65,139,211,.25)!important;
+  animation:swipeNudge 1.7s ease-in-out infinite!important;pointer-events:none!important;
+}
+#aurumSplash .aurum-network-globe .network-globe-svg{width:100%!important;height:100%!important}
+@media(max-height:700px){
+  #aurumSplash .splash-content{gap:7px!important;padding-top:max(12px,env(safe-area-inset-top))!important;padding-bottom:max(14px,env(safe-area-inset-bottom))!important}
+  #aurumSplash .aurum-network-globe{width:min(285px,76vw)!important;height:min(285px,76vw)!important}
+  #aurumSplash .splash-welcome-block{padding:7px 14px!important}
+}
+@media(prefers-reduced-motion:reduce){#aurumSplash .swipe-handle{animation:none!important}}
+</style>
+
 </head>
   
   
@@ -4217,6 +4268,10 @@ body {
       
     </div>
   </div>
+    <div class="splash-swipe" id="aurumSwipeEnter" role="button" tabindex="0" aria-label="Geser untuk masuk ke dashboard">
+      <span class="swipe-copy">SWIPE TO ENTER</span>
+      <span class="swipe-handle" aria-hidden="true">➜</span>
+    </div>
 </div>
 <!-- END AURUM PREMIUM SPLASH SCREEN -->
 
@@ -8594,16 +8649,62 @@ console.log('STATUS SERVER DIPERIKSA');
 <script>
 (function () {
   const splash = document.getElementById('aurumSplash');
-  if (!splash) return;
+  const track = document.getElementById('aurumSwipeEnter');
+  const handle = track && track.querySelector('.swipe-handle');
+  if (!splash || !track || !handle) return;
   splash.classList.remove('hidden');
   splash.style.display = 'flex';
+
+  let pointerStart = 0;
+  let handleStart = 4;
+  let dragging = false;
+
+  function maxTravel() {
+    return Math.max(0, track.clientWidth - handle.offsetWidth - 8);
+  }
+  function resetHandle() {
+    handle.style.transform = 'translateX(0)';
+  }
   function enterDashboard() {
     if (splash.classList.contains('hidden')) return;
     splash.classList.add('hidden');
     window.setTimeout(function () { splash.style.display = 'none'; }, 750);
   }
-  // Intro runs automatically, then opens the dashboard without any swipe or tap.
-  window.setTimeout(enterDashboard, 6400);
+
+  track.addEventListener('pointerdown', function (event) {
+    if (splash.classList.contains('hidden')) return;
+    dragging = true;
+    pointerStart = event.clientX;
+    const match = handle.style.transform.match(/translateX\((-?[\d.]+)px\)/);
+    handleStart = match ? Number(match[1]) + 4 : 4;
+    track.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  track.addEventListener('pointermove', function (event) {
+    if (!dragging) return;
+    const travel = Math.max(0, Math.min(maxTravel(), handleStart - 4 + event.clientX - pointerStart));
+    handle.style.transform = 'translateX(' + travel + 'px)';
+  });
+  function finishSwipe() {
+    if (!dragging) return;
+    dragging = false;
+    const match = handle.style.transform.match(/translateX\(([\d.]+)px\)/);
+    const moved = match ? Number(match[1]) : 0;
+    if (moved >= maxTravel() * 0.72) {
+      handle.style.transform = 'translateX(' + maxTravel() + 'px)';
+      enterDashboard();
+    } else {
+      resetHandle();
+    }
+  }
+  track.addEventListener('pointerup', finishSwipe);
+  track.addEventListener('pointercancel', finishSwipe);
+  track.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      enterDashboard();
+    }
+  });
 })();
 </script>
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
