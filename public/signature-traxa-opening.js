@@ -23,7 +23,7 @@
         '<div class="sto-footer-line"></div><div class="sto-welcome"><span>WELCOME BACK</span><strong>REZZA ON</strong></div>'+
       '</section>';
     document.body.appendChild(root);
-    // Recreate the reference TRAXA sequence: colorful scrambled glyphs lock into the member name.
+    // Reveal REZZA ON visibly, one character at a time after the name appears.
     var memberName=root.querySelector('.sto-welcome strong');
     if(memberName){
       var finalName='REZZA ON';
@@ -37,39 +37,43 @@
         ch.textContent=finalName[ci]===' '?' ':glyphs[Math.floor(Math.random()*glyphs.length)];
         memberName.appendChild(ch);
       }
+      // Wait until WELCOME BACK and the name have visibly appeared.
       setTimeout(function(){
         var chars=Array.prototype.slice.call(memberName.querySelectorAll('.sto-char'));
-        var started=performance.now(),scrambleDuration=2300;
         memberName.classList.add('is-glitching');
-        chars.forEach(function(node,index){
-          node.style.animationDelay=(index*145)+'ms';
-          node.textContent=finalName[index]===' '?' ':glyphs[Math.floor(Math.random()*glyphs.length)];
-        });
-        function scramble(now){
-          var p=Math.min(1,(now-started)/scrambleDuration);
-          chars.forEach(function(node,index){
-            var lockAt=(index+1)/(chars.length+1);
-            if(p>=lockAt){
-              if(!node.classList.contains('is-locked')){
-                node.classList.add('is-locked');
-                node.textContent=finalName[index]===' '?' ':finalName[index];
-              }
-            }else if(Math.random()>.08){
-              node.textContent=finalName[index]===' '?' ':glyphs[Math.floor(Math.random()*glyphs.length)];
-            }
-          });
-          if(p<1){requestAnimationFrame(scramble);}
-          else{
-            chars.forEach(function(node,index){
-              node.textContent=finalName[index]===' '?' ':finalName[index];
-              node.classList.add('is-locked');
-            });
+        var letterIndex=0;
+        function revealNext(){
+          if(letterIndex>=chars.length){
             memberName.classList.remove('is-glitching');
             memberName.classList.add('is-resolved');
+            return;
           }
+          var index=letterIndex++;
+          var node=chars[index];
+          if(finalName[index]===' '){
+            node.textContent=' ';
+            node.classList.add('is-locked');
+            setTimeout(revealNext,360);
+            return;
+          }
+          var started=performance.now();
+          var duration=620;
+          function flicker(now){
+            if(now-started<duration){
+              node.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
+              requestAnimationFrame(flicker);
+            }else{
+              node.textContent=finalName[index];
+              node.classList.add('is-locked');
+              node.classList.remove('is-glitching');
+              setTimeout(revealNext,220);
+            }
+          }
+          node.classList.add('is-glitching');
+          requestAnimationFrame(flicker);
         }
-        requestAnimationFrame(scramble);
-      },4550);
+        revealNext();
+      },8200);
     }
     var bar=root.querySelector('.sto-swipe');
     var handle=root.querySelector('.sto-handle');
