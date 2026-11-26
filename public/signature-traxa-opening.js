@@ -39,7 +39,7 @@
       }
       setTimeout(function(){
         var chars=Array.prototype.slice.call(memberName.querySelectorAll('.sto-char'));
-        var started=performance.now(),scrambleDuration=2650;
+        var started=performance.now(),scrambleDuration=1650;
         memberName.classList.add('is-glitching');
         chars.forEach(function(node,index){
           node.style.animationDelay=(index*35)+'ms';
@@ -69,7 +69,7 @@
           }
         }
         requestAnimationFrame(scramble);
-      },7900);
+      },4550);
     }
     var bar=root.querySelector('.sto-swipe');
     var handle=root.querySelector('.sto-handle');
@@ -83,13 +83,13 @@
     function end(){if(!dragging)return;dragging=false;if(progress<.92)setProgress(0);}
     function enter(){
       if(done)return;done=true;dragging=false;root.classList.add('is-loading');
-      var began=performance.now(),duration=4800;
+      var began=performance.now(),duration=3600;
       function tick(now){
         var p=Math.min(1,(now-began)/duration);
         pct.textContent=String(Math.round(p*100));
         fill.style.width=(p*100)+'%';
         if(p<1){requestAnimationFrame(tick);return;}
-        setTimeout(function(){root.classList.add('is-leaving');setTimeout(function(){root.remove();},800);},5600);
+        setTimeout(function(){root.classList.add('is-leaving');setTimeout(function(){root.remove();},800);},2600);
       }
       requestAnimationFrame(tick);
     }
