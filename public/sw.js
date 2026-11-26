@@ -1,5 +1,5 @@
-const CACHE_NAME = 'aurum-pwa-v3';
-const APP_SHELL = ['/', '/manifest.json'];
+const CACHE_NAME = 'signature-pwa-v4';
+const APP_SHELL = ['/', '/signature.webmanifest'];
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
