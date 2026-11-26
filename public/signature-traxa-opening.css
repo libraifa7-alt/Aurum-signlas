@@ -457,3 +457,29 @@
     letter-spacing:3px!important;
   }
 }
+
+
+/* Larger mobile welcome headline and member name, matching the requested emphasis */
+#signature-traxa-opening .sto-welcome{
+  gap:14px;
+}
+#signature-traxa-opening .sto-welcome span{
+  font-size:clamp(18px,5.5vw,24px)!important;
+  letter-spacing:3.5px!important;
+  line-height:1.2;
+  font-weight:900;
+}
+#signature-traxa-opening .sto-welcome strong{
+  font-size:clamp(52px,17vw,68px)!important;
+  letter-spacing:2px!important;
+  line-height:1.12!important;
+  padding:4px 3px 10px!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-welcome span{
+    font-size:clamp(17px,5vw,22px)!important;
+  }
+  #signature-traxa-opening .sto-welcome strong{
+    font-size:clamp(48px,15.5vw,62px)!important;
+  }
+}
