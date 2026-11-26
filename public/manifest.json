@@ -14,10 +14,10 @@
   "theme_color": "#080d18",
   "icons": [
     {
-      "src": "/aurum-signals-ai-icon.jpg?v=1",
-      "sizes": "128x128",
-      "type": "image/jpeg",
-      "purpose": "any"
+      "src": "/aurum-pwa-icon.svg?v=2",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
   "prefer_related_applications": false
