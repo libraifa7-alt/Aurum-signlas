@@ -667,3 +667,27 @@
   #signature-traxa-opening .sto-stage-two .sto-footer-line{top:57%!important}
   #signature-traxa-opening .sto-stage-two .sto-welcome{top:60%!important}
 }
+
+
+/* Stage two enlarged to the same bold visual scale as the Signature Club opening screen. */
+#signature-traxa-opening .sto-stage-two .sto-orb{top:13vh!important;width:min(390px,84vw)!important;filter:drop-shadow(0 0 34px rgba(218,173,73,.42))!important}
+#signature-traxa-opening .sto-stage-two .sto-orb-core{width:46%!important}
+#signature-traxa-opening .sto-stage-two .sto-loading{top:calc(13vh + min(390px,84vw) + 8px)!important;gap:10px!important}
+#signature-traxa-opening .sto-stage-two .sto-loading-label{font-size:10px!important;letter-spacing:4px!important}
+#signature-traxa-opening .sto-stage-two .sto-percent{font-size:clamp(48px,13vw,62px)!important;line-height:1!important}
+#signature-traxa-opening .sto-stage-two .sto-percent small{font-size:18px!important}
+#signature-traxa-opening .sto-stage-two .sto-progress{width:min(440px,88vw)!important;height:6px!important}
+#signature-traxa-opening .sto-stage-two .sto-log{top:calc(13vh + min(390px,84vw) + 112px)!important;width:min(470px,90vw)!important;padding:15px 17px!important;font-size:clamp(10px,2.7vw,13px)!important;line-height:1.9!important;border-radius:11px!important}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{top:54%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome{top:57%!important;gap:13px!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{font-size:clamp(24px,6.5vw,32px)!important;letter-spacing:4px!important;font-weight:950!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{font-size:clamp(68px,19vw,88px)!important;letter-spacing:4px!important;line-height:1.1!important;padding:5px 8px 12px!important}
+@media(max-height:700px){
+#signature-traxa-opening .sto-stage-two .sto-orb{top:8vh!important;width:min(300px,72vw)!important}
+#signature-traxa-opening .sto-stage-two .sto-loading{top:calc(8vh + min(300px,72vw) + 7px)!important}
+#signature-traxa-opening .sto-stage-two .sto-log{top:calc(8vh + min(300px,72vw) + 100px)!important}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{top:53%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome{top:57%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{font-size:22px!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{font-size:clamp(56px,15vw,72px)!important}
+}
