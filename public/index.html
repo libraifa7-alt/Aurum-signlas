@@ -4354,6 +4354,37 @@ html,body{min-height:100%;}
 @media(max-height:700px){#aurumSplash .aurum-secure-terminal{top:calc(12vh + min(245px,62vw) + 82px)!important;width:min(340px,88vw)!important}}
 @media(prefers-reduced-motion:reduce){#aurumSplash .aurum-terminal-head i,#aurumSplash .aurum-terminal-cursor{animation:none!important}#aurumSplash .aurum-terminal-lines p{opacity:1;animation:none!important}}
 </style>
+
+<style id="signature-photo-splash">
+/* Signature Trading Club opening artwork — splash only */
+#aurumSplash.aurum-splash{
+  position:fixed!important;inset:0!important;z-index:99999!important;
+  width:100vw!important;height:100dvh!important;min-height:100dvh!important;
+  padding:0!important;margin:0!important;overflow:hidden!important;
+  background:#030916 url('/signature-club-splash.webp') center center/100% 100% no-repeat!important;
+}
+#aurumSplash .splash-live-pill{display:none!important}
+#aurumSplash .splash-content{position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;
+  padding:0!important;margin:0!important;display:block!important}
+#aurumSplash .splash-content>*:not(#aurumSwipeEnter){display:none!important}
+#aurumSplash #aurumSwipeEnter{
+  position:absolute!important;left:10%!important;right:10%!important;bottom:10.5%!important;
+  width:80%!important;height:8.8%!important;min-height:0!important;
+  margin:0!important;padding:0!important;border:0!important;border-radius:999px!important;
+  background:transparent!important;box-shadow:none!important;opacity:1!important;
+  touch-action:pan-y!important;cursor:grab!important;z-index:2!important
+}
+#aurumSplash #aurumSwipeEnter .swipe-handle,
+#aurumSplash #aurumSwipeEnter .swipe-copy{opacity:0!important;visibility:hidden!important}
+@media(max-aspect-ratio:9/16){
+ #aurumSplash.aurum-splash{background-size:auto 100%!important}
+}
+@media(min-aspect-ratio:9/16){
+ #aurumSplash.aurum-splash{background-size:100% auto!important;background-color:#030916!important}
+}
+</style>
+
 </head>
   
   
