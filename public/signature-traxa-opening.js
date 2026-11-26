@@ -11,13 +11,13 @@
     root.setAttribute('aria-label','Signature Trading opening screen');
     root.innerHTML=
       '<section class="sto-stage sto-stage-one is-active">'+
-        '<div class="sto-orb" aria-hidden="true"><i class="sto-spark s1"></i><i class="sto-spark s2"></i><i class="sto-spark s3"></i><div class="sto-orb-core"><span class="sto-mark">A</span></div></div>'+
+        '<div class="sto-orb" aria-hidden="true"><i class="sto-spark s1"></i><i class="sto-spark s2"></i><i class="sto-spark s3"></i><div class="sto-orb-core"><span class="sto-mark">S</span></div></div>'+
         '<div class="sto-brand"><strong>AURUM</strong><span>S I G N A L S</span><small>THE FUTURE OF TRADING</small></div>'+
         '<div class="sto-markets"><span>GOLD</span><span>BITCOIN</span><span>WTI OIL</span></div>'+
-        '<div class="sto-swipe" aria-label="Geser untuk masuk"><span class="sto-swipe-label">SLIDE TO POWER UP</span><span class="sto-handle" role="button" aria-label="Geser untuk mulai">›</span></div>'+
+        '<div class="sto-swipe" aria-label="Geser untuk masuk"><span class="sto-swipe-label">SWIPE TO ENTER</span><span class="sto-handle" role="button" aria-label="Geser untuk mulai">›</span></div>'+
       '</section>'+
       '<section class="sto-stage sto-stage-two">'+
-        '<div class="sto-orb" aria-hidden="true"><i class="sto-spark s1"></i><i class="sto-spark s2"></i><i class="sto-spark s3"></i><div class="sto-orb-core"><span class="sto-mark">A</span></div></div>'+
+        '<div class="sto-orb" aria-hidden="true"><i class="sto-spark s1"></i><i class="sto-spark s2"></i><i class="sto-spark s3"></i><div class="sto-orb-core"><span class="sto-mark">S</span></div></div>'+
         '<div class="sto-loading"><span class="sto-loading-label">INITIALIZING</span><div class="sto-percent"><span>0</span><small>%</small></div><div class="sto-progress"><i></i></div></div>'+
         '<div class="sto-log"><div>› Verifying member <b>OK</b></div><div>› Preparing your setup <b>OK</b></div><div>› Syncing live prices <b>OK</b></div><div>› Loading signals &amp; market data <b>OK</b></div><div>› Connecting to your dashboard <b>OK</b></div></div>'+
         '<div class="sto-footer-line"></div><div class="sto-welcome"><span>WELCOME BACK</span><strong>WINENGKU</strong></div>'+
