@@ -3190,6 +3190,80 @@ body {
 </style>
 
 
+<style id="aurum-traxa-tighter-mobile-v2">
+@media screen and (max-width:600px) {
+  body #homePage .aurum-home-hero-v2 {
+    min-height:0!important;
+    height:auto!important;
+    margin:0 -4% 7px!important;
+    padding:9px 8px 8px!important;
+    gap:3px!important;
+  }
+  body #homePage .aurum-home-hero-v2 .aurum-greeting span {
+    font-size:7px!important; letter-spacing:1.5px!important;
+  }
+  body #homePage .aurum-home-hero-v2 .aurum-greeting h1 {
+    font-size:18px!important; line-height:1.08!important; margin:2px 0 0!important;
+  }
+  body #homePage .aurum-home-hero-v2 .aurum-greeting p {
+    font-size:8px!important; margin:0!important; line-height:1.2!important;
+  }
+  body #homePage .aurum-session-clock {
+    width:132px!important; height:132px!important; margin:0 auto!important;
+  }
+  body #homePage .aurum-clock-face {
+    width:120px!important; height:120px!important;
+    box-shadow:0 0 0 4px rgba(255,255,255,.42),0 4px 12px rgba(68,57,36,.07),inset 0 0 10px rgba(190,165,111,.1)!important;
+  }
+  body #homePage .clock-hour { height:27px!important; }
+  body #homePage .clock-minute { height:37px!important; }
+  body #homePage .clock-second { height:43px!important; }
+  body #homePage .clock-center { width:31px!important;height:31px!important;font-size:19px!important; }
+  body #homePage .clock-orbit { width:82px!important;height:30px!important; }
+  body #homePage .aurum-session-note { gap:2px!important;margin-top:0!important; }
+  body #homePage .aurum-session-note strong { font-size:6px!important;letter-spacing:.8px!important; }
+  body #homePage .aurum-session-note span { font-size:7px!important;letter-spacing:1px!important; }
+  body #homePage .aurum-session-note small { font-size:7px!important;line-height:1.2!important; }
+
+  body #homePage .home-section {
+    padding:8px 8px!important;
+    margin-bottom:7px!important;
+    border-radius:14px!important;
+  }
+  body #homePage .home-section-heading { margin-bottom:5px!important; }
+  body #homePage .home-section-heading h3 { font-size:8px!important; }
+  body #homePage .home-market-grid { gap:5px!important; }
+  body #homePage .home-market-card {
+    min-height:82px!important;
+    padding:6px 5px 4px!important;
+    gap:2px!important;
+    border-radius:10px!important;
+  }
+  body #homePage .home-market-card .home-asset-icon {
+    width:20px!important;height:20px!important;min-width:20px!important;
+  }
+  body #homePage .home-market-top { gap:4px!important; }
+  body #homePage .home-market-top strong { font-size:9px!important; }
+  body #homePage .home-market-top small { font-size:6px!important; }
+  body #homePage .home-market-price { font-size:10px!important; }
+  body #homePage .home-market-change { font-size:7px!important;min-height:8px!important; }
+  body #homePage .home-market-updated {
+    display:block!important;white-space:nowrap!important;overflow:hidden!important;
+    text-overflow:ellipsis!important;font-size:6px!important;line-height:1.1!important;
+    min-height:7px!important;margin-top:0!important;
+  }
+  body #homePage .home-market-spark { height:17px!important;margin-top:0!important; }
+  body #homePage .home-menu-grid, body #homePage .home-tools-grid { gap:5px!important; }
+  body #homePage .home-menu-card { min-height:43px!important;padding:5px!important;border-radius:10px!important; }
+  body #homePage .home-menu-icon { width:27px!important;height:27px!important; }
+  body #homePage .home-menu-card strong { font-size:8px!important; }
+  body #homePage .home-menu-card small { font-size:6px!important; }
+  body #homePage .home-community-grid { gap:4px!important; }
+  body #homePage .home-community-grid a { padding:4px 2px!important; }
+  body #homePage .home-community-grid .community-icon { width:34px!important;height:34px!important; }
+  body #homePage .home-community-grid strong { font-size:7px!important; }
+}
+</style>
 <style id="aurum-market-directory-style">
 #aurumMarketDirectory{max-width:560px;margin:0 auto 18px;padding:12px 10px 4px}
 #aurumMarketDirectory h2{margin:0 0 10px 2px;color:#64748b;font-size:13px;font-weight:700;letter-spacing:.1px}
@@ -3302,20 +3376,30 @@ body {
 }
 </style>
 <style id="aurum-mobile-navigation-final">
+/* Final mobile shell overrides: consistent full-width app and safe-area navigation. */
 @media (max-width: 600px) {
-  header, main { width:100% !important; max-width:none !important; }
-  header { margin-left:0 !important; margin-right:0 !important; }
-  main { padding-left:4% !important; padding-right:4% !important; }
+  header, main { width: 100% !important; max-width: 570px !important; }
+  header { margin-left: auto !important; margin-right: auto !important; }
+  main { padding-left: 12px !important; padding-right: 12px !important; }
   .aurum-bottom-nav {
-    position:fixed !important; left:0 !important; right:0 !important; bottom:0 !important;
-    width:100% !important; max-width:none !important; transform:none !important;
-    margin:0 !important; border-radius:16px 16px 0 0 !important;
-    padding:5px 6px calc(5px + env(safe-area-inset-bottom,0px)) !important;
-    min-height:calc(64px + env(safe-area-inset-bottom,0px)) !important; z-index:99999 !important;
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: 0 !important;
+    width: min(100%, 570px) !important;
+    max-width: 570px !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    padding: 5px 6px calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 16px 16px 0 0 !important;
+    z-index: 99999 !important;
   }
-  body { padding-bottom:calc(76px + env(safe-area-inset-bottom,0px)) !important; }
+  body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; }
 }
-@media (prefers-reduced-motion: reduce) { .aurum-live-ticker .ticker-track { animation:none !important; transform:none !important; } }
+@media (prefers-reduced-motion: reduce) {
+  .aurum-live-ticker .ticker-track { animation: none !important; transform: none !important; }
+}
 </style>
 <style id="signature-photo-splash">
 /* Signature Trading Club opening artwork — splash only */
@@ -3355,30 +3439,7 @@ body {
  #aurumSplash.aurum-splash{background-size:100% auto!important;background-color:#030916!important}
 }
 </style>
-<style id="aurum-original-dashboard-restore">
-#homePage .aurum-home-hero{min-height:330px;margin:-10px -4% 22px;padding:28px 18px 24px;justify-content:space-between}
-#homePage .home-section{margin:0 0 13px;padding:14px 12px;border-radius:18px}
-#homePage .home-market-grid{gap:8px}
-#homePage .home-market-card{min-height:0;padding:11px 8px;gap:5px;border-radius:14px;overflow:visible}
-#homePage .home-market-card .home-asset-icon{width:31px;height:31px;min-width:31px}
-#homePage .home-market-card strong{font-size:11px}
-#homePage .home-market-card small{font-size:9px}
-#homePage .home-menu-card{min-height:62px;padding:9px;border-radius:14px}
-#homePage .home-menu-icon,#homePage .community-icon{width:38px;height:38px;box-shadow:0 3px 12px rgba(0,0,0,.08)}
-#homePage .home-community-grid{gap:8px}
-#homePage .home-community-grid a{padding:10px 3px}
-#homePage .home-community-grid .community-icon{width:48px;height:48px}
-#homePage .home-menu-card strong{font-size:11px}
-#homePage .home-menu-card small{font-size:9px}
-@media(max-width:600px){
- #homePage .aurum-home-hero{min-height:325px}
- #homePage .aurum-home-orb{width:165px;height:165px}
- #homePage .home-section{padding:13px 10px}
- #homePage .home-market-card{padding:10px 7px}
- #homePage .home-menu-card{min-height:60px;padding:8px 7px}
- #homePage .home-menu-icon{width:34px;height:34px}
-}
-</style>
+
 </head>
   
   
@@ -3503,87 +3564,99 @@ body {
   <!-- AURUM LIVE MARKET TICKER -->
 <div class="aurum-live-ticker">
   <div class="ticker-track">
-
-    <div class="ticker-item">
+    <div class="ticker-live-mark"><i></i> LIVE</div>
+    <div class="ticker-item ticker-gold">
+      <span class="ticker-coin-logo" aria-label="Gold">Au</span>
       <strong>XAU</strong>
-      <span>GOLD</span>
       <b id="tickerXAU">Memuat...</b>
       <small id="changeXAU">--</small>
     </div>
-
-    <div class="ticker-item">
+    <div class="ticker-item ticker-bitcoin">
+      <span class="ticker-coin-logo" aria-label="Bitcoin">₿</span>
       <strong>BTC</strong>
-      <span>BITCOIN</span>
       <b id="tickerBTC">Memuat...</b>
       <small id="changeBTC">--</small>
     </div>
-
-    <div class="ticker-item">
+    <div class="ticker-item ticker-oil">
+      <span class="ticker-coin-logo" aria-label="WTI Oil">W</span>
       <strong>WTI</strong>
-      <span>OIL</span>
       <b id="tickerWTI">Memuat...</b>
       <small id="changeWTI">--</small>
     </div>
-
   </div>
 </div>
 <!-- END AURUM LIVE MARKET TICKER -->
 
-  <!-- AURUM HERO -->
-  <section class="aurum-home-hero">
+  <!-- AURUM HERO: TRAXA-INSPIRED SESSION CLOCK -->
+  <section class="aurum-home-hero aurum-home-hero-v2">
     <div class="aurum-greeting">
-      <span>✦ WELCOME TO AURUM</span>
-      <h1>Intelligent Trading</h1>
-      <p>ICT Smart Money Concepts · Market Intelligence</p>
+      <span id="aurumGreetingLabel">✦ GOOD EVENING</span>
+      <h1 id="aurumGreetingText">Selamat datang</h1>
+      <p id="aurumHomeClock">--:--</p>
     </div>
 
-    <div class="aurum-home-orb">
-      <div class="home-orb-core">✦</div>
-      <div class="home-orb-ring home-ring-one"></div>
-      <div class="home-orb-ring home-ring-two"></div>
+    <div class="aurum-session-clock" aria-label="Jam sesi pasar">
+      <div class="aurum-clock-face">
+        <span class="clock-mark mark-12">12</span>
+        <span class="clock-mark mark-3">06</span>
+        <span class="clock-mark mark-6">18</span>
+        <span class="clock-mark mark-9">00</span>
+        <span class="clock-hand clock-hour" id="aurumClockHour"></span>
+        <span class="clock-hand clock-minute" id="aurumClockMinute"></span>
+        <span class="clock-hand clock-second" id="aurumClockSecond"></span>
+        <span class="clock-center">✦</span>
+        <span class="clock-orbit orbit-a"></span>
+        <span class="clock-orbit orbit-b"></span>
+      </div>
     </div>
 
-    <div class="aurum-home-caption">
-      <strong>AURUM SIGNALS AI</strong>
-      <span>PRECISION · STRUCTURE · INTELLIGENCE</span>
+    <div class="aurum-session-note">
+      <strong>‹ SWIPE THE GLOBE TO EXPLORE MARKET SESSIONS ›</strong>
+      <span id="aurumMarketSession">MARKET SESSION · LIVE DATA</span>
+      <small>Harga pasar mengikuti pembaruan data AURUM</small>
     </div>
   </section>
+
+
 
   <!-- MARKET CARDS -->
   <section class="home-section">
     <div class="home-section-heading">
       <h3>PASAR</h3>
-      <span class="home-live"><i></i> LIVE MARKET</span>
+      <span class="home-live" id="homeLiveStatus" role="status" aria-live="polite"><i></i> Memeriksa data...</span>
     </div>
 
     <div class="home-market-grid">
-      <a href="#marketPage" class="home-market-card"
-         onclick="window.aurumShowPage?.('marketDirectoryPage');return false;">
-        <span class="home-asset-icon gold-icon">Au</span>
-        <strong>Emas</strong>
-        <small>XAU/USD</small>
-        <span class="home-market-action">Lihat harga →</span>
+      <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
+        <span class="home-market-top"><span class="home-asset-icon gold-icon">Au</span><span><strong>Gold</strong><small>XAU/USD · ● <em id="homeStatusXAU">Memeriksa</em></small></span></span>
+        <b class="home-market-price" id="homePriceXAU">--</b>
+        <small class="home-market-change" id="homeChangeXAU">Memuat data...</small>
+        <small id="homeGoldUpdatedAt" class="home-market-updated" aria-live="polite">Waktu pembaruan: memeriksa...</small>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Gold"><path id="homeSparkXAU" d="M0 21 L180 21"/></svg>
       </a>
-
-      <a href="#marketPage" class="home-market-card"
-         onclick="window.aurumShowPage?.('marketDirectoryPage');return false;">
-        <span class="home-asset-icon bitcoin-icon">₿</span>
-        <strong>Bitcoin</strong>
-        <small>BTC/USD</small>
-        <span class="home-market-action">Lihat harga →</span>
+      <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
+        <span class="home-market-top"><span class="home-asset-icon bitcoin-icon">₿</span><span><strong>Bitcoin</strong><small>BTC/USD · ● <em id="homeStatusBTC">Memeriksa</em></small></span></span>
+        <b class="home-market-price" id="homePriceBTC">--</b>
+        <small class="home-market-change" id="homeChangeBTC">Memuat data...</small>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Bitcoin"><path id="homeSparkBTC" d="M0 21 L180 21"/></svg>
       </a>
-
-      <a href="#marketPage" class="home-market-card"
-         onclick="window.aurumShowPage?.('marketDirectoryPage');return false;">
-        <span class="home-asset-icon oil-icon">◈</span>
-        <strong>Minyak</strong>
-        <small>WTI</small>
-        <span class="home-market-action">Lihat harga →</span>
+      <a href="#marketPage" class="home-market-card" onclick="document.querySelector('.nav-item[data-page=marketDirectoryPage]').click();return false;">
+        <span class="home-market-top"><span class="home-asset-icon oil-icon">◈</span><span><strong>Oil</strong><small>WTI · ● <em id="homeStatusWTI">Memeriksa</em></small></span></span>
+        <b class="home-market-price" id="homePriceWTI">--</b>
+        <small class="home-market-change" id="homeChangeWTI">Memuat data...</small>
+        <svg class="home-market-spark" viewBox="0 0 180 42" preserveAspectRatio="none" aria-label="Grafik mini Oil"><path id="homeSparkWTI" d="M0 21 L180 21"/></svg>
       </a>
     </div>
   </section>
 
-  <!-- TRADING MENU -->
+  <!-- AURUM QUICK ACCESS -->
+<section class="home-section aurum-home-new-section"><div class="home-section-heading"><h3>BARU DI AURUM</h3></div>
+<div class="aurum-home-feature-grid">
+<button type="button" class="aurum-home-feature" onclick="document.querySelector('.nav-item[data-page=guidePage]').click()"><span class="home-menu-icon green-icon aurum-glow-icon">▱</span><span><strong>Kelas</strong><small>Pelajaran dan panduan aplikasi</small></span><em>BARU</em></button>
+<button type="button" class="aurum-home-feature" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.()"><span class="home-menu-icon blue aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Jurnal sinyal paper di perangkat ini</small></span><em>JURNAL</em></button>
+<button type="button" class="aurum-home-feature aurum-home-feature-wide" onclick="window.aurumShowPage?.('partnerPage')"><span class="home-menu-icon amber aurum-glow-icon">♧</span><span><strong>Jadi partner</strong><small>Undang teman dan bagikan AURUM</small></span><em>UNDANG</em></button>
+</div></section>
+<!-- TRADING MENU -->
   <section class="home-section">
     <div class="home-section-heading">
       <h3>TRADING</h3>
@@ -3591,27 +3664,27 @@ body {
 
     <div class="home-menu-grid">
       <a href="#marketPage" class="home-menu-card"
-         onclick="window.aurumShowPage?.('marketDirectoryPage');return false;">
-        <span class="home-menu-icon purple">ϟ</span>
-        <span><strong>Sinyal</strong><small>Setup trading live</small></span>
+         onclick="window.aurumShowPage?.('marketPage');document.querySelector('[data-signal-tab=setup]')?.click();return false;">
+        <span class="home-menu-icon purple aurum-glow-icon">⚡</span>
+        <span><strong>Sinyal</strong><small>Setup pasar terkini</small></span>
       </a>
 
       <a href="#marketPage" class="home-menu-card"
-         onclick="window.aurumShowPage?.('marketDirectoryPage');return false;">
-        <span class="home-menu-icon teal">▥</span>
+         onclick="window.aurumShowPage?.('marketPage');document.querySelector('[data-signal-tab=performance]')?.click();return false;">
+        <span class="home-menu-icon teal aurum-glow-icon">▥</span>
         <span><strong>Performa</strong><small>Hasil dan win rate</small></span>
       </a>
 
       <a href="#marketPage" class="home-menu-card"
-         onclick="window.aurumShowPage?.('marketDirectoryPage');return false;">
-        <span class="home-menu-icon coral">◉</span>
-        <span><strong>Analisis</strong><small>ICT dan Smart Money</small></span>
+         onclick="window.aurumShowPage?.('marketPage');document.querySelector('[data-signal-tab=analysis]')?.click();return false;">
+        <span class="home-menu-icon coral aurum-glow-icon">◉</span>
+        <span><strong>Analisis</strong><small>Level kunci dan rentang</small></span>
       </a>
 
       <a href="#newsPage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=newsPage]').click();return false;">
-        <span class="home-menu-icon blue">▤</span>
-        <span><strong>Berita</strong><small>Market intelligence</small></span>
+        <span class="home-menu-icon blue aurum-glow-icon">▣</span>
+        <span><strong>Berita</strong><small>Berita fundamental</small></span>
       </a>
     </div>
   </section>
@@ -3625,19 +3698,14 @@ body {
     <div class="home-community-grid">
       <a href="#chatPage"
          onclick="document.querySelector('.nav-item[data-page=chatPage]').click();return false;">
-        <span class="community-icon pink">▢</span>
+        <span class="community-icon pink aurum-glow-icon">▱</span>
         <strong>Obrolan</strong>
       </a>
 
-      <a href="#chatPage"
-         onclick="document.querySelector('.nav-item[data-page=chatPage]').click();return false;">
-        <span class="community-icon sky">➤</span>
-        <strong>Telegram</strong>
-      </a>
+      
 
-      <a href="#guidePage"
-         onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
-        <span class="community-icon amber">♧</span>
+      <a href="#partnerPage" onclick="window.aurumShowPage?.('partnerPage');return false;">
+        <span class="community-icon amber aurum-glow-icon">♧</span>
         <strong>Undang teman</strong>
       </a>
     </div>
@@ -3650,23 +3718,23 @@ body {
     </div>
 
     <div class="home-tools-grid">
+      <a href="#announcementsPage" class="home-menu-card" onclick="window.aurumShowPage?.('announcementsPage');return false;">
+        <span class="home-menu-icon amber aurum-glow-icon">▤</span>
+        <span><strong>Pengumuman</strong><small>Informasi dan pembaruan AURUM</small></span>
+      </a>
+
       <a href="#guidePage" class="home-menu-card"
          onclick="document.querySelector('.nav-item[data-page=guidePage]').click();return false;">
-        <span class="home-menu-icon green-icon">▷</span>
-        <span><strong>Panduan</strong><small>Cara kerja AURUM</small></span>
+        <span class="home-menu-icon green-icon aurum-glow-icon">▶</span>
+        <span><strong>Edukasi</strong><small>Pelajaran dan cara memakai AURUM</small></span>
       </a>
 
-      <a href="#newsPage" class="home-menu-card"
-         onclick="document.getElementById('aurumOpenNotifications')?.click();return false;">
-        <span class="home-menu-icon amber">♢</span>
-        <span><strong>Notifikasi</strong><small>Informasi pasar</small></span>
-      </a>
+      <a href="#pnlPage" class="home-menu-card" onclick="window.aurumShowPage?.('pnlPage');window.aurumRenderPnl?.();return false;"><span class="home-menu-icon teal aurum-glow-icon">▤</span><span><strong>P&amp;L Saya</strong><small>Hasil paper tracking AURUM</small></span></a>
+      <a href="#homePage" class="home-menu-card" onclick="document.getElementById('aurumOpenNotifications')?.click();return false;">
+        <span class="home-menu-icon amber aurum-glow-icon">♟</span><span><strong>Notifikasi</strong><small>Atur peringatan yang diterima</small></span></a>
 
-      <a href="#guidePage" class="home-menu-card home-tool-wide"
-         onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
-        <span class="home-menu-icon slate">⚙</span>
-        <span><strong>Pengaturan</strong><small>Preferensi AURUM</small></span>
-      </a>
+      <a href="#homePage" class="home-menu-card home-tool-wide" onclick="document.getElementById('aurumOpenProfile')?.click();return false;">
+        <span class="home-menu-icon slate aurum-glow-icon">⚙</span><span><strong>Pengaturan</strong><small>Tampilan, suara, bahasa, akun</small></span></a>
     </div>
   </section>
 
