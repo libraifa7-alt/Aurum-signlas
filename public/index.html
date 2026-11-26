@@ -2,16 +2,14 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Signature Trading Club</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aurum Signals AI</title>
 <meta name="description" content="Aurum Signals — dashboard analisis Gold, Bitcoin, dan WTI, grafik pasar, sinyal, fundamental, serta edukasi trading.">
 
-<link rel="manifest" href="/signature.webmanifest?rev=20261127-4">
-<link rel="icon" type="image/png" sizes="192x192" href="/signature-trading-icon.png">
-<link rel="shortcut icon" type="image/png" href="/signature-trading-icon.png">
-<link rel="apple-touch-icon" sizes="192x192" href="/signature-trading-icon.png">
-<meta name="theme-color" content="#050d1d">
-<meta name="application-name" content="Signature Trading Club">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="/aurum-icon-192.png">
+<link rel="apple-touch-icon" href="/aurum-icon-192.png">
+<meta name="theme-color" content="#080808">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3442,66 +3440,6 @@ body {
  #aurumSplash.aurum-splash{background-size:100% auto!important;background-color:#030916!important}
 }
 </style>
-
-<style id="signature-traxa-launch-screen">
-#aurumSplash.signature-traxa-launch{position:fixed!important;inset:0!important;z-index:999999!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:100vh!important;min-height:100dvh!important;margin:0!important;padding:0!important;overflow:hidden!important;display:flex!important;align-items:center!important;justify-content:center!important;background:radial-gradient(ellipse at 50% 43%,#17140d 0%,#08090d 43%,#020307 100%)!important;color:#f4d58b!important}
-#aurumSplash.signature-traxa-launch .signature-launch-content{position:relative!important;width:100%!important;height:100%!important;max-width:520px!important;min-height:0!important;padding:env(safe-area-inset-top,12px) 26px max(22px,env(safe-area-inset-bottom))!important;margin:0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important}
-.signature-launch-logo{position:absolute;left:50%;top:42%;width:174px;height:174px;transform:translate(-50%,-50%);display:grid;place-items:center}
-.signature-launch-logo img{position:relative;width:112px;height:112px;object-fit:contain;border-radius:22px;z-index:3;filter:drop-shadow(0 0 18px rgba(223,174,71,.35))}
-.signature-launch-orbit{position:absolute;inset:0;border:1px solid rgba(222,177,82,.3);border-radius:50%;box-shadow:0 0 18px rgba(207,158,58,.08),inset 0 0 18px rgba(207,158,58,.05)}
-.signature-launch-orbit.orbit-a{transform:scale(1);border-style:dashed;animation:signatureOrbit 18s linear infinite}
-.signature-launch-orbit.orbit-b{inset:15px;transform:rotateX(68deg) rotate(-25deg);border-color:rgba(241,205,123,.52);animation:signatureOrbit 11s linear infinite reverse}
-.signature-launch-orbit.orbit-c{inset:-14px;transform:rotateX(70deg) rotate(35deg);border-color:rgba(76,133,255,.26);animation:signatureOrbit 22s linear infinite}
-.signature-launch-glint{position:absolute;top:15px;right:24px;width:6px;height:6px;border-radius:50%;background:#ffe6a2;box-shadow:0 0 12px 4px #d9a441;animation:signatureGlint 2.4s ease-in-out infinite}
-@keyframes signatureOrbit{to{rotate:360deg}}
-@keyframes signatureGlint{0%,100%{opacity:.35;transform:scale(.7)}50%{opacity:1;transform:scale(1.6)}}
-.signature-launch-brand{position:absolute;top:57%;left:0;width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;text-shadow:0 0 18px rgba(220,174,82,.22)}
-.signature-launch-brand strong{font-size:22px;letter-spacing:5px;color:#f5d78f;font-weight:800}
-.signature-launch-brand span{margin-top:4px;font-size:11px;letter-spacing:6px;color:#f4f1e9;font-weight:700}
-.signature-launch-brand small{margin-top:12px;font-size:8px;letter-spacing:2.4px;color:#b99a5b}
-.signature-launch-bottom{position:absolute;left:26px;right:26px;bottom:112px;display:flex;flex-direction:column;align-items:center}
-.signature-launch-stats{width:min(100%,330px);display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(20,19,17,.72);box-shadow:0 0 22px rgba(197,150,55,.08)}
-.signature-launch-stats div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 3px}
-.signature-launch-stats div+div{border-left:1px solid rgba(255,255,255,.1)}
-.signature-launch-stats strong{font-size:18px;line-height:1;color:#e8c36e}
-.signature-launch-stats span{font-size:7px;letter-spacing:.6px;color:#aaa29a;font-weight:700}
-#aurumSplash.signature-traxa-launch .splash-progress{width:min(100%,330px);height:3px;margin-top:16px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
-#aurumSplash.signature-traxa-launch .splash-progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#997022,#ffe5a0);box-shadow:0 0 10px #d7a84c}
-#aurumSplash.signature-traxa-launch .splash-loading-label{margin-top:7px;color:#9c8a65;font-size:7px;letter-spacing:2px}
-.signature-launch-welcome{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:16px}
-.signature-launch-welcome span{font-size:8px;letter-spacing:3px;color:#a9946a}
-.signature-launch-welcome strong{font-size:12px;letter-spacing:4px;color:#f0d38d}
-#aurumSplash.signature-traxa-launch .signature-launch-swipe{position:absolute!important;left:12%!important;right:12%!important;bottom:34px!important;width:76%!important;height:48px!important;min-height:48px!important;margin:0!important;padding:0 12px 0 54px!important;display:flex!important;align-items:center!important;justify-content:center!important;border:1px solid rgba(220,174,82,.55)!important;border-radius:28px!important;background:linear-gradient(180deg,rgba(30,27,20,.96),rgba(8,8,9,.98))!important;box-shadow:0 0 22px rgba(205,158,63,.12),inset 0 1px 8px rgba(255,255,255,.04)!important;color:#f0d38d!important;touch-action:pan-y!important;pointer-events:auto!important;z-index:9!important}
-#aurumSplash.signature-traxa-launch .signature-launch-swipe .swipe-handle{position:absolute!important;left:5px!important;top:5px!important;width:36px!important;height:36px!important;border-radius:50%!important;background:radial-gradient(circle at 35% 28%,#fff1bd,#e0b34d 65%,#946719)!important;box-shadow:0 0 14px rgba(224,178,75,.6),inset 0 0 5px #fff!important;color:transparent!important;font-size:0!important;animation:signatureHandlePulse 1.8s ease-in-out infinite!important}
-#aurumSplash.signature-traxa-launch .signature-launch-swipe .swipe-copy{display:block!important;visibility:visible!important;opacity:1!important;font-size:9px!important;letter-spacing:2.5px!important;color:#f1d48e!important}
-@keyframes signatureHandlePulse{0%,100%{box-shadow:0 0 10px rgba(224,178,75,.4),inset 0 0 5px #fff}50%{box-shadow:0 0 22px rgba(255,201,88,.9),inset 0 0 7px #fff}}
-#aurumSplash.signature-traxa-launch.hidden{opacity:0!important;visibility:hidden!important;transition:opacity .25s ease,visibility .25s ease!important;pointer-events:none!important}
-@media(max-height:700px){.signature-launch-logo{top:35%;width:140px;height:140px}.signature-launch-logo img{width:92px;height:92px}.signature-launch-brand{top:51%}.signature-launch-bottom{bottom:92px}.signature-launch-swipe{bottom:22px!important}}
-@media(prefers-reduced-motion:reduce){.signature-launch-orbit,.signature-launch-glint,.signature-launch-swipe .swipe-handle{animation:none!important}}
-</style>
-
-<style id="signature-installed-app-shell">
-@media (display-mode: standalone) {
-  html, body {
-    width: 100%;
-    min-width: 0;
-    min-height: 100%;
-    min-height: 100dvh;
-    margin: 0;
-    overscroll-behavior-y: contain;
-  }
-  body {
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
-  }
-  header, main {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: none;
-  }
-}
-</style>
-
 </head>
   
   
@@ -3529,33 +3467,44 @@ body {
 <div id="aurumDebugStatus" hidden aria-hidden="true"></div>
 
 <!-- AURUM PREMIUM SPLASH SCREEN -->
-<div id="aurumSplash" class="aurum-splash signature-traxa-launch">
-  <div class="signature-launch-content">
-    <div class="signature-launch-logo">
-      <span class="signature-launch-orbit orbit-a"></span>
-      <span class="signature-launch-orbit orbit-b"></span>
-      <span class="signature-launch-orbit orbit-c"></span>
-      <img src="/signature-trading-icon.png" alt="Signature Trading Club" width="192" height="192">
-      <span class="signature-launch-glint"></span>
+<div id="aurumSplash" class="aurum-splash aurum-traxa-intro">
+  <div class="splash-live-pill"><i></i> AURUM NETWORK · LIVE</div>
+  <div class="splash-content">
+    <div class="aurum-orb aurum-network-globe" aria-label="Animasi jaringan digital AURUM">
+      <svg class="network-globe-svg" viewBox="0 0 300 300" role="img" aria-hidden="true">
+        <defs><radialGradient id="aurumGlobeGlow"><stop offset="0" stop-color="#f7d77e" stop-opacity=".28"/><stop offset=".68" stop-color="#b9862c" stop-opacity=".07"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>
+        <circle cx="150" cy="150" r="145" fill="url(#aurumGlobeGlow)"/>
+        <circle class="globe-outline" cx="150" cy="150" r="125"/>
+        <ellipse class="globe-lat" cx="150" cy="150" rx="125" ry="48"/>
+        <ellipse class="globe-lat" cx="150" cy="150" rx="125" ry="88"/>
+        <ellipse class="globe-lon" cx="150" cy="150" rx="48" ry="125"/>
+        <ellipse class="globe-lon" cx="150" cy="150" rx="88" ry="125"/>
+        <path class="globe-link" d="M39 105 83 75 119 98 151 51 194 81 244 111 218 157 258 194 207 222 171 194 127 239 91 201 47 177 67 139 39 105Z"/>
+        <path class="globe-link" d="M83 75 67 139 119 98 127 239 171 194 194 81 218 157 151 51 91 201 47 177 119 98 207 222 258 194"/>
+        <g class="globe-dots"><circle cx="39" cy="105" r="2.5"/><circle cx="83" cy="75" r="2"/><circle cx="119" cy="98" r="2.6"/><circle cx="151" cy="51" r="2"/><circle cx="194" cy="81" r="2.8"/><circle cx="244" cy="111" r="2"/><circle cx="218" cy="157" r="2.5"/><circle cx="258" cy="194" r="2"/><circle cx="207" cy="222" r="2.5"/><circle cx="171" cy="194" r="2"/><circle cx="127" cy="239" r="2.6"/><circle cx="91" cy="201" r="2"/><circle cx="47" cy="177" r="2.5"/><circle cx="67" cy="139" r="2"/><circle cx="150" cy="150" r="3"/></g>
+      </svg>
+      <div class="orb-core"><span class="aurum-core-mark">A</span></div>
+      <div class="orb-particle particle-one"></div><div class="orb-particle particle-two"></div><div class="orb-particle particle-three"></div><div class="orb-particle particle-four"></div><div class="orb-particle particle-five"></div>
     </div>
-    <div class="signature-launch-brand">
-      <strong>SIGNATURE</strong>
-      <span>TRADING CLUB</span>
-      <small>TRADE SMARTER · WIN BIGGER</small>
-    </div>
-    <div class="signature-launch-bottom">
-      <div class="signature-launch-stats" aria-label="Fitur Signature Trading Club">
-        <div><strong>7</strong><span>TIMEFRAMES</span></div>
-        <div><strong>3</strong><span>MARKETS</span></div>
-        <div><strong>AI</strong><span>ANALYSIS</span></div>
-      </div>
-      <div class="splash-progress" role="progressbar" aria-label="Memuat Signature Trading Club" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+    <div class="splash-brand-block"><strong>AURUM</strong><span>S I G N A L S</span><small>INTELLIGENT MARKET ANALYSIS</small></div>
+    <div class="splash-bottom-block">
+      <div class="splash-stats" aria-label="Fitur AURUM"><div><strong>7</strong><span>TIMEFRAMES</span></div><div><strong>3</strong><span>MARKETS</span></div><div><strong>AI</strong><span>ANALYSIS</span></div></div>
+      <div class="splash-progress" role="progressbar" aria-label="Memuat dashboard AURUM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
       <div class="splash-loading-label">INITIALIZING <strong>0%</strong></div>
-      <div class="signature-launch-welcome"><span>WELCOME BACK</span><strong>TRADER</strong></div>
+      <section class="aurum-secure-terminal" aria-live="polite" aria-label="Status koneksi AURUM">
+        <div class="aurum-terminal-head"><span>✦ AURUM · SECURE LINK</span><i></i></div>
+        <div class="aurum-terminal-lines">
+          <p><span>&gt; Verifying member</span><b>OK</b></p>
+          <p><span>&gt; Preparing your settings</span><b>OK</b></p>
+          <p><span>&gt; Syncing live prices</span><b>OK</b></p>
+          <p><span>&gt; Loading signals Gold · Bitcoin · Oil</span><b>OK</b></p>
+          <p><span>&gt; Connecting AURUM core <i class="aurum-terminal-cursor"></i></span><b>LIVE</b></p>
+        </div>
+      </section>
+      <div class="splash-welcome-block"><span>WELCOME BACK</span><strong>TRADER</strong></div>
     </div>
-    <div class="splash-swipe signature-launch-swipe" id="aurumSwipeEnter" role="slider" tabindex="0" aria-label="Geser untuk masuk ke dashboard Signature Trading Club" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-      <span class="swipe-handle" aria-hidden="true"></span>
-      <span class="swipe-copy">SWIPE TO ENTER</span>
+    <div class="splash-swipe" id="aurumSwipeEnter" role="slider" tabindex="0" aria-label="Geser untuk masuk ke dashboard AURUM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span class="swipe-handle" aria-hidden="true">➜</span><span class="swipe-copy">SWIPE TO POWER UP</span>
     </div>
   </div>
 </div>
