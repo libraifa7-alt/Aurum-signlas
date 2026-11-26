@@ -39,10 +39,10 @@
       }
       setTimeout(function(){
         var chars=Array.prototype.slice.call(memberName.querySelectorAll('.sto-char'));
-        var started=performance.now(),scrambleDuration=1650;
+        var started=performance.now(),scrambleDuration=2300;
         memberName.classList.add('is-glitching');
         chars.forEach(function(node,index){
-          node.style.animationDelay=(index*35)+'ms';
+          node.style.animationDelay=(index*145)+'ms';
           node.textContent=finalName[index]===' '?' ':glyphs[Math.floor(Math.random()*glyphs.length)];
         });
         function scramble(now){
