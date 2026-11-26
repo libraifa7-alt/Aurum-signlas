@@ -4123,6 +4123,43 @@ body {
 @media(prefers-reduced-motion:reduce){#aurumSplash .splash-brand-block,#aurumSplash .splash-welcome-block,#aurumSplash .splash-stats,#aurumSplash .splash-swipe,#aurumSplash .splash-hint,#aurumSplash #aurumEnterButton{animation:none;opacity:1;transform:none}#aurumSplash .splash-progress span,#aurumSplash.aurum-splash:after{animation:none}}
 </style>
 
+
+<style id="aurum-traxa-large-orbit-auto-dashboard">
+/* Remove the swipe prompt and all manual entry controls. */
+#aurumSplash .splash-swipe,
+#aurumSplash .splash-hint,
+#aurumSplash #aurumEnterButton { display:none !important; }
+/* Enlarge the rotating AURUM globe as the main visual, retaining the bright palette. */
+#aurumSplash .aurum-network-globe {
+  width:min(330px,86vw) !important;
+  height:min(330px,86vw) !important;
+  max-width:330px !important;
+  max-height:330px !important;
+  margin:0 auto 12px !important;
+  flex:0 0 auto !important;
+}
+#aurumSplash .aurum-network-globe .orb-core {
+  width:88px !important;
+  height:88px !important;
+  top:calc(50% - 44px) !important;
+  left:calc(50% - 44px) !important;
+}
+#aurumSplash .aurum-core-mark { font-size:56px !important; }
+#aurumSplash .splash-progress {
+  margin-top:16px !important;
+  width:min(280px,74vw) !important;
+}
+@media (max-height:700px) {
+  #aurumSplash .aurum-network-globe {
+    width:min(270px,76vw) !important;
+    height:min(270px,76vw) !important;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  #aurumSplash .aurum-network-globe { animation:none !important; }
+}
+</style>
+
 </head>
   
   
@@ -4176,12 +4213,7 @@ body {
         <div><strong>3</strong><span>MARKETS</span></div>
         <div><strong>AI</strong><span>ANALYSIS</span></div>
       </div>
-      <div class="splash-swipe" aria-label="Geser ke kanan untuk masuk">
-        <span class="swipe-handle">➜</span><span class="swipe-copy">SWIPE TO ENTER</span>
-      </div>
-      <p class="splash-hint">Animasi pembuka · Dashboard siap dalam beberapa detik</p>
-      <button id="aurumEnterButton" type="button">MASUK KE DASHBOARD</button>
-      <div class="splash-progress" role="progressbar" aria-label="Intro menuju dashboard"><span></span></div>
+      <div class="splash-progress" role="progressbar" aria-label="Memuat dashboard AURUM"><span></span></div>
       
     </div>
   </div>
@@ -8562,23 +8594,16 @@ console.log('STATUS SERVER DIPERIKSA');
 <script>
 (function () {
   const splash = document.getElementById('aurumSplash');
-  const enterButton = document.getElementById('aurumEnterButton');
-  if (!splash || !enterButton) return;
+  if (!splash) return;
   splash.classList.remove('hidden');
   splash.style.display = 'flex';
-  enterButton.disabled = true;
   function enterDashboard() {
-    if (enterButton.disabled || splash.classList.contains('hidden')) return;
+    if (splash.classList.contains('hidden')) return;
     splash.classList.add('hidden');
     window.setTimeout(function () { splash.style.display = 'none'; }, 750);
   }
-  enterButton.addEventListener('click', enterDashboard);
-  // No automatic redirect: wait for the user to choose when to enter.
-  window.setTimeout(function () {
-    enterButton.disabled = false;
-    const hint = splash.querySelector('.splash-hint');
-    if (hint) hint.textContent = 'AURUM SIAP · SENTUH UNTUK MASUK';
-  }, 12000);
+  // Intro runs automatically, then opens the dashboard without any swipe or tap.
+  window.setTimeout(enterDashboard, 6400);
 })();
 </script>
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
