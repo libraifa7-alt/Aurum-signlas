@@ -39,21 +39,31 @@
       }
       setTimeout(function(){
         var chars=Array.prototype.slice.call(memberName.querySelectorAll('.sto-char'));
-        var started=performance.now(),scrambleDuration=1850;
+        var started=performance.now(),scrambleDuration=2650;
         memberName.classList.add('is-glitching');
+        chars.forEach(function(node,index){
+          node.style.animationDelay=(index*35)+'ms';
+          node.textContent=finalName[index]===' '?' ':glyphs[Math.floor(Math.random()*glyphs.length)];
+        });
         function scramble(now){
           var p=Math.min(1,(now-started)/scrambleDuration);
           chars.forEach(function(node,index){
             var lockAt=(index+1)/(chars.length+1);
             if(p>=lockAt){
-              node.textContent=finalName[index]===' '?' ':finalName[index];
-            }else if(Math.random()>.16){
+              if(!node.classList.contains('is-locked')){
+                node.classList.add('is-locked');
+                node.textContent=finalName[index]===' '?' ':finalName[index];
+              }
+            }else if(Math.random()>.08){
               node.textContent=finalName[index]===' '?' ':glyphs[Math.floor(Math.random()*glyphs.length)];
             }
           });
           if(p<1){requestAnimationFrame(scramble);}
           else{
-            chars.forEach(function(node,index){node.textContent=finalName[index]===' '?' ':finalName[index];});
+            chars.forEach(function(node,index){
+              node.textContent=finalName[index]===' '?' ':finalName[index];
+              node.classList.add('is-locked');
+            });
             memberName.classList.remove('is-glitching');
             memberName.classList.add('is-resolved');
           }
