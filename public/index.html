@@ -4325,6 +4325,35 @@ html,body{min-height:100%;}
 }
 @media(prefers-reduced-motion:reduce){#aurumSplash .aurum-network-globe,#aurumSplash .orb-core{animation:none!important}}
 </style>
+<style id="aurum-traxa-secure-terminal">
+#aurumSplash .aurum-secure-terminal{
+ display:none;position:absolute!important;top:calc(clamp(115px,18vh,210px) + min(300px,72vw) + 88px)!important;
+ left:50%!important;transform:translateX(-50%)!important;width:min(340px,86vw)!important;
+ padding:13px 14px 12px!important;border:1px solid rgba(213,179,105,.38)!important;border-radius:15px!important;
+ background:linear-gradient(145deg,rgba(27,27,28,.97),rgba(12,13,16,.98))!important;
+ box-shadow:0 12px 36px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.07)!important;
+ color:#e8e2d4!important;text-align:left!important;font-family:ui-monospace,SFMono-Regular,Consolas,monospace!important;
+}
+#aurumSplash.aurum-terminal-ready .aurum-secure-terminal{display:block!important;animation:aurumTerminalReveal .55s ease-out both!important}
+#aurumSplash.aurum-loading .splash-welcome-block{display:none!important}
+#aurumSplash .aurum-terminal-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:9px;margin-bottom:8px;border-bottom:1px solid rgba(222,190,120,.15);color:#e6c879;font-size:8px;font-weight:800;letter-spacing:1.5px}
+#aurumSplash .aurum-terminal-head i{width:6px;height:6px;border-radius:50%;background:#e6c879;box-shadow:0 0 10px #e6c879;animation:aurumTerminalLed 1.2s ease-in-out infinite}
+#aurumSplash .aurum-terminal-lines p{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;color:#dedbd2;font-size:clamp(8px,2.2vw,10px);line-height:1.35;opacity:0;animation:aurumTerminalLine .35s ease-out forwards}
+#aurumSplash .aurum-terminal-lines p:nth-child(1){animation-delay:.2s}
+#aurumSplash .aurum-terminal-lines p:nth-child(2){animation-delay:.65s}
+#aurumSplash .aurum-terminal-lines p:nth-child(3){animation-delay:1.1s}
+#aurumSplash .aurum-terminal-lines p:nth-child(4){animation-delay:1.55s}
+#aurumSplash .aurum-terminal-lines p:nth-child(5){animation-delay:2s}
+#aurumSplash .aurum-terminal-lines b{flex:none;color:#f0d17f;font-size:9px;font-weight:800}
+#aurumSplash .aurum-terminal-cursor{display:inline-block;width:7px;height:10px;margin-left:2px;vertical-align:-1px;background:#e9e2d2;animation:aurumTerminalBlink .8s steps(2,start) infinite}
+@keyframes aurumTerminalReveal{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes aurumTerminalLine{to{opacity:1}}
+@keyframes aurumTerminalLed{50%{opacity:.35}}
+@keyframes aurumTerminalBlink{to{opacity:0}}
+@media(max-width:390px){#aurumSplash .aurum-secure-terminal{padding:11px 10px!important}#aurumSplash .aurum-terminal-lines p{font-size:7.5px}}
+@media(max-height:700px){#aurumSplash .aurum-secure-terminal{top:calc(12vh + min(245px,62vw) + 82px)!important;width:min(340px,88vw)!important}}
+@media(prefers-reduced-motion:reduce){#aurumSplash .aurum-terminal-head i,#aurumSplash .aurum-terminal-cursor{animation:none!important}#aurumSplash .aurum-terminal-lines p{opacity:1;animation:none!important}}
+</style>
 </head>
   
   
@@ -4375,7 +4404,17 @@ html,body{min-height:100%;}
     <div class="splash-bottom-block">
       <div class="splash-stats" aria-label="Fitur AURUM"><div><strong>7</strong><span>TIMEFRAMES</span></div><div><strong>3</strong><span>MARKETS</span></div><div><strong>AI</strong><span>ANALYSIS</span></div></div>
       <div class="splash-progress" role="progressbar" aria-label="Memuat dashboard AURUM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
-      <div class="splash-loading-label">INITIALIZING AURUM NETWORK <strong>0%</strong></div>
+      <div class="splash-loading-label">INITIALIZING <strong>0%</strong></div>
+      <section class="aurum-secure-terminal" aria-live="polite" aria-label="Status koneksi AURUM">
+        <div class="aurum-terminal-head"><span>✦ AURUM · SECURE LINK</span><i></i></div>
+        <div class="aurum-terminal-lines">
+          <p><span>&gt; Verifying member</span><b>OK</b></p>
+          <p><span>&gt; Preparing your settings</span><b>OK</b></p>
+          <p><span>&gt; Syncing live prices</span><b>OK</b></p>
+          <p><span>&gt; Loading signals Gold · Bitcoin · Oil</span><b>OK</b></p>
+          <p><span>&gt; Connecting AURUM core <i class="aurum-terminal-cursor"></i></span><b>LIVE</b></p>
+        </div>
+      </section>
       <div class="splash-welcome-block"><span>WELCOME BACK</span><strong>TRADER</strong></div>
     </div>
     <div class="splash-swipe" id="aurumSwipeEnter" role="slider" tabindex="0" aria-label="Geser untuk masuk ke dashboard AURUM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -8769,24 +8808,29 @@ console.log('STATUS SERVER DIPERIKSA');
   const max=()=>Math.max(0,track.clientWidth-handle.offsetWidth-10);
   function reset(){handle.style.transform='translateX(0)';track.setAttribute('aria-valuenow','0');}
   function launch(){
-    if(started)return;started=true;splash.classList.add('aurum-loading');
+    if(started)return;
+    started=true;
+    splash.classList.add('aurum-loading');
     track.setAttribute('aria-valuenow','100');
-    const startedAt=performance.now(),duration=2900;
+    const startedAt=performance.now(),duration=3000;
     const tick=now=>{
       const pct=Math.min(100,Math.round((now-startedAt)/duration*100));
-      if(progress){progress.setAttribute('aria-valuenow',String(pct));}
+      if(progress)progress.setAttribute('aria-valuenow',String(pct));
       if(label)label.textContent=pct+'%';
-      if(pct<100)requestAnimationFrame(tick);
-      else window.setTimeout(()=>{
+      if(pct<100){requestAnimationFrame(tick);return;}
+      splash.classList.add('aurum-terminal-ready');
+      window.setTimeout(()=>{
         splash.classList.add('hidden');
         window.setTimeout(()=>{splash.style.display='none';},750);
-      },500);
+      },5200);
     };
     requestAnimationFrame(tick);
   }
   track.addEventListener('pointerdown',e=>{
-    if(started)return;dragging=true;startX=e.clientX;
-    const m=handle.style.transform.match(/translateX\(([\d.]+)px\)/);offset=m?Number(m[1]):0;
+    if(started)return;
+    dragging=true;startX=e.clientX;
+    const m=handle.style.transform.match(/translateX\(([\d.]+)px\)/);
+    offset=m?Number(m[1]):0;
     try{track.setPointerCapture(e.pointerId)}catch(_){}
     e.preventDefault();
   });
@@ -8797,12 +8841,14 @@ console.log('STATUS SERVER DIPERIKSA');
     track.setAttribute('aria-valuenow',String(Math.round(x/Math.max(1,max())*100)));
   });
   function finish(){
-    if(!dragging)return;dragging=false;
+    if(!dragging)return;
+    dragging=false;
     const m=handle.style.transform.match(/translateX\(([\d.]+)px\)/),x=m?Number(m[1]):0;
     if(x>=max()*.72){handle.style.transform='translateX('+max()+'px)';launch();}
     else reset();
   }
-  track.addEventListener('pointerup',finish);track.addEventListener('pointercancel',finish);
+  track.addEventListener('pointerup',finish);
+  track.addEventListener('pointercancel',finish);
   track.addEventListener('keydown',e=>{
     if(['Enter',' ','ArrowRight'].includes(e.key)){e.preventDefault();launch();}
   });
