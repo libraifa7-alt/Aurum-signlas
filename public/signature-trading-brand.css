@@ -116,3 +116,8 @@
 @media(max-width:620px){
   #marketPage .signature-analysis-presenter img{min-height:470px!important}
 }
+
+
+/* REQUESTED CHANGE: remove only the presenter photo from META TREND; keep analysis content full width. */
+#marketPage .signature-analysis-layout{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
+#marketPage .signature-analysis-presenter{display:none!important}
