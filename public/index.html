@@ -9126,6 +9126,92 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   });
 })();
 </script>
+
+<script id="signature-session-splash-rotation">
+(function () {
+  'use strict';
+
+  // Rotasi ini hanya mengubah gambar pada splash pembuka Signature Trading Club.
+  // Dashboard dan seluruh komponennya tidak disentuh.
+  var splash = document.getElementById('aurumSplash');
+  if (!splash) return;
+
+  var images = {
+    asia: '/asia-session.webp',
+    london: '/london-session.webp',
+    newyork: '/new-york-session.webp'
+  };
+
+  var loaded = {};
+  Object.keys(images).forEach(function (key) {
+    var image = new Image();
+    image.onload = function () { loaded[key] = true; };
+    image.src = images[key];
+  });
+
+  function clockInZone(date, timeZone) {
+    var parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: timeZone,
+      weekday: 'short',
+      hour: '2-digit',
+      hourCycle: 'h23'
+    }).formatToParts(date);
+    var values = {};
+    parts.forEach(function (part) { values[part.type] = part.value; });
+    return {
+      weekday: values.weekday,
+      hour: Number(values.hour)
+    };
+  }
+
+  function isWeekday(value) {
+    return value.weekday !== 'Sat' && value.weekday !== 'Sun';
+  }
+
+  function isOpen(value, startHour, endHour) {
+    return isWeekday(value) && value.hour >= startHour && value.hour < endHour;
+  }
+
+  function currentSession(date) {
+    // Jam sesi memakai zona waktu kota pasar agar otomatis mengikuti DST.
+    var tokyo = clockInZone(date, 'Asia/Tokyo');       // 09.00–18.00 Tokyo
+    var london = clockInZone(date, 'Europe/London');   // 08.00–17.00 London
+    var newYork = clockInZone(date, 'America/New_York'); // 08.00–17.00 New York
+
+    // Saat sesi bertumpuk, prioritaskan sesi yang baru mulai: New York > London > Asia.
+    if (isOpen(newYork, 8, 17)) return 'newyork';
+    if (isOpen(london, 8, 17)) return 'london';
+    if (isOpen(tokyo, 9, 18)) return 'asia';
+    return 'asia';
+  }
+
+  function applySession() {
+    var session = currentSession(new Date());
+    var imagePath = images[session];
+    if (!imagePath || splash.getAttribute('data-signature-session') === session) return;
+
+    function showImage() {
+      splash.style.setProperty('background-image', 'url("' + imagePath + '")', 'important');
+      splash.setAttribute('data-signature-session', session);
+    }
+
+    if (loaded[session]) {
+      showImage();
+    } else {
+      var preload = new Image();
+      preload.onload = function () {
+        loaded[session] = true;
+        showImage();
+      };
+      preload.src = imagePath;
+    }
+  }
+
+  applySession();
+  window.setInterval(applySession, 60000);
+})();
+</script>
+
 </body>
 </html>
 
