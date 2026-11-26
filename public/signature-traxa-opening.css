@@ -401,3 +401,44 @@
   65%{opacity:1;filter:blur(0)}
   100%{opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 8px rgba(255,213,92,.68))}
 }
+
+
+/* TRAXA reference match: RGB scramble flashes, sequential lock-in, then a clean gold name */
+#signature-traxa-opening .sto-welcome strong .sto-char{
+  color:#ffe8a3;
+  background:linear-gradient(180deg,#fffce9 0%,#ffe49b 45%,#d6a33e 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 8px rgba(255,218,126,.72),0 0 18px rgba(221,164,57,.4);
+  transform-origin:50% 70%;
+}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char{
+  background:none!important;
+  -webkit-text-fill-color:initial!important;
+  color:#fff!important;
+  text-shadow:2px 0 #ff315b,-2px 0 #28baff,0 0 12px rgba(255,255,255,.8);
+  filter:brightness(1.35);
+  animation:stoTraxaScramble .105s steps(2,end) infinite;
+}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char:nth-child(3n+1){color:#ff4d68!important;text-shadow:2px 0 #ffd45c,0 0 12px #ff315b}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char:nth-child(3n+2){color:#48c8ff!important;text-shadow:-2px 0 #ff4d68,0 0 12px #36aaff}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char:nth-child(3n){color:#ffe36e!important;text-shadow:2px 0 #35baff,-2px 0 #ff315b}
+#signature-traxa-opening .sto-welcome strong.is-resolved .sto-char{
+  background:linear-gradient(180deg,#fffce9 0%,#ffe49b 45%,#d6a33e 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  color:#ffe8a3!important;
+  text-shadow:0 0 7px rgba(255,222,145,.85),0 0 18px rgba(220,165,57,.58);
+  animation:stoTraxaLock .62s cubic-bezier(.16,.9,.24,1) both;
+}
+#signature-traxa-opening .sto-welcome strong.is-resolved .sto-char.is-space{min-width:.38em}
+@keyframes stoTraxaScramble{
+  0%{transform:translate(-1px,-2px) skewX(-12deg) scale(1.08);opacity:.62}
+  50%{transform:translate(2px,1px) skewX(9deg) scale(.94);opacity:1}
+  100%{transform:translate(0,0) skewX(0) scale(1);opacity:.82}
+}
+@keyframes stoTraxaLock{
+  0%{opacity:0;transform:translateY(12px) scale(1.28);filter:blur(5px) brightness(2.2)}
+  55%{opacity:1;transform:translateY(-2px) scale(1.06);filter:blur(0) brightness(1.5)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 7px rgba(255,220,130,.72))}
+}
