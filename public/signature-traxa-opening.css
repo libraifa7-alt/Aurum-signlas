@@ -75,13 +75,13 @@
 #signature-traxa-opening .sto-brand span{font-size:8px;letter-spacing:4px;color:#d6b66c}
 #signature-traxa-opening .sto-brand small{font-size:7px;letter-spacing:2px;color:#9d8a61}
 #signature-traxa-opening .sto-markets{
-  position:absolute;bottom:calc(env(safe-area-inset-bottom) + 108px);
+  position:absolute;bottom:calc(env(safe-area-inset-bottom) + 150px);
   width:min(330px,88vw);display:grid;grid-template-columns:repeat(3,1fr);
   border:1px solid rgba(205,166,86,.3);border-radius:11px;
   background:rgba(15,14,13,.8);box-shadow:0 0 22px rgba(205,166,86,.1);
   animation:stoRise .8s .75s both;
 }
-#signature-traxa-opening .sto-markets span{padding:11px 4px;color:#c9b98f;font-size:8px;letter-spacing:1.4px}
+#signature-traxa-opening .sto-markets span{padding:13px 4px;color:#c9b98f;font-size:10px;letter-spacing:1.5px}
 #signature-traxa-opening .sto-markets span+span{border-left:1px solid rgba(205,166,86,.2)}
 #signature-traxa-opening .sto-swipe{
   position:absolute;bottom:calc(env(safe-area-inset-bottom) + 68px);left:50%;
@@ -142,7 +142,7 @@
 @media(max-height:700px){
  #signature-traxa-opening .sto-orb{top:clamp(50px,9vh,85px);width:min(210px,58vw)}
  #signature-traxa-opening .sto-brand{top:calc(clamp(50px,9vh,85px) + min(210px,58vw) + 5px)}
- #signature-traxa-opening .sto-markets{bottom:calc(env(safe-area-inset-bottom) + 92px)}
+ #signature-traxa-opening .sto-markets{bottom:calc(env(safe-area-inset-bottom) + 138px)}
  #signature-traxa-opening .sto-swipe{bottom:calc(env(safe-area-inset-bottom) + 68px)}
  #signature-traxa-opening .sto-stage-two .sto-orb{top:48px;width:min(205px,56vw)}
  #signature-traxa-opening .sto-loading{top:calc(48px + min(205px,56vw) + 7px)}
