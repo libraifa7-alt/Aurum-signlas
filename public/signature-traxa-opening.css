@@ -518,3 +518,35 @@
     top:calc(clamp(105px,15vh,145px) + min(250px,68vw) + 8px);
   }
 }
+
+
+/* Final first-screen composition: match TRAXA reference scale and vertical placement */
+#signature-traxa-opening .sto-stage-one .sto-orb{
+  top:22vh!important;
+  width:min(340px,82vw)!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand{
+  top:calc(22vh + min(340px,82vw) + 10px)!important;
+  gap:7px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand strong{
+  font-size:clamp(25px,6vw,32px)!important;
+  letter-spacing:4px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand span{
+  font-size:10px!important;
+  letter-spacing:6px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand small{
+  font-size:8px!important;
+  letter-spacing:2.5px!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-stage-one .sto-orb{
+    top:17vh!important;
+    width:min(280px,72vw)!important;
+  }
+  #signature-traxa-opening .sto-stage-one .sto-brand{
+    top:calc(17vh + min(280px,72vw) + 8px)!important;
+  }
+}
