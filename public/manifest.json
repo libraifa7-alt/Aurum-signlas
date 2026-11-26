@@ -11,10 +11,10 @@
   "theme_color": "#080d18",
   "icons": [
     {
-      "src": "/signature-trading-icon.svg",
+      "src": "/signature-trading-icon.svg?v=2",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
   "prefer_related_applications": false
