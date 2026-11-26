@@ -716,3 +716,7 @@
 #signature-traxa-opening .sto-stage-two .sto-welcome{top:70%!important}
 #signature-traxa-opening .sto-stage-two .sto-welcome strong{font-size:clamp(27px,8vw,34px)!important}
 }
+
+/* Timing matched to the reference clip: progress resolves, then welcome/name appears. */
+#signature-traxa-opening .sto-stage-two .sto-welcome span{animation:stoWelcomeLabel .65s 3.85s ease-out both!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{animation:stoNameReveal .9s 4.45s cubic-bezier(.16,.84,.24,1) both!important}
