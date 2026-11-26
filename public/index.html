@@ -4066,6 +4066,23 @@ body {
   to{opacity:1;transform:translateY(0)}
 }
 @media(prefers-reduced-motion:reduce){#aurumSplash .splash-welcome-block{animation:none}}
+
+/* AURUM INTRO SEQUENCE — reliable 6-second bright welcome */
+#aurumSplash .splash-content{position:relative}
+#aurumSplash .aurum-network-globe{animation:aurumIntroOrbIn 1.15s cubic-bezier(.2,.8,.2,1) both,aurumOrbGlow 4s 1.15s ease-in-out infinite}
+#aurumSplash .splash-brand-block{animation:aurumIntroReveal .85s .65s both}
+#aurumSplash .splash-welcome-block{animation:aurumIntroReveal .85s 1.35s both}
+#aurumSplash .splash-stats{animation:aurumIntroReveal .8s 2.05s both}
+#aurumSplash .splash-swipe{animation:aurumIntroReveal .8s 2.55s both}
+#aurumSplash .splash-hint,#aurumSplash #aurumEnterButton{animation:aurumIntroReveal .75s 3s both}
+#aurumSplash .splash-progress{width:min(260px,72vw);height:4px;margin:17px auto 0;overflow:hidden;border-radius:9px;background:#dce8f5;box-shadow:inset 0 1px 2px rgba(30,70,120,.10)}
+#aurumSplash .splash-progress span{display:block;width:100%;height:100%;border-radius:9px;background:linear-gradient(90deg,#2c8bd9,#d6a43d);transform:scaleX(0);transform-origin:left;animation:aurumIntroProgress 6.2s linear forwards}
+#aurumSplash.aurum-splash:after{content:"";position:absolute;inset:-35% -70%;pointer-events:none;background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,.0) 47%,rgba(255,255,255,.72) 50%,rgba(255,255,255,.0) 53%,transparent 58%);transform:translateX(-55%);animation:aurumIntroLightSweep 2.8s .3s ease-in-out both}
+@keyframes aurumIntroOrbIn{from{opacity:0;transform:scale(.72) rotate(-12deg);filter:blur(8px)}to{opacity:1;transform:scale(1) rotate(0);filter:blur(0)}}
+@keyframes aurumIntroReveal{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes aurumIntroProgress{to{transform:scaleX(1)}}
+@keyframes aurumIntroLightSweep{0%{transform:translateX(-55%);opacity:0}25%{opacity:.75}75%{opacity:.55}100%{transform:translateX(55%);opacity:0}}
+@media(prefers-reduced-motion:reduce){#aurumSplash .splash-brand-block,#aurumSplash .splash-welcome-block,#aurumSplash .splash-stats,#aurumSplash .splash-swipe,#aurumSplash .splash-hint,#aurumSplash #aurumEnterButton{animation:none;opacity:1;transform:none}#aurumSplash .splash-progress span,#aurumSplash.aurum-splash:after{animation:none}}
 </style>
 
 </head>
@@ -4128,8 +4145,9 @@ body {
       <div class="splash-swipe" aria-label="Geser ke kanan untuk masuk">
         <span class="swipe-handle">➜</span><span class="swipe-copy">SWIPE TO ENTER</span>
       </div>
-      <p class="splash-hint">Geser ke kanan untuk masuk ke Aurum Signals</p>
-      <button id="aurumEnterButton">MASUK KE DASHBOARD</button>
+      <p class="splash-hint">Animasi pembuka · Dashboard siap dalam beberapa detik</p>
+      <button id="aurumEnterButton">LEWATI INTRO</button>
+      <div class="splash-progress" role="progressbar" aria-label="Intro menuju dashboard"><span></span></div>
       
     </div>
   </div>
@@ -8513,72 +8531,66 @@ console.log('STATUS SERVER DIPERIKSA');
   const enterButton = document.getElementById('aurumEnterButton');
   if (!splash || !enterButton) return;
 
-  let splashAlreadySeen = false;
-  try {
-    splashAlreadySeen = localStorage.getItem('aurumSplashSeen') === 'true';
-  } catch (_) {
-    // Private browsing or storage restrictions must not prevent app entry.
-  }
-  if (splashAlreadySeen) {
-    splash.classList.add('hidden');
-    splash.style.display = 'none';
-    return;
-  }
-
+  // Always show the welcome intro on a fresh page load; never skip it
+  // because of a previously saved localStorage flag.
+  splash.classList.remove('hidden');
+  splash.style.display = 'flex';
+  let hasEntered = false;
   let startX = 0;
   let startY = 0;
+  let introTimer = null;
+
   const splashMusic = new Audio('/aurum-splash-music.mp3');
-  splashMusic.preload = 'auto';
+  splashMusic.preload = 'none';
   splashMusic.loop = true;
-  splashMusic.volume = 0.55;
+  splashMusic.volume = 0.35;
   splashMusic.setAttribute('playsinline', '');
 
   function stopSplashMusic() {
     splashMusic.pause();
-    splashMusic.currentTime = 0;
+    try { splashMusic.currentTime = 0; } catch (_) {}
   }
 
   function enterDashboard() {
-    if (splash.classList.contains('hidden')) return;
+    if (hasEntered || splash.classList.contains('hidden')) return;
+    hasEntered = true;
+    if (introTimer) clearTimeout(introTimer);
     stopSplashMusic();
-    try {
-      localStorage.setItem('aurumSplashSeen', 'true');
-    } catch (_) {
-      // The splash still closes for this visit when persistent storage is unavailable.
-    }
     splash.classList.add('hidden');
-    setTimeout(function () { splash.style.display = 'none'; }, 750);
+    window.setTimeout(function () {
+      splash.style.display = 'none';
+    }, 750);
   }
 
-  // Try audible autoplay on opening. If the browser blocks it, unlock
-  // playback on the visitor's first real touch without showing a music button.
+  // Audio is optional and only starts after a user gesture, avoiding
+  // browser autoplay interruptions during the intro.
   function startSplashMusic() {
     if (!splashMusic.paused) return;
-    splashMusic.play().catch(function (error) {
-      console.info('AURUM splash music requires a browser-approved gesture:', error);
-    });
+    splashMusic.play().catch(function () {});
   }
-  startSplashMusic();
 
   enterButton.addEventListener('click', enterDashboard);
   splash.addEventListener('touchstart', function (event) {
-    startSplashMusic();
     const touch = event.changedTouches[0];
     startX = touch.clientX;
     startY = touch.clientY;
+    startSplashMusic();
   }, { passive: true });
   splash.addEventListener('touchend', function (event) {
     const touch = event.changedTouches[0];
     if ((touch.clientX - startX) > 70 && Math.abs(touch.clientY - startY) < 100) enterDashboard();
   }, { passive: true });
   splash.addEventListener('pointerdown', function (event) {
-    startSplashMusic();
     startX = event.clientX;
     startY = event.clientY;
+    startSplashMusic();
   });
   splash.addEventListener('pointerup', function (event) {
     if ((event.clientX - startX) > 70 && Math.abs(event.clientY - startY) < 100) enterDashboard();
   });
+
+  // Let the complete logo/orbit/welcome sequence play before opening the dashboard.
+  introTimer = window.setTimeout(enterDashboard, 6200);
 })();
 </script>
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
