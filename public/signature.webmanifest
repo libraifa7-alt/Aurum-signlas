@@ -3,9 +3,13 @@
   "name": "Signature Trading Club",
   "short_name": "Signature",
   "description": "Signature Trading Club · Trade Smarter · Win Bigger",
-  "start_url": "/?source=signature-home",
+  "start_url": "/?source=signature-app",
   "scope": "/",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait",
   "background_color": "#050d1d",
   "theme_color": "#050d1d",
@@ -14,7 +18,7 @@
       "src": "/signature-trading-icon.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/signature-trading-icon-512.svg",

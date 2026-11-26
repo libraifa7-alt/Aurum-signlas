@@ -1,4 +1,4 @@
-const CACHE_NAME = 'signature-pwa-v4';
+const CACHE_NAME = 'signature-pwa-v5';
 const APP_SHELL = ['/', '/signature.webmanifest'];
 
 self.addEventListener('install', event => {
@@ -19,7 +19,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key.startsWith('aurum-pwa-') && key !== CACHE_NAME).map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => (key.startsWith('aurum-pwa-') || key.startsWith('signature-pwa-')) && key !== CACHE_NAME).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
