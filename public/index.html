@@ -4211,6 +4211,120 @@ body {
 @media(prefers-reduced-motion:reduce){#aurumSplash .swipe-handle{animation:none!important}}
 </style>
 
+
+<style id="aurum-traxa-video-opening">
+html,body{min-height:100%;} 
+#aurumSplash.aurum-traxa-intro{
+ position:fixed!important;inset:0!important;z-index:999999!important;display:flex!important;
+ overflow:hidden!important;color:#f7df9c!important;text-align:center!important;
+ background:
+  radial-gradient(ellipse at 50% 28%,rgba(193,143,45,.22),transparent 30%),
+  radial-gradient(ellipse at 23% 35%,rgba(20,79,164,.16),transparent 28%),
+  radial-gradient(ellipse at 80% 35%,rgba(156,34,40,.13),transparent 27%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='49' viewBox='0 0 56 49'%3E%3Cpath d='M14 1L28 1 41 12 41 36 28 48 14 48 1 36 1 12Z' fill='none' stroke='%23b9954d' stroke-opacity='.105' stroke-width='.7'/%3E%3C/svg%3E"),
+  radial-gradient(circle at center,#11100e 0%,#070707 60%,#020203 100%)!important;
+ background-size:auto,auto,auto,56px 49px,auto!important;
+}
+#aurumSplash.aurum-traxa-intro:before{
+ content:"";position:absolute;inset:0;pointer-events:none;opacity:.7;
+ background:linear-gradient(90deg,transparent,rgba(221,178,87,.06) 50%,transparent),
+ radial-gradient(ellipse at 50% 45%,transparent 20%,rgba(0,0,0,.4) 100%);
+}
+#aurumSplash .splash-live-pill{display:none!important}
+#aurumSplash .splash-content{
+ position:relative!important;width:100%!important;max-width:560px!important;height:100%!important;
+ padding:calc(env(safe-area-inset-top) + 20px) 22px calc(env(safe-area-inset-bottom) + 22px)!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:flex-start!important;gap:0!important;
+}
+#aurumSplash .aurum-network-globe{
+ position:absolute!important;top:clamp(115px,18vh,210px)!important;left:50%!important;
+ transform:translateX(-50%)!important;width:min(300px,72vw)!important;height:min(300px,72vw)!important;
+ max-width:300px!important;max-height:300px!important;margin:0!important;flex:none!important;
+ filter:drop-shadow(0 0 25px rgba(210,166,74,.2));
+}
+#aurumSplash .network-globe-svg{width:100%!important;height:100%!important}
+#aurumSplash .globe-outline,#aurumSplash .globe-lat,#aurumSplash .globe-lon{stroke:rgba(231,197,126,.66)!important}
+#aurumSplash .globe-link{stroke:rgba(75,147,225,.62)!important}
+#aurumSplash .globe-dots{fill:#e8c36f!important}
+#aurumSplash .orb-core{
+ width:90px!important;height:90px!important;top:calc(50% - 45px)!important;left:calc(50% - 45px)!important;
+ background:radial-gradient(circle at 32% 25%,#fff1bd 0%,#d9ad54 38%,#73501c 78%,#17100a 100%)!important;
+ border:1px solid rgba(255,223,151,.8)!important;box-shadow:0 0 25px rgba(222,177,80,.7),0 0 70px rgba(198,143,43,.3),inset 0 0 20px rgba(255,241,196,.25)!important;
+}
+#aurumSplash .aurum-core-mark{font-size:58px!important;color:#123f75!important;text-shadow:0 1px 0 #fff0bc!important}
+#aurumSplash .splash-brand-block{
+ position:absolute!important;top:calc(clamp(115px,18vh,210px) + min(300px,72vw) + 10px)!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;
+ color:#f2d58d!important;text-shadow:0 0 16px rgba(223,184,101,.35)!important;
+}
+#aurumSplash .splash-brand-block strong{font-size:25px!important;letter-spacing:7px!important;font-weight:900!important}
+#aurumSplash .splash-brand-block span{font-size:9px!important;letter-spacing:5px!important;color:#d6b66c!important}
+#aurumSplash .splash-brand-block small{font-size:7px!important;letter-spacing:2px!important;color:#9d8a61!important}
+#aurumSplash .splash-bottom-block{display:contents!important}
+#aurumSplash .splash-stats{
+ position:absolute!important;bottom:calc(env(safe-area-inset-bottom) + 108px)!important;
+ left:50%!important;transform:translateX(-50%)!important;width:min(330px,86vw)!important;
+ display:grid!important;grid-template-columns:repeat(3,1fr)!important;
+ border:1px solid rgba(205,166,86,.3)!important;border-radius:12px!important;
+ background:rgba(15,14,13,.8)!important;box-shadow:0 0 22px rgba(205,166,86,.1)!important;
+}
+#aurumSplash .splash-stats div{padding:8px 4px!important}
+#aurumSplash .splash-stats div+div{border-left:1px solid rgba(205,166,86,.2)!important}
+#aurumSplash .splash-stats strong{display:block!important;color:#e9c66f!important;font-size:15px!important}
+#aurumSplash .splash-stats span{display:block!important;color:#a99b7c!important;font-size:7px!important;letter-spacing:1px!important}
+#aurumSplash .splash-swipe{
+ position:absolute!important;bottom:calc(env(safe-area-inset-bottom) + 38px)!important;left:50%!important;
+ transform:translateX(-50%)!important;width:min(330px,86vw)!important;height:52px!important;min-height:52px!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:0 54px!important;border:1px solid rgba(224,188,111,.6)!important;border-radius:30px!important;
+ background:linear-gradient(180deg,rgba(49,42,28,.95),rgba(11,11,11,.98))!important;
+ box-shadow:0 0 18px rgba(207,164,75,.14),inset 0 1px 0 rgba(255,232,176,.13)!important;
+ color:#e6c879!important;touch-action:pan-y!important;cursor:grab!important;
+}
+#aurumSplash .swipe-copy{font-size:8px!important;letter-spacing:2px!important;color:#d5c18d!important}
+#aurumSplash .swipe-handle{
+ position:absolute!important;left:5px!important;top:5px!important;width:40px!important;height:40px!important;
+ display:grid!important;place-items:center!important;border-radius:50%!important;
+ background:radial-gradient(circle at 35% 28%,#fff3c7,#e1b95d 58%,#8d6725)!important;
+ color:#172f50!important;font-size:20px!important;box-shadow:0 0 0 3px rgba(223,183,93,.13),0 0 18px rgba(220,176,78,.45)!important;
+ transition:transform .12s ease!important;
+}
+#aurumSplash .splash-progress{
+ position:absolute!important;top:calc(clamp(115px,18vh,210px) + min(300px,72vw) + 55px)!important;
+ left:50%!important;transform:translateX(-50%)!important;width:min(280px,74vw)!important;height:4px!important;
+ margin:0!important;background:rgba(194,160,93,.2)!important;border-radius:9px!important;overflow:hidden!important;display:none!important;
+}
+#aurumSplash .splash-progress span{display:block!important;width:100%!important;height:100%!important;background:linear-gradient(90deg,#247bd2,#e4bd61,#c94d55)!important;transform:scaleX(0);transform-origin:left}
+#aurumSplash .splash-loading-label{
+ display:none;position:absolute;top:calc(clamp(115px,18vh,210px) + min(300px,72vw) + 28px);
+ left:0;width:100%;font-size:7px;letter-spacing:3px;color:#b99c5e
+}
+#aurumSplash .splash-loading-label strong{display:block;margin-top:5px;font-size:24px;color:#f0d17f;letter-spacing:1px;text-shadow:0 0 16px rgba(229,185,91,.5)}
+#aurumSplash .splash-welcome-block{
+ display:none!important;position:absolute!important;top:62%!important;left:0!important;width:100%!important;
+ margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;
+}
+#aurumSplash .splash-welcome-block span{font-size:10px!important;letter-spacing:3px!important;color:#e5e0d4!important}
+#aurumSplash .splash-welcome-block strong{font-size:26px!important;letter-spacing:5px!important;color:#f0d17f!important;text-shadow:0 0 18px rgba(229,185,91,.45)!important}
+#aurumSplash.aurum-loading .aurum-network-globe{top:clamp(100px,15vh,180px)!important}
+#aurumSplash.aurum-loading .splash-brand-block,#aurumSplash.aurum-loading .splash-stats,#aurumSplash.aurum-loading .splash-swipe{display:none!important}
+#aurumSplash.aurum-loading .splash-progress{display:block!important}
+#aurumSplash.aurum-loading .splash-loading-label{display:block!important}
+#aurumSplash.aurum-loading .splash-welcome-block{display:flex!important;animation:aurumTraxaWelcome .7s 2.1s both!important}
+#aurumSplash.aurum-loading .splash-progress span{animation:aurumTraxaProgress 2.8s ease-out forwards!important}
+#aurumSplash.aurum-loading .aurum-network-globe{animation:aurumTraxaOrbPulse 2s ease-in-out infinite!important}
+@keyframes aurumTraxaProgress{0%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+@keyframes aurumTraxaWelcome{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes aurumTraxaOrbPulse{0%,100%{filter:drop-shadow(0 0 15px rgba(210,166,74,.18))}50%{filter:drop-shadow(0 0 38px rgba(210,166,74,.55))}}
+@media(max-height:700px){
+ #aurumSplash .aurum-network-globe{top:12vh!important;width:min(245px,62vw)!important;height:min(245px,62vw)!important}
+ #aurumSplash .splash-brand-block{top:calc(12vh + min(245px,62vw) + 8px)!important}
+ #aurumSplash .splash-stats{bottom:calc(env(safe-area-inset-bottom) + 92px)!important}
+ #aurumSplash .splash-swipe{bottom:calc(env(safe-area-inset-bottom) + 25px)!important}
+}
+@media(prefers-reduced-motion:reduce){#aurumSplash .aurum-network-globe,#aurumSplash .orb-core{animation:none!important}}
+</style>
 </head>
   
   
@@ -4238,7 +4352,7 @@ body {
 <div id="aurumDebugStatus" hidden aria-hidden="true"></div>
 
 <!-- AURUM PREMIUM SPLASH SCREEN -->
-<div id="aurumSplash" class="aurum-splash">
+<div id="aurumSplash" class="aurum-splash aurum-traxa-intro">
   <div class="splash-live-pill"><i></i> AURUM NETWORK · LIVE</div>
   <div class="splash-content">
     <div class="aurum-orb aurum-network-globe" aria-label="Animasi jaringan digital AURUM">
@@ -4257,19 +4371,15 @@ body {
       <div class="orb-core"><span class="aurum-core-mark">A</span></div>
       <div class="orb-particle particle-one"></div><div class="orb-particle particle-two"></div><div class="orb-particle particle-three"></div><div class="orb-particle particle-four"></div><div class="orb-particle particle-five"></div>
     </div>
+    <div class="splash-brand-block"><strong>AURUM</strong><span>S I G N A L S</span><small>INTELLIGENT MARKET ANALYSIS</small></div>
     <div class="splash-bottom-block">
+      <div class="splash-stats" aria-label="Fitur AURUM"><div><strong>7</strong><span>TIMEFRAMES</span></div><div><strong>3</strong><span>MARKETS</span></div><div><strong>AI</strong><span>ANALYSIS</span></div></div>
+      <div class="splash-progress" role="progressbar" aria-label="Memuat dashboard AURUM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+      <div class="splash-loading-label">INITIALIZING AURUM NETWORK <strong>0%</strong></div>
       <div class="splash-welcome-block"><span>WELCOME BACK</span><strong>TRADER</strong></div>
-      <div class="splash-stats" aria-label="Fitur Aurum Signals">
-        <div><strong>7</strong><span>TIMEFRAMES</span></div>
-        <div><strong>3</strong><span>MARKETS</span></div>
-        <div><strong>AI</strong><span>ANALYSIS</span></div>
-      </div>
-      <div class="splash-progress" role="progressbar" aria-label="Memuat dashboard AURUM"><span></span></div>
-      
     </div>
-    <div class="splash-swipe" id="aurumSwipeEnter" role="button" tabindex="0" aria-label="Geser untuk masuk ke dashboard">
-      <span class="swipe-copy">SWIPE TO ENTER</span>
-      <span class="swipe-handle" aria-hidden="true">➜</span>
+    <div class="splash-swipe" id="aurumSwipeEnter" role="slider" tabindex="0" aria-label="Geser untuk masuk ke dashboard AURUM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span class="swipe-handle" aria-hidden="true">➜</span><span class="swipe-copy">SWIPE TO POWER UP</span>
     </div>
   </div>
 </div>
@@ -8648,63 +8758,55 @@ console.log('STATUS SERVER DIPERIKSA');
 <!-- AURUM SPLASH SCREEN INTERACTION -->
 <script>
 (function () {
-  const splash = document.getElementById('aurumSplash');
-  const track = document.getElementById('aurumSwipeEnter');
-  const handle = track && track.querySelector('.swipe-handle');
-  if (!splash || !track || !handle) return;
-  splash.classList.remove('hidden');
-  splash.style.display = 'flex';
-
-  let pointerStart = 0;
-  let handleStart = 4;
-  let dragging = false;
-
-  function maxTravel() {
-    return Math.max(0, track.clientWidth - handle.offsetWidth - 8);
+  const splash=document.getElementById('aurumSplash');
+  const track=document.getElementById('aurumSwipeEnter');
+  const handle=track&&track.querySelector('.swipe-handle');
+  const progress=splash&&splash.querySelector('.splash-progress');
+  const label=splash&&splash.querySelector('.splash-loading-label strong');
+  if(!splash||!track||!handle)return;
+  splash.classList.remove('hidden');splash.style.display='flex';
+  let startX=0,dragging=false,offset=0,started=false;
+  const max=()=>Math.max(0,track.clientWidth-handle.offsetWidth-10);
+  function reset(){handle.style.transform='translateX(0)';track.setAttribute('aria-valuenow','0');}
+  function launch(){
+    if(started)return;started=true;splash.classList.add('aurum-loading');
+    track.setAttribute('aria-valuenow','100');
+    const startedAt=performance.now(),duration=2900;
+    const tick=now=>{
+      const pct=Math.min(100,Math.round((now-startedAt)/duration*100));
+      if(progress){progress.setAttribute('aria-valuenow',String(pct));}
+      if(label)label.textContent=pct+'%';
+      if(pct<100)requestAnimationFrame(tick);
+      else window.setTimeout(()=>{
+        splash.classList.add('hidden');
+        window.setTimeout(()=>{splash.style.display='none';},750);
+      },500);
+    };
+    requestAnimationFrame(tick);
   }
-  function resetHandle() {
-    handle.style.transform = 'translateX(0)';
-  }
-  function enterDashboard() {
-    if (splash.classList.contains('hidden')) return;
-    splash.classList.add('hidden');
-    window.setTimeout(function () { splash.style.display = 'none'; }, 750);
-  }
-
-  track.addEventListener('pointerdown', function (event) {
-    if (splash.classList.contains('hidden')) return;
-    dragging = true;
-    pointerStart = event.clientX;
-    const match = handle.style.transform.match(/translateX\((-?[\d.]+)px\)/);
-    handleStart = match ? Number(match[1]) + 4 : 4;
-    track.setPointerCapture(event.pointerId);
-    event.preventDefault();
+  track.addEventListener('pointerdown',e=>{
+    if(started)return;dragging=true;startX=e.clientX;
+    const m=handle.style.transform.match(/translateX\(([\d.]+)px\)/);offset=m?Number(m[1]):0;
+    try{track.setPointerCapture(e.pointerId)}catch(_){}
+    e.preventDefault();
   });
-  track.addEventListener('pointermove', function (event) {
-    if (!dragging) return;
-    const travel = Math.max(0, Math.min(maxTravel(), handleStart - 4 + event.clientX - pointerStart));
-    handle.style.transform = 'translateX(' + travel + 'px)';
+  track.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const x=Math.max(0,Math.min(max(),offset+e.clientX-startX));
+    handle.style.transform='translateX('+x+'px)';
+    track.setAttribute('aria-valuenow',String(Math.round(x/Math.max(1,max())*100)));
   });
-  function finishSwipe() {
-    if (!dragging) return;
-    dragging = false;
-    const match = handle.style.transform.match(/translateX\(([\d.]+)px\)/);
-    const moved = match ? Number(match[1]) : 0;
-    if (moved >= maxTravel() * 0.72) {
-      handle.style.transform = 'translateX(' + maxTravel() + 'px)';
-      enterDashboard();
-    } else {
-      resetHandle();
-    }
+  function finish(){
+    if(!dragging)return;dragging=false;
+    const m=handle.style.transform.match(/translateX\(([\d.]+)px\)/),x=m?Number(m[1]):0;
+    if(x>=max()*.72){handle.style.transform='translateX('+max()+'px)';launch();}
+    else reset();
   }
-  track.addEventListener('pointerup', finishSwipe);
-  track.addEventListener('pointercancel', finishSwipe);
-  track.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowRight') {
-      event.preventDefault();
-      enterDashboard();
-    }
+  track.addEventListener('pointerup',finish);track.addEventListener('pointercancel',finish);
+  track.addEventListener('keydown',e=>{
+    if(['Enter',' ','ArrowRight'].includes(e.key)){e.preventDefault();launch();}
   });
+  track.addEventListener('click',e=>{if(!started&&e.detail===0)launch();});
 })();
 </script>
 <!-- END AURUM SPLASH SCREEN INTERACTION -->
