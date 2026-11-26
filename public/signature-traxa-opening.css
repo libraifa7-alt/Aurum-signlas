@@ -282,9 +282,9 @@
   isolation:isolate;
   overflow:visible;
   padding:2px 10px 7px;
-  font-size:clamp(29px,8.5vw,39px);
+  font-size:clamp(40px,12vw,56px);
   font-weight:900;
-  letter-spacing:8px;
+  letter-spacing:7px;
   line-height:1.15;
   color:#fff0bd;
   background:linear-gradient(180deg,#fffbe9 0%,#ffe39a 38%,#d9a943 72%,#fff0c0 100%);
@@ -333,7 +333,7 @@
 }
 @media(max-height:700px){
  #signature-traxa-opening .sto-welcome{top:80%}
- #signature-traxa-opening .sto-welcome strong{font-size:clamp(25px,7.5vw,34px);letter-spacing:6px}
+ #signature-traxa-opening .sto-welcome strong{font-size:clamp(36px,11vw,48px);letter-spacing:6px}
 }
 @media(prefers-reduced-motion:reduce){
  #signature-traxa-opening .sto-welcome span,
