@@ -41,7 +41,7 @@
         pct.textContent=String(Math.round(p*100));
         fill.style.width=(p*100)+'%';
         if(p<1){requestAnimationFrame(tick);return;}
-        setTimeout(function(){root.classList.add('is-leaving');setTimeout(function(){root.remove();},800);},3000);
+        setTimeout(function(){root.classList.add('is-leaving');setTimeout(function(){root.remove();},800);},4300);
       }
       requestAnimationFrame(tick);
     }
