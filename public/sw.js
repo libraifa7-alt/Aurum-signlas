@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aurum-pwa-v3';
+const CACHE_NAME = 'aurum-pwa-v4';
 const APP_SHELL = ['/', '/manifest.json'];
 
 self.addEventListener('install', event => {
