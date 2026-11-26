@@ -720,3 +720,60 @@
 /* Timing matched to the reference clip: progress resolves, then welcome/name appears. */
 #signature-traxa-opening .sto-stage-two .sto-welcome span{animation:stoWelcomeLabel .65s 3.85s ease-out both!important}
 #signature-traxa-opening .sto-stage-two .sto-welcome strong{animation:stoNameReveal .9s 4.45s cubic-bezier(.16,.84,.24,1) both!important}
+
+
+/* FINAL OVERRIDE — make the second/loading screen genuinely large and legible.
+   This block is intentionally last so earlier responsive/reference rules cannot shrink it. */
+#signature-traxa-opening .sto-stage-two .sto-orb{
+  top:12vh!important;
+  width:min(300px,82vw)!important;
+  filter:drop-shadow(0 0 32px rgba(218,173,73,.48))!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-orb-core{width:48%!important}
+#signature-traxa-opening .sto-stage-two .sto-globe{width:92%!important;height:92%!important}
+#signature-traxa-opening .sto-stage-two .sto-loading{
+  top:calc(12vh + min(300px,82vw) + 8px)!important;
+  gap:8px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-loading-label{
+  font-size:11px!important;letter-spacing:4px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-percent{
+  font-size:clamp(48px,14vw,60px)!important;line-height:1.05!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-percent small{font-size:19px!important}
+#signature-traxa-opening .sto-stage-two .sto-progress{
+  width:min(340px,86vw)!important;height:6px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-log{
+  top:calc(12vh + min(300px,82vw) + 105px)!important;
+  width:min(390px,88vw)!important;padding:13px 16px!important;
+  font-size:clamp(10px,3vw,13px)!important;line-height:2!important;
+  border-radius:10px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{top:62%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome{
+  top:66%!important;gap:12px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{
+  font-size:clamp(20px,5.8vw,26px)!important;
+  letter-spacing:3px!important;font-weight:900!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{
+  width:auto!important;max-width:94vw!important;
+  font-size:clamp(48px,14vw,62px)!important;
+  letter-spacing:3px!important;line-height:1.2!important;
+  padding:7px 10px 12px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong .sto-char{
+  min-width:.58em!important;font-size:inherit!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-stage-two .sto-orb{top:7vh!important;width:min(230px,66vw)!important}
+  #signature-traxa-opening .sto-stage-two .sto-loading{top:calc(7vh + min(230px,66vw) + 7px)!important}
+  #signature-traxa-opening .sto-stage-two .sto-log{top:calc(7vh + min(230px,66vw) + 92px)!important}
+  #signature-traxa-opening .sto-stage-two .sto-footer-line{top:60%!important}
+  #signature-traxa-opening .sto-stage-two .sto-welcome{top:64%!important}
+  #signature-traxa-opening .sto-stage-two .sto-welcome span{font-size:19px!important}
+  #signature-traxa-opening .sto-stage-two .sto-welcome strong{font-size:clamp(42px,12vw,54px)!important}
+}
