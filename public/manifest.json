@@ -1,9 +1,9 @@
 {
   "id": "/",
   "name": "Signature Trading Club",
-  "short_name": "Signature",
+  "short_name": "Signature Trading",
   "description": "Signature Trading Club · Institutional Market Analysis",
-  "start_url": "/",
+  "start_url": "/?source=homescreen",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -11,13 +11,13 @@
   "theme_color": "#050d1d",
   "icons": [
     {
-      "src": "/signature-trading-icon.png",
+      "src": "/signature-trading-icon.png?v=signature-20261127-2",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/signature-trading-icon-512.svg",
+      "src": "/signature-trading-icon-512.svg?v=signature-20261127-2",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
