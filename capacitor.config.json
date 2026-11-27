@@ -1,0 +1,12 @@
+{
+  "appId": "com.aurum.signaturetrading",
+  "appName": "Signature Trading",
+  "webDir": "public",
+  "server": {
+    "url": "https://feature-signature-traxa-open.aurum-signlas.pages.dev",
+    "cleartext": false,
+    "allowNavigation": [
+      "feature-signature-traxa-open.aurum-signlas.pages.dev"
+    ]
+  }
+}
