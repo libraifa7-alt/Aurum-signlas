@@ -8,6 +8,10 @@
 [functions]
   node_bundler = "esbuild"
 
+# Run the server-side ICT scanner every five minutes on published deploys.
+[functions."aurum-scheduler"]
+  schedule = "*/5 * * * *"
+
 # Keep API URLs identical across Vercel, Cloudflare Pages, and Netlify.
 [[redirects]]
   from = "/api"
