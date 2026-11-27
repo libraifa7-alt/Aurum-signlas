@@ -9193,24 +9193,7 @@ if (timeframe && dashboardTimeframe) {
 
 loadChart(timeframe.value || 'M15');
 
-// Jalankan analisis 7 timeframe secara independen saat halaman dibuka.
-// Panel teknikal tidak boleh bergantung pada keberhasilan chart M1/M15.
-Promise.resolve().then(async function () {
-  const initialSymbol = document.getElementById('pair')?.value || 'XAU/USD';
-  const statusNode = document.getElementById('marketStructure');
-  if (statusNode) statusNode.textContent = 'MEMERIKSA DATA 7 TIMEFRAME…';
-  try {
-    const structure = await analyzeMarketStructure(initialSymbol);
-    if (document.getElementById('pair')?.value === initialSymbol && statusNode) {
-      statusNode.textContent = structure;
-    }
-  } catch (error) {
-    console.error('AURUM initial 7-timeframe analysis failed:', error);
-    if (document.getElementById('pair')?.value === initialSymbol && statusNode) {
-      statusNode.textContent = 'DATA TEKNIKAL GAGAL DIMUAT — PERIKSA KONEKSI PROVIDER';
-    }
-  }
-});
+// Initial multi-timeframe execution is registered outside the chart-element guard below.
 
 const timeframeButtons = document.querySelectorAll('.aurum-chart-timeframes button[data-timeframe]');
 function syncTimeframeButtons(value) {
@@ -9265,6 +9248,42 @@ setInterval(async function() {
 }, 65000);
 
 } // Penutup blok IF
+
+// Publish a single entry point so the market dashboard can request its own
+// seven timeframes even when the chart page is hidden or its chart guard exits.
+if (typeof analyzeMarketStructure === 'function') {
+  window.aurumRunTechnicalAnalysis = async function (reason) {
+    const symbol = document.getElementById('pair')?.value || 'XAU/USD';
+    const statusNode = document.getElementById('marketStructure');
+    if (statusNode) statusNode.textContent = 'MEMERIKSA DATA 7 TIMEFRAME…';
+    console.info('AURUM TECHNICAL ANALYSIS START:', reason || 'page-open', symbol);
+    try {
+      const structure = await analyzeMarketStructure(symbol);
+      if (document.getElementById('pair')?.value === symbol && statusNode) {
+        statusNode.textContent = structure;
+      }
+      return structure;
+    } catch (error) {
+      console.error('AURUM 7-timeframe analysis failed:', error);
+      if (document.getElementById('pair')?.value === symbol && statusNode) {
+        statusNode.textContent = 'DATA TEKNIKAL GAGAL DIMUAT — ' + String(error?.message || error);
+      }
+      return null;
+    }
+  };
+
+  // Run once on initial market-page load and again whenever navigation returns
+  // to Market. This is deliberately independent of loadChart().
+  const runIfMarketPage = function (reason) {
+    if (window.location.hash === '#marketPage') {
+      window.aurumRunTechnicalAnalysis(reason);
+    }
+  };
+  runIfMarketPage('initial-market-page');
+  window.addEventListener('hashchange', function () {
+    runIfMarketPage('market-page-navigation');
+  });
+}
 
 document.getElementById('aurumDebugStatus').textContent =
   'MEMUAT DATA CANDLE... | CHART: ' + !!window.LightweightCharts +
