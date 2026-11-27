@@ -8,6 +8,11 @@
 [functions]
   node_bundler = "esbuild"
 
+# Register the server-side ICT scanner as a Netlify Scheduled Function.
+# Runs every five minutes (Netlify schedules use UTC).
+[functions."aurum-scheduler"]
+  schedule = "*/5 * * * *"
+
 # Keep API URLs identical across Vercel, Cloudflare Pages, and Netlify.
 [[redirects]]
   from = "/api"
