@@ -6393,7 +6393,7 @@ if (useBrowserCache) {
       'GRAFIK UTAMA KOSONG · MEMERIKSA 7 TIMEFRAME';
 
     try {
-      const structure = await analyzeMarketStructure(symbol);
+      const structure = await window.aurumAnalyzeMarketStructure(symbol);
       if (
         requestId === window.aurumChartLoadSequence &&
         document.getElementById('pair')?.value === symbol
@@ -7584,6 +7584,9 @@ const direction = signal =>
     return 'MENUNGGU — Gagal membaca timeframe';
   }
 }
+
+// Expose the analyzer before leaving the chart-element scope.
+window.aurumAnalyzeMarketStructure = analyzeMarketStructure;
       
       
       
@@ -9251,7 +9254,7 @@ setInterval(async function() {
 
 // Publish a single entry point so the market dashboard can request its own
 // seven timeframes even when the chart page is hidden or its chart guard exits.
-if (typeof analyzeMarketStructure === 'function') {
+if (typeof window.aurumAnalyzeMarketStructure === 'function') {
   window.aurumRunTechnicalAnalysis = async function (reason) {
     const symbol = document.getElementById('pair')?.value || 'XAU/USD';
     const statusNode = document.getElementById('marketStructure');
