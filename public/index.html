@@ -7247,22 +7247,19 @@ const fvgZone = detectFVGZone(candles);
   })
 );
 
-// Jika seluruh timeframe belum memiliki candle yang cukup, pertahankan WAIT.
-const hasUsableTimeframe = results.some(item =>
+// Jangan hentikan proses render saat candle belum mencukupi.
+// Semua timeframe tetap ditampilkan dengan jumlah candle aktual; sinyal tetap
+// UNKNOWN/WAIT sampai struktur harga memiliki data yang cukup.
+const usableTimeframes = results.filter(item =>
   Array.isArray(item.candles) && item.candles.length >= 30
-);
-if (!hasUsableTimeframe) {
-  window.aurumMultiTimeframeTrend = null;
-  const details = timeframes.map(tf => {
-    const d = window.aurumTimeframeDiagnostics?.[tf];
-    return tf + ': ' + (d?.error || ((d?.count ?? 0) + ' candle'));
+).length;
+if (usableTimeframes < timeframes.length) {
+  const details = results.map(item => {
+    const count = Array.isArray(item.candles) ? item.candles.length : 0;
+    const error = item.error || window.aurumTimeframeDiagnostics?.[item.timeframe]?.error;
+    return item.timeframe + ': ' + (error || (count + ' candle'));
   }).join(' | ');
-  const waitingNode = document.getElementById('marketStructure');
-  if (waitingNode) waitingNode.textContent = 'DATA BELUM CUKUP — ' + details;
-  const statusNode = document.querySelector('#trendMeter .aurum-reference-hero-top span');
-  if (statusNode) statusNode.textContent = '● DATA PROVIDER PERLU DIPERIKSA';
-  console.warn('AURUM MULTI-TIMEFRAME BELUM SIAP:', details);
-  return 'WAIT — ' + details;
+  console.warn('AURUM MULTI-TIMEFRAME DATA CHECK:', details);
 }
 
 // Hasil analisis lama tidak boleh menimpa instrumen yang baru dipilih.
@@ -7344,13 +7341,15 @@ const direction = signal =>
 
       // Ringkasan arah utama harus mencerminkan mayoritas timeframe,
       // bukan sekadar selisih bullish vs bearish saat mayoritas masih RANGE.
-      const overall = bullish >= 4 && bullish > bearish
-        ? 'BULLISH'
-        : bearish >= 4 && bearish > bullish
-          ? 'BEARISH'
-          : (bullish > 0 && bearish > 0)
-            ? 'MIXED'
-            : 'RANGE';
+      const overall = unknownCount > 0
+        ? 'WAIT'
+        : bullish >= 4 && bullish > bearish
+          ? 'BULLISH'
+          : bearish >= 4 && bearish > bullish
+            ? 'BEARISH'
+            : (bullish > 0 && bearish > 0)
+              ? 'MIXED'
+              : 'RANGE';
 
       window.aurumMultiTimeframeTrend = {
         direction: overall,
@@ -7364,7 +7363,9 @@ const direction = signal =>
         ? '#00e676'
         : overall === 'BEARISH'
           ? '#ff4057'
-          : '#c7a34b';
+          : overall === 'WAIT'
+            ? '#64748b'
+            : '#c7a34b';
 
       const latestPrice = document.getElementById('goldPrice')?.textContent || '--';
 
@@ -7385,10 +7386,14 @@ const direction = signal =>
         const color = state === 'BULLISH' ? '#399fe8' : state === 'BEARISH' ? '#f05b67' : '#aeb5bf';
         const label = state === 'BULLISH' ? 'BUY' : state === 'BEARISH' ? 'SELL' : state === 'RANGE' ? 'NEUTRAL' : 'N/A';
         const symbol = state === 'BULLISH' ? '▲' : state === 'BEARISH' ? '▼' : '•';
+        const candleCount = Array.isArray(item.candles) ? item.candles.length : 0;
+        const cardStatus = state === 'UNKNOWN'
+          ? 'NO DATA · ' + candleCount + ' CANDLE'
+          : state;
         return `
           <div class="aurum-tf-card aurum-reference-tf" data-trend="${state}" style="--tf-color:${color}">
             <div class="aurum-tf-card-head"><strong>${item.timeframe}</strong><span>${symbol}</span></div>
-            <small>${state === 'UNKNOWN' ? 'NO DATA' : state}</small>
+            <small>${cardStatus}</small>
             <div class="aurum-reference-ring" style="--ring-color:${color}"><b>${symbol}</b><small>${label}</small></div>
             <b class="aurum-reference-tf-label">${label}</b>
           </div>`;
