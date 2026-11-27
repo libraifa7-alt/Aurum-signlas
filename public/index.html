@@ -5660,7 +5660,15 @@ document.getElementById('aurumDebugStatus').textContent =
   'SCRIPT UTAMA MULAI BERJALAN';
 
 console.log('CEK LOADCHART DIMULAI');
-const el = document.getElementById('candleChart');
+const el = document.getElementById('candleChart') || (function () {
+  // Mount a hidden chart host so the shared technical-analysis engine is
+  // initialized even when the dedicated chart page is not mounted.
+  const fallback = document.createElement('div');
+  fallback.id = 'candleChart';
+  fallback.style.cssText = 'display:none;width:1px;height:1px;overflow:hidden;';
+  document.body.appendChild(fallback);
+  return fallback;
+})();
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
 // Analisis teknikal harus tetap berjalan meskipun library grafik gagal dimuat.
 const noOp = function () {};
