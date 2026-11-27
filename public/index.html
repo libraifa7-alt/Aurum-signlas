@@ -6860,7 +6860,8 @@ async function getSharedCandles(interval, requestedSymbol) {
   try {
     const response = await fetch(
       '/api?interval=' + interval +
-      '&symbol=' + encodeURIComponent(symbol)
+      '&symbol=' + encodeURIComponent(symbol),
+      { cache: 'no-store' }
     );
 
     const result = await response.json();
@@ -7134,6 +7135,7 @@ async function analyzeMarketStructure(requestedSymbol) {
     
 const results = await Promise.all(
   timeframes.map(async timeframe => {
+    try {
     const candles = await getSharedCandles(timeframe, analysisSymbol);
 
     const sr = detectSupportResistance(candles);
@@ -7205,6 +7207,22 @@ const fvgZone = detectFVGZone(candles);
   supportResistance: sr,
   candles
 };
+    } catch (timeframeError) {
+      console.warn('AURUM timeframe analysis failed:', timeframe, analysisSymbol, timeframeError);
+      window.aurumAnalysisDiagnostics = window.aurumAnalysisDiagnostics || {};
+      window.aurumAnalysisDiagnostics[timeframe] = {
+        candleCount: 0,
+        lastCandleTime: null,
+        error: String(timeframeError?.message || timeframeError)
+      };
+      return {
+        timeframe,
+        signal: 'UNKNOWN',
+        supportResistance: null,
+        candles: [],
+        error: String(timeframeError?.message || timeframeError)
+      };
+    }
   })
 );
 
