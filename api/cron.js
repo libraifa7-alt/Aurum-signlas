@@ -4,9 +4,13 @@ const { TIMEFRAMES, normalizeCandles, evaluateMarket } = require('./engine');
 const webpush = require('web-push');
 
 async function redis(command) {
-  const url=process.env.KV_REST_API_URL;
-  const token=process.env.KV_REST_API_TOKEN;
+  // Match the normalization used by the market and signals APIs. Netlify
+  // environment values may contain copied whitespace or wrapping quotes.
+  const url=String(process.env.KV_REST_API_URL || '').trim().replace(/^['"]|['"]$/g, '');
+  const token=String(process.env.KV_REST_API_TOKEN || '').trim().replace(/^['"]|['"]$/g, '');
   if(!url||!token) throw new Error('KV_REST_API_URL dan KV_REST_API_TOKEN belum dikonfigurasi');
+  const parsedUrl = new URL(url);
+  if (parsedUrl.protocol !== 'https:') throw new Error('Redis REST URL harus menggunakan HTTPS');
   const response=await fetch(url,{
     method:'POST',
     headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
