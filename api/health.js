@@ -13,10 +13,13 @@ module.exports = async function handler(req, res) {
 
   const env = req.env || process.env;
 
+  const redisUrl = String(env.KV_REST_API_URL || '').trim().replace(/^['"]|['"]$/g, '');
+  const redisToken = String(env.KV_REST_API_TOKEN || '').trim().replace(/^['"]|['"]$/g, '');
+
   const checks = {
     marketApi: 'not_probed',
     cronSecret: Boolean(env.CRON_SECRET),
-    redisConfigured: Boolean(env.KV_REST_API_URL && env.KV_REST_API_TOKEN),
+    redisConfigured: Boolean(redisUrl && redisToken),
     pushConfigured: Boolean(
       env.VAPID_PUBLIC_KEY &&
       env.VAPID_PRIVATE_KEY &&
@@ -32,7 +35,6 @@ module.exports = async function handler(req, res) {
     try {
       // Netlify env values can accidentally contain copied whitespace or
       // wrapping quotes. Normalize those harmless formatting errors before fetch.
-      const redisUrl = String(env.KV_REST_API_URL).trim().replace(/^['"]|['"]$/g, '');
       const parsedRedisUrl = new URL(redisUrl);
       if (parsedRedisUrl.protocol !== 'https:') {
         const invalidProtocol = new Error('Redis REST URL must use HTTPS');
@@ -42,7 +44,7 @@ module.exports = async function handler(req, res) {
       const response = await fetch(redisUrl, {
         method: 'POST',
         headers: {
-          Authorization: 'Bearer ' + env.KV_REST_API_TOKEN,
+          Authorization: 'Bearer ' + redisToken,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(['PING']),
