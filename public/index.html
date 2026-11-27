@@ -5106,6 +5106,50 @@ html,body{min-height:100%;}
       </div>
     </section>
   </section>
+
+  <script id="aurum-technical-waiting-bootstrap">
+  (function () {
+    // Tampilkan dashboard WAIT sejak halaman pertama dirender.
+    // Data valid dari loadChart akan mengganti placeholder ini secara otomatis.
+    var root = document.getElementById('trendMeter');
+    if (!root || root.querySelector('.aurum-reference-dashboard, .aurum-trend-dashboard')) return;
+    var frames = ['M5','M15','M30','M45','H1','H4','D1'];
+    var cards = frames.map(function (tf) {
+      return '<div class="aurum-reference-tf" data-trend="WAIT">' +
+        '<div class="aurum-tf-card-head">' + tf + '</div>' +
+        '<small>MENUNGGU</small>' +
+        '<div class="aurum-reference-ring"><b>—</b><small>WAIT</small></div>' +
+        '<span class="aurum-reference-tf-label">WAIT</span></div>';
+    }).join('');
+    var segments = Array(28).fill('<i aria-hidden="true"></i>').join('');
+    var rows = frames.map(function (tf) {
+      return '<div class="aurum-reference-table-row"><span>' + tf +
+        '</span><span style="color:#64748b;font-weight:900">WAIT</span>' +
+        '<span>—</span><span>—</span><span>—</span></div>';
+    }).join('');
+    root.innerHTML =
+      '<div class="aurum-trend-dashboard aurum-reference-dashboard" data-direction="WAIT">' +
+        '<section class="aurum-reference-hero">' +
+          '<div class="aurum-reference-hero-top"><small>GOLD · XAUUSD</small><span style="color:#64748b">● MENUNGGU DATA</span></div>' +
+          '<div class="aurum-reference-hero-main"><div><strong style="color:#64748b">WAITING</strong>' +
+          '<small>ANALISIS 7 TIMEFRAME SEDANG MENUNGGU DATA PROVIDER</small></div><b>—</b></div>' +
+          '<div class="aurum-reference-meter-title"><span>TREND METER</span><b>— / 7</b></div>' +
+          '<div class="aurum-reference-meter" aria-label="Menunggu data candle">' + segments + '</div>' +
+          '<div class="aurum-reference-meter-legend"><span>BEARISH —</span><span>MENUNGGU DATA</span><span>BULLISH —</span></div>' +
+        '</section>' +
+        '<div class="aurum-reference-tf-grid">' + cards + '</div>' +
+        '<div class="aurum-reference-table-wrap">' +
+          '<div class="aurum-reference-table-head"><span>TF</span><span>TREND</span><span>VOLUME / SIDE</span><span>SUPPORT</span><span>RESIST.</span></div>' +
+          rows +
+        '</div>' +
+        '<small class="aurum-trend-footnote">Menunggu candle valid dari provider. Data BUY/SELL tidak dibuat-buat.</small>' +
+      '</div>';
+    var status = document.getElementById('marketStructure');
+    if (status && /Menunggu analisis candle/i.test(status.textContent)) {
+      status.textContent = 'MENUNGGU DATA CANDLE PROVIDER…';
+    }
+  })();
+  </script>
   <!-- END HALAMAN SINYAL -->
 
 
