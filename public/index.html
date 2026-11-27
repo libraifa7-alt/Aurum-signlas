@@ -7164,6 +7164,17 @@ const fvgZone = detectFVGZone(candles);
   })
 );
 
+// Jika seluruh timeframe belum memiliki candle yang cukup, pertahankan WAIT.
+const hasUsableTimeframe = results.some(item =>
+  Array.isArray(item.candles) && item.candles.length >= 30
+);
+if (!hasUsableTimeframe) {
+  window.aurumMultiTimeframeTrend = null;
+  const waitingNode = document.getElementById('marketStructure');
+  if (waitingNode) waitingNode.textContent = 'MENUNGGU DATA CANDLE PROVIDER…';
+  return 'WAIT — Menunggu candle valid dari provider';
+}
+
 // Hasil analisis lama tidak boleh menimpa instrumen yang baru dipilih.
 if (document.getElementById('pair')?.value !== analysisSymbol) {
   return 'WAIT — Instrumen berubah; analisis lama dibatalkan';
@@ -8549,6 +8560,17 @@ series.setData(candles);
 }
 
 if (candles.length === 0) {
+  // Jalankan analisis 7 timeframe secara mandiri meskipun chart timeframe aktif kosong.
+  // Dengan begitu panel teknikal tetap dapat terisi dari feed M5–D1 yang valid.
+  try {
+    const structure = await analyzeMarketStructure(symbol);
+    if (requestId === window.aurumChartLoadSequence && document.getElementById('pair')?.value === symbol) {
+      const structureNode = document.getElementById('marketStructure');
+      if (structureNode) structureNode.textContent = structure;
+    }
+  } catch (analysisError) {
+    console.warn('AURUM independent multi-timeframe analysis:', analysisError);
+  }
   return;
 }
 
@@ -9046,6 +9068,16 @@ console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
   if (timeNode) timeNode.textContent = symbol + ' · Data belum tersedia';
   document.getElementById('orderBlockAnalysis').textContent =
     'ERROR GRAFIK: ' + error.message;
+  // Jika chart utama gagal, tetap coba ambil ketujuh timeframe untuk Data Teknikal.
+  try {
+    const structure = await analyzeMarketStructure(symbol);
+    if (requestId === window.aurumChartLoadSequence && document.getElementById('pair')?.value === symbol) {
+      const structureNode = document.getElementById('marketStructure');
+      if (structureNode) structureNode.textContent = structure;
+    }
+  } catch (analysisError) {
+    console.warn('AURUM independent multi-timeframe analysis:', analysisError);
+  }
   }
 }
 
