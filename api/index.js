@@ -585,7 +585,7 @@ module.exports = async function handler(req, res) {
           const fallbackCandles = fallbackPayload.values.map(point => {
             const rawDate = String(point.datetime || "").trim();
             const normalizedDate = rawDate.includes("T") ? rawDate : rawDate.replace(" ", "T");
-            const dateText = /[zZ]|[+-]\\d{2}:\\d{2}$/.test(normalizedDate) ? normalizedDate : normalizedDate + "Z";
+            const dateText = /[zZ]|[+-]\d{2}:\d{2}$/.test(normalizedDate) ? normalizedDate : normalizedDate + "Z";
             const timestampMs = Date.parse(dateText);
             const open = Number(point.open);
             const high = Number(point.high);
