@@ -6450,25 +6450,20 @@ if (chartStatus) {
     H4: 28800000,
     D1: 172800000
   }[interval] || 1800000);
-  if (symbol === 'XAU/USD') {
-    const quoteAge = chartFeedMeta && chartFeedMeta.livePriceUpdatedAt
-      ? Date.now() - Date.parse(chartFeedMeta.livePriceUpdatedAt) : Infinity;
-    const quoteIsFresh = !chartFeedMeta?.fromCache &&
-      chartFeedMeta?.livePriceStatus === 'live_quote' &&
-      quoteAge >= 0 && quoteAge <= 120000;
-    const backendCandleFresh = chartFeedMeta?.candleStatus === 'fresh_candles';
-    const candleIsFresh = backendCandleFresh &&
-      candleAge >= 0 && candleAge <= intervalFreshnessMs;
-    if (quoteIsFresh && candleIsFresh) {
-      state = 'LIVE DATA';
-    } else if (chartFeedMeta?.marketStatus === 'closed' ||
-      (new Date().getUTCDay() === 0 || new Date().getUTCDay() === 6)) {
-      state = 'PASAR TUTUP';
-    }
-  } else if (candleAge >= 0 && candleAge <= intervalFreshnessMs) {
-    state = 'LIVE DATA';
-  } else if (symbol === 'WTI' && (new Date().getUTCDay() === 0 || new Date().getUTCDay() === 6)) {
+  const backendCandleFresh = chartFeedMeta?.candleStatus === 'fresh_candles';
+  const candleIsFresh = backendCandleFresh &&
+    candleAge >= 0 && candleAge <= intervalFreshnessMs;
+  const quoteAge = chartFeedMeta?.livePriceUpdatedAt
+    ? Date.now() - Date.parse(chartFeedMeta.livePriceUpdatedAt) : Infinity;
+  const quoteIsFresh = symbol !== 'XAU/USD' || (
+    !chartFeedMeta?.fromCache &&
+    chartFeedMeta?.livePriceStatus === 'live_quote' &&
+    quoteAge >= 0 && quoteAge <= 120000
+  );
+  if (chartFeedMeta?.marketStatus === 'closed') {
     state = 'PASAR TUTUP';
+  } else if (candleIsFresh && quoteIsFresh) {
+    state = 'LIVE DATA';
   }
   chartStatus.textContent = '● ' + state;
   chartStatus.classList.remove('is-live','is-delayed','is-closed');
@@ -6476,7 +6471,7 @@ if (chartStatus) {
   chartStatus.title = chartFeedMeta?.fromCache
     ? 'Data berasal dari cache; kesegaran live belum diverifikasi'
     : state === 'LIVE DATA'
-      ? 'Timestamp sumber data masih dalam batas 2 menit'
+      ? 'Timestamp candle dan kuotasi memenuhi batas kesegaran'
       : state === 'PASAR TUTUP'
         ? 'Pasar sedang tutup; menampilkan data sesi terakhir'
         : 'Data terbaru belum memenuhi syarat status LIVE';
