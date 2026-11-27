@@ -10,8 +10,8 @@
     "standalone"
   ],
   "orientation": "portrait",
-  "background_color": "#080d18",
-  "theme_color": "#080d18",
+  "background_color": "#020203",
+  "theme_color": "#020203",
   "icons": [
     {
       "src": "/signature-app-icon-192.png?v=3",
