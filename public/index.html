@@ -7185,7 +7185,7 @@ const direction = signal =>
         const label = state === 'BULLISH' ? 'BUY' : state === 'BEARISH' ? 'SELL' : state === 'RANGE' ? 'NEUTRAL' : 'N/A';
         const symbol = state === 'BULLISH' ? '▲' : state === 'BEARISH' ? '▼' : '•';
         return `
-          <div class="aurum-tf-card aurum-reference-tf" style="--tf-color:${color}">
+          <div class="aurum-tf-card aurum-reference-tf" data-trend="${state}" style="--tf-color:${color}">
             <div class="aurum-tf-card-head"><strong>${item.timeframe}</strong><span>${symbol}</span></div>
             <small>${state === 'UNKNOWN' ? 'NO DATA' : state}</small>
             <div class="aurum-reference-ring" style="--ring-color:${color}"><b>${symbol}</b><small>${label}</small></div>
@@ -7229,7 +7229,7 @@ const direction = signal =>
               <small>${document.getElementById('signalAssetName')?.textContent || 'GOLD · XAUUSD'}</small><span>● LIVE</span>
             </div>
             <div class="aurum-reference-hero-main">
-              <div><strong style="color:${overall === 'BEARISH' ? '#ef5b67' : overall === 'BULLISH' ? '#16b981' : '#8b929d'}">${overall}</strong><small>${bearish + bullish} OF ${total} TIMEFRAMES DIRECTIONAL</small></div>
+              <div><strong style="color:${overall === 'BEARISH' ? '#ef3348' : overall === 'BULLISH' ? '#0878f9' : '#68758a'}">${overall}</strong><small>${bearish + bullish} OF ${total} TIMEFRAMES DIRECTIONAL</small></div>
               <b>${latestPrice}</b>
             </div>
             <div class="aurum-reference-meter-title"><span>TREND METER</span><b>${scoreValue}</b></div>
@@ -10930,6 +10930,62 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
  to{box-shadow:0 0 0 2px #d7f1ff,0 0 18px #168cffff,0 0 34px #168cff77,inset 0 0 24px #c6e6ff}
 }
 </style>
+
+<style id="signature-technical-dynamic-colors">
+/* Match the supplied Signature reference: BUY/BULLISH blue, SELL/BEARISH red.
+   Direction colors follow the live analysis state; no timeframe is hard-coded. */
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-hero-main strong{
+  font-size:clamp(34px,6.5vw,48px)!important;font-weight:1000!important;letter-spacing:-.6px!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-dashboard[data-direction="BULLISH"] .aurum-reference-hero-main strong{
+  color:#0878f9!important;text-shadow:0 1px 0 #fff,0 3px 12px #0878f944!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-dashboard[data-direction="BEARISH"] .aurum-reference-hero-main strong{
+  color:#ef3348!important;text-shadow:0 1px 0 #fff,0 3px 12px #ef334844!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-dashboard[data-direction="MIXED"] .aurum-reference-hero-main strong,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-dashboard[data-direction="RANGE"] .aurum-reference-hero-main strong{
+  color:#66758a!important;text-shadow:none!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="BULLISH"]{
+  border-color:#62aaff!important;background:linear-gradient(180deg,#fff 0%,#e7f2ff 100%)!important;
+  box-shadow:0 3px 12px #0878f927,inset 0 0 0 1px #c9e2ff!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="BULLISH"] .aurum-tf-card-head span,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="BULLISH"]>small,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="BULLISH"] .aurum-reference-tf-label{
+  color:#0878f9!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="BEARISH"]{
+  border-color:#f07886!important;background:linear-gradient(180deg,#fff 0%,#fff0f2 100%)!important;
+  box-shadow:0 3px 12px #ef334822,inset 0 0 0 1px #ffd5db!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="BEARISH"] .aurum-tf-card-head span,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="BEARISH"]>small,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="BEARISH"] .aurum-reference-tf-label{
+  color:#ef3348!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="RANGE"],
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="UNKNOWN"]{
+  border-color:#cbd5e1!important;background:linear-gradient(180deg,#fff 0%,#f3f6fa 100%)!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="RANGE"] .aurum-tf-card-head span,
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-tf[data-trend="UNKNOWN"] .aurum-tf-card-head span{
+  color:#718096!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-table-support{
+  color:#0878d8!important;font-weight:1000!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-table-resistance{
+  color:#e02e42!important;font-weight:1000!important;
+}
+@media(max-width:420px){
+  #marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-hero-main strong{
+    font-size:clamp(31px,8vw,40px)!important;
+  }
+}
+</style>
+
 </body>
 </html>
 
