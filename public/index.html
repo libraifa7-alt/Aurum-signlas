@@ -4598,6 +4598,35 @@ html,body{min-height:100%;}
 }
 </style>
 
+
+<style id="aurum-traxa-waiting-dashboard-fix">
+/* Keep the TRAXA-style technical dashboard visible and readable while candle data loads. */
+#marketPage #trendMeter .aurum-reference-dashboard{display:grid!important;gap:14px!important;padding:14px!important;border:1px solid #b9dcfb!important;border-radius:16px!important;background:linear-gradient(145deg,#fff,#eef7ff 65%,#fffaf0)!important;color:#183b65!important;box-shadow:0 8px 20px #235f991a!important}
+#marketPage #trendMeter .aurum-reference-hero{display:grid!important;gap:12px!important;padding:16px!important;border:1px solid #c8e1f8!important;border-radius:13px!important;background:linear-gradient(110deg,#f4fbff,#fff 55%,#fff8e8)!important}
+#marketPage #trendMeter .aurum-reference-hero-top,#marketPage #trendMeter .aurum-reference-hero-main,#marketPage #trendMeter .aurum-reference-meter-title,#marketPage #trendMeter .aurum-reference-meter-legend{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;flex-wrap:wrap!important}
+#marketPage #trendMeter .aurum-reference-hero-top{font-size:11px!important;font-weight:900!important;color:#2876b8!important;letter-spacing:.7px!important}
+#marketPage #trendMeter .aurum-reference-hero-main strong{display:block!important;font-size:clamp(30px,7vw,48px)!important;line-height:1.08!important;font-weight:1000!important;color:#64748b!important}
+#marketPage #trendMeter .aurum-reference-hero-main small{display:block!important;margin-top:5px!important;font-size:9px!important;font-weight:900!important;color:#526b88!important;letter-spacing:.55px!important}
+#marketPage #trendMeter .aurum-reference-hero-main>b{padding:10px 13px!important;border-radius:9px!important;background:#e6f2ff!important;border:1px solid #b8d8fa!important;color:#2563a6!important;font-size:clamp(18px,4vw,26px)!important;font-weight:950!important}
+#marketPage #trendMeter .aurum-reference-meter-title{font-size:11px!important;font-weight:950!important;color:#27496f!important}
+#marketPage #trendMeter .aurum-reference-meter{display:grid!important;grid-template-columns:repeat(28,minmax(0,1fr))!important;gap:3px!important;min-height:17px!important}
+#marketPage #trendMeter .aurum-reference-meter i{display:block!important;min-width:0!important;height:15px!important;border-radius:3px!important;background:#cbd5e1!important;border:1px solid #b6c6d8!important;box-shadow:inset 0 1px #ffffffb8!important}
+#marketPage #trendMeter .aurum-reference-meter-legend{font-size:9px!important;font-weight:900!important;color:#526b88!important}
+#marketPage #trendMeter .aurum-reference-tf-grid{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important}
+#marketPage #trendMeter .aurum-reference-tf{display:grid!important;justify-items:center!important;align-content:start!important;gap:6px!important;min-width:0!important;min-height:105px!important;padding:9px 3px!important;border:1px solid #c5def5!important;border-radius:11px!important;background:linear-gradient(180deg,#fff,#edf6ff)!important;color:#174477!important;box-shadow:0 4px 10px #2868a51a!important;text-align:center!important}
+#marketPage #trendMeter .aurum-reference-tf .aurum-tf-card-head{width:100%!important;font-size:clamp(10px,2vw,13px)!important;font-weight:950!important;color:#173d70!important}
+#marketPage #trendMeter .aurum-reference-tf>small{font-size:8px!important;font-weight:950!important;color:#64748b!important}
+#marketPage #trendMeter .aurum-reference-ring{display:grid!important;place-items:center!important;width:43px!important;height:43px!important;border:3px solid #94a3b8!important;border-radius:50%!important;background:#fff!important;color:#64748b!important;box-shadow:0 0 0 3px #e6eef7!important}
+#marketPage #trendMeter .aurum-reference-ring b{font-size:15px!important;font-weight:1000!important}
+#marketPage #trendMeter .aurum-reference-ring small{font-size:7px!important;font-weight:900!important}
+#marketPage #trendMeter .aurum-reference-tf-label{font-size:8px!important;font-weight:950!important;color:#64748b!important}
+#marketPage #trendMeter .aurum-reference-table-wrap{overflow:hidden!important;border:1px solid #c7dff6!important;border-radius:11px!important;background:#fff!important}
+#marketPage #trendMeter .aurum-reference-table-head,#marketPage #trendMeter .aurum-reference-table-row{display:grid!important;grid-template-columns:.55fr .85fr 1.1fr .85fr .85fr!important;align-items:center!important;gap:5px!important;padding:10px 7px!important;border-bottom:1px solid #e2edf7!important;font-size:clamp(8px,1.8vw,10px)!important;color:#29496c!important}
+#marketPage #trendMeter .aurum-reference-table-head{font-weight:1000!important;color:#174b82!important;background:linear-gradient(90deg,#e6f2ff,#fff,#fff5dd)!important}
+#marketPage #trendMeter .aurum-reference-table-row:last-child{border-bottom:0!important}
+#marketPage #trendMeter .aurum-trend-footnote{font-size:9px!important;line-height:1.55!important;color:#607995!important;font-weight:650!important}
+@media(max-width:420px){#marketPage #trendMeter .aurum-reference-dashboard{padding:9px!important;gap:10px!important}#marketPage #trendMeter .aurum-reference-hero{padding:11px!important}#marketPage #trendMeter .aurum-reference-tf-grid{gap:4px!important}#marketPage #trendMeter .aurum-reference-tf{min-height:91px!important;padding:7px 2px!important}#marketPage #trendMeter .aurum-reference-ring{width:36px!important;height:36px!important}#marketPage #trendMeter .aurum-reference-table-head,#marketPage #trendMeter .aurum-reference-table-row{padding:8px 4px!important;gap:3px!important;font-size:7px!important}}
+</style>
 </head>
   
   
@@ -6211,10 +6240,12 @@ async function loadChart(interval) {
       try { chart.timeScale().fitContent(); } catch (_) {}
     }
 
-    if (window.aurumDisplayedSignalSymbol !== symbol) {
-      clearSelectedInstrumentView(symbol + ' · Memuat data instrumen…');
-      window.aurumDisplayedSignalSymbol = symbol;
-    }
+    // Render kerangka Data Teknikal pada SETIAP pemuatan chart, termasuk saat
+    // halaman pertama dibuka. Jangan bergantung pada perubahan simbol saja.
+    // Ini memastikan meter 28 kotak + 7 timeframe tetap terlihat ketika provider
+    // belum mengirim candle; hasil analisis valid akan menggantikannya setelah siap.
+    clearSelectedInstrumentView(symbol + ' · Memuat data instrumen…');
+    window.aurumDisplayedSignalSymbol = symbol;
     try {
       document.getElementById('aurumDebugStatus').textContent =
         'LOADCHART BERJALAN: ' + interval;
