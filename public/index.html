@@ -6172,7 +6172,32 @@ async function loadChart(interval) {
       const plan = document.getElementById('aurumTradePlan');
       if (plan) plan.style.display = 'none';
       const trendMeter = document.getElementById('trendMeter');
-      if (trendMeter) trendMeter.innerHTML = '<p>Analisis multi-timeframe menunggu data ' + symbol + ' yang valid.</p>';
+      if (trendMeter) {
+        const waitingFrames = ['M5','M15','M30','M45','H1','H4','D1'];
+        const waitingCards = waitingFrames.map(function(tf){
+          return '<div class="aurum-reference-tf" style="--ring-color:#94a3b8;--tf-color:#64748b">' +
+            '<div class="aurum-tf-card-head">' + tf + '</div><small>MENUNGGU</small>' +
+            '<div class="aurum-reference-ring"><b>—</b><small>WAIT</small></div>' +
+            '<span class="aurum-reference-tf-label">WAIT</span></div>';
+        }).join('');
+        const waitingSegments = Array(28).fill('<i style="background:#cbd5e1"></i>').join('');
+        const waitingRows = waitingFrames.map(function(tf){
+          return '<div class="aurum-reference-table-row"><span>' + tf + '</span><span style="color:#64748b;font-weight:800">WAIT</span><span>—</span><span>—</span><span>—</span></div>';
+        }).join('');
+        trendMeter.innerHTML =
+          '<div class="aurum-trend-dashboard aurum-reference-dashboard" data-direction="WAIT">' +
+            '<section class="aurum-reference-hero">' +
+              '<div class="aurum-reference-hero-top"><small>' + symbol + '</small><span style="color:#64748b">● MENUNGGU DATA CANDLE</span></div>' +
+              '<div class="aurum-reference-hero-main"><div><strong style="color:#64748b">WAITING</strong><small>ANALISIS 7 TIMEFRAME BELUM TERSEDIA</small></div><b>—</b></div>' +
+              '<div class="aurum-reference-meter-title"><span>TREND METER</span><b style="color:#64748b">— / 7</b></div>' +
+              '<div class="aurum-reference-meter" aria-label="Menunggu data candle">' + waitingSegments + '</div>' +
+              '<div class="aurum-reference-meter-legend"><span>BEARISH —</span><span>MENUNGGU DATA</span><span>BULLISH —</span></div>' +
+            '</section>' +
+            '<div class="aurum-tf-grid aurum-reference-tf-grid">' + waitingCards + '</div>' +
+            '<div class="aurum-reference-table-wrap"><div class="aurum-reference-table-head"><span>TF</span><span>TREND</span><span>VOLUME / SIDE</span><span>SUPPORT</span><span>RESIST.</span></div>' + waitingRows + '</div>' +
+            '<small class="aurum-trend-footnote">Data teknikal akan terisi otomatis setelah provider mengirim candle yang valid. Tidak ada arah BUY/SELL yang dibuat-buat.</small>' +
+          '</div>';
+      }
       const dailyRange = document.getElementById('aurumDailyRange');
       if (dailyRange) dailyRange.innerHTML = '<p>Rentang harian ' + symbol + ' belum tersedia.</p>';
       const status = document.getElementById('chartFeedStatus');
