@@ -1,5 +1,41 @@
 
 
+function getCmeMarketStatus(timestamp = Date.now()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(new Date(timestamp));
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  const weekday = values.weekday;
+  const minutes = Number(values.hour) * 60 + Number(values.minute);
+  let closed = false;
+  let reason = "Sesi perdagangan terjadwal";
+
+  if (weekday === "Sat") {
+    closed = true;
+    reason = "Akhir pekan";
+  } else if (weekday === "Sun" && minutes < 17 * 60) {
+    closed = true;
+    reason = "Sesi mingguan dibuka Minggu pukul 17.00 waktu Chicago";
+  } else if (weekday === "Fri" && minutes >= 16 * 60) {
+    closed = true;
+    reason = "Sesi Jumat berakhir pukul 16.00 waktu Chicago";
+  } else if (weekday !== "Sun" && weekday !== "Fri" && minutes >= 16 * 60 && minutes < 17 * 60) {
+    closed = true;
+    reason = "Jeda pemeliharaan harian pukul 16.00–17.00 waktu Chicago";
+  }
+
+  return {
+    status: closed ? "closed" : "open",
+    reason,
+    timezone: "America/Chicago",
+    source: "Jadwal mingguan reguler CME Globex; penyesuaian hari libur khusus tidak disimpulkan"
+  };
+}
+
 module.exports = async function handler(req, res) {
   const env = req.env || process.env;
   if (typeof res.setHeader === "function") {
@@ -137,11 +173,24 @@ module.exports = async function handler(req, res) {
       rawAgeSeconds >= -60 &&
       rawAgeSeconds <= freshnessLimit;
 
+    const marketSession = selectedSymbol === "BTC/USD"
+      ? {
+          status: "open",
+          reason: "Bitcoin diperdagangkan 24 jam, 7 hari",
+          timezone: "UTC",
+          source: "Pasar spot BTC 24/7"
+        }
+      : getCmeMarketStatus();
+
     return {
       ...payload,
       lastCandleAt,
       candleAgeSeconds: Number.isFinite(rawAgeSeconds) ? Math.max(0, rawAgeSeconds) : null,
       candleStatus: fresh ? "fresh_candles" : "stale_candles",
+      marketStatus: marketSession.status,
+      marketStatusReason: marketSession.reason,
+      marketSessionTimezone: marketSession.timezone,
+      marketStatusSource: marketSession.source,
       ...(cacheLabel ? { cache: cacheLabel } : {})
     };
   }
@@ -814,4 +863,6 @@ globalThis.aurumCache.set(cacheKey, {
     });
   }
 };
+
+module.exports.getCmeMarketStatus = getCmeMarketStatus;
 
