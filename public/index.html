@@ -9116,6 +9116,25 @@ if (timeframe && dashboardTimeframe) {
 
 loadChart(timeframe.value || 'M15');
 
+// Jalankan analisis 7 timeframe secara independen saat halaman dibuka.
+// Panel teknikal tidak boleh bergantung pada keberhasilan chart M1/M15.
+Promise.resolve().then(async function () {
+  const initialSymbol = pairSelect?.value || 'XAU/USD';
+  const statusNode = document.getElementById('marketStructure');
+  if (statusNode) statusNode.textContent = 'MEMERIKSA DATA 7 TIMEFRAME…';
+  try {
+    const structure = await analyzeMarketStructure(initialSymbol);
+    if (pairSelect?.value === initialSymbol && statusNode) {
+      statusNode.textContent = structure;
+    }
+  } catch (error) {
+    console.error('AURUM initial 7-timeframe analysis failed:', error);
+    if (pairSelect?.value === initialSymbol && statusNode) {
+      statusNode.textContent = 'DATA TEKNIKAL GAGAL DIMUAT — PERIKSA KONEKSI PROVIDER';
+    }
+  }
+});
+
 const timeframeButtons = document.querySelectorAll('.aurum-chart-timeframes button[data-timeframe]');
 function syncTimeframeButtons(value) {
   timeframeButtons.forEach(button => {
