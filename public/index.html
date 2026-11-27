@@ -7002,7 +7002,14 @@ if (candles.length === 0) {
     return candles;
 
     } catch (error) {
-    console.log('Shared candle error:', error);
+    window.aurumTimeframeDiagnostics = window.aurumTimeframeDiagnostics || {};
+    window.aurumTimeframeDiagnostics[interval] = {
+      requested: interval,
+      symbol,
+      count: 0,
+      error: 'Gagal mengambil/membaca API: ' + String(error?.message || error)
+    };
+    console.warn('AURUM SHARED CANDLE REQUEST FAILED:', window.aurumTimeframeDiagnostics[interval]);
     return [];
   }
 }
