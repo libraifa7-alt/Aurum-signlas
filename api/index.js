@@ -639,6 +639,133 @@ module.exports = async function handler(req, res) {
         }
       }
 
+      // Final no-key fallback: Yahoo Finance COMEX gold futures (GC=F).
+      // This is explicitly a futures proxy, NOT spot XAU/USD. It is used only
+      // when XAUS OHLC and the optional Twelve Data fallback are unavailable.
+      if (!candleData) {
+        try {
+          const yahooIntervals = {
+            M1: "1m", M5: "5m", M15: "15m", M30: "30m",
+            M45: "15m", H1: "60m", H4: "60m", D1: "1d"
+          };
+          const yahooRanges = {
+            M1: "5d", M5: "1mo", M15: "1mo", M30: "1mo",
+            M45: "1mo", H1: "3mo", H4: "3mo", D1: "2y"
+          };
+          const yahooUrl = new URL(
+            "https://query1.finance.yahoo.com/v8/finance/chart/GC=F"
+          );
+          yahooUrl.searchParams.set("interval", yahooIntervals[selected]);
+          yahooUrl.searchParams.set("range", yahooRanges[selected] || "5d");
+          const yahooResponse = await fetch(yahooUrl, {
+            headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
+            signal: AbortSignal.timeout(12000)
+          });
+          const yahooPayload = await yahooResponse.json();
+          const yahooResult = yahooPayload.chart?.result?.[0];
+          const yahooQuote = yahooResult?.indicators?.quote?.[0];
+          if (!yahooResponse.ok || !yahooResult || !yahooQuote) {
+            throw new Error(
+              yahooPayload.chart?.error?.description ||
+              "Yahoo Finance GC=F tidak mengirim data OHLC"
+            );
+          }
+
+          let yahooCandles = (yahooResult.timestamp || []).map((timestamp, index) => {
+            const open = Number(yahooQuote.open?.[index]);
+            const high = Number(yahooQuote.high?.[index]);
+            const low = Number(yahooQuote.low?.[index]);
+            const close = Number(yahooQuote.close?.[index]);
+            const timeMs = Number(timestamp) * 1000;
+            if (!Number.isFinite(timeMs) || timeMs <= 0 ||
+                timeMs > Date.now() + 60000 ||
+                !Number.isFinite(open) || !Number.isFinite(high) ||
+                !Number.isFinite(low) || !Number.isFinite(close) ||
+                open <= 0 || high <= 0 || low <= 0 || close <= 0 ||
+                high < Math.max(open, close, low) ||
+                low > Math.min(open, close, high)) return null;
+            return {
+              timestamp: Math.floor(timeMs / 1000),
+              datetime: new Date(timeMs).toISOString(),
+              open, high, low, close,
+              volume: Number(yahooQuote.volume?.[index]) || 0
+            };
+          }).filter(Boolean).sort((a, b) => a.timestamp - b.timestamp);
+
+          if (selected === "M45" || selected === "H4") {
+            const sourceSeconds = selected === "M45" ? 900 : 3600;
+            const targetSeconds = selected === "M45" ? 2700 : 14400;
+            const expectedBars = targetSeconds / sourceSeconds;
+            const buckets = new Map();
+            for (const candle of yahooCandles) {
+              const bucketStart = Math.floor(candle.timestamp / targetSeconds) * targetSeconds;
+              const group = buckets.get(bucketStart) || [];
+              group.push(candle);
+              buckets.set(bucketStart, group);
+            }
+            yahooCandles = Array.from(buckets.entries())
+              .sort((a, b) => a[0] - b[0])
+              .filter(([bucketStart, group]) => {
+                if (group.length !== expectedBars ||
+                    (bucketStart + targetSeconds) * 1000 > Date.now()) return false;
+                group.sort((a, b) => a.timestamp - b.timestamp);
+                return group.every((item, index) =>
+                  item.timestamp === bucketStart + index * sourceSeconds
+                );
+              })
+              .map(([bucketStart, group]) => ({
+                timestamp: bucketStart,
+                datetime: new Date(bucketStart * 1000).toISOString(),
+                open: group[0].open,
+                high: Math.max(...group.map(item => item.high)),
+                low: Math.min(...group.map(item => item.low)),
+                close: group[group.length - 1].close,
+                volume: group.reduce((sum, item) => sum + item.volume, 0)
+              }));
+          }
+
+          yahooCandles = yahooCandles.slice(-(selected === "M45" ? 300 : 500));
+          if (!yahooCandles.length) {
+            throw new Error("Yahoo Finance GC=F tidak mengirim candle valid untuk " + selected);
+          }
+          const lastCandleAt = yahooCandles[yahooCandles.length - 1].datetime;
+          const rawAge = Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000);
+          if (!Number.isFinite(rawAge) || rawAge < -60) {
+            throw new Error("Timestamp candle Yahoo GC=F tidak valid");
+          }
+          const freshnessLimit = ({
+            M1: 300, M5: 900, M15: 2700, M30: 5400,
+            M45: 8100, H1: 10800, H4: 43200, D1: 259200
+          }[selected] || 2700);
+          candleData = {
+            status: "success",
+            symbol: selectedSymbol,
+            interval: selected,
+            source: "Yahoo Finance GC=F · COMEX gold futures proxy",
+            candleSource: "Yahoo Finance GC=F (futures proxy, bukan spot)",
+            providerFetchedAt: new Date().toISOString(),
+            lastCandleAt,
+            candleAgeSeconds: Math.max(0, rawAge),
+            candleStatus: rawAge <= freshnessLimit ? "fresh_candles" : "stale_candles",
+            candles: yahooCandles
+          };
+          globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: candleData });
+          try {
+            await aurumRedis([
+              "SET", redisKey,
+              JSON.stringify({ time: Date.now(), data: candleData }),
+              "EX", "3600"
+            ]);
+          } catch (cacheError) {
+            console.warn("YAHOO GOLD FALLBACK CACHE WRITE:", cacheError.message);
+          }
+        } catch (yahooError) {
+          chartError = [chartError, "Yahoo GC=F fallback: " + String(yahooError.message || "gagal").slice(0, 140)]
+            .filter(Boolean).join(" | ");
+          console.warn("GOLD YAHOO FUTURES FALLBACK:", yahooError.message);
+        }
+      }
+
       if (!candleData && chartCoolingDown && cachedGold && !cachedGoldHasFutureCandles && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
         candleData = {
           ...cachedGold,
