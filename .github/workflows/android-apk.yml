@@ -41,6 +41,28 @@ jobs:
       - name: Sync web application
         run: npx cap sync android
 
+      - name: Remove Android white launch flash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in Path('android/app/src/main/res').rglob('styles.xml'):
+              source = path.read_text()
+              updated = source.replace('<item name="android:background">@drawable/splash</item>', '<item name="android:background">#080808</item>')
+              marker = '<style name="AppTheme.NoActionBarLaunch"'
+              if marker in updated:
+                  start = updated.index(marker)
+                  end = updated.index('</style>', start)
+                  block = updated[start:end]
+                  if 'windowSplashScreenBackground' not in block:
+                      block += '\\n        <item name="windowSplashScreenBackground">#080808</item>'
+                  if 'windowSplashScreenAnimatedIcon' not in block:
+                      block += '\\n        <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>'
+                  updated = updated[:start] + block + updated[end:]
+              if updated != source:
+                  path.write_text(updated)
+                  print(f'Patched {path}')
+          PY
+
       - name: Build debug APK
         working-directory: android
         run: |
