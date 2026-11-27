@@ -11447,6 +11447,57 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   #marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-meter>i{border-radius:2px!important}
 }
 </style>
+
+<style id="signature-tab-isolation-fix">
+/* Keep Sinyal, Performa, and Data Teknikal mutually exclusive.
+   The hidden attribute must win over every later panel display rule. */
+#marketPage .aurum-signal-panel[hidden],
+#marketPage [data-signal-panel][hidden]{
+  display:none!important;
+  visibility:hidden!important;
+  height:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+}
+#marketPage .aurum-signal-panel:not([hidden]){
+  display:block!important;
+  visibility:visible!important;
+  height:auto!important;
+}
+</style>
+<script id="signature-tab-isolation-fix-js">
+(function(){
+  function isolateSignalPanels(selected){
+    var panels=document.querySelectorAll('#marketPage [data-signal-panel]');
+    panels.forEach(function(panel){
+      var active=panel.getAttribute('data-signal-panel')===selected;
+      panel.hidden=!active;
+      panel.classList.toggle('active',active);
+      if(active) panel.removeAttribute('aria-hidden');
+      else panel.setAttribute('aria-hidden','true');
+    });
+    document.querySelectorAll('#marketPage [data-signal-tab]').forEach(function(tab){
+      var active=tab.getAttribute('data-signal-tab')===selected;
+      tab.classList.toggle('active',active);
+      tab.setAttribute('aria-selected',active?'true':'false');
+    });
+  }
+  document.addEventListener('click',function(event){
+    var tab=event.target.closest('#marketPage [data-signal-tab]');
+    if(tab) isolateSignalPanels(tab.getAttribute('data-signal-tab'));
+  },true);
+  document.addEventListener('DOMContentLoaded',function(){
+    var selected=document.querySelector('#marketPage [data-signal-tab].active')?.getAttribute('data-signal-tab')||'setup';
+    isolateSignalPanels(selected);
+  });
+  var selected=document.querySelector('#marketPage [data-signal-tab].active')?.getAttribute('data-signal-tab')||'setup';
+  isolateSignalPanels(selected);
+})();
+</script>
+<!-- SIGNATURE TAB ISOLATION FIX -->
 </body>
 </html>
 
