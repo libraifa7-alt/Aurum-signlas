@@ -17,9 +17,9 @@
       "purpose": "any"
     },
     {
-      "src": "/signature-app-icon-512.svg?v=1",
+      "src": "/signature-app-icon-512.png?v=4",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     }
   ],
