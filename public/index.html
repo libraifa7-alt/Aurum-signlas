@@ -6352,9 +6352,27 @@ if (useBrowserCache) {
     ' | CANDLES: ' + (data.candles?.length || 0);
 
   if (data.status !== 'success' || !data.candles?.length) {
-    console.log('Data grafik belum tersedia untuk', symbol, data);
-    clearSelectedInstrumentView(symbol + ' · Data belum tersedia dari provider');
-    document.getElementById('aurumDebugStatus').textContent = 'DATA ' + symbol + ' BELUM TERSEDIA';
+    console.log('Data grafik utama belum tersedia untuk', symbol, data);
+    clearSelectedInstrumentView(symbol + ' · Data grafik utama belum tersedia; memeriksa 7 timeframe');
+
+    // Jangan hentikan seluruh Data Teknikal hanya karena timeframe grafik utama
+    // kosong. Ambil M5–D1 secara mandiri agar meter tetap bisa terisi dari
+    // timeframe lain yang memiliki candle valid.
+    document.getElementById('aurumDebugStatus').textContent =
+      'GRAFIK UTAMA KOSONG · MEMERIKSA 7 TIMEFRAME';
+
+    try {
+      const structure = await analyzeMarketStructure(symbol);
+      if (
+        requestId === window.aurumChartLoadSequence &&
+        document.getElementById('pair')?.value === symbol
+      ) {
+        const structureNode = document.getElementById('marketStructure');
+        if (structureNode) structureNode.textContent = structure;
+      }
+    } catch (analysisError) {
+      console.warn('AURUM independent multi-timeframe analysis after empty chart:', analysisError);
+    }
     return;
   }
 
