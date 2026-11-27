@@ -22,7 +22,7 @@
         '<div class="sto-log"><div>› Verifying member <b>OK</b></div><div>› Preparing your setup <b>OK</b></div><div>› Syncing live prices <b>OK</b></div><div>› Loading signals &amp; market data <b>OK</b></div><div>› Connecting to your dashboard <b>OK</b></div></div>'+
         '<div class="sto-footer-line"></div><div class="sto-welcome"><span>WELCOME BACK</span><strong>REZZA ON</strong></div>'+
       '</section>';
-    document.body.appendChild(root);
+    document.documentElement.appendChild(root);
     // Reveal REZZA ON visibly, one character at a time after the name appears.
     var memberName=root.querySelector('.sto-welcome strong');
     if(memberName){
@@ -105,6 +105,5 @@
     window.addEventListener('resize',function(){measure();setProgress(progress);});
     measure();setProgress(0);
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
-  else start();
+  start();
 })();
