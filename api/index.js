@@ -560,6 +560,85 @@ module.exports = async function handler(req, res) {
         }
       }
 
+      // Fallback candle Gold ke Twelve Data jika XAUS Chart gagal/tidak mengirim OHLC valid.
+      // Harga spot XAUS tetap terpisah; candle tidak pernah dibuat dari harga spot.
+      const twelveFallbackKey = String(env.TWELVE_DATA_API_KEY || "").trim().replace(/^['"]|['"]$/g, "");
+      if (!candleData && twelveFallbackKey) {
+        try {
+          const fallbackUrl = new URL("https://api.twelvedata.com/time_series");
+          fallbackUrl.searchParams.set("symbol", "XAU/USD");
+          fallbackUrl.searchParams.set("interval", interval);
+          fallbackUrl.searchParams.set("outputsize", selected === "M45" ? "300" : "500");
+          fallbackUrl.searchParams.set("timezone", "UTC");
+          fallbackUrl.searchParams.set("order", "ASC");
+          fallbackUrl.searchParams.set("apikey", twelveFallbackKey);
+
+          const fallbackResponse = await fetch(fallbackUrl, {
+            headers: { "Accept": "application/json" },
+            signal: AbortSignal.timeout(12000)
+          });
+          const fallbackPayload = await fallbackResponse.json();
+          if (!fallbackResponse.ok || fallbackPayload.status === "error" || !Array.isArray(fallbackPayload.values)) {
+            throw new Error(fallbackPayload.message || fallbackPayload.code || "Twelve Data tidak mengirim candle OHLC");
+          }
+
+          const fallbackCandles = fallbackPayload.values.map(point => {
+            const rawDate = String(point.datetime || "").trim();
+            const normalizedDate = rawDate.includes("T") ? rawDate : rawDate.replace(" ", "T");
+            const dateText = /[zZ]|[+-]\\d{2}:\\d{2}$/.test(normalizedDate) ? normalizedDate : normalizedDate + "Z";
+            const timestampMs = Date.parse(dateText);
+            const open = Number(point.open);
+            const high = Number(point.high);
+            const low = Number(point.low);
+            const close = Number(point.close);
+            const volume = Number(point.volume || 0);
+            if (!Number.isFinite(timestampMs) || timestampMs <= 0 || timestampMs > Date.now() + 60000 ||
+                !Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close) ||
+                open <= 0 || high <= 0 || low <= 0 || close <= 0 ||
+                high < Math.max(open, close, low) || low > Math.min(open, close, high)) return null;
+            return {
+              timestamp: Math.floor(timestampMs / 1000),
+              datetime: new Date(timestampMs).toISOString(),
+              open, high, low, close,
+              volume: Number.isFinite(volume) ? volume : 0
+            };
+          }).filter(Boolean).sort((left, right) => left.timestamp - right.timestamp).slice(-(selected === "M45" ? 300 : 500));
+
+          if (!fallbackCandles.length) throw new Error("Twelve Data tidak mengirim candle XAU/USD yang valid");
+          const lastCandleAt = fallbackCandles[fallbackCandles.length - 1].datetime;
+          const rawAge = Math.floor((Date.now() - Date.parse(lastCandleAt)) / 1000);
+          if (!Number.isFinite(rawAge) || rawAge < -60) throw new Error("Timestamp candle Twelve Data tidak valid");
+
+          const freshnessLimit = ({
+            M1: 300, M5: 900, M15: 2700, M30: 5400,
+            M45: 8100, H1: 10800, H4: 43200, D1: 259200
+          }[selected] || 2700);
+          candleData = {
+            status: "success",
+            symbol: selectedSymbol,
+            interval: selected,
+            source: "Twelve Data OHLCV (fallback)",
+            candleSource: "Twelve Data fallback",
+            providerFetchedAt: new Date().toISOString(),
+            lastCandleAt,
+            candleAgeSeconds: Math.max(0, rawAge),
+            candleStatus: rawAge <= freshnessLimit ? "fresh_candles" : "stale_candles",
+            candles: fallbackCandles
+          };
+
+          globalThis.aurumCache.set(cacheKey, { time: Date.now(), data: candleData });
+          try {
+            await aurumRedis(["DEL", chartErrorKey]);
+            await aurumRedis(["SET", redisKey, JSON.stringify({ time: Date.now(), data: candleData }), "EX", "604800"]);
+          } catch (cacheError) {
+            console.warn("TWELVE DATA GOLD FALLBACK CACHE:", cacheError.message);
+          }
+        } catch (fallbackError) {
+          chartError = [chartError, "Twelve Data fallback: " + String(fallbackError.message || "gagal").slice(0, 140)].filter(Boolean).join(" | ");
+          console.warn("XAUS CHART + TWELVE DATA FALLBACK:", fallbackError.message);
+        }
+      }
+
       if (!candleData && chartCoolingDown && cachedGold && !cachedGoldHasFutureCandles && Array.isArray(cachedGold.candles) && cachedGold.candles.length) {
         candleData = {
           ...cachedGold,
