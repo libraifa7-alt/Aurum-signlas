@@ -6866,13 +6866,27 @@ async function getSharedCandles(interval, requestedSymbol) {
 
     const result = await response.json();
 
+    // Simpan alasan kegagalan setiap timeframe agar panel tidak berhenti di WAITING tanpa petunjuk.
+    window.aurumTimeframeDiagnostics = window.aurumTimeframeDiagnostics || {};
+    const recordTimeframeFailure = reason => {
+      window.aurumTimeframeDiagnostics[interval] = {
+        requested: interval,
+        symbol,
+        count: 0,
+        error: reason
+      };
+      console.warn('AURUM TIMEFRAME DATA FAILURE:', window.aurumTimeframeDiagnostics[interval]);
+    };
+
     // Tolak respons yang tidak cocok dengan instrumen yang diminta.
     if (result.symbol && String(result.symbol).toUpperCase() !== String(symbol).toUpperCase()) {
-      console.warn('SIMBOL CANDLE TIDAK COCOK:', { requested: symbol, received: result.symbol, interval });
+      const reason = 'Simbol API tidak cocok: ' + result.symbol;
+      recordTimeframeFailure(reason);
       return [];
     }
 
-    if (result.status !== 'success' || !result.candles?.length) {
+    if (result.status !== 'success' || !Array.isArray(result.candles) || !result.candles.length) {
+      recordTimeframeFailure(result.message || result.error || ('API ' + response.status + ' tidak mengirim candle'));
       return [];
     }
 
@@ -6923,10 +6937,10 @@ const candles = result.candles
   .filter(c => c !== null);
 
 if (candles.length === 0) {
-  console.warn(
-    'SEMUA CANDLE TIDAK VALID:',
-    interval
-  );
+  const reason = 'Provider mengirim candle, tetapi format waktu/harga tidak lolos validasi';
+  window.aurumTimeframeDiagnostics = window.aurumTimeframeDiagnostics || {};
+  window.aurumTimeframeDiagnostics[interval] = { requested: interval, symbol, count: 0, error: reason };
+  console.warn('SEMUA CANDLE TIDAK VALID:', interval, symbol);
   return [];
 }
     
@@ -7232,9 +7246,16 @@ const hasUsableTimeframe = results.some(item =>
 );
 if (!hasUsableTimeframe) {
   window.aurumMultiTimeframeTrend = null;
+  const details = timeframes.map(tf => {
+    const d = window.aurumTimeframeDiagnostics?.[tf];
+    return tf + ': ' + (d?.error || ((d?.count ?? 0) + ' candle'));
+  }).join(' | ');
   const waitingNode = document.getElementById('marketStructure');
-  if (waitingNode) waitingNode.textContent = 'MENUNGGU DATA CANDLE PROVIDER…';
-  return 'WAIT — Menunggu candle valid dari provider';
+  if (waitingNode) waitingNode.textContent = 'DATA BELUM CUKUP — ' + details;
+  const statusNode = document.querySelector('#trendMeter .aurum-reference-hero-top span');
+  if (statusNode) statusNode.textContent = '● DATA PROVIDER PERLU DIPERIKSA';
+  console.warn('AURUM MULTI-TIMEFRAME BELUM SIAP:', details);
+  return 'WAIT — ' + details;
 }
 
 // Hasil analisis lama tidak boleh menimpa instrumen yang baru dipilih.
