@@ -5662,7 +5662,32 @@ document.getElementById('aurumDebugStatus').textContent =
 console.log('CEK LOADCHART DIMULAI');
 const el = document.getElementById('candleChart');
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
-if (el && window.LightweightCharts) {
+// Analisis teknikal harus tetap berjalan meskipun library grafik gagal dimuat.
+const noOp = function () {};
+const createFallbackSeries = function () {
+  return {
+    setData: noOp,
+    update: noOp,
+    createPriceLine: function () { return {}; },
+    removePriceLine: noOp,
+    priceToCoordinate: function () { return null; }
+  };
+};
+const fallbackChart = {
+  addCandlestickSeries: createFallbackSeries,
+  addLineSeries: createFallbackSeries,
+  timeScale: function () {
+    return {
+      fitContent: noOp,
+      timeToCoordinate: function () { return null; },
+      subscribeVisibleTimeRangeChange: noOp,
+      subscribeVisibleLogicalRangeChange: noOp
+    };
+  },
+  applyOptions: noOp,
+  removeSeries: noOp
+};
+if (el) {
   console.log('LIGHTWEIGHT CHARTS AKTIF');
   console.log('MASUK KE BLOK GRAFIK');
   console.log('UKURAN AREA GRAFIK:', el.clientWidth, el.clientHeight);
@@ -5670,7 +5695,10 @@ if (el && window.LightweightCharts) {
   document.getElementById('aurumDebugStatus').textContent =
     'UKURAN GRAFIK: ' + el.clientWidth + ' x ' + el.clientHeight;
 
-  const chart = LightweightCharts.createChart(el, {
+  let chart = fallbackChart;
+  if (window.LightweightCharts) {
+    try {
+      chart = LightweightCharts.createChart(el, {
     width: Math.max(el.clientWidth, 300),
     height: 340,
     layout: {
@@ -5681,8 +5709,11 @@ if (el && window.LightweightCharts) {
       vertLines: { color: '#edf0f5' },
       horzLines: { color: '#edf0f5' }
     },
-    timeScale: { timeVisible: true }
-  });
+      });
+    } catch (chartInitError) {
+      console.warn('AURUM chart visual unavailable; technical analysis will continue:', chartInitError);
+    }
+  }
   
 
   const series = chart.addCandlestickSeries({
