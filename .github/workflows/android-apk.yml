@@ -54,9 +54,9 @@ jobs:
                   end = updated.index('</style>', start)
                   block = updated[start:end]
                   if 'windowSplashScreenBackground' not in block:
-                      block += '\\n        <item name="windowSplashScreenBackground">#080808</item>'
+                      block += '\n        <item name="windowSplashScreenBackground">#080808</item>'
                   if 'windowSplashScreenAnimatedIcon' not in block:
-                      block += '\\n        <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>'
+                      block += '\n        <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>'
                   updated = updated[:start] + block + updated[end:]
               if updated != source:
                   path.write_text(updated)
