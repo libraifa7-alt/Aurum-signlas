@@ -7221,6 +7221,16 @@ const direction = signal =>
       const keyState = m45Item ? trends.M45 : 'UNKNOWN';
       const keyLabel = keyState === 'BULLISH' ? 'SUPPORT · BUY ZONE' : keyState === 'BEARISH' ? 'RESISTANCE · SELL ZONE' : 'KEY LEVEL';
       const scoreValue = (netScore > 0 ? '+' : '') + netScore + ' / ' + total;
+      // Segmented TRAXA-style meter: each block reflects the measured timeframe share.
+      const meterSegmentCount = 28;
+      const bearishBlocks = Math.round((bearishShare / 100) * meterSegmentCount);
+      const mixedBlocks = Math.round((rangeShare / 100) * meterSegmentCount);
+      const bullishBlocks = Math.max(0, meterSegmentCount - bearishBlocks - mixedBlocks);
+      const meterSegments = [
+        ...Array(bearishBlocks).fill('<i class="is-bearish"></i>'),
+        ...Array(mixedBlocks).fill('<i class="is-mixed"></i>'),
+        ...Array(bullishBlocks).fill('<i class="is-bullish"></i>')
+      ].join('');
 
       trendMeter.innerHTML = `
         <div class="aurum-trend-dashboard aurum-reference-dashboard" data-direction="${overall}">
@@ -7233,7 +7243,7 @@ const direction = signal =>
               <b>${latestPrice}</b>
             </div>
             <div class="aurum-reference-meter-title"><span>TREND METER</span><b>${scoreValue}</b></div>
-            <div class="aurum-reference-meter"><span style="width:${bearishShare}%;background:#f05b67"></span><span style="width:${rangeShare}%;background:#c7cbd1"></span><span style="width:${bullishShare}%;background:#399fe8"></span></div>
+            <div class="aurum-reference-meter" role="img" aria-label="Trend meter: bearish ${bearishShare}%, mixed ${rangeShare}%, bullish ${bullishShare}%">${meterSegments}</div>
             <div class="aurum-reference-meter-legend"><span>BEARISH ${bearishShare}%</span><span>MIXED ${rangeShare}%</span><span>BULLISH ${bullishShare}%</span></div>
             <div class="aurum-reference-buyers"><span>Bearish trend share <b>${bearishShare}%</b></span><i><em style="width:${bearishShare}%;background:#f05b67"></em><em style="width:${bullishShare}%;background:#399fe8"></em></i><span>Bullish trend share <b>${bullishShare}%</b></span></div>
           </section>
@@ -11206,6 +11216,37 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 }
 </style>
 
+
+
+<style id="signature-trend-meter-segments">
+/* TRAXA-style segmented trend meter — visual only; percentages come from live timeframe results. */
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-meter{
+  display:grid!important;grid-template-columns:repeat(28,minmax(0,1fr))!important;
+  align-items:stretch!important;gap:3px!important;width:100%!important;height:22px!important;
+  padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-meter>i{
+  display:block!important;min-width:0!important;height:100%!important;border-radius:3px!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 1px 2px rgba(25,48,75,.12)!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-meter>i.is-bearish{
+  background:linear-gradient(180deg,#ff6672,#e5233b)!important;border-color:#f34d5c!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-meter>i.is-mixed{
+  background:linear-gradient(180deg,#d8dde4,#aeb7c4)!important;border-color:#c2cad4!important;
+}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-meter>i.is-bullish{
+  background:linear-gradient(180deg,#42b7ff,#0872e8)!important;border-color:#278eea!important;
+}
+@media(max-width:560px){
+  #marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-meter{
+    gap:2px!important;height:18px!important;
+  }
+  #marketPage .aurum-signal-panel[data-signal-panel="analysis"] #trendMeter .aurum-reference-meter>i{border-radius:2px!important}
+}
+</style>
 </body>
 </html>
 
