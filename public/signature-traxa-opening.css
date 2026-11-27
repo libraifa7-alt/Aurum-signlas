@@ -1,0 +1,779 @@
+/* Signature Trading opening sequence — isolated overlay only */
+#signature-traxa-opening{
+  position:fixed;inset:0;z-index:2147483000;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  color:#f7df9c;text-align:center;
+  background:
+    radial-gradient(ellipse at 50% 30%,rgba(193,143,45,.22),transparent 31%),
+    radial-gradient(ellipse at 23% 39%,rgba(20,79,164,.16),transparent 29%),
+    radial-gradient(ellipse at 80% 39%,rgba(156,34,40,.13),transparent 28%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='49' viewBox='0 0 56 49'%3E%3Cpath d='M14 1L28 1 41 12 41 36 28 48 14 48 1 36 1 12Z' fill='none' stroke='%23b9954d' stroke-opacity='.13' stroke-width='.8'/%3E%3C/svg%3E"),
+    radial-gradient(circle at center,#11100e 0%,#070707 60%,#020203 100%);
+  background-size:auto,auto,auto,56px 49px,auto;
+  opacity:1;visibility:visible;transition:opacity .75s ease,visibility .75s ease;
+  font-family:Arial,Helvetica,sans-serif;isolation:isolate;
+}
+#signature-traxa-opening:before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.75;
+  background:linear-gradient(90deg,transparent,rgba(221,178,87,.06) 50%,transparent),
+    radial-gradient(ellipse at 50% 45%,transparent 20%,rgba(0,0,0,.42) 100%);
+}
+#signature-traxa-opening.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+#signature-traxa-opening *{box-sizing:border-box}
+#signature-traxa-opening .sto-stage{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  padding:calc(env(safe-area-inset-top) + 22px) 20px calc(env(safe-area-inset-bottom) + 22px);
+  opacity:0;visibility:hidden;transition:opacity .55s ease,visibility .55s ease;
+}
+#signature-traxa-opening .sto-stage.is-active{opacity:1;visibility:visible}
+#signature-traxa-opening .sto-orb{
+  position:absolute;top:clamp(64px,10vh,105px);left:50%;
+  width:min(218px,60vw);aspect-ratio:1;transform:translateX(-50%);
+  border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle,rgba(223,177,76,.15),rgba(8,8,8,0) 68%);
+  filter:drop-shadow(0 0 24px rgba(210,166,74,.22));
+}
+#signature-traxa-opening .sto-orb:before,
+#signature-traxa-opening .sto-orb:after{
+  content:"";position:absolute;inset:8%;border:1px solid rgba(239,204,128,.72);
+  border-radius:50%;box-shadow:0 0 12px rgba(226,177,75,.22);
+  animation:stoOrbit 13s linear infinite;
+}
+#signature-traxa-opening .sto-orb:after{
+  inset:17%;border:1px dashed rgba(239,204,128,.78);
+  animation:stoOrbit 19s linear infinite reverse;
+}
+#signature-traxa-opening .sto-orb-core{
+  position:relative;z-index:1;width:35%;aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;
+  background:radial-gradient(circle at 32% 24%,#fff0bc 0%,#d9ad54 38%,#73501c 78%,#17100a 100%);
+  border:1px solid rgba(255,223,151,.85);
+  box-shadow:0 0 25px rgba(222,177,80,.72),0 0 70px rgba(198,143,43,.35),inset 0 0 20px rgba(255,241,196,.25);
+  animation:stoPulse 3s ease-in-out infinite;
+}
+#signature-traxa-opening .sto-mark{
+  color:#132e51;font-weight:1000;font-size:clamp(48px,14vw,66px);
+  line-height:1;text-shadow:0 1px 0 #fff0bc,0 0 14px rgba(255,244,205,.45);
+  letter-spacing:-7px;transform:translateX(-3px);
+}
+#signature-traxa-opening .sto-spark{
+  position:absolute;width:5px;height:5px;border-radius:50%;background:#f6d989;
+  box-shadow:0 0 10px 3px rgba(238,190,86,.75);animation:stoSpark 2.4s ease-in-out infinite;
+}
+#signature-traxa-opening .sto-spark.s1{top:13%;left:48%}
+#signature-traxa-opening .sto-spark.s2{top:48%;right:7%;animation-delay:.5s}
+#signature-traxa-opening .sto-spark.s3{bottom:14%;left:27%;animation-delay:1s}
+#signature-traxa-opening .sto-brand{
+  position:absolute;top:calc(clamp(64px,10vh,105px) + min(218px,60vw) + 7px);
+  width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;
+  animation:stoRise .9s .35s both;
+}
+#signature-traxa-opening .sto-brand strong{
+  font-size:clamp(25px,7vw,32px);font-weight:900;letter-spacing:8px;
+  color:#f2d58d;text-shadow:0 0 17px rgba(223,184,101,.38)
+}
+#signature-traxa-opening .sto-brand span{font-size:8px;letter-spacing:4px;color:#d6b66c}
+#signature-traxa-opening .sto-brand small{font-size:7px;letter-spacing:2px;color:#9d8a61}
+#signature-traxa-opening .sto-markets{
+  position:absolute;bottom:calc(env(safe-area-inset-bottom) + 112px);
+  width:min(330px,88vw);display:grid;grid-template-columns:repeat(3,1fr);
+  border:1px solid rgba(205,166,86,.3);border-radius:11px;
+  background:rgba(15,14,13,.8);box-shadow:0 0 22px rgba(205,166,86,.1);
+  animation:stoRise .8s .75s both;
+}
+#signature-traxa-opening .sto-markets span{padding:12px 4px;color:#d8c79f;font-size:11px;letter-spacing:1.4px}
+#signature-traxa-opening .sto-markets span+span{border-left:1px solid rgba(205,166,86,.2)}
+#signature-traxa-opening .sto-swipe{
+  position:absolute;bottom:calc(env(safe-area-inset-bottom) + 34px);left:50%;
+  transform:translateX(-50%);width:min(330px,88vw);height:52px;border-radius:30px;
+  border:1px solid rgba(218,165,55,.48);background:linear-gradient(180deg,rgba(55,43,20,.82),rgba(13,12,10,.94));
+  box-shadow:inset 0 1px 0 rgba(255,229,165,.12),0 0 24px rgba(209,158,57,.09);
+  display:flex;align-items:center;justify-content:center;color:#d8c18b;
+  font-size:10px;letter-spacing:2px;user-select:none;touch-action:pan-y;
+  animation:stoSwipeRise .8s 1.05s both;
+}
+#signature-traxa-opening .sto-swipe-label{pointer-events:none;opacity:.9}
+#signature-traxa-opening .sto-handle{
+  position:absolute;left:4px;top:4px;width:42px;height:42px;border-radius:50%;
+  display:grid;place-items:center;background:radial-gradient(circle at 35% 28%,#fff,#e9c66e 65%,#b8892e);
+  color:#231b0c;font-size:23px;font-weight:700;
+  box-shadow:0 0 0 4px rgba(230,188,91,.12),0 0 19px rgba(218,165,55,.48);
+  cursor:grab;touch-action:none;transition:left .12s ease;
+}
+#signature-traxa-opening .sto-stage-two .sto-orb{
+  top:clamp(55px,10vh,95px);width:min(235px,64vw);
+}
+#signature-traxa-opening .sto-loading{
+  position:absolute;top:calc(clamp(55px,10vh,95px) + min(235px,64vw) + 8px);
+  width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+#signature-traxa-opening .sto-loading-label{font-size:7px;letter-spacing:3px;color:#bba16a}
+#signature-traxa-opening .sto-percent{font-size:30px;font-weight:900;color:#f2d17b;text-shadow:0 0 16px rgba(231,186,83,.4)}
+#signature-traxa-opening .sto-percent small{font-size:11px;color:#b99a59}
+#signature-traxa-opening .sto-progress{width:min(265px,72vw);height:4px;background:#29251c;border-radius:10px;overflow:hidden}
+#signature-traxa-opening .sto-progress i{display:block;width:0;height:100%;background:linear-gradient(90deg,#287fce,#e6c36d,#d54a4a);box-shadow:0 0 12px #d7ad55}
+#signature-traxa-opening .sto-log{
+  position:absolute;top:calc(clamp(55px,10vh,95px) + min(235px,64vw) + 78px);
+  width:min(330px,88vw);padding:11px 13px;text-align:left;
+  border:1px solid rgba(205,166,86,.25);border-radius:8px;
+  background:rgba(10,10,10,.72);color:#c7b98f;font-size:8px;line-height:1.9;
+}
+#signature-traxa-opening .sto-log b{float:right;color:#e6c36d;font-weight:700}
+#signature-traxa-opening .sto-welcome{
+  position:absolute;top:75%;width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;
+  opacity:0;animation:stoWelcome .9s 2.1s both;
+}
+#signature-traxa-opening .sto-welcome span{font-size:12px;font-weight:700;letter-spacing:3px;color:#eee}
+#signature-traxa-opening .sto-welcome strong{
+  color:#f4d17a;font-size:clamp(23px,7vw,31px);letter-spacing:6px;
+  text-shadow:0 0 8px #f4d17a,0 0 22px rgba(238,187,77,.75);
+}
+#signature-traxa-opening .sto-footer-line{
+  position:absolute;top:72%;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(213,177,91,.45),transparent)
+}
+#signature-traxa-opening.is-loading .sto-stage-one{opacity:0;visibility:hidden}
+#signature-traxa-opening.is-loading .sto-stage-two{opacity:1;visibility:visible}
+@keyframes stoOrbit{to{transform:rotate(360deg)}}
+@keyframes stoPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.07);filter:brightness(1.28)}}
+@keyframes stoSpark{0%,100%{opacity:.35;transform:scale(.7)}50%{opacity:1;transform:scale(1.6)}}
+@keyframes stoRise{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes stoSwipeRise{from{opacity:0;transform:translate(-50%,15px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes stoWelcome{from{opacity:0;transform:translateY(15px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@media(max-height:700px){
+ #signature-traxa-opening .sto-orb{top:clamp(44px,7vh,72px);width:min(190px,54vw)}
+ #signature-traxa-opening .sto-brand{top:calc(clamp(44px,7vh,72px) + min(190px,54vw) + 5px)}
+ #signature-traxa-opening .sto-markets{bottom:calc(env(safe-area-inset-bottom) + 98px)}
+ #signature-traxa-opening .sto-swipe{bottom:calc(env(safe-area-inset-bottom) + 28px)}
+ #signature-traxa-opening .sto-stage-two .sto-orb{top:48px;width:min(205px,56vw)}
+ #signature-traxa-opening .sto-loading{top:calc(48px + min(205px,56vw) + 7px)}
+ #signature-traxa-opening .sto-log{top:calc(48px + min(205px,56vw) + 70px)}
+ #signature-traxa-opening .sto-welcome{top:76%}
+}
+@media(prefers-reduced-motion:reduce){
+ #signature-traxa-opening *,#signature-traxa-opening *:before,#signature-traxa-opening *:after{animation:none!important;transition:none!important}
+}
+
+
+/* Signature Club Trading globe emblem and brand lockup */
+#signature-traxa-opening .sto-orb-core{
+  overflow:visible;
+  background:radial-gradient(circle at 34% 25%,#fff3c7 0%,#d9b45e 42%,#88601f 78%,#211707 100%);
+}
+#signature-traxa-opening .sto-globe{
+  display:block;width:84%;height:84%;overflow:visible;
+  filter:drop-shadow(0 0 7px rgba(255,226,153,.62));
+  animation:stoGlobeTurn 24s linear infinite;
+}
+#signature-traxa-opening .sto-globe .globe-grid{
+  fill:none;stroke:#fff0c0;stroke-width:1.35;opacity:.7;
+}
+#signature-traxa-opening .sto-globe .globe-land{
+  fill:#73501c;stroke:#f7dfa0;stroke-width:.8;opacity:.92;
+}
+#signature-traxa-opening .sto-brand strong{
+  font-size:clamp(18px,5.2vw,25px);letter-spacing:4px;
+  white-space:nowrap;
+}
+#signature-traxa-opening .sto-brand span{
+  margin-top:1px;font-size:10px;letter-spacing:6px;color:#f0d28d;
+}
+@keyframes stoGlobeTurn{
+  0%{transform:rotateY(0deg)}
+  50%{transform:rotateY(180deg)}
+  100%{transform:rotateY(360deg)}
+}
+
+
+/* Reference-video loading sequence: centered HUD, staged progress, delayed welcome */
+#signature-traxa-opening .sto-stage-two:before,
+#signature-traxa-opening .sto-stage-two:after{
+  content:"S C T";position:absolute;top:43%;font-size:7px;letter-spacing:3px;
+  color:rgba(218,178,91,.48);writing-mode:vertical-rl;text-orientation:mixed;
+  text-shadow:0 0 9px rgba(224,178,79,.5);
+}
+#signature-traxa-opening .sto-stage-two:before{left:8px}
+#signature-traxa-opening .sto-stage-two:after{right:8px}
+#signature-traxa-opening .sto-stage-two .sto-orb{
+  top:clamp(78px,14vh,128px);width:min(245px,66vw);
+}
+#signature-traxa-opening .sto-loading{
+  top:calc(clamp(78px,14vh,128px) + min(245px,66vw) + 7px);
+  gap:5px;
+}
+#signature-traxa-opening .sto-loading-label{
+  font-size:7px;letter-spacing:3.5px;color:#c6a45c;
+}
+#signature-traxa-opening .sto-percent{
+  font-size:clamp(29px,8vw,36px);line-height:1.05;
+  letter-spacing:1px;color:#f4d477;
+  text-shadow:0 0 8px rgba(240,194,91,.8),0 0 20px rgba(221,166,66,.48);
+}
+#signature-traxa-opening .sto-progress{
+  width:min(220px,62vw);height:3px;
+  background:linear-gradient(90deg,rgba(43,128,209,.22),rgba(220,189,104,.2),rgba(205,61,61,.22));
+}
+#signature-traxa-opening .sto-log{
+  top:calc(clamp(78px,14vh,128px) + min(245px,66vw) + 69px);
+  width:min(300px,82vw);padding:8px 11px;
+  border-color:rgba(205,166,86,.2);border-radius:6px;
+  background:linear-gradient(180deg,rgba(17,17,18,.9),rgba(7,8,10,.86));
+  box-shadow:0 5px 20px rgba(0,0,0,.38),0 0 13px rgba(198,151,57,.08);
+  font-size:7px;line-height:1.8;color:#b9ad8c;
+}
+#signature-traxa-opening .sto-log b{color:#eacb78;letter-spacing:.5px}
+#signature-traxa-opening .sto-footer-line{
+  top:79%;box-shadow:0 0 14px rgba(220,177,83,.2);
+}
+#signature-traxa-opening .sto-welcome{
+  top:82%;gap:7px;animation:stoWelcome .8s 7.2s both;
+}
+#signature-traxa-opening .sto-welcome span{
+  font-size:10px;letter-spacing:2.8px;color:#f0e7d0;
+}
+#signature-traxa-opening .sto-welcome strong{
+  font-size:clamp(22px,7vw,30px);letter-spacing:5px;
+  animation:stoNameReveal .9s 8s both;
+}
+@keyframes stoNameReveal{
+  from{opacity:0;transform:translateY(10px);filter:blur(5px);letter-spacing:10px}
+  to{opacity:1;transform:translateY(0);filter:blur(0);letter-spacing:5px}
+}
+@media(max-height:700px){
+ #signature-traxa-opening .sto-stage-two .sto-orb{top:65px;width:min(205px,56vw)}
+ #signature-traxa-opening .sto-loading{top:calc(65px + min(205px,56vw) + 6px)}
+ #signature-traxa-opening .sto-log{top:calc(65px + min(205px,56vw) + 65px)}
+ #signature-traxa-opening .sto-footer-line{top:78%}
+ #signature-traxa-opening .sto-welcome{top:81%}
+}
+
+
+/* Match the reference video's glowing, widely tracked member-name reveal */
+#signature-traxa-opening .sto-welcome{gap:9px}
+#signature-traxa-opening .sto-welcome span{
+  font-size:clamp(11px,3vw,14px);letter-spacing:2.6px;font-weight:800;
+  color:#f4f0e7;text-shadow:0 0 8px rgba(255,244,220,.18);
+}
+#signature-traxa-opening .sto-welcome strong{
+  display:block;text-transform:uppercase;font-weight:800;
+  font-size:clamp(27px,8vw,36px);letter-spacing:7px;line-height:1.2;
+  color:#ffe49a;
+  text-shadow:0 0 5px rgba(255,229,157,.95),0 0 15px rgba(239,190,84,.8),0 0 28px rgba(224,167,61,.48);
+  animation:stoNameReveal 1.15s 8s cubic-bezier(.16,.84,.24,1) both;
+}
+@keyframes stoNameReveal{
+  0%{opacity:0;transform:translateY(12px) scale(.96);filter:blur(7px);letter-spacing:13px}
+  65%{opacity:1;filter:blur(0);letter-spacing:5px}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);letter-spacing:7px}
+}
+
+
+/* Cinematic REZZA ON reveal: glow bloom, sharp focus and moving gold light */
+#signature-traxa-opening .sto-welcome{
+  top:81%;
+  gap:10px;
+  perspective:700px;
+}
+#signature-traxa-opening .sto-welcome span{
+  opacity:0;
+  animation:stoWelcomeLabel .75s 7.05s ease-out forwards;
+}
+#signature-traxa-opening .sto-welcome strong{
+  position:relative;
+  isolation:isolate;
+  overflow:visible;
+  padding:2px 10px 7px;
+  font-size:clamp(40px,12vw,56px);
+  font-weight:900;
+  letter-spacing:7px;
+  line-height:1.15;
+  color:#fff0bd;
+  background:linear-gradient(180deg,#fffbe9 0%,#ffe39a 38%,#d9a943 72%,#fff0c0 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 7px rgba(255,218,126,.95)) drop-shadow(0 0 19px rgba(221,164,57,.72));
+  opacity:0;
+  transform:translate3d(0,25px,0) scale(.78);
+  animation:stoRezzaCinematic 1.65s 7.75s cubic-bezier(.16,1,.3,1) forwards,
+            stoRezzaGlow 2.4s 9.4s ease-in-out infinite alternate;
+}
+#signature-traxa-opening .sto-welcome strong:after{
+  content:"";
+  position:absolute;
+  z-index:2;
+  top:-12%;
+  bottom:-12%;
+  left:-45%;
+  width:34%;
+  transform:skewX(-22deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,235,.98),rgba(255,219,133,.5),transparent);
+  filter:blur(3px);
+  opacity:0;
+  pointer-events:none;
+  animation:stoRezzaShine 1.05s 8.75s ease-out forwards;
+}
+@keyframes stoWelcomeLabel{
+  0%{opacity:0;transform:translateY(9px);filter:blur(5px);letter-spacing:8px}
+  100%{opacity:1;transform:translateY(0);filter:blur(0);letter-spacing:3px}
+}
+@keyframes stoRezzaCinematic{
+  0%{opacity:0;transform:translate3d(0,25px,0) scale(.78);filter:blur(13px) brightness(2.3);letter-spacing:19px}
+  48%{opacity:1;filter:blur(1px) brightness(1.65);letter-spacing:4px}
+  72%{transform:translate3d(0,-3px,0) scale(1.045);filter:blur(0) brightness(1.25);letter-spacing:7px}
+  100%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0) brightness(1);letter-spacing:8px}
+}
+@keyframes stoRezzaShine{
+  0%{left:-45%;opacity:0}
+  15%{opacity:1}
+  100%{left:115%;opacity:0}
+}
+@keyframes stoRezzaGlow{
+  from{filter:drop-shadow(0 0 6px rgba(255,218,126,.72)) drop-shadow(0 0 13px rgba(221,164,57,.48))}
+  to{filter:drop-shadow(0 0 11px rgba(255,238,183,1)) drop-shadow(0 0 27px rgba(238,181,69,.88))}
+}
+@media(max-height:700px){
+ #signature-traxa-opening .sto-welcome{top:80%}
+ #signature-traxa-opening .sto-welcome strong{font-size:clamp(36px,11vw,48px);letter-spacing:6px}
+}
+@media(prefers-reduced-motion:reduce){
+ #signature-traxa-opening .sto-welcome span,
+ #signature-traxa-opening .sto-welcome strong,
+ #signature-traxa-opening .sto-welcome strong:after{animation:none!important;opacity:1;transform:none;filter:none}
+}
+
+
+/* TRAXA-style RGB glitch name: scrambled multicolor glyphs resolve to REZZA ON */
+#signature-traxa-opening .sto-welcome strong{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:0;
+  white-space:pre;
+  padding:5px 9px 8px;
+  background:none;
+  -webkit-text-fill-color:initial;
+  color:#fff;
+  filter:none;
+  text-shadow:0 0 8px rgba(255,255,255,.45);
+}
+#signature-traxa-opening .sto-welcome strong .sto-char{
+  display:inline-block;
+  min-width:.58em;
+  font-weight:950;
+  background:linear-gradient(180deg,#fff8d5 0%,#ffd85c 38%,#f5a623 70%,#fff1bd 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 7px rgba(255,210,83,.62);
+  animation:stoCharSettle .42s ease-out both;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char:nth-child(4n+1){
+  background:linear-gradient(180deg,#ffb5b5,#ff424d 55%,#a90031);
+  -webkit-background-clip:text;background-clip:text;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char:nth-child(4n+2){
+  background:linear-gradient(180deg,#b9f5ff,#31baff 55%,#2453df);
+  -webkit-background-clip:text;background-clip:text;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char:nth-child(4n+3){
+  background:linear-gradient(180deg,#fff5ad,#ffd32f 55%,#f07819);
+  -webkit-background-clip:text;background-clip:text;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char:nth-child(4n){
+  background:linear-gradient(180deg,#f5d9ff,#b17cff 55%,#5842df);
+  -webkit-background-clip:text;background-clip:text;
+}
+#signature-traxa-opening .sto-welcome strong .sto-char.is-space{min-width:.38em}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char{
+  animation:stoRgbFlicker .12s steps(2,end) infinite;
+  filter:drop-shadow(2px 0 #ff315b) drop-shadow(-2px 0 #20baff);
+}
+#signature-traxa-opening .sto-welcome strong.is-resolved .sto-char{
+  animation:stoCharSettle .55s cubic-bezier(.2,.9,.25,1) both;
+}
+@keyframes stoRgbFlicker{
+  0%{opacity:.55;transform:translate(1px,-1px) skewX(-8deg)}
+  50%{opacity:1;transform:translate(-1px,1px) skewX(6deg)}
+  100%{opacity:.8;transform:translate(0,0)}
+}
+@keyframes stoCharSettle{
+  0%{opacity:0;transform:translateY(8px) scale(1.22);filter:blur(4px)}
+  65%{opacity:1;filter:blur(0)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 8px rgba(255,213,92,.68))}
+}
+
+
+/* TRAXA reference match: RGB scramble flashes, sequential lock-in, then a clean gold name */
+#signature-traxa-opening .sto-welcome strong .sto-char{
+  color:#ffe8a3;
+  background:linear-gradient(180deg,#fffce9 0%,#ffe49b 45%,#d6a33e 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 8px rgba(255,218,126,.72),0 0 18px rgba(221,164,57,.4);
+  transform-origin:50% 70%;
+}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char{
+  background:none!important;
+  -webkit-text-fill-color:initial!important;
+  color:#fff!important;
+  text-shadow:2px 0 #ff315b,-2px 0 #28baff,0 0 12px rgba(255,255,255,.8);
+  filter:brightness(1.35);
+  animation:stoTraxaScramble .105s steps(2,end) infinite;
+}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char:nth-child(3n+1){color:#ff4d68!important;text-shadow:2px 0 #ffd45c,0 0 12px #ff315b}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char:nth-child(3n+2){color:#48c8ff!important;text-shadow:-2px 0 #ff4d68,0 0 12px #36aaff}
+#signature-traxa-opening .sto-welcome strong.is-glitching .sto-char:nth-child(3n){color:#ffe36e!important;text-shadow:2px 0 #35baff,-2px 0 #ff315b}
+#signature-traxa-opening .sto-welcome strong.is-resolved .sto-char{
+  background:linear-gradient(180deg,#fffce9 0%,#ffe49b 45%,#d6a33e 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  color:#ffe8a3!important;
+  text-shadow:0 0 7px rgba(255,222,145,.85),0 0 18px rgba(220,165,57,.58);
+  animation:stoTraxaLock .62s cubic-bezier(.16,.9,.24,1) both;
+}
+#signature-traxa-opening .sto-welcome strong.is-resolved .sto-char.is-space{min-width:.38em}
+@keyframes stoTraxaScramble{
+  0%{transform:translate(-1px,-2px) skewX(-12deg) scale(1.08);opacity:.62}
+  50%{transform:translate(2px,1px) skewX(9deg) scale(.94);opacity:1}
+  100%{transform:translate(0,0) skewX(0) scale(1);opacity:.82}
+}
+@keyframes stoTraxaLock{
+  0%{opacity:0;transform:translateY(12px) scale(1.28);filter:blur(5px) brightness(2.2)}
+  55%{opacity:1;transform:translateY(-2px) scale(1.06);filter:blur(0) brightness(1.5)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 7px rgba(255,220,130,.72))}
+}
+
+
+/* Increase REZZA ON to a bold headline scale while keeping it centered on mobile */
+#signature-traxa-opening .sto-welcome strong{
+  font-size:clamp(48px,14vw,68px)!important;
+  letter-spacing:4px!important;
+  line-height:1.08;
+  padding:3px 6px 8px;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-welcome strong{
+    font-size:clamp(44px,12.5vw,60px)!important;
+    letter-spacing:3px!important;
+  }
+}
+
+
+/* Larger mobile welcome headline and member name, matching the requested emphasis */
+#signature-traxa-opening .sto-welcome{
+  gap:14px;
+}
+#signature-traxa-opening .sto-welcome span{
+  font-size:clamp(18px,5.5vw,24px)!important;
+  letter-spacing:3.5px!important;
+  line-height:1.2;
+  font-weight:900;
+}
+#signature-traxa-opening .sto-welcome strong{
+  font-size:clamp(52px,17vw,68px)!important;
+  letter-spacing:2px!important;
+  line-height:1.12!important;
+  padding:4px 3px 10px!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-welcome span{
+    font-size:clamp(17px,5vw,22px)!important;
+  }
+  #signature-traxa-opening .sto-welcome strong{
+    font-size:clamp(48px,15.5vw,62px)!important;
+  }
+}
+
+
+/* Mobile splash lockup: larger globe and brand, positioned closer to the entry controls */
+#signature-traxa-opening .sto-stage-one .sto-orb{
+  top:clamp(145px,19vh,220px);
+  width:min(292px,76vw);
+}
+#signature-traxa-opening .sto-stage-one .sto-orb-core{
+  width:42%;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand{
+  top:calc(clamp(145px,19vh,220px) + min(292px,76vw) + 10px);
+  gap:7px;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand strong{
+  font-size:clamp(25px,7vw,34px);
+  letter-spacing:5px;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand span{
+  font-size:11px;
+  letter-spacing:6px;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand small{
+  font-size:8px;
+  letter-spacing:2.5px;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-stage-one .sto-orb{
+    top:clamp(105px,15vh,145px);
+    width:min(250px,68vw);
+  }
+  #signature-traxa-opening .sto-stage-one .sto-brand{
+    top:calc(clamp(105px,15vh,145px) + min(250px,68vw) + 8px);
+  }
+}
+
+
+/* Final first-screen composition: match TRAXA reference scale and vertical placement */
+#signature-traxa-opening .sto-stage-one .sto-orb{
+  top:22vh!important;
+  width:min(340px,82vw)!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand{
+  top:calc(22vh + min(340px,82vw) + 10px)!important;
+  gap:7px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand strong{
+  font-size:clamp(25px,6vw,32px)!important;
+  letter-spacing:4px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand span{
+  font-size:10px!important;
+  letter-spacing:6px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand small{
+  font-size:8px!important;
+  letter-spacing:2.5px!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-stage-one .sto-orb{
+    top:17vh!important;
+    width:min(280px,72vw)!important;
+  }
+  #signature-traxa-opening .sto-stage-one .sto-brand{
+    top:calc(17vh + min(280px,72vw) + 8px)!important;
+  }
+}
+
+
+/* TRAXA reference scale — larger orbital globe, Signature Club title,
+   market labels and swipe control. Scoped to the opening screen only. */
+#signature-traxa-opening .sto-stage-one .sto-orb{
+  top:22vh!important;
+  width:min(430px,88vw)!important;
+  filter:drop-shadow(0 0 30px rgba(218,173,73,.38))!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-orb-core{
+  width:46%!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-globe{
+  width:90%!important;height:90%!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand{
+  top:calc(22vh + min(430px,88vw) + 12px)!important;
+  gap:9px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand strong{
+  font-size:clamp(34px,8.2vw,48px)!important;
+  letter-spacing:6px!important;
+  font-weight:950!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand span{
+  font-size:14px!important;
+  letter-spacing:7px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-brand small{
+  font-size:10px!important;
+  letter-spacing:3px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-markets{
+  bottom:calc(env(safe-area-inset-bottom) + 142px)!important;
+  width:min(440px,90vw)!important;
+  border-radius:13px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-markets span{
+  padding:16px 5px!important;
+  font-size:clamp(14px,3.8vw,18px)!important;
+  font-weight:900!important;
+  letter-spacing:1.7px!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-swipe{
+  bottom:calc(env(safe-area-inset-bottom) + 48px)!important;
+  width:min(440px,90vw)!important;
+  height:66px!important;
+  font-size:clamp(14px,3.8vw,17px)!important;
+  font-weight:900!important;
+  letter-spacing:3px!important;
+  border-width:2px!important;
+  box-shadow:inset 0 1px 0 rgba(255,229,165,.2),0 0 30px rgba(209,158,57,.22)!important;
+}
+#signature-traxa-opening .sto-stage-one .sto-handle{
+  width:54px!important;height:54px!important;
+  top:5px!important;left:5px!important;
+  font-size:29px!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-stage-one .sto-orb{
+    top:15vh!important;
+    width:min(340px,76vw)!important;
+  }
+  #signature-traxa-opening .sto-stage-one .sto-brand{
+    top:calc(15vh + min(340px,76vw) + 9px)!important;
+  }
+  #signature-traxa-opening .sto-stage-one .sto-markets{
+    bottom:calc(env(safe-area-inset-bottom) + 116px)!important;
+  }
+  #signature-traxa-opening .sto-stage-one .sto-swipe{
+    bottom:calc(env(safe-area-inset-bottom) + 32px)!important;
+    height:58px!important;
+  }
+  #signature-traxa-opening .sto-stage-one .sto-handle{
+    width:46px!important;height:46px!important;
+  }
+}
+
+
+/* Stage two: tighten the initializing-to-welcome composition, matching the compact TRAXA layout. */
+#signature-traxa-opening .sto-stage-two .sto-orb{
+  top:11vh!important;
+  width:min(300px,78vw)!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-loading{
+  top:calc(11vh + min(300px,78vw) + 6px)!important;
+  gap:6px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-percent{
+  font-size:clamp(36px,10vw,44px)!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-log{
+  top:calc(11vh + min(300px,78vw) + 76px)!important;
+  width:min(340px,88vw)!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{
+  top:59%!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome{
+  top:62%!important;
+  gap:10px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{
+  font-size:clamp(20px,5.8vw,25px)!important;
+  letter-spacing:3px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{
+  font-size:clamp(54px,16vw,70px)!important;
+  letter-spacing:3px!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-stage-two .sto-orb{top:9vh!important;width:min(250px,70vw)!important}
+  #signature-traxa-opening .sto-stage-two .sto-loading{top:calc(9vh + min(250px,70vw) + 5px)!important}
+  #signature-traxa-opening .sto-stage-two .sto-log{top:calc(9vh + min(250px,70vw) + 68px)!important}
+  #signature-traxa-opening .sto-stage-two .sto-footer-line{top:57%!important}
+  #signature-traxa-opening .sto-stage-two .sto-welcome{top:60%!important}
+}
+
+
+/* Stage two enlarged to the same bold visual scale as the Signature Club opening screen. */
+#signature-traxa-opening .sto-stage-two .sto-orb{top:13vh!important;width:min(390px,84vw)!important;filter:drop-shadow(0 0 34px rgba(218,173,73,.42))!important}
+#signature-traxa-opening .sto-stage-two .sto-orb-core{width:46%!important}
+#signature-traxa-opening .sto-stage-two .sto-loading{top:calc(13vh + min(390px,84vw) + 8px)!important;gap:10px!important}
+#signature-traxa-opening .sto-stage-two .sto-loading-label{font-size:10px!important;letter-spacing:4px!important}
+#signature-traxa-opening .sto-stage-two .sto-percent{font-size:clamp(48px,13vw,62px)!important;line-height:1!important}
+#signature-traxa-opening .sto-stage-two .sto-percent small{font-size:18px!important}
+#signature-traxa-opening .sto-stage-two .sto-progress{width:min(440px,88vw)!important;height:6px!important}
+#signature-traxa-opening .sto-stage-two .sto-log{top:calc(13vh + min(390px,84vw) + 112px)!important;width:min(470px,90vw)!important;padding:15px 17px!important;font-size:clamp(10px,2.7vw,13px)!important;line-height:1.9!important;border-radius:11px!important}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{top:54%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome{top:57%!important;gap:13px!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{font-size:clamp(24px,6.5vw,32px)!important;letter-spacing:4px!important;font-weight:950!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{font-size:clamp(68px,19vw,88px)!important;letter-spacing:4px!important;line-height:1.1!important;padding:5px 8px 12px!important}
+@media(max-height:700px){
+#signature-traxa-opening .sto-stage-two .sto-orb{top:8vh!important;width:min(300px,72vw)!important}
+#signature-traxa-opening .sto-stage-two .sto-loading{top:calc(8vh + min(300px,72vw) + 7px)!important}
+#signature-traxa-opening .sto-stage-two .sto-log{top:calc(8vh + min(300px,72vw) + 100px)!important}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{top:53%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome{top:57%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{font-size:22px!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{font-size:clamp(56px,15vw,72px)!important}
+}
+
+
+/* Reference video parity: compact HUD stack and readable welcome/name reveal. */
+#signature-traxa-opening .sto-stage-two .sto-orb{top:17vh!important;width:min(210px,56vw)!important;filter:drop-shadow(0 0 24px rgba(218,173,73,.4))!important}
+#signature-traxa-opening .sto-stage-two .sto-orb-core{width:46%!important}
+#signature-traxa-opening .sto-stage-two .sto-globe{width:90%!important;height:90%!important}
+#signature-traxa-opening .sto-stage-two .sto-loading{top:calc(17vh + min(210px,56vw) + 5px)!important;gap:4px!important}
+#signature-traxa-opening .sto-stage-two .sto-loading-label{font-size:8px!important;letter-spacing:3.5px!important}
+#signature-traxa-opening .sto-stage-two .sto-percent{font-size:clamp(32px,9vw,38px)!important;line-height:1.05!important}
+#signature-traxa-opening .sto-stage-two .sto-percent small{font-size:12px!important}
+#signature-traxa-opening .sto-stage-two .sto-progress{width:min(230px,64vw)!important;height:4px!important}
+#signature-traxa-opening .sto-stage-two .sto-log{top:calc(17vh + min(210px,56vw) + 70px)!important;width:min(245px,72vw)!important;padding:9px 11px!important;font-size:8px!important;line-height:1.8!important;border-radius:7px!important}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{top:67%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome{top:72%!important;gap:7px!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{font-size:clamp(12px,3.4vw,14px)!important;letter-spacing:2.5px!important;font-weight:800!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{width:auto!important;max-width:92vw!important;display:flex!important;justify-content:center!important;gap:0!important;white-space:pre!important;padding:3px 5px 7px!important;font-size:clamp(29px,8.8vw,38px)!important;letter-spacing:2px!important;line-height:1.15!important;overflow:visible!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong .sto-char{min-width:.55em!important}
+@media(max-height:700px){
+#signature-traxa-opening .sto-stage-two .sto-orb{top:12vh!important;width:min(180px,50vw)!important}
+#signature-traxa-opening .sto-stage-two .sto-loading{top:calc(12vh + min(180px,50vw) + 4px)!important}
+#signature-traxa-opening .sto-stage-two .sto-log{top:calc(12vh + min(180px,50vw) + 66px)!important}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{top:65%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome{top:70%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{font-size:clamp(27px,8vw,34px)!important}
+}
+
+/* Timing matched to the reference clip: progress resolves, then welcome/name appears. */
+#signature-traxa-opening .sto-stage-two .sto-welcome span{animation:stoWelcomeLabel .65s 3.85s ease-out both!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{animation:stoNameReveal .9s 4.45s cubic-bezier(.16,.84,.24,1) both!important}
+
+
+/* FINAL OVERRIDE — make the second/loading screen genuinely large and legible.
+   This block is intentionally last so earlier responsive/reference rules cannot shrink it. */
+#signature-traxa-opening .sto-stage-two .sto-orb{
+  top:12vh!important;
+  width:min(300px,82vw)!important;
+  filter:drop-shadow(0 0 32px rgba(218,173,73,.48))!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-orb-core{width:48%!important}
+#signature-traxa-opening .sto-stage-two .sto-globe{width:92%!important;height:92%!important}
+#signature-traxa-opening .sto-stage-two .sto-loading{
+  top:calc(12vh + min(300px,82vw) + 8px)!important;
+  gap:8px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-loading-label{
+  font-size:11px!important;letter-spacing:4px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-percent{
+  font-size:clamp(48px,14vw,60px)!important;line-height:1.05!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-percent small{font-size:19px!important}
+#signature-traxa-opening .sto-stage-two .sto-progress{
+  width:min(340px,86vw)!important;height:6px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-log{
+  top:calc(12vh + min(300px,82vw) + 105px)!important;
+  width:min(390px,88vw)!important;padding:13px 16px!important;
+  font-size:clamp(10px,3vw,13px)!important;line-height:2!important;
+  border-radius:10px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-footer-line{top:62%!important}
+#signature-traxa-opening .sto-stage-two .sto-welcome{
+  top:66%!important;gap:12px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome span{
+  font-size:clamp(20px,5.8vw,26px)!important;
+  letter-spacing:3px!important;font-weight:900!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong{
+  width:auto!important;max-width:94vw!important;
+  font-size:clamp(48px,14vw,62px)!important;
+  letter-spacing:3px!important;line-height:1.2!important;
+  padding:7px 10px 12px!important;
+}
+#signature-traxa-opening .sto-stage-two .sto-welcome strong .sto-char{
+  min-width:.58em!important;font-size:inherit!important;
+}
+@media(max-height:700px){
+  #signature-traxa-opening .sto-stage-two .sto-orb{top:7vh!important;width:min(230px,66vw)!important}
+  #signature-traxa-opening .sto-stage-two .sto-loading{top:calc(7vh + min(230px,66vw) + 7px)!important}
+  #signature-traxa-opening .sto-stage-two .sto-log{top:calc(7vh + min(230px,66vw) + 92px)!important}
+  #signature-traxa-opening .sto-stage-two .sto-footer-line{top:60%!important}
+  #signature-traxa-opening .sto-stage-two .sto-welcome{top:64%!important}
+  #signature-traxa-opening .sto-stage-two .sto-welcome span{font-size:19px!important}
+  #signature-traxa-opening .sto-stage-two .sto-welcome strong{font-size:clamp(42px,12vw,54px)!important}
+}
