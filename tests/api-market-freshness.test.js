@@ -123,6 +123,15 @@ test("rejects unsupported market intervals instead of silently using M15", async
   assert.equal(fetchCalled, false);
 });
 
+test("classifies regular CME futures sessions using Chicago local time", () => {
+  const session = handler.getCmeMarketStatus;
+  assert.equal(session(Date.parse("2026-11-27T19:30:00Z")).status, "open");
+  assert.equal(session(Date.parse("2026-11-27T23:00:00Z")).status, "closed");
+  assert.equal(session(Date.parse("2026-11-28T12:00:00Z")).status, "closed");
+  assert.equal(session(Date.parse("2026-11-30T22:30:00Z")).status, "closed");
+  assert.equal(session(Date.parse("2026-11-30T23:30:00Z")).status, "open");
+});
+
 test("marks recent Yahoo BTC candles fresh and applies a provider timeout", async () => {
   const timestamp = Math.floor(Date.now() / 1000) - 60;
   let requestOptions;
