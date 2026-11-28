@@ -8667,6 +8667,102 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 }
 </style>
 
+
+<!-- AURUM FIX: force signal card details into non-overlapping rows v2 -->
+<style id="aurum-signal-card-no-overlap-v2">
+#marketPage .aurum-signal-feed-card{
+ display:grid!important;
+ grid-template-columns:54px minmax(0,1fr)!important;
+ grid-template-rows:auto minmax(0,1fr)!important;
+ grid-template-areas:"tf content" "direction content"!important;
+ align-items:start!important;
+ min-height:112px!important;
+ height:auto!important;
+ padding:10px 25px 10px 10px!important;
+ gap:5px 9px!important;
+}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-timeframe{grid-area:tf!important;position:static!important;align-self:start!important}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-direction{grid-area:direction!important;position:static!important;align-self:start!important;justify-self:stretch!important}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-content{
+ grid-area:content!important;
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:stretch!important;
+ justify-content:flex-start!important;
+ gap:6px!important;
+ width:100%!important;
+ min-width:0!important;
+ height:auto!important;
+ overflow:visible!important;
+ position:static!important;
+}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-top{
+ display:flex!important;
+ flex-direction:row!important;
+ align-items:flex-start!important;
+ justify-content:space-between!important;
+ flex-wrap:wrap!important;
+ gap:4px 8px!important;
+ width:100%!important;
+ min-width:0!important;
+ position:static!important;
+}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-entry{
+ display:block!important;
+ flex:1 1 125px!important;
+ min-width:0!important;
+ width:auto!important;
+ position:static!important;
+ font-size:13px!important;
+ line-height:1.35!important;
+ overflow-wrap:anywhere!important;
+ white-space:normal!important;
+}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-date{
+ display:flex!important;
+ flex:0 1 100px!important;
+ flex-direction:column!important;
+ align-items:flex-end!important;
+ justify-content:flex-start!important;
+ min-width:0!important;
+ max-width:100px!important;
+ width:auto!important;
+ position:static!important;
+ text-align:right!important;
+ white-space:normal!important;
+ font-size:9px!important;
+ line-height:1.35!important;
+}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-levels,
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-result{
+ display:block!important;
+ position:static!important;
+ inset:auto!important;
+ grid-area:auto!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ height:auto!important;
+ margin:0!important;
+ padding:0 2px 0 0!important;
+ text-align:left!important;
+ white-space:normal!important;
+ overflow-wrap:anywhere!important;
+ word-break:normal!important;
+ line-height:1.5!important;
+}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-levels{font-size:11px!important;font-weight:800!important}
+#marketPage .aurum-signal-feed-card .aurum-signal-feed-result{font-size:10.5px!important;font-weight:800!important}
+#marketPage .aurum-signal-feed-card:after{right:8px!important;bottom:8px!important;position:absolute!important}
+@media(max-width:390px){
+ #marketPage .aurum-signal-feed-card{grid-template-columns:48px minmax(0,1fr)!important;min-height:118px!important;gap:5px 7px!important}
+ #marketPage .aurum-signal-feed-card .aurum-signal-feed-entry{font-size:12px!important}
+ #marketPage .aurum-signal-feed-card .aurum-signal-feed-levels{font-size:10.5px!important}
+ #marketPage .aurum-signal-feed-card .aurum-signal-feed-result{font-size:10px!important}
+ #marketPage .aurum-signal-feed-card .aurum-signal-feed-date{font-size:8.5px!important}
+}
+</style>
+
 </body>
 </html>
 
