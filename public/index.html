@@ -6015,6 +6015,39 @@ if (el) {
   }
   
 
+  // AURUM_CHART_RESIZE_RECOVERY_V1
+  // Chart may initialize while its page is hidden; resize after it becomes visible.
+  const resizeAurumChart = function () {
+    if (!el || !chart || chart === fallbackChart) return;
+    const width = Math.floor(el.getBoundingClientRect().width || el.clientWidth || 0);
+    if (width > 80) {
+      try { chart.resize(width, 340); } catch (error) {
+        try { chart.applyOptions({ width: width, height: 340 }); } catch (_) {}
+      }
+    }
+  };
+  if (typeof ResizeObserver !== 'undefined') {
+    const aurumChartResizeObserver = new ResizeObserver(resizeAurumChart);
+    aurumChartResizeObserver.observe(el);
+  }
+  window.addEventListener('resize', resizeAurumChart, { passive: true });
+  const chartPageNode = document.getElementById('chartPage');
+  if (chartPageNode && typeof MutationObserver !== 'undefined') {
+    const aurumChartPageObserver = new MutationObserver(function () {
+      if (chartPageNode.classList.contains('active')) {
+        requestAnimationFrame(function () {
+          resizeAurumChart();
+          setTimeout(resizeAurumChart, 120);
+        });
+      }
+    });
+    aurumChartPageObserver.observe(chartPageNode, { attributes: true, attributeFilter: ['class'] });
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) requestAnimationFrame(resizeAurumChart);
+  });
+  requestAnimationFrame(resizeAurumChart);
+
   const series = chart.addCandlestickSeries({
     upColor: '#20c997',
     downColor: '#ef5350',
@@ -9459,6 +9492,13 @@ console.log('CANDLE TERAKHIR:', candles[candles.length - 1]);
 } catch (error) {
   if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
   console.log('Chart error:', error);
+  const feedStatusNode = document.getElementById('chartFeedStatus');
+  if (feedStatusNode) {
+    feedStatusNode.textContent = '● DATA GAGAL';
+    feedStatusNode.classList.remove('is-live','is-closed');
+    feedStatusNode.classList.add('is-delayed');
+    feedStatusNode.title = 'Grafik gagal dimuat: ' + String(error?.message || error);
+  }
   const priceNode = document.getElementById('goldPrice');
   const timeNode = document.getElementById('goldTime');
   if (priceNode) priceNode.textContent = '--';
