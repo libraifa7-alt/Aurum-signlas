@@ -4723,6 +4723,31 @@ html,body{min-height:100%;}
  #marketPage .nt-section{padding:12px!important}
 }
 </style>
+
+<style id="traxa-reference-technical-layout">
+/* Match the requested light TRAXA-style technical-data layout. Data engine untouched. */
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"]{background:linear-gradient(145deg,#f8fbff,#edf5fc 60%,#fffaf0)!important;color:#17345b!important;border:1px solid #cbdced!important;border-radius:18px!important;box-shadow:0 8px 24px #183b5b12!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title{background:linear-gradient(110deg,#f4fbff,#fff 58%,#fff8e8)!important;border:1px solid #c8e1f8!important;border-radius:13px!important;color:#17345b!important;padding:12px!important;box-shadow:0 3px 12px #235f9910!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title strong{color:#173f70!important;letter-spacing:.25px!important;font-size:clamp(16px,2vw,21px)!important}
+#marketPage .aurum-signal-panel[data-signal-panel="analysis"] .aurum-analysis-title small{color:#71849b!important}
+#marketPage .nt-dashboard{color:#17345b!important;gap:11px!important}
+#marketPage .nt-status{background:linear-gradient(110deg,#f1f8ff,#fff)!important;border:1px solid #cbdced!important;color:#23466c!important}
+#marketPage .nt-hero{background:linear-gradient(110deg,#fff0f0,#fff 52%,#edf7ff)!important;border:1px solid #d8e3ef!important;color:#26364c!important;box-shadow:0 3px 12px #183b5b10!important}
+#marketPage .nt-hero small{color:#8993a2!important}
+#marketPage .nt-hero strong{color:#0b9c72!important;text-shadow:none!important}
+#marketPage .nt-hero span{color:#607995!important}
+#marketPage .nt-tf{background:linear-gradient(180deg,#fff,#f7fbff)!important;border:1px solid #c8d9eb!important;box-shadow:0 3px 9px #183b5b10!important}
+#marketPage .nt-tf header b{color:#173f70!important}
+#marketPage .nt-tf small{color:#71849b!important}
+#marketPage .nt-section{background:linear-gradient(145deg,#fff,#f7fbff)!important;border:1px solid #cbdced!important;box-shadow:0 3px 12px #183b5b0c!important}
+#marketPage .nt-section h3{color:#23466c!important;border-bottom:1px solid #e3ebf4!important;padding-bottom:8px!important}
+#marketPage .nt-table{color:#243b58!important}
+#marketPage .nt-table th{background:#eaf3fb!important;color:#23466c!important}
+#marketPage .nt-table td{border-color:#e4ebf3!important}
+#marketPage .nt-errors{color:#71849b!important}
+#marketPage .nt-refresh{background:linear-gradient(110deg,#ffe9a6,#d7a53d)!important;color:#51390a!important;border:1px solid #c99a35!important}
+@media(max-width:760px){#marketPage .nt-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}#marketPage .nt-tf{min-height:100px!important}#marketPage .nt-levels{grid-template-columns:1fr!important}}
+</style>
 </head>
   
   
@@ -5181,7 +5206,7 @@ html,body{min-height:100%;}
     </section>
 
     <section class="aurum-signal-panel" data-signal-panel="analysis" role="tabpanel" hidden>
-      <div class="aurum-analysis-title"><span class="aurum-heading-icon">▥</span><div><strong>MARKET STRUCTURE &amp; SMART MONEY</strong><small>Live technical analysis · 7 timeframe · multi-layer confluence</small></div><button type="button" id="newTechnicalRefresh" class="nt-refresh">↻ MUAT ULANG</button></div>
+      <div class="aurum-analysis-title"><span class="aurum-heading-icon">▥</span><div><strong>DATA TEKNIKAL</strong><small>Support · Resistance · Level kunci · Rentang harian · 7 timeframe</small></div><button type="button" id="newTechnicalRefresh" class="nt-refresh">↻ MUAT ULANG</button></div>
       <div id="newTechnicalDashboard" class="nt-dashboard">
         <div id="newTechnicalStatus" class="nt-status">MENGHUBUNGKAN KE PROVIDER…</div>
         <div id="newTechnicalHero"></div>
