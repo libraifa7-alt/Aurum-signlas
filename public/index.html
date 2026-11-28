@@ -2936,8 +2936,8 @@ body {
 .aurum-chart-timeframes{display:flex;gap:5px;margin-bottom:10px;overflow:hidden}
 .aurum-chart-timeframes button{flex:1;text-align:center;padding:7px 2px;border:0;border-radius:7px;background:#f1f5fc;color:#68748a;font-size:8px;font-weight:800;cursor:pointer}
 .aurum-chart-timeframes button.active{background:#e9c96f;color:#594313}
-#chartPage .chart{height:390px;padding:6px;border-radius:12px;border:1px solid #e7eaf0;box-shadow:none}
-#chartPage #candleChart{height:370px!important}
+#chartPage .chart{height:540px;padding:6px;border-radius:12px;border:1px solid #e7eaf0;box-shadow:none}
+#chartPage #candleChart{height:520px!important;min-height:520px!important}
 .aurum-bottom-nav{grid-template-columns:repeat(6,minmax(0,1fr));min-height:66px;padding:6px 5px;gap:2px;border:1px solid #eeeaf0;border-radius:19px 19px 0 0;background:rgba(255,255,255,.97);box-shadow:0 -5px 22px rgba(31,41,55,.10)}
 .aurum-bottom-nav .nav-item{gap:3px;min-height:50px;padding:4px 1px}
 .aurum-bottom-nav .nav-item span{width:27px;height:25px;font-size:19px}
@@ -6096,10 +6096,16 @@ if (el) {
     },
       });
     } catch (chartInitError) {
-      console.warn('AURUM chart visual unavailable; technical analysis will continue:', chartInitError);
+      console.warn('AURUM chart visual unavailable; using native canvas renderer:', chartInitError);
     }
   }
-  
+  if (chart === fallbackChart && fallbackCanvas) {
+    fallbackCanvas.style.display = 'block';
+    fallbackWidth = Math.max(100, el.clientWidth || 320);
+    drawFallbackMarketChart();
+  } else if (fallbackCanvas) {
+    fallbackCanvas.style.display = 'none';
+  }
 
   // AURUM_CHART_RESIZE_RECOVERY_V1
   // Chart may initialize while its page is hidden; resize after it becomes visible.
