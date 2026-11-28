@@ -5612,6 +5612,16 @@ html,body{min-height:100%;}
           window.dispatchEvent(new Event('resize'));
         });
       }
+
+      // Navigasi aplikasi memakai history.pushState(), yang tidak memicu
+      // hashchange. Jalankan analisis saat halaman Sinyal benar-benar dibuka.
+      if (pageId === 'marketPage') {
+        requestAnimationFrame(function () {
+          if (typeof window.aurumRunTechnicalAnalysis === 'function') {
+            window.aurumRunTechnicalAnalysis('market-page-show');
+          }
+        });
+      }
     }
 
     navItems.forEach(function (item) {
