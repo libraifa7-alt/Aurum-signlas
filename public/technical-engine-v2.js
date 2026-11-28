@@ -64,7 +64,7 @@ function analyze(candles,tf){
  }
  const hi=recentHigh?.p??Math.max(...candles.slice(-20).map(c=>c.high)),lo=recentLow?.p??Math.min(...candles.slice(-20).map(c=>c.low)),eq=(hi+lo)/2;
  const structure=recentHigh&&last.close>recentHigh.p?'BOS BULLISH':recentLow&&last.close<recentLow.p?'BOS BEARISH':'STRUCTURE';
- return {tf,count:n,last,trend,structure,atr,support,resistance,levels,sweep,fvg:fvg.filter(x=>!x.mitigated).slice(-3),role,zone:last.close>eq?'PREMIUM':last.close<eq?'DISCOUNT':'EQUILIBRIUM',hi,lo};
+ return {tf,count:n,last,prevClose:prev.close,trend,structure,atr,support,resistance,levels,sweep,fvg:fvg.filter(x=>!x.mitigated).slice(-3),role,zone:last.close>eq?'PREMIUM':last.close<eq?'DISCOUNT':'EQUILIBRIUM',hi,lo};
 }
 function render(results,symbol,errors){
  const root=$('newTechnicalDashboard');if(!root)return;
@@ -72,11 +72,11 @@ function render(results,symbol,errors){
  const direction=good.length<4?'DATA TERBATAS':bull>bear&&bull>=3?'BULLISH':bear>bull&&bear>=3?'BEARISH':bull+bear===0?'RANGE':'MIXED';
  const all=good.map(x=>x.analysis),primary=all.find(x=>x.tf==='M15')||all.find(x=>x.tf==='H1')||all[0],priceSource=all.find(x=>x.tf==='M5')||primary;
  const price=priceSource?.last.close,fmtP=n=>Number.isFinite(n)?fmt(n):'—';
- const strength=x=>{if(!x||x.trend==='RANGE')return 50;const prev=x.last.close;const delta=x.last.close-(x._prevClose??x.last.close);return Math.max(51,Math.min(95,Math.round(65+Math.abs(delta)/(x.atr||1)*10)))};
+ const strength=x=>{if(!x||x.trend==='RANGE')return 50;const delta=x.last.close-(x.prevClose??x.last.close);return Math.max(51,Math.min(95,Math.round(65+Math.abs(delta)/(x.atr||1)*10)))};
  const cards=FRAMES.map(tf=>{const x=results.find(v=>v.tf===tf),a=x?.analysis,up=a?.trend==='BULLISH',down=a?.trend==='BEARISH',color=up?'#399fe8':down?'#ef5b67':'#aeb5bf',label=up?'BUY':down?'SELL':'NEUTRAL';return '<article class="tx-tf '+(up?'bull':down?'bear':'neutral')+'"><div class="tx-tf-head"><b>'+tf+'</b><span>'+(up?'▲':down?'▼':'•')+'</span></div><small>'+(a?a.trend:'NO DATA')+'</small><div class="tx-ring" style="--ring:'+color+'"><b>'+(a?strength(a)+'%':'—')+'</b><small>'+(a?label:'WAIT')+'</small></div><em>'+(a?label:'WAIT')+'</em></article>'}).join('');
  const bearishBlocks=good.length?Math.round(bear/good.length*28):0,neutralBlocks=good.length?Math.round(range/good.length*28):28;
  const segments=Array.from({length:28},(_,i)=>'<i class="'+(i<bearishBlocks?'bear':i<bearishBlocks+neutralBlocks?'neutral':'bull')+'"></i>').join('');
- const rows=results.map(x=>{const a=x.analysis;return '<div class="tx-row"><b>'+x.tf+'</b><span class="'+(a?.trend==='BULLISH'?'bull-text':a?.trend==='BEARISH'?'bear-text':'')+'">'+(a?a.trend:'WAIT')+'</span><span>'+(a?fmtP(a.last.volume):'—')+'</span><span>'+fmtP(a?.support?.price)+'</span><span>'+fmtP(a?.resistance?.price)+'</span></div>'}).join('');
+ const rows=results.map(x=>{const a=x.analysis;return '<div class="tx-row"><b>'+x.tf+'</b><span class="'+(a?.trend==='BULLISH'?'bull-text':a?.trend==='BEARISH'?'bear-text':'')+'">'+(a?a.trend:'WAIT')+'</span><span>'+(a&&a.last.volume>0?fmtP(a.last.volume):'—')+'</span><span>'+fmtP(a?.support?.price)+'</span><span>'+fmtP(a?.resistance?.price)+'</span></div>'}).join('');
  const level=primary||all[0],support=level?.support?.price,resistance=level?.resistance?.price,current=level?.last.close;
  let pos=50;if(Number.isFinite(support)&&Number.isFinite(resistance)&&resistance>support)pos=Math.max(0,Math.min(100,(current-support)/(resistance-support)*100));
  const keyType=level?(level.trend==='BEARISH'?'RESISTANCE · SELL ZONE':level.trend==='BULLISH'?'SUPPORT · BUY ZONE':'PIVOT RANGE'):'LEVEL DATA UNAVAILABLE';
