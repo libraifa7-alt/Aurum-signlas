@@ -9673,7 +9673,7 @@ console.log('STATUS SERVER DIPERIKSA');
     if(asset.symbol===activeAsset){
       const marketState=document.querySelector('.aurum-market-state');
       if(marketState){
-        const labels={LIVE:'● DATA LIVE',TERTUNDA:'● DATA TERTUNDA','PASAR TUTUP':'● PASAR TUTUP'};
+        const labels={LIVE:'● DATA LIVE',TERTUNDA:'● DATA TERTUNDA','PASAR TUTUP':'● MARKET CLOSED'};
         marketState.textContent=labels[status]||'● DATA BELUM TERVERIFIKASI';
         marketState.dataset.state=status==='LIVE'?'live':status==='TERTUNDA'?'delayed':'closed';
         marketState.title=detail||status;
@@ -9682,7 +9682,7 @@ console.log('STATUS SERVER DIPERIKSA');
     }
     if(asset.symbol==='XAU/USD'){
       const session=$('aurumMarketSession');
-      if(session)session.textContent='MARKET SESSION · '+(status==='LIVE'?'LIVE DATA':status==='PASAR TUTUP'?'PASAR TUTUP':'DATA TERTUNDA');
+      if(session)session.textContent='MARKET SESSION · '+(status==='LIVE'?'LIVE DATA':status==='PASAR TUTUP'?'MARKET CLOSED':'DATA TERTUNDA');
       const badge=$('homeLiveStatus');
       if(badge){
         const live=status==='LIVE';
@@ -9715,7 +9715,9 @@ console.log('STATUS SERVER DIPERIKSA');
       let feedStatus='TERTUNDA';
       let feedDetail='Timestamp data belum cukup untuk menyatakan live';
       let feedTimestamp=lastCandleTime;
-      if(asset.symbol==='XAU/USD'){
+      if(data.marketStatus==='closed'){
+        feedStatus='PASAR TUTUP'; feedDetail='Market sedang tutup; harga yang ditampilkan adalah harga sesi terakhir';
+      }else if(asset.symbol==='XAU/USD'){
         if(data.livePriceStatus==='live_quote' && quoteAge>=0 && quoteAge<=120000){
           feedStatus='LIVE'; feedDetail='Kuotasi XAUS diterima '+Math.floor(quoteAge/1000)+' detik lalu'; feedTimestamp=data.livePriceUpdatedAt;
         }else if(data.livePriceStatus==='quote_unavailable' || data.livePriceStatus==='stale_quote'){
