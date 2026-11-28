@@ -13,7 +13,14 @@ function setStatus(message, kind) {
   if (kind) node.classList.add(kind);
 }
 function symbolLabel(symbol) {
-  return symbol === 'BTC/USD' ? 'BITCOIN · BTC/USD' : symbol === 'WTI' ? 'WTI OIL' : 'GOLD · XAU/USD';
+  return symbol === 'BTC/USD' ? 'Bitcoin · BTCUSD' : symbol === 'WTI' ? 'WTI Oil' : 'Gold · XAUUSD';
+}
+function syncAssetButtons() {
+  document.querySelectorAll('#chartPage .aurum-asset-switch [data-asset]').forEach(button => {
+    const active = button.dataset.asset === ($('pair')?.value || 'XAU/USD');
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
 }
 function normalizeCandles(raw) {
   if (!Array.isArray(raw)) return [];
@@ -156,8 +163,9 @@ async function load(reason) {
   const symbol = pair.value || 'XAU/USD';
   const interval = tf.value || 'M15';
   state.symbol = symbol; state.tf = interval; state.busy = true; state.error = '';
-  const label = $('chartMarketLabel');
+  const label = $('chartInstrumentTitle');
   if (label) label.textContent = symbolLabel(symbol);
+  syncAssetButtons();
   setStatus('● MENGAMBIL DATA ' + interval, 'is-delayed');
   try {
     const url = '/api?interval=' + encodeURIComponent(interval) + '&symbol=' + encodeURIComponent(symbol) + '&chartVersion=2';
@@ -198,7 +206,14 @@ function syncButtons() {
 function init() {
   if (!mount()) return;
   const pair = $('pair'), tf = $('tf');
-  if (pair) pair.addEventListener('change', () => load('symbol-change'));
+  if (pair) pair.addEventListener('change', () => { syncAssetButtons(); load('symbol-change'); });
+  document.querySelectorAll('#chartPage .aurum-asset-switch [data-asset]').forEach(button => {
+    button.addEventListener('click', () => {
+      if (!pair || !button.dataset.asset) return;
+      pair.value = button.dataset.asset;
+      pair.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
   if (tf) tf.addEventListener('change', () => { syncButtons(); load('timeframe-change'); });
   document.querySelectorAll('.aurum-chart-timeframes [data-timeframe]').forEach(button => {
     button.addEventListener('click', () => {
@@ -222,6 +237,7 @@ function init() {
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && page?.classList.contains('active')) load('tab-visible');
   });
+  syncAssetButtons();
   syncButtons();
   load('engine-v2-init');
   window.aurumLoadChartV2 = load;
