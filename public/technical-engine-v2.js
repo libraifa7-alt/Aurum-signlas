@@ -83,7 +83,6 @@ function render(results,symbol,errors){
  const daily=results.find(x=>x.tf==='D1')?.candles||[],d0=daily.at(-1),d1=daily.at(-2);
  const rangeHtml=d0?'<div class="tx-range-row"><span>Latest closed D1 candle</span><b><i>H '+fmtP(d0.high)+'</i><em>L '+fmtP(d0.low)+'</em></b></div>':'<div class="tx-range-row">Daily range unavailable</div>';
  const prevHtml=d1?'<div class="tx-range-row"><span>Previous closed D1 candle</span><b><i>H '+fmtP(d1.high)+'</i><em>L '+fmtP(d1.low)+'</em></b></div>':'';
- const smc=all.map(a=>'<div class="tx-smc-row"><b>'+a.tf+'</b><span>SWEEP: '+a.sweep+'</span><span>FVG: '+a.fvg.length+'</span><span>RETEST: '+a.role+'</span><span>'+a.zone+'</span></div>').join('');
  root.innerHTML='<div class="tx-dashboard">'+
  '<section class="tx-hero"><div class="tx-kicker"><span>'+escapeHtml(symbol)+' · CLOSED CANDLE ANALYSIS</span><b>● '+good.length+'/7 ACTIVE</b></div>'+
  '<div class="tx-hero-main"><div><strong class="tx-direction '+(direction==='BULLISH'?'bull-text':direction==='BEARISH'?'bear-text':'mixed-text')+'">'+direction+'</strong><small>'+bull+' BULLISH · '+bear+' BEARISH · '+range+' RANGE</small></div><b>'+fmtP(price)+'</b></div>'+
@@ -93,7 +92,6 @@ function render(results,symbol,errors){
  '<div class="tx-cards">'+cards+'</div><div class="tx-table"><div class="tx-row tx-head"><b>TF</b><b>TREND</b><b>VOLUME</b><b>SUPPORT</b><b>RESIST.</b></div>'+rows+'</div>'+
  '<section class="tx-key"><div class="tx-section-title"><b>● AT A KEY LEVEL</b><small>'+(level?.tf||'NO TF')+' · '+(level?'PIVOT':'WAITING')+'</small></div><div class="tx-key-card"><div class="tx-key-head"><strong>'+(level?.tf||'—')+'</strong><span>'+keyType+'</span><b>'+fmtP(support)+' — '+fmtP(resistance)+'</b></div><div class="tx-key-track"><i style="left:'+pos+'%"></i></div><div class="tx-key-foot"><span>'+fmtP(support)+'</span><span>PRICE · '+fmtP(current)+'</span><span>'+fmtP(resistance)+'</span></div><small>Level hanya ditampilkan jika pivot berulang terkonfirmasi.</small></div></section>'+
  '<section class="tx-range"><div class="tx-section-title"><b>DAILY CANDLE RANGE</b><small>D1 · CLOSED CANDLES</small></div>'+rangeHtml+prevHtml+'</section>'+
- '<section class="tx-smc"><div class="tx-section-title"><b>SMART MONEY · ICT</b><small>SWEEP / FVG / RBS / SBR</small></div>'+(smc||'Belum ada data SMC.')+'</section>'+
  '<p class="tx-note">'+(errors.length?'Data belum lengkap: '+escapeHtml(errors.join(' · ')):'Seluruh timeframe berhasil dianalisis.')+' · Persentase kartu adalah estimasi kekuatan momentum, bukan probabilitas kemenangan. Volume ditampilkan sebagai volume candle, bukan dominasi buyer/seller.</p></div>';
  $('newTechnicalStatus').textContent=good.length+'/7 TIMEFRAME AKTIF · '+symbol;
 }
