@@ -955,3 +955,12 @@ html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4:not(:la
     animation:none!important;opacity:.38!important;
   }
 }
+
+/* Ensure the old between-card lightning animation is fully replaced by the in-card flame. */
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4:not(:last-child)::before{
+  animation:stcSignalFireInside 2.9s ease-in-out infinite alternate!important;
+  filter:blur(3px) saturate(1.35)!important;
+  opacity:.62!important;
+  z-index:0!important;
+  pointer-events:none!important;
+}
