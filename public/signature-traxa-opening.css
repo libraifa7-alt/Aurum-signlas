@@ -850,3 +850,22 @@
   48%{opacity:.78}
   71%{opacity:1}
 }
+
+/* Neon electric border: brighter, thicker traveling arc around every signal card. */
+#marketPage .stc-traxa-setup-card-v4::before{
+  inset:-2px!important;
+  padding:3px!important;
+  opacity:1!important;
+  filter:drop-shadow(0 0 5px var(--stc-electric-color)) drop-shadow(0 0 10px var(--stc-electric-color))!important;
+  background:conic-gradient(from 0deg,
+    transparent 0deg 220deg,
+    rgba(255,255,255,.45) 238deg,
+    #fff 250deg,
+    var(--stc-electric-color) 265deg,
+    #fff 274deg,
+    transparent 292deg 360deg)!important;
+  animation:stcElectricArc 2.2s linear infinite,stcElectricFlicker 1.1s ease-in-out infinite!important;
+}
+#marketPage .stc-traxa-setup-card-v4.win{--stc-electric-color:#00ff78!important}
+#marketPage .stc-traxa-setup-card-v4.loss{--stc-electric-color:#ff174b!important}
+#marketPage .stc-traxa-setup-card-v4.pending{--stc-electric-color:#00aaff!important}
