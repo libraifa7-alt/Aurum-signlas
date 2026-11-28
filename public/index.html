@@ -11846,6 +11846,77 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 })();
 </script>
 <!-- SIGNATURE TAB ISOLATION FIX -->
+
+<!-- SIGNATURE SELECTED ASSET TOP CARD SYNC -->
+<script>
+(function(){
+  if(window.__signatureTopAssetSync) return;
+  window.__signatureTopAssetSync=true;
+  var sequence=0;
+  var names={'XAU/USD':'GOLD · XAU/USD','BTC/USD':'BITCOIN · BTC/USD','WTI':'WTI OIL'};
+  function setTopAsset(symbol){
+    var pair=document.getElementById('pair');
+    if(!pair || !names[symbol]) return;
+    var id=++sequence;
+    pair.value=symbol;
+    var label=document.getElementById('signalAssetName');
+    var mark=document.getElementById('marketAssetMark');
+    var price=document.getElementById('goldPrice');
+    var time=document.getElementById('goldTime');
+    var chart=document.getElementById('aurumMiniChart');
+    if(label) label.textContent=names[symbol];
+    if(mark){
+      mark.textContent=symbol==='XAU/USD'?'Au':symbol==='BTC/USD'?'₿':'WTI';
+      mark.classList.toggle('is-bitcoin',symbol==='BTC/USD');
+      mark.classList.toggle('is-oil',symbol==='WTI');
+    }
+    document.querySelectorAll('#marketPage .aurum-asset-switch [data-asset]').forEach(function(button){
+      button.classList.toggle('active',button.dataset.asset===symbol);
+    });
+    if(price) price.textContent='Memuat '+symbol+'…';
+    if(time) time.textContent=symbol+' · Mengambil harga instrumen';
+    if(chart) chart.innerHTML='<path d="M0 29 L420 29" fill="none" stroke="#d9dee7" stroke-width="1.5" stroke-dasharray="5 5"/>';
+    pair.dispatchEvent(new Event('change',{bubbles:true}));
+    fetch('/api?interval=M1&symbol='+encodeURIComponent(symbol),{cache:'no-store'})
+      .then(function(response){if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
+      .then(function(data){
+        if(id!==sequence || pair.value!==symbol || data.symbol!==symbol) return;
+        if(data.status!=='success'||!Array.isArray(data.candles)||!data.candles.length) throw new Error('Data '+symbol+' belum tersedia');
+        var candles=data.candles,latest=Number(candles[candles.length-1].close);
+        if(!Number.isFinite(latest)||latest<=0) throw new Error('Harga '+symbol+' tidak valid');
+        var quoteTime=Date.parse(data.livePriceUpdatedAt||''),age=Date.now()-quoteTime;
+        if(symbol==='XAU/USD'&&data.livePriceStatus==='live_quote'&&Number.isFinite(Number(data.livePrice))&&Number(data.livePrice)>0&&age>=0&&age<=120000) latest=Number(data.livePrice);
+        if(price) price.textContent=latest.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        if(time) time.textContent=symbol+' · '+(data.marketStatus==='closed'?'MARKET CLOSED':'DATA CANDLE')+' · '+new Date(candles[candles.length-1].datetime).toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' WIB';
+        if(chart&&candles.length>1){
+          var points=candles.slice(-30).map(function(c){return Number(c.close)}).filter(Number.isFinite);
+          var min=Math.min.apply(null,points),max=Math.max.apply(null,points),spread=max-min||1;
+          var xy=points.map(function(v,i){return{x:i*420/Math.max(1,points.length-1),y:7+((max-v)/spread)*39};});
+          var d='M '+xy[0].x.toFixed(1)+' '+xy[0].y.toFixed(1);
+          for(var i=1;i<xy.length;i++) d+=' L '+xy[i].x.toFixed(1)+' '+xy[i].y.toFixed(1);
+          var color=symbol==='XAU/USD'?'#e16f79':symbol==='BTC/USD'?'#399bd0':'#159b9b';
+          chart.innerHTML='<path d="'+d+' L 420 58 L 0 58 Z" fill="'+color+'" opacity=".10"/><path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round"/>';
+        }
+      })
+      .catch(function(error){
+        if(id!==sequence||pair.value!==symbol)return;
+        if(price)price.textContent='--';
+        if(time)time.textContent=symbol+' · DATA TIDAK TERSEDIA';
+        console.warn('Top asset card sync:',error);
+      });
+  }
+  document.addEventListener('click',function(event){
+    var button=event.target.closest('#marketPage .aurum-asset-switch [data-asset]');
+    if(!button)return;
+    setTopAsset(button.dataset.asset);
+  },true);
+  document.addEventListener('DOMContentLoaded',function(){
+    var pair=document.getElementById('pair');
+    if(pair&&names[pair.value]) setTopAsset(pair.value);
+  },{once:true});
+})();
+</script>
+
 </body>
 </html>
 
