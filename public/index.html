@@ -4967,6 +4967,48 @@ main, main#mainContent, .app-page, #homePage, #chartPage {
 }
 </style>
 
+
+<style id="aurum-traxa-neutral-canvas-v4">
+/* Final neutral-grey TRAXA-inspired page canvas. Preserve cards and chart geometry. */
+:root { color-scheme: light; }
+html, body, #app, #root, .app-shell, .app-layout, .main-layout, main,
+main#mainContent, .app-content, .content, .page-content, .app-page,
+#homePage, #marketPage, #chartPage, #newsPage, #chatPage {
+  background-color:#f0f1f5 !important;
+  background-image:
+    radial-gradient(circle,rgba(150,160,176,.13) .7px,transparent .9px),
+    linear-gradient(180deg,#f0f1f5 0%,#f3f4f7 52%,#eef0f4 100%) !important;
+  background-size:9px 9px,100% 100% !important;
+  background-attachment:fixed !important;
+  background-repeat:repeat,no-repeat !important;
+}
+body::before, body::after,
+#homePage::before, #homePage::after,
+#chartPage::before, #chartPage::after {
+  background-color:transparent !important;
+}
+#homePage, #marketPage, #chartPage, #newsPage, #chatPage {
+  background-color:transparent !important;
+  background-image:none !important;
+}
+#chartPage .aurum-chart-shell {
+  background:linear-gradient(145deg,#f1f5fb 0%,#edf1f7 55%,#f4f6fa 100%) !important;
+  border:1px solid #dce3ed !important;
+  box-shadow:0 10px 26px rgba(42,56,78,.10) !important;
+}
+#chartPage .chart, #chartPage #goldChart, #chartPage #candleChart {
+  background:#fff !important;
+}
+/* No vendor logo or watermark inside the chart viewport. */
+#chartPage #candleChart .tv-lightweight-charts,
+#chartPage #candleChart [class*="logo"],
+#chartPage #candleChart [class*="watermark"],
+#chartPage #candleChart [id*="logo"],
+#chartPage #candleChart [id*="watermark"] {
+  display:none !important;
+}
+</style>
+
 </head>
   
   
