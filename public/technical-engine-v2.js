@@ -86,7 +86,7 @@ function render(results,symbol,errors){
  const smc=all.map(a=>'<div class="tx-smc-row"><b>'+a.tf+'</b><span>SWEEP: '+a.sweep+'</span><span>FVG: '+a.fvg.length+'</span><span>RETEST: '+a.role+'</span><span>'+a.zone+'</span></div>').join('');
  root.innerHTML='<div class="tx-dashboard">'+
  '<section class="tx-hero"><div class="tx-kicker"><span>'+escapeHtml(symbol)+' · CLOSED CANDLE ANALYSIS</span><b>● '+good.length+'/7 ACTIVE</b></div>'+
- '<div class="tx-hero-main"><div><strong>'+direction+'</strong><small>'+bull+' BULLISH · '+bear+' BEARISH · '+range+' RANGE</small></div><b>'+fmtP(price)+'</b></div>'+
+ '<div class="tx-hero-main"><div><strong class="tx-direction '+(direction==='BULLISH'?'bull-text':direction==='BEARISH'?'bear-text':'mixed-text')+'">'+direction+'</strong><small>'+bull+' BULLISH · '+bear+' BEARISH · '+range+' RANGE</small></div><b>'+fmtP(price)+'</b></div>'+
  '<div class="tx-meter-title"><span>TREND METER</span><b>'+(bull-bear>0?'+':'')+(bull-bear)+' / 7</b></div><div class="tx-meter">'+segments+'</div>'+
  '<div class="tx-meter-legend"><span>BEARISH '+(good.length?Math.round(bear/good.length*100):0)+'%</span><span>MIXED '+(good.length?Math.round(range/good.length*100):0)+'%</span><span>BULLISH '+(good.length?Math.round(bull/good.length*100):0)+'%</span></div>'+
  '<div class="tx-share"><span>Bearish TF <b>'+bear+'</b></span><i><em style="width:'+(good.length?bear/good.length*100:0)+'%"></em><em style="width:'+(good.length?bull/good.length*100:0)+'%"></em></i><span>Bullish TF <b>'+bull+'</b></span></div></section>'+
