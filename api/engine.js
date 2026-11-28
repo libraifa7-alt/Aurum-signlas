@@ -600,13 +600,18 @@ function normalizeCandles(rows) {
 }
 
 function evaluateMarket(symbol, candleSets) {
+  const { analyzeSmartMoney } = require('./smc');
+  const smartMoney = Object.fromEntries(TIMEFRAMES.map(tf => [
+    tf,
+    Array.isArray(candleSets[tf]) ? analyzeSmartMoney(candleSets[tf], tf) : { timeframe: tf, status: 'INSUFFICIENT_DATA', candleCount: 0 }
+  ]));
   // Mirror the live dashboard's actual MTF confirmation:
   // H4 is contextual; H1 and M15 must agree, and both OB zones must
   // confirm that same direction. Do not require D1/M45 or 5-of-7
   // alignment here; that was stricter than the dashboard strategy.
   const required = ['H4','H1','M15'];
   const missing = required.filter(tf => !Array.isArray(candleSets[tf]) || candleSets[tf].length < 30);
-  if (missing.length) return {status:'WAIT',reason:'DATA_TIMEFRAME_KURANG',missing,symbol};
+  if (missing.length) return {status:'WAIT',reason:'DATA_TIMEFRAME_KURANG',missing,symbol,smartMoney};
 
   const trends = {};
   const diagnostics = {};
@@ -626,7 +631,7 @@ function evaluateMarket(symbol, candleSets) {
   if ([h4,h1,m15].includes('UNKNOWN')) {
     return {
       status:'WAIT',reason:'OB_STRUCTURE_DATA_INSUFFICIENT',symbol,
-      trends:diagnostics,
+      trends:diagnostics,smartMoney,
       orderBlocks:{H1:{status:h1Ob.status,type:h1Ob.type||null},M15:{status:m15Ob.status,type:m15Ob.type||null}}
     };
   }
@@ -647,7 +652,7 @@ function evaluateMarket(symbol, candleSets) {
     return {
       status:'WAIT',
       reason:bias==='WAIT'?'MTF_NOT_ALIGNED':'ORDER_BLOCK_NOT_ALIGNED',
-      symbol,trends:diagnostics,
+      symbol,trends:diagnostics,smartMoney,
       orderBlocks:{H1:{status:h1Ob.status,type:h1Ob.type||null},M15:{status:m15Ob.status,type:m15Ob.type||null}}
     };
   }
@@ -656,7 +661,7 @@ function evaluateMarket(symbol, candleSets) {
   const tradePlan=calculateTradePlan(selectedOb);
   const riskProfiles=calculateRiskProfiles(selectedOb);
   if (!tradePlan || riskProfiles.length!==3) {
-    return {status:'WAIT',reason:'TRADE_PLAN_INVALID',symbol,trends:diagnostics};
+    return {status:'WAIT',reason:'TRADE_PLAN_INVALID',symbol,trends:diagnostics,smartMoney};
   }
 
   const wanted=bias==='BUY'?'BULLISH':'BEARISH';
@@ -676,7 +681,7 @@ function evaluateMarket(symbol, candleSets) {
 
   return {
     status:'SIGNAL',direction:bias,symbol,generatedAt:new Date().toISOString(),
-    trends:diagnostics,bullish:Object.values(diagnostics).filter(x=>x==='BULLISH').length,
+    trends:diagnostics,smartMoney,bullish:Object.values(diagnostics).filter(x=>x==='BULLISH').length,
     bearish:Object.values(diagnostics).filter(x=>x==='BEARISH').length,
     unknown:Object.values(diagnostics).filter(x=>x==='UNKNOWN').length,
     signalStrength,
