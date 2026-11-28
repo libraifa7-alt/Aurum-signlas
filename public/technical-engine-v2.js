@@ -69,6 +69,9 @@ function analyze(candles,tf){
 }
 function render(results,symbol,errors){
  const root=$('newTechnicalDashboard');if(!root)return;
+ const feed=results.find(x=>x.tf==='M5'&&x.payload)?.payload||results.find(x=>x.payload)?.payload||{};
+ const quoteAge=Date.now()-Date.parse(feed.livePriceUpdatedAt||'');
+ const marketLabel=feed.marketStatus==='closed'?'● MARKET CLOSED':(feed.livePriceStatus==='live_quote'&&quoteAge>=0&&quoteAge<=120000?'● LIVE':'● DATA DELAYED');
  const good=results.filter(x=>x.analysis),bull=good.filter(x=>x.analysis.trend==='BULLISH').length,bear=good.filter(x=>x.analysis.trend==='BEARISH').length,range=good.length-bull-bear;
  const direction=good.length<4?'DATA TERBATAS':bull>bear&&bull>=3?'BULLISH':bear>bull&&bear>=3?'BEARISH':bull+bear===0?'RANGE':'MIXED';
  const all=good.map(x=>x.analysis),primary=all.find(x=>x.tf==='M15')||all.find(x=>x.tf==='H1')||all[0],priceSource=all.find(x=>x.tf==='M5')||primary;
@@ -85,7 +88,7 @@ function render(results,symbol,errors){
  const rangeHtml=d0?'<div class="tx-range-row"><span>Latest closed D1 candle</span><b><i>H '+fmtP(d0.high)+'</i><em>L '+fmtP(d0.low)+'</em></b></div>':'<div class="tx-range-row">Daily range unavailable</div>';
  const prevHtml=d1?'<div class="tx-range-row"><span>Previous closed D1 candle</span><b><i>H '+fmtP(d1.high)+'</i><em>L '+fmtP(d1.low)+'</em></b></div>':'';
  root.innerHTML='<div class="tx-dashboard">'+
- '<section class="tx-hero"><div class="tx-kicker"><span>'+escapeHtml(symbol)+' · CLOSED CANDLE ANALYSIS</span><b>● '+good.length+'/7 ACTIVE</b></div>'+
+ '<section class="tx-hero"><div class="tx-kicker"><span>'+escapeHtml(symbol)+' · CLOSED CANDLE ANALYSIS</span><b>'+marketLabel+' · '+good.length+'/7 ACTIVE</b></div>'+
  '<div class="tx-hero-main"><div><strong class="tx-direction '+(direction==='BULLISH'?'bull-text':direction==='BEARISH'?'bear-text':'mixed-text')+'">'+direction+'</strong><small>'+bull+' BULLISH · '+bear+' BEARISH · '+range+' RANGE</small></div><b>'+fmtQuote(price)+'</b></div>'+
  '<div class="tx-meter-title"><span>TREND METER</span><b>'+(bull-bear>0?'+':'')+(bull-bear)+' / 7</b></div><div class="tx-meter">'+segments+'</div>'+
  '<div class="tx-meter-legend"><span>BEARISH '+(good.length?Math.round(bear/good.length*100):0)+'%</span><span>MIXED '+(good.length?Math.round(range/good.length*100):0)+'%</span><span>BULLISH '+(good.length?Math.round(bull/good.length*100):0)+'%</span></div>'+
