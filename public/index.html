@@ -11592,7 +11592,21 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
   }
   document.addEventListener('click',function(event){
     var tab=event.target.closest('#marketPage [data-signal-tab]');
-    if(tab) isolateSignalPanels(tab.getAttribute('data-signal-tab'));
+    if(!tab) return;
+    var selected=tab.getAttribute('data-signal-tab');
+    isolateSignalPanels(selected);
+    // The Analysis panel owns the seven-timeframe technical dashboard.
+    // Its tab can be opened while marketPage is already active, so page
+    // navigation alone is not a reliable trigger for loading the candles.
+    if(selected==='analysis'){
+      requestAnimationFrame(function(){
+        if(typeof window.aurumRunTechnicalAnalysis==='function'){
+          window.aurumRunTechnicalAnalysis('analysis-tab-selected');
+        } else {
+          console.warn('AURUM technical analyzer is not ready when Analysis tab is selected');
+        }
+      });
+    }
   },true);
   document.addEventListener('DOMContentLoaded',function(){
     var selected=document.querySelector('#marketPage [data-signal-tab].active')?.getAttribute('data-signal-tab')||'setup';
