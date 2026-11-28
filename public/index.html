@@ -9304,47 +9304,13 @@ window.aurumAnalyzeMarketStructure = analyzeMarketStructure;
 
 } // Penutup blok IF
 
-// Publish a single entry point so the market dashboard can request its own
-// seven timeframes even when the chart page is hidden or its chart guard exits.
-if (typeof window.aurumAnalyzeMarketStructure === 'function') {
-  window.aurumRunTechnicalAnalysis = async function (reason) {
-    const symbol = document.getElementById('pair')?.value || 'XAU/USD';
-    const statusNode = document.getElementById('marketStructure');
-    if (statusNode) statusNode.textContent = 'MEMERIKSA DATA 7 TIMEFRAME…';
-    console.info('AURUM TECHNICAL ANALYSIS START:', reason || 'page-open', symbol);
-    try {
-      const structure = await window.aurumAnalyzeMarketStructure(symbol);
-      if (document.getElementById('pair')?.value === symbol && statusNode) {
-        statusNode.textContent = structure;
-      }
-      return structure;
-    } catch (error) {
-      console.error('AURUM 7-timeframe analysis failed:', error);
-      if (document.getElementById('pair')?.value === symbol && statusNode) {
-        statusNode.textContent = 'DATA TEKNIKAL GAGAL DIMUAT — ' + String(error?.message || error);
-      }
-      return null;
-    }
-  };
-
-  // The app uses pushState and can initialize the active page before this
-  // engine script is ready. Use the actual visible page state, not location.hash,
-  // and run once here after the analyzer has definitely been registered.
-  const isMarketPageActive = function () {
-    return !!document.getElementById('marketPage')?.classList.contains('active');
-  };
-  const runIfMarketPage = function (reason) {
-    if (isMarketPageActive()) {
-      window.aurumRunTechnicalAnalysis(reason);
-    }
-  };
-  runIfMarketPage('technical-engine-ready');
-  window.addEventListener('hashchange', function () {
-    runIfMarketPage('market-page-navigation');
-  });
-  window.addEventListener('popstate', function () {
-    runIfMarketPage('market-page-history-navigation');
-  });
+// Legacy technical analyzer is intentionally disabled. The independent
+// technical-engine-v2.js now owns the seven-timeframe dashboard and requests.
+// Keep this compatibility hook only for older navigation listeners.
+window.aurumRunTechnicalAnalysis = function () {
+  console.info('Legacy technical engine disabled; Signature Technical Engine v2 is active.');
+  return Promise.resolve('ENGINE_V2');
+};
 }
 
 document.getElementById('aurumDebugStatus').textContent =
