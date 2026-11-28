@@ -5024,6 +5024,23 @@ body::before, body::after,
 }
 </style>
 
+
+<style id="signature-chart-instrument-timeframe-layout">
+#chartPage .aurum-chart-heading{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px}
+#chartPage .aurum-chart-heading strong{font-size:16px;font-weight:900;letter-spacing:.2px;color:#202b3b}
+#chartPage .market-controls{display:none!important}
+#chartPage .aurum-asset-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 9px}
+#chartPage .aurum-asset-switch button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:40px;padding:8px 5px;border:1px solid #dfe5ee;border-radius:11px;background:#eef2f8;color:#68748a;font-size:10px;font-weight:900;letter-spacing:.25px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+#chartPage .aurum-asset-switch button i{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#f1a32d}
+#chartPage .aurum-asset-switch button[data-asset="XAU/USD"] i{background:#d6ad48}
+#chartPage .aurum-asset-switch button[data-asset="BTC/USD"] i{background:#f2a12b}
+#chartPage .aurum-asset-switch button[data-asset="WTI"] i{background:#38c5b6}
+#chartPage .aurum-asset-switch button.active{background:linear-gradient(135deg,#fffdf5,#f4edda);border-color:#dfcf9e;color:#a17b2b;box-shadow:0 2px 8px rgba(169,133,52,.12),inset 0 1px 0 #fff}
+#chartPage .aurum-chart-timeframes{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;margin:0 0 10px;overflow:visible}
+#chartPage .aurum-chart-timeframes button{min-width:0;min-height:29px;padding:6px 1px;border:1px solid #dce5f1;border-radius:8px;background:#eff5fc;color:#5e6d83;font-size:8px;font-weight:800}
+#chartPage .aurum-chart-timeframes button.active{background:linear-gradient(135deg,#8b5cf6 0%,#6d28d9 100%)!important;color:#fff!important;border:1px solid #6d28d9!important;box-shadow:0 2px 8px rgba(109,40,217,.24)!important}
+@media(max-width:360px){#chartPage .aurum-asset-switch{gap:5px}#chartPage .aurum-asset-switch button{font-size:9px;gap:5px}#chartPage .aurum-chart-timeframes{gap:3px}#chartPage .aurum-chart-timeframes button{font-size:7px}}
+</style>
 </head>
   
   
@@ -5544,10 +5561,15 @@ body::before, body::after,
   <!-- HALAMAN GRAFIK -->
   <section id="chartPage" class="app-page">
     <section class="aurum-chart-shell">
-      <div class="aurum-chart-heading"><div><strong>Grafik Pasar</strong><small id="chartMarketLabel">EMAS · XAU/USD</small></div><span id="chartFeedStatus" role="status" aria-live="polite">● MEMERIKSA DATA</span></div>
-      <div class="market-controls">
+      <div class="aurum-chart-heading"><div><strong id="chartInstrumentTitle">Gold · XAUUSD</strong></div><span id="chartFeedStatus" role="status" aria-live="polite">● MEMERIKSA DATA</span></div>
+      <div class="aurum-asset-switch" role="group" aria-label="Pilih instrumen grafik">
+        <button type="button" data-asset="XAU/USD" class="active"><i></i> GOLD</button>
+        <button type="button" data-asset="BTC/USD"><i></i> BITCOIN</button>
+        <button type="button" data-asset="WTI"><i></i> WTI OIL</button>
+      </div>
+      <div class="market-controls" aria-hidden="true">
         <select id="pair" aria-label="Pilih instrumen">
-          <option value="XAU/USD">Emas · XAU/USD</option>
+          <option value="XAU/USD" selected>Emas · XAU/USD</option>
           <option value="BTC/USD">Bitcoin · BTC/USD</option>
           <option value="WTI">Minyak · WTI</option>
         </select>
@@ -5555,7 +5577,7 @@ body::before, body::after,
           <option>M1</option><option>M5</option><option selected>M15</option><option>M30</option><option>M45</option><option>H1</option><option>H4</option><option>D1</option>
         </select>
       </div>
-      <div class="aurum-chart-timeframes" aria-label="Pilih timeframe grafik"><button type="button" data-timeframe="M1">M1</button><button type="button" data-timeframe="M15">M15</button><button type="button" data-timeframe="M30">M30</button><button type="button" data-timeframe="H1">H1</button><button type="button" data-timeframe="H4">H4</button><button type="button" data-timeframe="D1">D1</button></div>
+      <div class="aurum-chart-timeframes" role="group" aria-label="Pilih timeframe grafik"><button type="button" data-timeframe="M1">M1</button><button type="button" data-timeframe="M5">M5</button><button type="button" data-timeframe="M15">M15</button><button type="button" data-timeframe="M30">M30</button><button type="button" data-timeframe="M45">M45</button><button type="button" data-timeframe="H1">H1</button><button type="button" data-timeframe="H4">H4</button><button type="button" data-timeframe="D1">D1</button></div>
       <div class="chart" id="goldChart"><div id="candleChart" style="width:100%;height:520px;min-height:520px;position:relative"></div></div>
       <p class="aurum-disclaimer">Grafik menggunakan data pasar yang diterima AURUM. Periksa status data sebelum mengambil keputusan.</p>
     </section>
