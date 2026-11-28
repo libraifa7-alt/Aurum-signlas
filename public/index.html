@@ -5449,7 +5449,7 @@ html,body{min-height:100%;}
         </select>
       </div>
       <div class="aurum-chart-timeframes" aria-label="Pilih timeframe grafik"><button type="button" data-timeframe="M1">M1</button><button type="button" data-timeframe="M15">M15</button><button type="button" data-timeframe="M30">M30</button><button type="button" data-timeframe="H1">H1</button><button type="button" data-timeframe="H4">H4</button><button type="button" data-timeframe="D1">D1</button></div>
-      <div class="chart" id="goldChart"><div id="candleChart" style="width:100%;height:340px;position:relative"></div></div>
+      <div class="chart" id="goldChart"><div id="candleChart" style="width:100%;height:520px;min-height:520px;position:relative"></div></div>
       <p class="aurum-disclaimer">Grafik menggunakan data pasar yang diterima AURUM. Periksa status data sebelum mengambil keputusan.</p>
     </section>
   </section>
@@ -5999,7 +5999,7 @@ if (el) {
     try {
       chart = LightweightCharts.createChart(el, {
     width: Math.max(el.clientWidth, 300),
-    height: 340,
+    height: 520,
     layout: {
       background: { color: '#ffffff' },
       textColor: '#475569'
@@ -6021,8 +6021,8 @@ if (el) {
     if (!el || !chart || chart === fallbackChart) return;
     const width = Math.floor(el.getBoundingClientRect().width || el.clientWidth || 0);
     if (width > 80) {
-      try { chart.resize(width, 340); } catch (error) {
-        try { chart.applyOptions({ width: width, height: 340 }); } catch (_) {}
+      try { chart.resize(width, 520); } catch (error) {
+        try { chart.applyOptions({ width: width, height: 520 }); } catch (_) {}
       }
     }
   };
@@ -6037,7 +6037,13 @@ if (el) {
       if (chartPageNode.classList.contains('active')) {
         requestAnimationFrame(function () {
           resizeAurumChart();
-          setTimeout(resizeAurumChart, 120);
+          setTimeout(function () {
+            resizeAurumChart();
+            if (typeof loadChart === 'function' && !window.__aurumChartPageFirstLoad) {
+              window.__aurumChartPageFirstLoad = true;
+              loadChart(timeframe.value || 'M15');
+            }
+          }, 220);
         });
       }
     });
@@ -6049,12 +6055,12 @@ if (el) {
   requestAnimationFrame(resizeAurumChart);
 
   const series = chart.addCandlestickSeries({
-    upColor: '#20c997',
-    downColor: '#ef5350',
-    borderUpColor: '#20c997',
-    borderDownColor: '#ef5350',
-    wickUpColor: '#20c997',
-    wickDownColor: '#ef5350'
+    upColor: '#2563eb',
+    downColor: '#ef4444',
+    borderUpColor: '#2563eb',
+    borderDownColor: '#ef4444',
+    wickUpColor: '#2563eb',
+    wickDownColor: '#ef4444'
   });
 
   // Separate live spot trace: never rewrite old OHLC candles with a spot quote.
