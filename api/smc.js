@@ -62,7 +62,7 @@ function analyzeSmartMoney(rows, timeframe='UNKNOWN') {
       const retested=breakIndex>=0&&candles.slice(breakIndex+1).some(c=>
         g.kind==='HIGH'?c.low<=g.level+tolerance&&c.close>g.level:c.high>=g.level-tolerance&&c.close<g.level
       );
-      const role=broken=breakIndex>=0&&retested?(g.kind==='HIGH'?'RBS':'SBR'):'S/R';
+      const role=breakIndex>=0&&retested?(g.kind==='HIGH'?'RBS':'SBR'):'S/R';
       zones.push({kind:g.kind,level:Number(g.level.toFixed(8)),touches:g.touches,role,twiceTested:g.touches>=2});
     }
   }
