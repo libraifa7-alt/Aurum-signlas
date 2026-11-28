@@ -9269,6 +9269,11 @@ setInterval(async function() {
   }
 }, 65000);
 
+// Expose the analyzer defined inside the chart-engine scope. Without this
+// bridge, the publisher below checks an undefined window property, so the
+// Analysis tab never requests M5–D1 candles.
+window.aurumAnalyzeMarketStructure = analyzeMarketStructure;
+
 } // Penutup blok IF
 
 // Publish a single entry point so the market dashboard can request its own
