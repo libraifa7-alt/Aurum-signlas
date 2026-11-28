@@ -8464,6 +8464,104 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 })();
 </script>
 
+
+<style id="aurum-market-summary-mobile-fix">
+#marketPage .aurum-signal-feed-top{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:6px;min-width:0}
+#marketPage .aurum-signal-feed-entry{display:block;min-width:0;overflow-wrap:anywhere;word-break:normal}
+#marketPage .aurum-signal-feed-date{min-width:64px;max-width:86px;white-space:normal;text-align:right}
+#marketPage .aurum-signal-feed-levels,#marketPage .aurum-signal-feed-result{display:block;min-width:0;overflow-wrap:anywhere;white-space:normal}
+#marketPage .aurum-signal-feed-content{min-width:0;overflow:hidden}
+</style>
+<script id="aurum-market-summary-data-fix">
+(function(){
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const pair=$('pair');
+ const fmt=n=>Number.isFinite(n)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'--';
+ let busy=false,lastSymbol='';
+ function candlesFrom(payload,tf){
+  const seconds=tf==='D1'?86400:900,now=Date.now()/1000;
+  return (Array.isArray(payload?.candles)?payload.candles:[]).map(c=>({
+   time:Math.floor(Date.parse(c.datetime)/1000),open:Number(c.open),high:Number(c.high),low:Number(c.low),close:Number(c.close)
+  })).filter(c=>Number.isFinite(c.time)&&c.time<=now&&[c.open,c.high,c.low,c.close].every(Number.isFinite)&&c.high>=Math.max(c.open,c.close,c.low)&&c.low<=Math.min(c.open,c.close,c.high))
+   .sort((a,b)=>a.time-b.time).filter((c,i,a)=>i===0||c.time>a[i-1].time)
+   .filter(c=>tf==='D1'||c.time+seconds<=now+1);
+ }
+ function pivots(rows){
+  const highs=[],lows=[];
+  for(let i=2;i<rows.length-2;i++){
+   const c=rows[i],left=rows.slice(i-2,i),right=rows.slice(i+1,i+3);
+   if(left.every(x=>c.high>x.high)&&right.every(x=>c.high>x.high))highs.push({price:c.high,index:i});
+   if(left.every(x=>c.low<x.low)&&right.every(x=>c.low<x.low))lows.push({price:c.low,index:i});
+  }
+  return {highs,lows};
+ }
+ function nearest(levels,price,kind,tolerance){
+  const candidates=levels.filter(x=>kind==='SUPPORT'?x.price<price:x.price>price);
+  const clusters=[];
+  candidates.forEach(p=>{
+   let g=clusters.find(x=>Math.abs(x.sum/x.count-p.price)<=tolerance);
+   if(!g){g={sum:0,count:0,last:-99};clusters.push(g);}
+   if(p.index-g.last>=3){g.sum+=p.price;g.count++;g.last=p.index;}
+  });
+  const valid=clusters.filter(x=>x.count>=2).map(x=>({price:x.sum/x.count,touches:x.count}));
+  valid.sort((a,b)=>kind==='SUPPORT'?b.price-a.price:a.price-b.price);
+  return valid[0]||null;
+ }
+ async function refresh(){
+  if(busy||!$('marketPage'))return;
+  busy=true;
+  const symbol=pair?.value||'XAU/USD';
+  try{
+   const [m15res,d1res]=await Promise.all([
+    fetch('/api?interval=M15&symbol='+encodeURIComponent(symbol),{cache:'no-store'}),
+    fetch('/api?interval=D1&symbol='+encodeURIComponent(symbol),{cache:'no-store'})
+   ]);
+   if(!m15res.ok||!d1res.ok)throw new Error('API market belum merespons normal');
+   const [m15,d1]=await Promise.all([m15res.json(),d1res.json()]);
+   if((pair?.value||'XAU/USD')!==symbol)return;
+   if(m15.status!=='success'||d1.status!=='success')throw new Error(m15.message||d1.message||'Data candle tidak tersedia');
+   const rows=candlesFrom(m15,'M15'),daily=candlesFrom(d1,'D1');
+   if(rows.length<15||!daily.length)throw new Error('Riwayat candle belum cukup untuk ringkasan');
+   const last=rows[rows.length-1],sw=pivots(rows),h=sw.highs.slice(-2),l=sw.lows.slice(-2);
+   let trend='SIDEWAYS';
+   if(h.length===2&&l.length===2){
+    if(h[1].price>h[0].price&&l[1].price>l[0].price)trend='BULLISH';
+    else if(h[1].price<h[0].price&&l[1].price<l[0].price)trend='BEARISH';
+   }
+   const trendNode=$('aurumHeaderTrend');
+   if(trendNode){trendNode.textContent='Trend '+trend.toLowerCase();trendNode.dataset.trend=trend;trendNode.style.color=trend==='BULLISH'?'#168bd2':trend==='BEARISH'?'#e34d5d':'#202733';}
+   const day=daily[daily.length-1],range=Math.max(0,day.high-day.low);
+   const low=$('aurumRangeLow'),high=$('aurumRangeHigh'),pips=$('aurumRangePips'),marker=$('aurumRangeMarker');
+   if(low)low.textContent='L '+fmt(day.low);
+   if(high)high.textContent='H '+fmt(day.high);
+   if(pips)pips.textContent=fmt(range)+' pts';
+   if(marker){const pct=range>0?Math.max(0,Math.min(100,(last.close-day.low)/range*100)):50;marker.style.left=pct+'%';}
+   const tr=rows.slice(1).map((c,i)=>Math.max(c.high-c.low,Math.abs(c.high-rows[i].close),Math.abs(c.low-rows[i].close)));
+   const atr=tr.slice(-14).reduce((a,b)=>a+b,0)/Math.max(1,tr.slice(-14).length);
+   const tolerance=Math.max(atr*.15,last.close*.0002);
+   const support=nearest(sw.lows,last.close,'SUPPORT',tolerance),resistance=nearest(sw.highs,last.close,'RESISTANCE',tolerance);
+   const s=$('aurumNearestSupport'),r=$('aurumNearestResistance'),sd=$('aurumSupportDistance'),rd=$('aurumResistanceDistance');
+   if(s)s.textContent=support?fmt(support.price):'--';
+   if(r)r.textContent=resistance?fmt(resistance.price):'--';
+   if(sd)sd.textContent=support?fmt(Math.abs(last.close-support.price))+' pts below':'Level belum terkonfirmasi (pivot 2x)';
+   if(rd)rd.textContent=resistance?fmt(Math.abs(resistance.price-last.close))+' pts above':'Level belum terkonfirmasi (pivot 2x)';
+   const state=$('.aurum-market-state');
+   const closed=m15.marketStatus==='closed'||d1.marketStatus==='closed';
+   if(state&&closed)state.textContent='● MARKET CLOSED';
+   lastSymbol=symbol;
+  }catch(error){
+   console.warn('AURUM market summary:',error);
+   const trend=$('aurumHeaderTrend');
+   if(trend&&lastSymbol!==(pair?.value||'XAU/USD'))trend.textContent='Trend menunggu data valid';
+  }finally{busy=false;}
+ }
+ pair?.addEventListener('change',()=>{lastSymbol='';refresh();});
+ document.querySelectorAll('#marketPage [data-asset]').forEach(b=>b.addEventListener('click',()=>setTimeout(refresh,120)));
+ refresh();setInterval(refresh,60000);
+})();
+</script>
+
 </body>
 </html>
 
