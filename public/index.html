@@ -4676,6 +4676,53 @@ html,body{min-height:100%;}
  #marketPage .nt-hero b{white-space:normal!important}
 }
 </style>
+
+<style id="traxa-inspired-technical-skin">
+/* TRAXA-inspired visual treatment; presentation only, no data or signal logic changes. */
+#marketPage .aurum-analysis-title{display:flex!important;align-items:center!important;gap:10px!important;margin:0 0 13px!important;padding:13px 14px!important;border:1px solid #29415d!important;border-radius:14px!important;background:linear-gradient(115deg,#081421,#10263b 62%,#0a1726)!important;color:#f5f8fc!important;box-shadow:0 8px 24px #07132122!important}
+#marketPage .aurum-analysis-title>div{min-width:0;display:grid!important;gap:4px!important}
+#marketPage .aurum-analysis-title strong{font-size:12px!important;letter-spacing:.7px!important;color:#f1c66a!important}
+#marketPage .aurum-analysis-title small{font-size:9px!important;line-height:1.4!important;color:#a9bed2!important}
+#marketPage .nt-dashboard{gap:12px!important;color:#e8eef5!important}
+#marketPage .nt-status{border:1px solid #29415b!important;border-radius:11px!important;background:#0d1d2d!important;color:#b9cce0!important;line-height:1.5!important}
+#marketPage .nt-hero{position:relative!important;overflow:hidden!important;min-height:112px!important;padding:18px!important;border:1px solid #34516c!important;border-radius:15px!important;background:radial-gradient(circle at 85% 0%,#244d70 0,transparent 40%),linear-gradient(115deg,#071522,#102b43 60%,#0a1b2b)!important;box-shadow:0 10px 26px #06132135!important}
+#marketPage .nt-hero small{color:#91aac2!important;letter-spacing:1.1px!important}
+#marketPage .nt-hero strong{color:#55d6a6!important;text-shadow:0 0 18px #55d6a633!important}
+#marketPage .nt-hero span{color:#b8cadd!important}
+#marketPage .nt-cards{gap:9px!important}
+#marketPage .nt-tf{position:relative!important;overflow:hidden!important;min-height:112px!important;padding:12px!important;border:1px solid #29435d!important;border-radius:12px!important;background:linear-gradient(145deg,#10263a,#0b1a29)!important;color:#e9f0f7!important;box-shadow:0 5px 16px #0613212b!important}
+#marketPage .nt-tf:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#58728a}
+#marketPage .nt-tf:has(.bullish):before{background:#20bd89}
+#marketPage .nt-tf:has(.bearish):before{background:#e05c68}
+#marketPage .nt-tf header b{color:#dce8f4!important;font-size:12px!important;letter-spacing:.5px!important}
+#marketPage .nt-tf header span{color:#91a9bf!important;font-size:9px!important}
+#marketPage .nt-tf>strong{font-size:14px!important;color:#f4f7fb!important}
+#marketPage .nt-tf .bullish{color:#43d6a0!important}
+#marketPage .nt-tf .bearish{color:#ff7881!important}
+#marketPage .nt-tf .wait{color:#a5b3c1!important}
+#marketPage .nt-tf small{color:#9db1c4!important;font-size:9px!important;line-height:1.45!important}
+#marketPage .nt-section{padding:14px!important;border:1px solid #29435d!important;border-radius:14px!important;background:linear-gradient(145deg,#0e2031,#0a1826)!important;box-shadow:0 6px 20px #06132122!important}
+#marketPage .nt-section h3{padding-bottom:9px!important;border-bottom:1px solid #294057!important;color:#f0c66d!important;font-size:10px!important;letter-spacing:.8px!important}
+#marketPage .nt-level{border:1px solid #263f57!important;background:#132a3e!important}
+#marketPage .nt-level small{color:#9bb0c4!important}
+#marketPage .nt-level b{color:#f0f5fa!important}
+#marketPage .nt-level span{color:#a7bbce!important}
+#marketPage .nt-row{border-color:#263d53!important;color:#b5c7d8!important}
+#marketPage .nt-row b{color:#f0cb78!important}
+#marketPage .nt-table{color:#dce7f1!important}
+#marketPage .nt-table th{background:#172d42!important;color:#e9c978!important}
+#marketPage .nt-table td{border-color:#263d53!important}
+#marketPage .nt-errors{color:#9bb0c4!important}
+#marketPage .nt-refresh{border:1px solid #8d713c!important;border-radius:9px!important;background:linear-gradient(135deg,#f3d58c,#c3943e)!important;color:#182536!important;font-size:9px!important;font-weight:950!important}
+@media(max-width:480px){
+ #marketPage .aurum-analysis-title{padding:11px!important;gap:8px!important}
+ #marketPage .aurum-analysis-title strong{font-size:10px!important}
+ #marketPage .nt-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #marketPage .nt-tf{min-height:108px!important;padding:10px!important}
+ #marketPage .nt-hero{padding:15px!important}
+ #marketPage .nt-section{padding:12px!important}
+}
+</style>
 </head>
   
   
@@ -5134,7 +5181,7 @@ html,body{min-height:100%;}
     </section>
 
     <section class="aurum-signal-panel" data-signal-panel="analysis" role="tabpanel" hidden>
-      <div class="aurum-analysis-title"><span class="aurum-heading-icon">▥</span><div><strong>DATA TEKNIKAL · ENGINE BARU</strong><small>Analisis candle tertutup · 7 timeframe · ICT / Smart Money</small></div><button type="button" id="newTechnicalRefresh" class="nt-refresh">↻ MUAT ULANG</button></div>
+      <div class="aurum-analysis-title"><span class="aurum-heading-icon">▥</span><div><strong>MARKET STRUCTURE &amp; SMART MONEY</strong><small>Live technical analysis · 7 timeframe · multi-layer confluence</small></div><button type="button" id="newTechnicalRefresh" class="nt-refresh">↻ MUAT ULANG</button></div>
       <div id="newTechnicalDashboard" class="nt-dashboard">
         <div id="newTechnicalStatus" class="nt-status">MENGHUBUNGKAN KE PROVIDER…</div>
         <div id="newTechnicalHero"></div>
