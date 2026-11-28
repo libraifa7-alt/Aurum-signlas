@@ -54,6 +54,38 @@ function mount() {
   draw();
   return true;
 }
+function drawWatermarks() {
+  if (!ctx || !canvas) return;
+  ctx.save();
+  ctx.globalAlpha = 0.72;
+  // TradingView-style chart attribution mark, drawn directly on canvas.
+  const x = 14, y = 493;
+  ctx.strokeStyle = '#66758b';
+  ctx.fillStyle = '#66758b';
+  ctx.lineWidth = 2.1;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x + 1, y - 4); ctx.lineTo(x + 8, y - 4);
+  ctx.lineTo(x + 12, y - 10); ctx.lineTo(x + 19, y - 10);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x + 5, y - 1); ctx.lineTo(x + 12, y - 1);
+  ctx.lineTo(x + 16, y - 7); ctx.stroke();
+  ctx.font = '600 11px Arial,sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('TradingView', x + 24, y - 1);
+  // Signature "S" monogram.
+  const sx = x + 112, sy = y - 6;
+  ctx.globalAlpha = 0.82;
+  ctx.beginPath(); ctx.arc(sx, sy, 9, 0, Math.PI * 2);
+  ctx.fillStyle = '#f7f8fb'; ctx.fill();
+  ctx.strokeStyle = '#aeb9c9'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.fillStyle = '#59677e';
+  ctx.font = 'bold 12px Georgia,serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('S', sx, sy + .5);
+  ctx.restore();
+}
 function draw() {
   if (!canvas || !ctx || !host) return;
   const rect = host.getBoundingClientRect();
@@ -111,6 +143,7 @@ function draw() {
   ctx.fillRect(left + plotW + 3, Math.max(top, Math.min(top + plotH - 19, lastY - 9)), right - 6, 18);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 10px Arial,sans-serif';
   ctx.fillText(last.close.toLocaleString('en-US', { maximumFractionDigits: 2 }), left + plotW + 7, Math.max(top + 12, Math.min(top + plotH - 6, lastY + 3)));
+  drawWatermarks();
   ctx.fillStyle = COLORS.text; ctx.font = '10px Arial,sans-serif';
   const firstDate = new Date(data[0].time * 1000), lastDate = new Date(last.time * 1000);
   ctx.fillText(firstDate.toLocaleDateString(), left, height - 9);
