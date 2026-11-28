@@ -5065,13 +5065,13 @@ body::before, body::after,
 </style>
 
 <style id="aurum-traxa-chart-card-proportion-v2">
-/* Closer TRAXA mobile proportions: centered card with a wider footprint and a slightly taller chart. */
+/* Match the narrower, shorter TRAXA card proportions on mobile. */
 #chartPage{
-  width:98%!important;
-  max-width:680px!important;
+  width:82.5%!important;
+  max-width:560px!important;
   margin-left:auto!important;
   margin-right:auto!important;
-  padding:12px 4% 28px!important;
+  padding:12px 0 28px!important;
   box-sizing:border-box!important;
 }
 #chartPage .aurum-chart-shell{
@@ -5080,8 +5080,11 @@ body::before, body::after,
   margin-left:auto!important;
   margin-right:auto!important;
 }
-#chartPage .chart{height:570px!important}
-#chartPage #candleChart{height:550px!important;min-height:550px!important}
+#chartPage .chart{height:520px!important}
+#chartPage #candleChart{height:500px!important;min-height:500px!important}
+@media(min-width:700px){
+  #chartPage{width:min(82.5%,760px)!important}
+}
 </style>
 
 </head>
