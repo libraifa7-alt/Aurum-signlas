@@ -6030,6 +6030,34 @@ function drawFallbackMarketChart() {
     ctx.stroke();
   });
 }
+
+// AURUM_NATIVE_CHART_ALWAYS_ON_V2
+// Draw verified OHLC candles on a native canvas as the visible chart layer.
+// This is independent of CDN availability and Lightweight Charts initialization.
+function renderNativeMarketCandles(data) {
+  if (!fallbackCanvas || !fallbackContext || !Array.isArray(data) || !data.length) return;
+  let layer = fallbackSeriesList.find(item => item.kind === 'candles');
+  if (!layer) {
+    layer = { kind: 'candles', options: {}, data: [] };
+    fallbackSeriesList.push(layer);
+  }
+  layer.data = data.filter(c =>
+    Number.isFinite(Number(c.time)) &&
+    Number.isFinite(Number(c.open)) &&
+    Number.isFinite(Number(c.high)) &&
+    Number.isFinite(Number(c.low)) &&
+    Number.isFinite(Number(c.close))
+  ).sort((a,b) => Number(a.time) - Number(b.time));
+  fallbackWidth = Math.max(100, Math.floor(el.getBoundingClientRect().width || el.clientWidth || 320));
+  fallbackHeight = 520;
+  fallbackCanvas.style.display = 'block';
+  fallbackCanvas.style.position = 'absolute';
+  fallbackCanvas.style.inset = '0';
+  fallbackCanvas.style.zIndex = '50';
+  fallbackCanvas.style.pointerEvents = 'none';
+  drawFallbackMarketChart();
+}
+
 const fallbackChart = {
   addCandlestickSeries: function (options) {
     const item = { kind: 'candles', options: options || {}, data: [] }; fallbackSeriesList.push(item);
@@ -6113,6 +6141,11 @@ if (el) {
     if (!el || !chart) return;
     const width = Math.floor(el.getBoundingClientRect().width || el.clientWidth || 0);
     if (width > 80) {
+      if (fallbackCanvas && fallbackCanvas.style.display !== 'none') {
+        fallbackWidth = width;
+        fallbackHeight = 520;
+        drawFallbackMarketChart();
+      }
       try { chart.resize(width, 520); } catch (error) {
         try { chart.applyOptions({ width: width, height: 520 }); } catch (_) {}
       }
@@ -6860,6 +6893,10 @@ if (useBrowserCache) {
     data: candles
   });
 }
+
+// Draw candles immediately after the API payload has been normalized.
+// The native layer remains visible even if the chart library renders blank.
+renderNativeMarketCandles(candles);
 
 if (requestId !== window.aurumChartLoadSequence || document.getElementById('pair')?.value !== symbol) return;
 
