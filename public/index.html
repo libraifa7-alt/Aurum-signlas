@@ -5041,6 +5041,28 @@ body::before, body::after,
 #chartPage .aurum-chart-timeframes button.active{background:linear-gradient(135deg,#8b5cf6 0%,#6d28d9 100%)!important;color:#fff!important;border:1px solid #6d28d9!important;box-shadow:0 2px 8px rgba(109,40,217,.24)!important}
 @media(max-width:360px){#chartPage .aurum-asset-switch{gap:5px}#chartPage .aurum-asset-switch button{font-size:9px;gap:5px}#chartPage .aurum-chart-timeframes{gap:3px}#chartPage .aurum-chart-timeframes button{font-size:7px}}
 </style>
+
+<style id="aurum-traxa-chart-card-width-v1">
+/* Match the narrower, centered TRAXA chart-card proportions without changing chart internals. */
+#chartPage {
+  width:91.3% !important;
+  max-width:610px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  padding-left:4% !important;
+  padding-right:4% !important;
+  box-sizing:border-box !important;
+}
+#chartPage .aurum-chart-shell {
+  width:100% !important;
+  max-width:none !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+@media(max-width:380px){
+  #chartPage { width:91.3% !important; }
+}
+</style>
 </head>
   
   
