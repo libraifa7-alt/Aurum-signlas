@@ -41,7 +41,7 @@ function mount() {
   host = $('candleChart');
   if (!host) return false;
   host.innerHTML = '';
-  host.style.cssText = 'position:relative;width:100%;height:500px;min-height:500px;background:#fff;overflow:hidden;';
+  host.style.cssText = 'position:relative;width:100%;height:520px;min-height:520px;background:#fff;overflow:hidden;';
   canvas = document.createElement('canvas');
   canvas.setAttribute('role', 'img');
   canvas.setAttribute('aria-label', 'Grafik candlestick pasar dengan candle bullish biru dan bearish merah');
@@ -66,7 +66,7 @@ function drawWatermarks() {
   ctx.save();
   ctx.globalAlpha = 0.72;
   // TradingView-style chart attribution mark, drawn directly on canvas.
-  const x = 14, y = 473;
+  const x = 14, y = 493;
   ctx.strokeStyle = '#66758b';
   ctx.fillStyle = '#66758b';
   ctx.lineWidth = 2.1;
@@ -97,7 +97,7 @@ function draw() {
   if (!canvas || !ctx || !host) return;
   const rect = host.getBoundingClientRect();
   const width = Math.max(280, Math.floor(rect.width || host.clientWidth || 320));
-  const height = 500;
+  const height = 520;
   const dpr = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
   canvas.width = Math.floor(width * dpr);
   canvas.height = Math.floor(height * dpr);
