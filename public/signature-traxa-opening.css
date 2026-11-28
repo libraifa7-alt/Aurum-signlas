@@ -834,3 +834,19 @@
 @media(prefers-reduced-motion:reduce){
   #marketPage .stc-traxa-setup-card-v4::before{animation:none!important;opacity:.35!important}
 }
+
+
+/* FIX v2: keep the electric arc visible and continuously moving on signal-card borders. */
+#marketPage .stc-traxa-setup-card-v4::before{
+  content:""!important;
+  display:block!important;
+  opacity:.88!important;
+  filter:drop-shadow(0 0 3px var(--stc-electric-color))!important;
+  animation:stcElectricArc 3s linear infinite,stcElectricFlicker 1.7s ease-in-out infinite!important;
+}
+@keyframes stcElectricFlicker{
+  0%,100%{opacity:.62}
+  22%{opacity:1}
+  48%{opacity:.78}
+  71%{opacity:1}
+}
