@@ -68,17 +68,34 @@ function analyze(candles,tf){
 }
 function render(results,symbol,errors){
  const root=$('newTechnicalDashboard');if(!root)return;
- const good=results.filter(x=>x.analysis),bull=good.filter(x=>x.analysis.trend==='BULLISH').length,bear=good.filter(x=>x.analysis.trend==='BEARISH').length;
- const direction=good.length<4?'DATA TERBATAS':bull>=5?'BULLISH':bear>=5?'BEARISH':bull+bear===0?'RANGE':'MIXED';
- const top=good.map(x=>x.analysis).filter(Boolean);
- const sr=top.find(x=>x.tf==='M15')||top.find(x=>x.tf==='H1')||top[0];
+ const good=results.filter(x=>x.analysis),bull=good.filter(x=>x.analysis.trend==='BULLISH').length,bear=good.filter(x=>x.analysis.trend==='BEARISH').length,range=good.length-bull-bear;
+ const direction=good.length<4?'DATA TERBATAS':bull>bear&&bull>=3?'BULLISH':bear>bull&&bear>=3?'BEARISH':bull+bear===0?'RANGE':'MIXED';
+ const all=good.map(x=>x.analysis),primary=all.find(x=>x.tf==='M15')||all.find(x=>x.tf==='H1')||all[0],priceSource=all.find(x=>x.tf==='M5')||primary;
+ const price=priceSource?.last.close,fmtP=n=>Number.isFinite(n)?fmt(n):'—';
+ const strength=x=>{if(!x||x.trend==='RANGE')return 50;const prev=x.last.close;const delta=x.last.close-(x._prevClose??x.last.close);return Math.max(51,Math.min(95,Math.round(65+Math.abs(delta)/(x.atr||1)*10)))};
+ const cards=FRAMES.map(tf=>{const x=results.find(v=>v.tf===tf),a=x?.analysis,up=a?.trend==='BULLISH',down=a?.trend==='BEARISH',color=up?'#399fe8':down?'#ef5b67':'#aeb5bf',label=up?'BUY':down?'SELL':'NEUTRAL';return '<article class="tx-tf '+(up?'bull':down?'bear':'neutral')+'"><div class="tx-tf-head"><b>'+tf+'</b><span>'+(up?'▲':down?'▼':'•')+'</span></div><small>'+(a?a.trend:'NO DATA')+'</small><div class="tx-ring" style="--ring:'+color+'"><b>'+(a?strength(a)+'%':'—')+'</b><small>'+(a?label:'WAIT')+'</small></div><em>'+(a?label:'WAIT')+'</em></article>'}).join('');
+ const bearishBlocks=good.length?Math.round(bear/good.length*28):0,neutralBlocks=good.length?Math.round(range/good.length*28):28;
+ const segments=Array.from({length:28},(_,i)=>'<i class="'+(i<bearishBlocks?'bear':i<bearishBlocks+neutralBlocks?'neutral':'bull')+'"></i>').join('');
+ const rows=results.map(x=>{const a=x.analysis;return '<div class="tx-row"><b>'+x.tf+'</b><span class="'+(a?.trend==='BULLISH'?'bull-text':a?.trend==='BEARISH'?'bear-text':'')+'">'+(a?a.trend:'WAIT')+'</span><span>'+(a?fmtP(a.last.volume):'—')+'</span><span>'+fmtP(a?.support?.price)+'</span><span>'+fmtP(a?.resistance?.price)+'</span></div>'}).join('');
+ const level=primary||all[0],support=level?.support?.price,resistance=level?.resistance?.price,current=level?.last.close;
+ let pos=50;if(Number.isFinite(support)&&Number.isFinite(resistance)&&resistance>support)pos=Math.max(0,Math.min(100,(current-support)/(resistance-support)*100));
+ const keyType=level?(level.trend==='BEARISH'?'RESISTANCE · SELL ZONE':level.trend==='BULLISH'?'SUPPORT · BUY ZONE':'PIVOT RANGE'):'LEVEL DATA UNAVAILABLE';
+ const daily=results.find(x=>x.tf==='D1')?.candles||[],d0=daily.at(-1),d1=daily.at(-2);
+ const rangeHtml=d0?'<div class="tx-range-row"><span>Latest closed D1 candle</span><b><i>H '+fmtP(d0.high)+'</i><em>L '+fmtP(d0.low)+'</em></b></div>':'<div class="tx-range-row">Daily range unavailable</div>';
+ const prevHtml=d1?'<div class="tx-range-row"><span>Previous closed D1 candle</span><b><i>H '+fmtP(d1.high)+'</i><em>L '+fmtP(d1.low)+'</em></b></div>':'';
+ const smc=all.map(a=>'<div class="tx-smc-row"><b>'+a.tf+'</b><span>SWEEP: '+a.sweep+'</span><span>FVG: '+a.fvg.length+'</span><span>RETEST: '+a.role+'</span><span>'+a.zone+'</span></div>').join('');
+ root.innerHTML='<div class="tx-dashboard">'+
+ '<section class="tx-hero"><div class="tx-kicker"><span>'+escapeHtml(symbol)+' · CLOSED CANDLE ANALYSIS</span><b>● '+good.length+'/7 ACTIVE</b></div>'+
+ '<div class="tx-hero-main"><div><strong>'+direction+'</strong><small>'+bull+' BULLISH · '+bear+' BEARISH · '+range+' RANGE</small></div><b>'+fmtP(price)+'</b></div>'+
+ '<div class="tx-meter-title"><span>TREND METER</span><b>'+(bull-bear>0?'+':'')+(bull-bear)+' / 7</b></div><div class="tx-meter">'+segments+'</div>'+
+ '<div class="tx-meter-legend"><span>BEARISH '+(good.length?Math.round(bear/good.length*100):0)+'%</span><span>MIXED '+(good.length?Math.round(range/good.length*100):0)+'%</span><span>BULLISH '+(good.length?Math.round(bull/good.length*100):0)+'%</span></div>'+
+ '<div class="tx-share"><span>Bearish TF <b>'+bear+'</b></span><i><em style="width:'+(good.length?bear/good.length*100:0)+'%"></em><em style="width:'+(good.length?bull/good.length*100:0)+'%"></em></i><span>Bullish TF <b>'+bull+'</b></span></div></section>'+
+ '<div class="tx-cards">'+cards+'</div><div class="tx-table"><div class="tx-row tx-head"><b>TF</b><b>TREND</b><b>VOLUME</b><b>SUPPORT</b><b>RESIST.</b></div>'+rows+'</div>'+
+ '<section class="tx-key"><div class="tx-section-title"><b>● AT A KEY LEVEL</b><small>'+(level?.tf||'NO TF')+' · '+(level?'PIVOT':'WAITING')+'</small></div><div class="tx-key-card"><div class="tx-key-head"><strong>'+(level?.tf||'—')+'</strong><span>'+keyType+'</span><b>'+fmtP(support)+' — '+fmtP(resistance)+'</b></div><div class="tx-key-track"><i style="left:'+pos+'%"></i></div><div class="tx-key-foot"><span>'+fmtP(support)+'</span><span>PRICE · '+fmtP(current)+'</span><span>'+fmtP(resistance)+'</span></div><small>Level hanya ditampilkan jika pivot berulang terkonfirmasi.</small></div></section>'+
+ '<section class="tx-range"><div class="tx-section-title"><b>DAILY CANDLE RANGE</b><small>D1 · CLOSED CANDLES</small></div>'+rangeHtml+prevHtml+'</section>'+
+ '<section class="tx-smc"><div class="tx-section-title"><b>SMART MONEY · ICT</b><small>SWEEP / FVG / RBS / SBR</small></div>'+(smc||'Belum ada data SMC.')+'</section>'+
+ '<p class="tx-note">'+(errors.length?'Data belum lengkap: '+escapeHtml(errors.join(' · ')):'Seluruh timeframe berhasil dianalisis.')+' · Persentase kartu adalah estimasi kekuatan momentum, bukan probabilitas kemenangan. Volume ditampilkan sebagai volume candle, bukan dominasi buyer/seller.</p></div>';
  $('newTechnicalStatus').textContent=good.length+'/7 TIMEFRAME AKTIF · '+symbol;
- $('newTechnicalHero').innerHTML='<div class="nt-hero"><div><small>BIAS MULTI-TIMEFRAME</small><strong>'+direction+'</strong><span>'+good.length+' timeframe valid dari 7 · bukan sinyal entry otomatis</span></div><b>'+bull+' ▲ / '+bear+' ▼</b></div>';
- $('newTechnicalCards').innerHTML=FRAMES.map(tf=>{const x=results.find(v=>v.tf===tf),a=x?.analysis;return '<article class="nt-tf"><header><b>'+tf+'</b><span class="'+(a?'ok':'bad')+'">'+(a?'AKTIF':'GAGAL')+'</span></header>'+(a?'<strong class="'+a.trend.toLowerCase()+'">'+a.trend+'</strong><small>'+a.count+' candle tertutup</small><small>Close '+fmt(a.last.close)+'</small>':'<strong class="wait">WAIT</strong><small>'+escapeHtml(x?.error||'Data tidak tersedia')+'</small>')+'</article>'}).join('');
- $('newTechnicalLevels').innerHTML=sr?'<div class="nt-level"><small>SUPPORT TERDEKAT ('+sr.tf+')</small><b>'+(sr.support?fmt(sr.support.price):'Belum ada pivot berulang')+'</b><span>'+(sr.support?sr.support.touches+' sentuhan':'')+'</span></div><div class="nt-level"><small>RESISTANCE TERDEKAT ('+sr.tf+')</small><b>'+(sr.resistance?fmt(sr.resistance.price):'Belum ada pivot berulang')+'</b><span>'+(sr.resistance?sr.resistance.touches+' sentuhan':'')+'</span></div>':'<p>Menunggu candle valid untuk menghitung level.</p>';
- $('newTechnicalSMC').innerHTML=top.map(a=>'<div class="nt-row"><b>'+a.tf+'</b><span>Sweep: '+a.sweep+'</span><span>FVG aktif: '+a.fvg.length+'</span><span>Retest: '+a.role+'</span><span>Zona: '+a.zone+'</span></div>').join('')||'<p>Belum ada hasil SMC.</p>';
- $('newTechnicalTable').innerHTML=results.map(x=>{const a=x.analysis;return '<tr><td>'+x.tf+'</td><td>'+(a?a.trend:'WAIT')+'</td><td>'+(a?fmt(a.last.close):'—')+'</td><td>'+(a&&a.support?fmt(a.support.price):'—')+'</td><td>'+(a&&a.resistance?fmt(a.resistance.price):'—')+'</td><td>'+(a?a.structure:escapeHtml(x.error||'Data gagal'))+'</td></tr>'}).join('');
- $('newTechnicalErrors').textContent=errors.length?'Catatan data: '+errors.join(' · '):'Semua timeframe berhasil dimuat. Level hanya ditampilkan jika ada pivot terkonfirmasi berulang.';
 }
 let running=false,lastSymbol='';
 async function run(reason){
