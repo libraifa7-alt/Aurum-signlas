@@ -4917,6 +4917,56 @@ html,body{min-height:100%;}
 @media(max-width:420px){#marketPage #newTechnicalDashboard .tx-dashboard{padding:8px;gap:9px}#marketPage #newTechnicalDashboard .tx-cards{gap:3px}#marketPage #newTechnicalDashboard .tx-tf{padding:6px 1px;gap:4px}#marketPage #newTechnicalDashboard .tx-ring{width:34px;height:34px}#marketPage #newTechnicalDashboard .tx-ring b{font-size:9px}#marketPage #newTechnicalDashboard .tx-row{font-size:7px;padding:7px 4px;gap:2px}#marketPage #newTechnicalDashboard .tx-head{font-size:6px}}
 </style>
 
+
+<style id="aurum-traxa-page-canvas-v3">
+/* Neutral TRAXA-inspired canvas for Dashboard through Market Chart.
+   Keep all existing cards, chart candles, controls and panel geometry intact. */
+html, body {
+  background-color:#f0f1f5 !important;
+  background-image:
+    radial-gradient(circle, rgba(151,163,181,.16) .75px, transparent .9px),
+    linear-gradient(180deg,#f0f1f5 0%,#f4f5f8 52%,#eef0f4 100%) !important;
+  background-size:9px 9px,100% 100% !important;
+  background-attachment:fixed !important;
+}
+body {
+  background-repeat:repeat,no-repeat !important;
+  color:#273246;
+}
+main, main#mainContent, .app-page, #homePage, #chartPage {
+  background-color:transparent !important;
+  background-image:none !important;
+}
+#homePage, #chartPage {
+  position:relative;
+  isolation:isolate;
+}
+#homePage::before, #chartPage::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 32%,rgba(255,255,255,.30),transparent 58%),
+    radial-gradient(circle,rgba(151,163,181,.10) .65px,transparent .85px);
+  background-size:100% 100%,9px 9px;
+}
+#chartPage .aurum-chart-shell {
+  background:linear-gradient(145deg,#f4f8ff 0%,#edf3fb 54%,#f7f9fc 100%) !important;
+  border-color:#d7e1ee !important;
+  box-shadow:0 12px 30px rgba(40,58,82,.12) !important;
+}
+#chartPage .chart {
+  background:#fff !important;
+  border-color:#dce4ef !important;
+}
+#homePage .aurum-live-ticker {
+  background:rgba(255,255,255,.76) !important;
+  border-color:#e1e5ed !important;
+}
+</style>
+
 </head>
   
   
