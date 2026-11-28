@@ -27,3 +27,31 @@ html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setu
 html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-arrow{color:#fff!important}
 @keyframes stcOrganicFireV12{0%{transform:translateY(2px) scaleY(.96);filter:drop-shadow(0 0 5px var(--fire-glow)) saturate(1.45)}50%{transform:translateY(-1px) scaleY(1.02)}100%{transform:translateY(-3px) scaleY(1.07);filter:drop-shadow(0 0 12px var(--fire-glow)) saturate(1.85)}}
 @media(prefers-reduced-motion:reduce){html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4::before{animation:none!important}}
+
+
+/* FINAL OVERRIDE: remove the old zig-zag mask left by earlier flame experiments.
+   Keep the page shell light; only the signal cards use the vivid fire treatment. */
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4::before{
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  -webkit-mask:none!important;
+  mask:none!important;
+  clip-path:none!important;
+  opacity:1!important;
+  background-position:center bottom!important;
+  background-size:100% 100%!important;
+  mix-blend-mode:screen!important;
+  z-index:0!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.pending::before{
+  filter:drop-shadow(0 0 9px rgba(0,195,255,.95)) saturate(1.9) contrast(1.18)!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.loss::before{
+  filter:drop-shadow(0 0 9px rgba(255,65,30,.95)) saturate(2) contrast(1.18)!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.win::before{
+  filter:drop-shadow(0 0 9px rgba(0,235,90,.95)) saturate(2) contrast(1.18)!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4>*{
+  z-index:2!important;
+}
