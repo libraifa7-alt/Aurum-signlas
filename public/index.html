@@ -9169,6 +9169,112 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 }
 </style>
 
+
+<style id="signature-signal-fire-reference-v12">
+/* Reference-image rebuild: ONLY the Today's Signals section; leave the TRAXA page background untouched. */
+html body #marketPage section.aurum-signal-panel[data-signal-panel="setup"]{
+ position:relative!important;background:linear-gradient(145deg,#071a34 0%,#06142b 58%,#081d36 100%)!important;
+ border:2px solid #1265a0!important;border-radius:16px!important;padding:12px!important;
+ box-shadow:inset 0 0 0 1px rgba(115,210,255,.12),0 0 12px rgba(0,145,255,.18)!important;
+}
+html body #marketPage .aurum-todays-signals-head{
+ min-height:48px!important;display:flex!important;align-items:center!important;gap:11px!important;
+ padding:2px 10px 8px!important;margin:0!important;background:transparent!important;color:#fff!important;
+ border:0!important;box-shadow:none!important;
+}
+html body #marketPage .aurum-todays-signals-head>span{
+ width:27px!important;height:27px!important;flex:0 0 27px!important;border-radius:50%!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ color:#00ff72!important;background:#eafff1!important;border:3px solid #16e978!important;
+ box-shadow:0 0 10px rgba(0,255,105,.8)!important;font-size:0!important;
+}
+html body #marketPage .aurum-todays-signals-head>div{display:flex!important;flex-direction:column!important;gap:2px!important}
+html body #marketPage .aurum-todays-signals-head strong{color:#fff!important;font-size:17px!important;font-weight:950!important;letter-spacing:.25px!important;text-shadow:0 1px 4px #00152d!important}
+html body #marketPage .aurum-todays-signals-head small{color:#b8d9f1!important;font-size:10px!important;font-weight:700!important}
+html body #marketPage .aurum-signal-feed-status{
+ position:absolute!important;right:16px!important;top:17px!important;display:flex!important;flex-direction:column!important;
+ align-items:flex-end!important;gap:3px!important;margin:0!important;padding:0!important;background:transparent!important;
+ color:#eaf7ff!important;font-size:10px!important;font-weight:800!important;text-align:right!important;
+}
+html body #marketPage .aurum-signal-feed-status span{color:#9ce9dc!important;font-size:10px!important;font-weight:850!important}
+html body #marketPage #aurumSignalCards{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important;
+ margin:8px 0 0!important;padding:0!important;background:transparent!important;overflow:visible!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4{
+ position:relative!important;isolation:isolate!important;overflow:hidden!important;display:grid!important;
+ grid-template-columns:68px minmax(0,1fr)!important;align-items:center!important;gap:10px!important;
+ width:100%!important;min-width:0!important;min-height:78px!important;height:auto!important;margin:0!important;
+ padding:9px 15px 9px 11px!important;border-radius:13px!important;border:2px solid!important;
+ color:#fff!important;text-align:left!important;background-size:100% 100%!important;filter:none!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -12px 24px rgba(0,0,0,.22),0 0 9px var(--fire-glow),0 0 19px var(--fire-halo)!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.pending{
+ --fire-glow:rgba(0,210,255,.95);--fire-halo:rgba(0,130,255,.42);
+ border-color:#16d9ff!important;background:linear-gradient(110deg,#075caa 0%,#032b59 48%,#006b9b 100%)!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.loss{
+ --fire-glow:rgba(255,70,35,.98);--fire-halo:rgba(255,0,45,.48);
+ border-color:#ff394b!important;background:linear-gradient(110deg,#a80d2a 0%,#420818 48%,#9b1024 100%)!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.win{
+ --fire-glow:rgba(0,255,105,.98);--fire-halo:rgba(0,215,70,.48);
+ border-color:#20ff79!important;background:linear-gradient(110deg,#087f3e 0%,#06351f 48%,#078b3e 100%)!important;
+}
+/* Curved, layered flame artwork is integrated into the card fill, not placed outside it. */
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4::before{
+ content:""!important;display:block!important;position:absolute!important;left:0!important;right:0!important;
+ bottom:0!important;top:9%!important;z-index:0!important;pointer-events:none!important;border:0!important;
+ border-radius:0 0 11px 11px!important;background-repeat:no-repeat!important;background-position:center bottom!important;
+ background-size:100% 100%!important;opacity:.98!important;mix-blend-mode:screen!important;
+ background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20720%20220%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22f%22%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%220%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23ffffff%22%2F%3E%3Cstop%20offset%3D%22.12%22%20stop-color%3D%22%234deeff%22%2F%3E%3Cstop%20offset%3D%22.48%22%20stop-color%3D%22%23087dff%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8faff%22%20stop-opacity%3D%22.08%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%220%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23dfffff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%22.45%22%20stop-color%3D%22%233adfff%22%20stop-opacity%3D%22.65%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FlinearGradient%3E%3Cfilter%20id%3D%22t%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%22.014%20.045%22%20numOctaves%3D%222%22%20seed%3D%227%22%20result%3D%22n%22%2F%3E%3CfeDisplacementMap%20in%3D%22SourceGraphic%22%20in2%3D%22n%22%20scale%3D%229%22%20xChannelSelector%3D%22R%22%20yChannelSelector%3D%22G%22%2F%3E%3C%2Ffilter%3E%3Cfilter%20id%3D%22b%22%3E%3CfeGaussianBlur%20stdDeviation%3D%225%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M0%20220V174%20C14%20157%2010%20132%2028%20106%20C25%20143%2043%20158%2048%20184%20C65%20162%2055%20122%2078%2083%20C74%20131%2092%20160%2098%20188%20C116%20163%20108%20128%20129%2099%20C124%20142%20145%20166%20148%20190%20C169%20163%20157%20116%20183%2068%20C178%20128%20199%20162%20200%20190%20C220%20165%20213%20130%20235%2098%20C230%20142%20250%20166%20251%20190%20C273%20160%20259%20112%20288%2060%20C282%20128%20305%20163%20304%20191%20C327%20164%20316%20126%20340%2091%20C336%20139%20356%20166%20356%20192%20C379%20162%20365%20114%20394%2066%20C389%20129%20411%20165%20409%20192%20C432%20164%20420%20126%20445%2091%20C440%20139%20461%20166%20460%20192%20C483%20160%20470%20112%20499%2061%20C494%20128%20516%20163%20514%20191%20C537%20164%20526%20127%20550%2093%20C545%20140%20565%20166%20565%20191%20C588%20162%20575%20116%20603%2069%20C598%20130%20620%20164%20618%20190%20C641%20163%20631%20128%20654%2099%20C650%20143%20670%20166%20670%20188%20C690%20159%20680%20136%20702%20108%20C699%20145%20713%20160%20720%20174V220Z%22%20fill%3D%22url(%23f)%22%20filter%3D%22url(%23t)%22%2F%3E%3Cpath%20d%3D%22M0%20220V198%20C24%20178%2020%20153%2040%20132%20C38%20169%2057%20181%2062%20205%20C81%20180%2072%20149%2094%20122%20C90%20165%20109%20185%20112%20207%20C136%20178%20125%20145%20151%20111%20C147%20159%20167%20185%20168%20207%20C191%20181%20182%20149%20204%20124%20C200%20165%20220%20185%20221%20207%20C245%20180%20233%20145%20260%20110%20C256%20159%20277%20185%20277%20207%20C301%20180%20291%20149%20315%20124%20C311%20165%20330%20185%20331%20207%20C355%20179%20344%20145%20371%20111%20C367%20159%20388%20185%20388%20207%20C412%20180%20401%20149%20426%20124%20C422%20165%20442%20185%20442%20207%20C466%20179%20455%20145%20482%20110%20C478%20159%20499%20185%20499%20207%20C523%20180%20512%20149%20536%20124%20C532%20165%20552%20185%20552%20207%20C576%20180%20565%20145%20592%20111%20C588%20159%20609%20185%20609%20207%20C633%20181%20623%20149%20646%20124%20C642%20165%20662%20185%20663%20207%20C685%20181%20678%20158%20700%20137%20C697%20170%20710%20183%20720%20198V220Z%22%20fill%3D%22url(%23g)%22%20opacity%3D%22.62%22%20filter%3D%22url(%23b)%22%2F%3E%3Cpath%20d%3D%22M0%20215%20C70%20202%2085%20212%20145%20207%20S250%20214%20320%20207%20S430%20214%20500%20207%20S650%20214%20720%20207V220H0Z%22%20fill%3D%22%23c9fbff%22%20opacity%3D%22.72%22%2F%3E%3C%2Fsvg%3E")!important;
+ animation:stcReferenceFlameRise 1.45s ease-in-out infinite alternate!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.loss::before{filter:hue-rotate(137deg) saturate(1.8) drop-shadow(0 0 9px rgba(255,45,35,.95))!important}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.win::before{filter:hue-rotate(278deg) saturate(1.9) drop-shadow(0 0 9px rgba(0,255,85,.95))!important}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4.pending::before{filter:saturate(1.65) drop-shadow(0 0 9px rgba(0,195,255,.95))!important}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4::after{
+ content:""!important;position:absolute!important;inset:0!important;z-index:1!important;display:block!important;
+ pointer-events:none!important;border:0!important;border-radius:inherit!important;
+ background:linear-gradient(110deg,rgba(255,255,255,.15),transparent 32%,rgba(255,255,255,.07) 70%,transparent)!important;
+ opacity:.65!important;animation:stcReferenceCardShine 5s ease-in-out infinite!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4>*{position:relative!important;z-index:3!important}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-side>strong,
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-top>strong,
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-top>small,
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-result{
+ color:#fff!important;text-shadow:0 1px 4px rgba(0,0,0,.95),0 0 8px rgba(0,0,0,.8)!important;font-weight:950!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-side>strong{font-size:19px!important}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-top>strong{font-size:15px!important}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-result{font-size:12px!important}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-top>small{font-size:9px!important}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-side>b.buy{
+ background:linear-gradient(180deg,#49d9ff,#087fe7)!important;color:#fff!important;border-radius:12px!important;
+ box-shadow:0 0 9px rgba(0,200,255,.75)!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-side>b.sell{
+ background:linear-gradient(180deg,#ff6c76,#e90035)!important;color:#fff!important;border-radius:12px!important;
+ box-shadow:0 0 9px rgba(255,30,60,.72)!important;
+}
+html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-arrow{color:#fff!important;z-index:4!important}
+@keyframes stcReferenceFlameRise{0%{transform:translateY(3px) scaleY(.94);opacity:.84}100%{transform:translateY(-2px) scaleY(1.04);opacity:1}}
+@keyframes stcReferenceCardShine{0%,70%{opacity:.15;transform:translateX(-7%)}85%{opacity:.8}100%{opacity:.15;transform:translateX(7%)}}
+@media(max-width:390px){
+ html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4{grid-template-columns:49px minmax(0,1fr)!important;gap:7px!important;min-height:76px!important;padding:8px 10px!important}
+ html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-side>strong{font-size:16px!important}
+ html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-top>strong{font-size:12px!important}
+ html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4 .stc-traxa-setup-result{font-size:10px!important}
+ html body #marketPage .aurum-signal-feed-status{right:10px!important;top:12px!important}
+ html body #marketPage .aurum-todays-signals-head strong{font-size:14px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4::before,
+ html body #marketPage #aurumSignalCards>.stc-traxa-setup-card-v4::after{animation:none!important}
+}
+</style>
+
 </body>
 </html>
 
