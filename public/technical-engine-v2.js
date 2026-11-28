@@ -4,6 +4,7 @@ const FRAMES=['M5','M15','M30','M45','H1','H4','D1'];
 const DURATION={M5:300,M15:900,M30:1800,M45:2700,H1:3600,H4:14400,D1:86400};
 const $=id=>document.getElementById(id);
 const fmt=n=>Number.isFinite(n)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:5}):'—';
+const fmtQuote=n=>Number.isFinite(n)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function symbolNow(){const p=$('pair')?.value;if(p)return p;return document.querySelector('#marketPage [data-asset].active')?.dataset.asset||'XAU/USD';}
 function normalize(raw,tf){
@@ -85,7 +86,7 @@ function render(results,symbol,errors){
  const prevHtml=d1?'<div class="tx-range-row"><span>Previous closed D1 candle</span><b><i>H '+fmtP(d1.high)+'</i><em>L '+fmtP(d1.low)+'</em></b></div>':'';
  root.innerHTML='<div class="tx-dashboard">'+
  '<section class="tx-hero"><div class="tx-kicker"><span>'+escapeHtml(symbol)+' · CLOSED CANDLE ANALYSIS</span><b>● '+good.length+'/7 ACTIVE</b></div>'+
- '<div class="tx-hero-main"><div><strong class="tx-direction '+(direction==='BULLISH'?'bull-text':direction==='BEARISH'?'bear-text':'mixed-text')+'">'+direction+'</strong><small>'+bull+' BULLISH · '+bear+' BEARISH · '+range+' RANGE</small></div><b>'+fmtP(price)+'</b></div>'+
+ '<div class="tx-hero-main"><div><strong class="tx-direction '+(direction==='BULLISH'?'bull-text':direction==='BEARISH'?'bear-text':'mixed-text')+'">'+direction+'</strong><small>'+bull+' BULLISH · '+bear+' BEARISH · '+range+' RANGE</small></div><b>'+fmtQuote(price)+'</b></div>'+
  '<div class="tx-meter-title"><span>TREND METER</span><b>'+(bull-bear>0?'+':'')+(bull-bear)+' / 7</b></div><div class="tx-meter">'+segments+'</div>'+
  '<div class="tx-meter-legend"><span>BEARISH '+(good.length?Math.round(bear/good.length*100):0)+'%</span><span>MIXED '+(good.length?Math.round(range/good.length*100):0)+'%</span><span>BULLISH '+(good.length?Math.round(bull/good.length*100):0)+'%</span></div>'+
  '<div class="tx-share"><span>Bearish TF <b>'+bear+'</b></span><i><em style="width:'+(good.length?bear/good.length*100:0)+'%"></em><em style="width:'+(good.length?bull/good.length*100:0)+'%"></em></i><span>Bullish TF <b>'+bull+'</b></span></div></section>'+
