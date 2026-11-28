@@ -8562,6 +8562,14 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
 })();
 </script>
 
+
+<!-- AURUM FIX: contain electric signal panel border -->
+<style id="aurum-signal-panel-border-containment">
+/* Prevent the rotating conic-gradient frame from escaping the signal panel on mobile browsers. */
+#marketPage .aurum-signal-panel[data-signal-panel="setup"]{overflow:hidden!important;isolation:isolate!important}
+#marketPage .aurum-signal-panel[data-signal-panel="setup"]:before{display:none!important;content:none!important}
+</style>
+
 </body>
 </html>
 
