@@ -7068,22 +7068,30 @@ body.aurum-user-dark .app-page{background:transparent!important}
       const age=stamp?Math.max(0,Math.floor((Date.now()-stamp.getTime())/60000)):null;
       const ago=age===null?'Waktu tidak tersedia':age<1?'Baru saja':age<60?age+' mnt lalu':age<1440?Math.floor(age/60)+' jam lalu':Math.floor(age/1440)+' hari lalu';
       const date=stamp?stamp.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false}).replace(':','.')+' · '+stamp.toLocaleDateString('id-ID',{day:'2-digit',month:'short'}):'';
-      const tone=outcomeTone(r);
-      const direction=r.direction==='SELL'?'sell':'buy';
-      const directionLabel=r.direction==='SELL'?'JUAL':'BELI';
+      const tone=outcomeTone(r),direction=r.direction==='SELL'?'sell':'buy';
+      const directionLabel=r.direction==='SELL'?'SELL':'BUY';
       const tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'M15';
       const outcome=String(r.outcome||r.outcomeStatus||'WAITING_FOR_ENTRY').toUpperCase();
-      const statusText=/TP[123]|TARGET_HIT/.test(outcome)?'Selesai · '+outcome:outcome==='COMPLETED'?'Selesai':outcomeLabel(outcome);
+      const statusText=/TP[123]|TARGET_HIT/.test(outcome)?'Completed · '+outcome:outcome==='COMPLETED'?'Completed':outcomeLabel(outcome);
       return '<button type="button" class="aurum-signal-feed-card '+direction+' is-'+tone+'" data-aurum-signal-index="'+index+'">'+
         '<span class="aurum-signal-feed-timeframe"><strong>'+safe(tf)+'</strong><b class="aurum-signal-feed-direction '+direction+'">'+directionLabel+'</b></span>'+
-        '<span class="aurum-signal-feed-content">'+
-          '<span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-entry">'+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</strong><span class="aurum-signal-feed-date"><b>'+safe(ago)+'</b><small>'+safe(date)+'</small></span></span>'+
-          '<span class="aurum-signal-feed-levels">SL '+fmt(p.sl)+' · TP1 '+fmt(p.tp1)+' · TP2 '+fmt(p.tp2)+' · TP3 '+fmt(p.tp3)+'</span>'+
-          '<span class="aurum-signal-feed-result">'+(tone==='win'?'✓':tone==='loss'?'✕':'◷')+' '+safe(statusText)+' · Ketuk untuk analisis lengkap ›</span>'+
-        '</span></button>';
+        '<span class="aurum-signal-feed-content"><span class="aurum-signal-feed-top"><strong class="aurum-signal-feed-entry">'+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</strong><span class="aurum-signal-feed-date"><b>'+safe(ago)+'</b><small>'+safe(date)+'</small></span></span>'+
+        '<span class="aurum-signal-feed-result">'+(tone==='win'?'✓':tone==='loss'?'✕':'◷')+' '+safe(statusText)+' · '+safe(r.riskTier||'')+'</span></span></button>';
     }).join(''):'<div class="aurum-signal-feed-empty">Belum ada sinyal BUY/SELL terkonfirmasi untuk instrumen ini. Sinyal WAIT tidak ditampilkan sebagai sinyal aktif.</div>';
     const performanceList=document.getElementById('aurumPerformanceSignalList');
-    if(performanceList)performanceList.innerHTML=detailRecords.length?feed.innerHTML:'<div class="aurum-performance-empty">Belum ada riwayat sinyal server untuk instrumen ini.</div>';
+    if(performanceList)performanceList.innerHTML=detailRecords.length?detailRecords.map((x,index)=>{
+      const r=x.record,p=r.tradePlan||{},when=r.generatedAt||r.checkedAt,stamp=when?new Date(when):null;
+      const age=stamp?Math.max(0,Math.floor((Date.now()-stamp.getTime())/60000)):null;
+      const ago=age===null?'Waktu tidak tersedia':age<1?'Baru saja':age<60?age+' mnt lalu':age<1440?Math.floor(age/60)+' jam lalu':Math.floor(age/1440)+' hari lalu';
+      const date=stamp?stamp.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false}).replace(':','.')+' · '+stamp.toLocaleDateString('id-ID',{day:'2-digit',month:'short'}):'';
+      const tone=outcomeTone(r),sell=r.direction==='SELL',tf=r.timeframe||r.signalTimeframe||r.triggerTimeframe||'M15';
+      const outcome=String(r.outcome||r.outcomeStatus||'WAITING_FOR_ENTRY').toUpperCase();
+      const statusText=/TP[123]|TARGET_HIT/.test(outcome)?'Completed · '+outcome:outcome==='COMPLETED'?'Completed':outcomeLabel(outcome);
+      return '<button type="button" class="stc-traxa-history-card '+tone+'" data-aurum-signal-index="'+index+'">'+
+        '<span class="stc-traxa-history-left"><strong>'+safe(tf)+'</strong><b class="'+(sell?'sell':'buy')+'">'+(sell?'SELL':'BUY')+'</b></span>'+
+        '<span class="stc-traxa-history-main"><span class="stc-traxa-history-top"><strong class="'+(sell?'sell':'buy')+'">'+fmt(p.entryLow)+' – '+fmt(p.entryHigh)+'</strong><small><b>'+safe(ago)+'</b><br>'+safe(date)+'</small></span>'+
+        '<span class="stc-traxa-history-result '+tone+'">'+(tone==='win'?'✓':tone==='loss'?'✕':'◷')+' '+safe(statusText)+(r.riskTier?' · '+safe(r.riskTier):'')+'</span></span><span class="stc-traxa-history-chevron">›</span></button>';
+    }).join(''):'<div class="aurum-performance-empty">Belum ada riwayat sinyal server untuk instrumen ini.</div>';
     if(empty)empty.hidden=detailRecords.length>0;
     const status=document.getElementById('aurumFeedServerState');
     if(status)status.textContent='DATA SERVER '+(item?'TERHUBUNG':'MENUNGGU INSTRUMEN');
@@ -8879,6 +8887,37 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
  #marketPage #aurumSignalDetailView .aurum-detail-level b{font-size:11px!important}
  #marketPage #aurumSignalDetailView .aurum-strength-gauge{flex-basis:82px!important;width:82px!important;height:82px!important}
 }
+</style>
+
+
+<!-- SIGNATURE TRAXA PERFORMANCE HISTORY REBUILD V2 -->
+<style id="signature-traxa-performance-history-v2">
+#marketPage .aurum-performance-history{margin-top:14px;padding-top:12px;border-top:1px solid #e4e8ef}
+#marketPage .aurum-performance-history-head{display:flex;flex-direction:column;gap:4px;margin:0 2px 10px}
+#marketPage .aurum-performance-history-head strong{font-size:12px;letter-spacing:1.1px;color:#263449}
+#marketPage .aurum-performance-history-head small{font-size:10px;color:#8490a0}
+#marketPage .aurum-performance-signal-list{display:grid;gap:6px}
+#marketPage .stc-traxa-history-card{position:relative;display:grid!important;grid-template-columns:46px minmax(0,1fr)!important;grid-template-areas:"left main"!important;align-items:center!important;gap:8px!important;width:100%!important;min-height:59px!important;height:auto!important;padding:7px 18px 7px 9px!important;border-radius:11px!important;text-align:left!important;overflow:hidden!important;box-shadow:0 2px 6px rgba(25,55,40,.05)!important}
+#marketPage .stc-traxa-history-card.win{border:1px solid #8cdda8!important;background:linear-gradient(110deg,#dff9e8,#fff)!important}
+#marketPage .stc-traxa-history-card.loss{border:1px solid #efa2a8!important;background:linear-gradient(110deg,#ffe5e7,#fff)!important}
+#marketPage .stc-traxa-history-card.pending{border:1px solid #b4d7f2!important;background:linear-gradient(110deg,#e4f3ff,#fff)!important}
+#marketPage .stc-traxa-history-left{grid-area:left;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
+#marketPage .stc-traxa-history-left>strong{font-size:15px;line-height:1;font-weight:950;color:#152c25}
+#marketPage .stc-traxa-history-left>b{font-size:8px;line-height:1;padding:3px 7px;border-radius:10px;color:#fff}
+#marketPage .stc-traxa-history-left>b.buy{background:#2497e8}
+#marketPage .stc-traxa-history-left>b.sell{background:#f05260}
+#marketPage .stc-traxa-history-main{grid-area:main;display:flex;flex-direction:column;gap:5px;min-width:0}
+#marketPage .stc-traxa-history-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;min-width:0}
+#marketPage .stc-traxa-history-top>strong{font-size:12px;line-height:1.25;font-weight:900;overflow-wrap:anywhere}
+#marketPage .stc-traxa-history-top>strong.buy{color:#2676aa}
+#marketPage .stc-traxa-history-top>strong.sell{color:#b64d56}
+#marketPage .stc-traxa-history-top>small{flex:0 0 auto;text-align:right;color:#738093;font-size:8px;line-height:1.35}
+#marketPage .stc-traxa-history-result{font-size:9px;line-height:1.25;font-weight:800;overflow-wrap:anywhere}
+#marketPage .stc-traxa-history-result.win{color:#268ac6}
+#marketPage .stc-traxa-history-result.loss{color:#d24e5b}
+#marketPage .stc-traxa-history-result.pending{color:#b79734}
+#marketPage .stc-traxa-history-chevron{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:18px;color:#2488c5}
+@media(max-width:390px){#marketPage .stc-traxa-history-card{grid-template-columns:43px minmax(0,1fr)!important;gap:6px!important;padding:7px 16px 7px 8px!important}#marketPage .stc-traxa-history-top>strong{font-size:11px}#marketPage .stc-traxa-history-left>strong{font-size:14px}}
 </style>
 
 </body>
