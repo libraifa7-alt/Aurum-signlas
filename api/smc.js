@@ -40,8 +40,8 @@ function analyzeSmartMoney(rows, timeframe='UNKNOWN') {
   const fvg=[];
   for(let i=Math.max(2,candles.length-25);i<candles.length;i++){
     const a=candles[i-2],b=candles[i-1],c=candles[i];
-    if(a.high<c.low) fvg.push({type:'BULLISH',low:a.high,high:c.low,formedAt:c.time,mitigated:latest.low<=c.low});
-    if(a.low>c.high) fvg.push({type:'BEARISH',low:c.high,high:a.low,formedAt:c.time,mitigated:latest.high>=c.high});
+    if(a.high<c.low) fvg.push({type:'BULLISH',low:a.high,high:c.low,formedAt:c.time,mitigated:candles.slice(i+1).some(x=>x.low<=c.low)});
+    if(a.low>c.high) fvg.push({type:'BEARISH',low:c.high,high:a.low,formedAt:c.time,mitigated:candles.slice(i+1).some(x=>x.high>=c.high)});
   }
   const zones=[];
   for(const kind of ['HIGH','LOW']){
@@ -49,16 +49,20 @@ function analyzeSmartMoney(rows, timeframe='UNKNOWN') {
     const grouped=[];
     for(const s of pool){
       let g=grouped.find(x=>Math.abs(x.level-s.price)<=tolerance);
-      if(!g){g={kind,level:s.price,touches:0,lastIndex:-99};grouped.push(g);}
-      if(s.index-g.lastIndex>=3){g.touches++;g.lastIndex=s.index;}
+      if(!g){g={kind,level:s.price,touches:0,lastIndex:-99,indices:[]};grouped.push(g);}
+      if(s.index-g.lastIndex>=3){g.touches++;g.lastIndex=s.index;g.indices.push(s.index);}
     }
     for(const g of grouped.filter(x=>x.touches>=2)){
-      const latestClose=latest.close;
-      const broken=g.kind==='HIGH'?candles.some((c,i)=>i>0&&c.close>g.level+tolerance):candles.some((c,i)=>i>0&&c.close<g.level-tolerance);
-      const retested=g.kind==='HIGH'
-        ? candles.slice(-8).some(c=>c.low<=g.level+tolerance&&c.close>g.level)
-        : candles.slice(-8).some(c=>c.high>=g.level-tolerance&&c.close<g.level);
-      const role=broken&&retested?(g.kind==='HIGH'?'RBS':'SBR'):'S/R';
+      const lastTouchIndex=g.lastIndex;
+      let breakIndex=-1;
+      for(let i=lastTouchIndex+1;i<candles.length;i++){
+        const broke=g.kind==='HIGH'?candles[i].close>g.level+tolerance:candles[i].close<g.level-tolerance;
+        if(broke){breakIndex=i;break;}
+      }
+      const retested=breakIndex>=0&&candles.slice(breakIndex+1).some(c=>
+        g.kind==='HIGH'?c.low<=g.level+tolerance&&c.close>g.level:c.high>=g.level-tolerance&&c.close<g.level
+      );
+      const role=broken=breakIndex>=0&&retested?(g.kind==='HIGH'?'RBS':'SBR'):'S/R';
       zones.push({kind:g.kind,level:Number(g.level.toFixed(8)),touches:g.touches,role,twiceTested:g.touches>=2});
     }
   }
