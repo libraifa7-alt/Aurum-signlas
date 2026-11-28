@@ -4952,6 +4952,7 @@ html,body{min-height:100%;}
         <h3>MARKET STRUCTURE & KONFIRMASI</h3>
         <div id="aurumDetailTrends" class="aurum-detail-trends"></div>
         <div id="aurumDetailOrderBlocks" class="aurum-detail-orderblocks"></div>
+        <div id="aurumDetailSmartMoney" class="aurum-detail-orderblocks" aria-label="Konfirmasi Smart Money Concepts"></div>
       </div>
       <div class="aurum-detail-risk-grid" id="aurumDetailRiskProfiles"></div>
       <div class="aurum-detail-levels" id="aurumDetailLevels"></div>
@@ -10314,6 +10315,17 @@ body.aurum-user-dark .app-page{background:transparent!important}
     document.getElementById('aurumDetailOrderBlocks').innerHTML=['H1','M15'].map(tf=>{
       const ob=obs[tf]||{};
       return '<div><small>ORDER BLOCK '+tf+'</small><b>'+safe(ob.status||'Belum tersedia')+(ob.type?' · '+safe(ob.type):'')+'</b></div>';
+    }).join('');
+    const smc=cur.smartMoney&&typeof cur.smartMoney==='object'?cur.smartMoney:{};
+    const smcOrder=['M15','H1','H4'];
+    document.getElementById('aurumDetailSmartMoney').innerHTML=smcOrder.map(tf=>{
+      const x=smc[tf]||{};
+      if(x.status!=='OK')return '<div><small>SMART MONEY '+tf+'</small><b>Data belum cukup</b></div>';
+      const sweep=x.liquiditySweep?.type||'Tidak ada sweep terkonfirmasi';
+      const fvgCount=Array.isArray(x.fvgs)?x.fvgs.filter(z=>!z.mitigated).length:0;
+      const zones=Array.isArray(x.supportResistance)?x.supportResistance.filter(z=>z.role==='RBS'||z.role==='SBR'||z.twiceTested):[];
+      const zoneText=zones.length?zones.map(z=>z.role+' '+fmtDetail(z.level)+' · '+z.touches+'x').join(' | '):'Belum ada RBS/SBR atau S/R 2x';
+      return '<div><small>LIQUIDITY SWEEP '+tf+'</small><b>'+safe(sweep)+'</b><small>FVG aktif: '+fvgCount+' · '+safe(x.premiumDiscount?.zone||'Range belum tersedia')+'</small><small>'+safe(zoneText)+'</small></div>';
     }).join('');
     document.getElementById('aurumDetailLevels').innerHTML=[['SL',plan.sl],['TP 1',plan.tp1],['TP 2',plan.tp2],['TP 3',plan.tp3]].map(x=>'<div class="aurum-detail-level"><small>'+x[0]+'</small><b>'+fmtDetail(x[1])+'</b></div>').join('');
     const mapNode=document.getElementById('aurumDetailPriceMap');
