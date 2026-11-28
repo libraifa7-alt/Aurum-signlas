@@ -9293,16 +9293,23 @@ if (typeof window.aurumAnalyzeMarketStructure === 'function') {
     }
   };
 
-  // Run once on initial market-page load and again whenever navigation returns
-  // to Market. This is deliberately independent of loadChart().
+  // The app uses pushState and can initialize the active page before this
+  // engine script is ready. Use the actual visible page state, not location.hash,
+  // and run once here after the analyzer has definitely been registered.
+  const isMarketPageActive = function () {
+    return !!document.getElementById('marketPage')?.classList.contains('active');
+  };
   const runIfMarketPage = function (reason) {
-    if (window.location.hash === '#marketPage') {
+    if (isMarketPageActive()) {
       window.aurumRunTechnicalAnalysis(reason);
     }
   };
-  runIfMarketPage('initial-market-page');
+  runIfMarketPage('technical-engine-ready');
   window.addEventListener('hashchange', function () {
     runIfMarketPage('market-page-navigation');
+  });
+  window.addEventListener('popstate', function () {
+    runIfMarketPage('market-page-history-navigation');
   });
 }
 
