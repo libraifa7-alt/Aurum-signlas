@@ -869,3 +869,89 @@
 #marketPage .stc-traxa-setup-card-v4.win{--stc-electric-color:#00ff78!important}
 #marketPage .stc-traxa-setup-card-v4.loss{--stc-electric-color:#ff174b!important}
 #marketPage .stc-traxa-setup-card-v4.pending{--stc-electric-color:#00aaff!important}
+
+
+/* SIGNAL CARD FIRE V9 — animated flame texture INSIDE each colored card.
+   Replaces the previous lightning bolt between cards; content and signal logic stay untouched. */
+html body #marketPage #aurumSignalCards{
+  gap:8px!important;
+}
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+}
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  left:0!important;bottom:0!important;top:0!important;
+  width:100%!important;height:100%!important;
+  transform:none!important;
+  z-index:0!important;
+  border:0!important;
+  border-radius:inherit!important;
+  padding:0!important;
+  pointer-events:none!important;
+  opacity:.62!important;
+  filter:blur(3px) saturate(1.35)!important;
+  mix-blend-mode:screen!important;
+  background-size:190% 180%!important;
+  animation:stcSignalFireInside 2.9s ease-in-out infinite alternate!important;
+}
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4.win{
+  --stc-fire-a:rgba(0,255,128,.68);
+  --stc-fire-b:rgba(190,255,72,.62);
+  --stc-fire-c:rgba(0,190,92,.44);
+}
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4.loss{
+  --stc-fire-a:rgba(255,42,82,.7);
+  --stc-fire-b:rgba(255,172,65,.62);
+  --stc-fire-c:rgba(210,20,62,.48);
+}
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4.pending{
+  --stc-fire-a:rgba(0,174,255,.72);
+  --stc-fire-b:rgba(120,244,255,.66);
+  --stc-fire-c:rgba(38,112,255,.48);
+}
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4::before{
+  background-image:
+    radial-gradient(ellipse 8% 76% at 8% 112%,var(--stc-fire-a) 0%,transparent 76%),
+    radial-gradient(ellipse 10% 92% at 23% 116%,var(--stc-fire-b) 0%,transparent 74%),
+    radial-gradient(ellipse 8% 80% at 39% 112%,var(--stc-fire-c) 0%,transparent 76%),
+    radial-gradient(ellipse 11% 98% at 56% 118%,var(--stc-fire-a) 0%,transparent 74%),
+    radial-gradient(ellipse 8% 82% at 72% 112%,var(--stc-fire-b) 0%,transparent 76%),
+    radial-gradient(ellipse 10% 92% at 89% 116%,var(--stc-fire-c) 0%,transparent 74%),
+    linear-gradient(0deg,var(--stc-fire-a),transparent 58%)!important;
+}
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4 > *{
+  position:relative!important;
+  z-index:2!important;
+}
+@keyframes stcSignalFireInside{
+  0%{background-position:0% 100%;transform:scaleY(.92) skewX(-1deg);opacity:.42}
+  35%{background-position:38% 78%;transform:scaleY(1.04) skewX(1deg);opacity:.7}
+  68%{background-position:72% 95%;transform:scaleY(.96) skewX(-.7deg);opacity:.52}
+  100%{background-position:100% 72%;transform:scaleY(1.08) skewX(.8deg);opacity:.72}
+}
+/* No decorative lightning bolts in the gaps: the flame now lives within each card. */
+html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4:not(:last-child)::before{
+  background-image:
+    radial-gradient(ellipse 8% 76% at 8% 112%,var(--stc-fire-a) 0%,transparent 76%),
+    radial-gradient(ellipse 10% 92% at 23% 116%,var(--stc-fire-b) 0%,transparent 74%),
+    radial-gradient(ellipse 8% 80% at 39% 112%,var(--stc-fire-c) 0%,transparent 76%),
+    radial-gradient(ellipse 11% 98% at 56% 118%,var(--stc-fire-a) 0%,transparent 74%),
+    radial-gradient(ellipse 8% 82% at 72% 112%,var(--stc-fire-b) 0%,transparent 76%),
+    radial-gradient(ellipse 10% 92% at 89% 116%,var(--stc-fire-c) 0%,transparent 74%),
+    linear-gradient(0deg,var(--stc-fire-a),transparent 58%)!important;
+  background-size:190% 180%!important;
+  left:0!important;bottom:0!important;top:0!important;
+  width:100%!important;height:100%!important;
+  transform:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+  html body #marketPage #aurumSignalCards > button.stc-traxa-setup-card-v4::before{
+    animation:none!important;opacity:.38!important;
+  }
+}
