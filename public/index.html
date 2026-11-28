@@ -4627,6 +4627,33 @@ html,body{min-height:100%;}
 #marketPage #trendMeter .aurum-trend-footnote{font-size:9px!important;line-height:1.55!important;color:#607995!important;font-weight:650!important}
 @media(max-width:420px){#marketPage #trendMeter .aurum-reference-dashboard{padding:9px!important;gap:10px!important}#marketPage #trendMeter .aurum-reference-hero{padding:11px!important}#marketPage #trendMeter .aurum-reference-tf-grid{gap:4px!important}#marketPage #trendMeter .aurum-reference-tf{min-height:91px!important;padding:7px 2px!important}#marketPage #trendMeter .aurum-reference-ring{width:36px!important;height:36px!important}#marketPage #trendMeter .aurum-reference-table-head,#marketPage #trendMeter .aurum-reference-table-row{padding:8px 4px!important;gap:3px!important;font-size:7px!important}}
 </style>
+<style id="signature-technical-v2-style">
+#marketPage .nt-dashboard{display:grid;gap:12px;color:#17345b}
+#marketPage .nt-status{padding:12px;border:1px solid #cbdced;border-radius:12px;background:#f4f9ff;font-size:11px;font-weight:900}
+#marketPage .nt-hero{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:17px;border-radius:15px;background:linear-gradient(120deg,#0c2442,#17466c);color:#fff}
+#marketPage .nt-hero div{display:grid;gap:6px}#marketPage .nt-hero small{font-size:9px;letter-spacing:1px;color:#b9d4ec}
+#marketPage .nt-hero strong{font-size:clamp(25px,6vw,36px);color:#27d69a}#marketPage .nt-hero span{font-size:10px;color:#d2e1f1}#marketPage .nt-hero b{font-size:13px;white-space:nowrap}
+#marketPage .nt-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#marketPage .nt-tf{min-width:0;padding:10px;border:1px solid #c7d9ec;border-radius:12px;background:#fff;display:grid;gap:7px;box-shadow:0 2px 8px #183b5b0d}
+#marketPage .nt-tf header{min-height:0;padding:0;background:none;border:0;box-shadow:none;display:flex;justify-content:space-between;gap:3px}
+#marketPage .nt-tf header b{font-size:11px;color:#17345b}#marketPage .nt-tf header span{font-size:8px;font-weight:900}
+#marketPage .nt-tf .ok{color:#078b60}#marketPage .nt-tf .bad{color:#d34b5a}
+#marketPage .nt-tf>strong{font-size:13px}#marketPage .nt-tf .bullish{color:#07966a}#marketPage .nt-tf .bearish{color:#d64255}#marketPage .nt-tf .wait{color:#8a96a8}
+#marketPage .nt-tf small{font-size:9px;color:#64748b;overflow-wrap:anywhere}
+#marketPage .nt-section{padding:13px;border:1px solid #d2e0ef;border-radius:13px;background:#fff}
+#marketPage .nt-section h3{margin:0 0 10px;font-size:11px;letter-spacing:.4px;color:#23466c}
+#marketPage .nt-levels{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#marketPage .nt-level{display:grid;gap:5px;padding:11px;border-radius:10px;background:#f2f8fd}
+#marketPage .nt-level small{font-size:8px;font-weight:900;color:#64748b}#marketPage .nt-level b{font-size:14px;color:#173e66}#marketPage .nt-level span{font-size:9px;color:#64748b}
+#marketPage .nt-row{display:flex;flex-wrap:wrap;gap:6px 12px;padding:8px 0;border-bottom:1px solid #e7eef5;font-size:10px;color:#35516e}
+#marketPage .nt-row:last-child{border:0}#marketPage .nt-row b{color:#123d68}
+#marketPage .nt-table-wrap{overflow-x:auto}.nt-table{width:100%;border-collapse:collapse;font-size:9px;white-space:nowrap}
+#marketPage .nt-table th,#marketPage .nt-table td{padding:9px 7px;border-bottom:1px solid #e8eef5;text-align:left}
+#marketPage .nt-table th{background:#f2f7fc;color:#385878;font-size:8px}
+#marketPage .nt-errors{margin:0;font-size:9px;line-height:1.6;color:#687b91;overflow-wrap:anywhere}
+#marketPage .nt-refresh{margin-left:auto;padding:9px 11px;border:1px solid #b9d1e8;border-radius:10px;background:#eef6ff;color:#17466c;font-size:9px;font-weight:900}
+@media(max-width:480px){#marketPage .nt-cards{grid-template-columns:repeat(2,minmax(0,1fr))}#marketPage .nt-hero{align-items:flex-start}#marketPage .nt-levels{grid-template-columns:1fr}}
+</style>
 </head>
   
   
@@ -5096,14 +5123,15 @@ html,body{min-height:100%;}
     </section>
 
     <section class="aurum-signal-panel" data-signal-panel="analysis" role="tabpanel" hidden>
-      <div class="aurum-analysis-title"><span class="aurum-heading-icon">▥</span><div><strong>DATA TEKNIKAL</strong><small>Support · Resistance · Level kunci · Rentang harian</small></div></div>
-      <div class="aurum-analysis-card">
-        <div class="aurum-analysis-section"><p id="marketStructure">Menunggu analisis candle...</p></div>
-        <div class="aurum-analysis-section"><small class="aurum-section-kicker">METER TREN · 7 TIMEFRAME</small><div id="trendMeter"><p>Menunggu analisis tujuh timeframe...</p></div></div>
-        <div class="aurum-analysis-section aurum-daily-range-section"><div id="aurumDailyRange"><p>Menunggu data rentang harian D1...</p></div></div>
-        <div id="liquidityAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">LIQUIDITY</small><p id="liquidityAnalysis">Menunggu analisis liquidity...</p><small class="aurum-section-kicker">KONFIRMASI LIQUIDITY</small><p id="liquidityConfirmation">Menunggu konfirmasi liquidity...</p></div>
-        <div id="fvgAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">FAIR VALUE GAP · FVG</small><p id="fvgAnalysis">Menunggu analisis FVG...</p></div>
-        <div id="orderBlockAnalysisSection" class="aurum-analysis-section"><small class="aurum-section-kicker">ORDER BLOCK</small><p id="orderBlockAnalysis">Menunggu analisis Order Block...</p><p id="orderBlockMTF">Menunggu konfirmasi Order Block...</p><p id="orderBlockZone">Menunggu deteksi zona harga OB...</p></div>
+      <div class="aurum-analysis-title"><span class="aurum-heading-icon">▥</span><div><strong>DATA TEKNIKAL · ENGINE BARU</strong><small>Analisis candle tertutup · 7 timeframe · ICT / Smart Money</small></div><button type="button" id="newTechnicalRefresh" class="nt-refresh">↻ MUAT ULANG</button></div>
+      <div id="newTechnicalDashboard" class="nt-dashboard">
+        <div id="newTechnicalStatus" class="nt-status">MENGHUBUNGKAN KE PROVIDER…</div>
+        <div id="newTechnicalHero"></div>
+        <div id="newTechnicalCards" class="nt-cards"></div>
+        <div class="nt-section"><h3>SUPPORT & RESISTANCE · PIVOT BERULANG</h3><div id="newTechnicalLevels" class="nt-levels">Menunggu data…</div></div>
+        <div class="nt-section"><h3>SMART MONEY · SWEEP / FVG / RBS / SBR</h3><div id="newTechnicalSMC">Menunggu data…</div></div>
+        <div class="nt-section"><h3>RINGKASAN 7 TIMEFRAME</h3><div class="nt-table-wrap"><table class="nt-table"><thead><tr><th>TF</th><th>TREND</th><th>CLOSE</th><th>SUPPORT</th><th>RESISTANCE</th><th>STRUKTUR</th></tr></thead><tbody id="newTechnicalTable"></tbody></table></div></div>
+        <p id="newTechnicalErrors" class="nt-errors">Memeriksa data provider…</p>
       </div>
     </section>
   </section>
@@ -9330,6 +9358,8 @@ console.log('STATUS SERVER DIPERIKSA');
 
 
   
+
+<script src="/technical-engine-v2.js?v=1" defer></script>
 
 <!-- AURUM PWA SERVICE WORKER -->
 <script>
