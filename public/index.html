@@ -5961,31 +5961,117 @@ const el = document.getElementById('candleChart') || (function () {
   return fallback;
 })();
 console.log('CEK GRAFIK:', !!el, !!window.LightweightCharts);
-// Analisis teknikal harus tetap berjalan meskipun library grafik gagal dimuat.
+// Functional native-canvas fallback: never leave the chart blank if the
+// external Lightweight Charts CDN is blocked or unavailable.
 const noOp = function () {};
-const createFallbackSeries = function () {
-  return {
-    setData: noOp,
-    update: noOp,
-    createPriceLine: function () { return {}; },
-    removePriceLine: noOp,
-    priceToCoordinate: function () { return null; }
-  };
-};
+const fallbackSeriesList = [];
+let fallbackCanvas = null;
+let fallbackContext = null;
+let fallbackWidth = 0;
+let fallbackHeight = 520;
+function drawFallbackMarketChart() {
+  if (!fallbackContext || !fallbackCanvas) return;
+  const ctx = fallbackContext;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  fallbackCanvas.width = Math.floor(fallbackWidth * dpr);
+  fallbackCanvas.height = Math.floor(fallbackHeight * dpr);
+  fallbackCanvas.style.width = fallbackWidth + 'px';
+  fallbackCanvas.style.height = fallbackHeight + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, fallbackWidth, fallbackHeight);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, fallbackWidth, fallbackHeight);
+  const candles = (fallbackSeriesList.find(s => s.kind === 'candles') || {}).data || [];
+  const lines = fallbackSeriesList.filter(s => s.kind === 'line' && s.data.length);
+  if (!candles.length) {
+    ctx.fillStyle = '#8a94a6'; ctx.font = '12px sans-serif';
+    ctx.fillText('Menunggu data candle valid…', 16, 26); return;
+  }
+  const values = [];
+  candles.forEach(c => values.push(Number(c.high), Number(c.low)));
+  lines.forEach(s => s.data.forEach(p => values.push(Number(p.value))));
+  let min = Math.min.apply(null, values.filter(Number.isFinite));
+  let max = Math.max.apply(null, values.filter(Number.isFinite));
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return;
+  const pad = (max - min || Math.abs(max) * .002 || 1) * .08;
+  min -= pad; max += pad;
+  const left = 12, right = 62, top = 16, bottom = 26;
+  const plotW = Math.max(20, fallbackWidth - left - right);
+  const plotH = Math.max(20, fallbackHeight - top - bottom);
+  const y = v => top + (max - v) / (max - min) * plotH;
+  ctx.strokeStyle = '#edf0f5'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+  for (let i = 0; i <= 5; i++) {
+    const yy = top + plotH * i / 5;
+    ctx.beginPath(); ctx.moveTo(left, yy); ctx.lineTo(left + plotW, yy); ctx.stroke();
+    const price = max - (max - min) * i / 5;
+    ctx.fillText(price.toFixed(2), left + plotW + 7, yy + 3);
+  }
+  const step = plotW / Math.max(candles.length, 1);
+  const bodyW = Math.max(2, Math.min(12, step * .66));
+  candles.forEach((c, i) => {
+    const x = left + step * (i + .5);
+    const up = Number(c.close) >= Number(c.open);
+    const color = up ? '#2563eb' : '#ef4444';
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(x, y(Number(c.high))); ctx.lineTo(x, y(Number(c.low))); ctx.stroke();
+    const y1 = y(Math.max(Number(c.open), Number(c.close)));
+    const y2 = y(Math.min(Number(c.open), Number(c.close)));
+    ctx.fillRect(x - bodyW / 2, y1, bodyW, Math.max(1.5, y2 - y1));
+  });
+  lines.forEach(s => {
+    if (s.data.length < 2) return;
+    ctx.strokeStyle = s.options.color || '#159b72'; ctx.lineWidth = s.options.lineWidth || 2;
+    ctx.beginPath();
+    s.data.forEach((p, i) => {
+      const x = left + (Number(p.time) - Number(candles[0].time)) /
+        Math.max(1, Number(candles[candles.length - 1].time) - Number(candles[0].time)) * plotW;
+      if (i === 0) ctx.moveTo(x, y(Number(p.value))); else ctx.lineTo(x, y(Number(p.value)));
+    });
+    ctx.stroke();
+  });
+}
 const fallbackChart = {
-  addCandlestickSeries: createFallbackSeries,
-  addLineSeries: createFallbackSeries,
-  timeScale: function () {
+  addCandlestickSeries: function (options) {
+    const item = { kind: 'candles', options: options || {}, data: [] }; fallbackSeriesList.push(item);
     return {
-      fitContent: noOp,
-      timeToCoordinate: function () { return null; },
-      subscribeVisibleTimeRangeChange: noOp,
-      subscribeVisibleLogicalRangeChange: noOp
+      setData: data => { item.data = Array.isArray(data) ? data : []; drawFallbackMarketChart(); },
+      update: candle => { item.data.push(candle); drawFallbackMarketChart(); },
+      createPriceLine: () => ({}), removePriceLine: noOp, priceToCoordinate: () => null
     };
   },
-  applyOptions: noOp,
+  addLineSeries: function (options) {
+    const item = { kind: 'line', options: options || {}, data: [] }; fallbackSeriesList.push(item);
+    return {
+      setData: data => { item.data = Array.isArray(data) ? data : []; drawFallbackMarketChart(); },
+      update: point => { item.data.push(point); drawFallbackMarketChart(); },
+      createPriceLine: () => ({}), removePriceLine: noOp, priceToCoordinate: () => null
+    };
+  },
+  timeScale: function () {
+    return { fitContent: noOp, timeToCoordinate: () => null, subscribeVisibleTimeRangeChange: noOp, subscribeVisibleLogicalRangeChange: noOp };
+  },
+  resize: function (width, height) {
+    fallbackWidth = Math.max(100, Number(width) || el.clientWidth || 320);
+    fallbackHeight = Math.max(180, Number(height) || 520);
+    drawFallbackMarketChart();
+  },
+  applyOptions: function (opts) { if (opts && opts.height) fallbackHeight = opts.height; drawFallbackMarketChart(); },
   removeSeries: noOp
 };
+if (el) {
+  el.style.position = 'relative';
+  el.style.minHeight = '520px';
+  fallbackCanvas = document.createElement('canvas');
+  fallbackCanvas.setAttribute('aria-label', 'Grafik candle pasar');
+  fallbackCanvas.style.cssText = 'display:none;width:100%;height:520px;position:absolute;inset:0;';
+  el.appendChild(fallbackCanvas);
+  fallbackContext = fallbackCanvas.getContext('2d');
+  fallbackWidth = Math.max(100, el.clientWidth || 320);
+  if (!window.LightweightCharts) {
+    fallbackCanvas.style.display = 'block';
+    drawFallbackMarketChart();
+  }
+}
 if (el) {
   console.log('LIGHTWEIGHT CHARTS AKTIF');
   console.log('MASUK KE BLOK GRAFIK');
@@ -6018,7 +6104,7 @@ if (el) {
   // AURUM_CHART_RESIZE_RECOVERY_V1
   // Chart may initialize while its page is hidden; resize after it becomes visible.
   const resizeAurumChart = function () {
-    if (!el || !chart || chart === fallbackChart) return;
+    if (!el || !chart) return;
     const width = Math.floor(el.getBoundingClientRect().width || el.clientWidth || 0);
     if (width > 80) {
       try { chart.resize(width, 520); } catch (error) {
