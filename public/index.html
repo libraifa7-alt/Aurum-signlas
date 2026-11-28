@@ -8504,9 +8504,13 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
    if(!g){g={sum:0,count:0,last:-99};clusters.push(g);}
    if(p.index-g.last>=3){g.sum+=p.price;g.count++;g.last=p.index;}
   });
-  const valid=clusters.filter(x=>x.count>=2).map(x=>({price:x.sum/x.count,touches:x.count}));
-  valid.sort((a,b)=>kind==='SUPPORT'?b.price-a.price:a.price-b.price);
-  return valid[0]||null;
+  const confirmed=clusters.filter(x=>x.count>=2).map(x=>({price:x.sum/x.count,touches:x.count,confirmed:true}));
+  confirmed.sort((a,b)=>kind==='SUPPORT'?b.price-a.price:a.price-b.price);
+  if(confirmed.length)return confirmed[0];
+  // If no repeated zone exists, show the nearest confirmed swing as provisional,
+  // explicitly labelling it as a single pivot rather than pretending it is 2x S/R.
+  const single=candidates.slice().sort((a,b)=>kind==='SUPPORT'?b.price-a.price:a.price-b.price)[0];
+  return single?{price:single.price,touches:1,confirmed:false}:null;
  }
  async function refresh(){
   if(busy||!$('marketPage'))return;
@@ -8544,8 +8548,8 @@ $('aurumDetailFeedbackSend')?.addEventListener('click',()=>{const value=$('aurum
    const s=$('aurumNearestSupport'),r=$('aurumNearestResistance'),sd=$('aurumSupportDistance'),rd=$('aurumResistanceDistance');
    if(s)s.textContent=support?fmt(support.price):'--';
    if(r)r.textContent=resistance?fmt(resistance.price):'--';
-   if(sd)sd.textContent=support?fmt(Math.abs(last.close-support.price))+' pts below':'Level belum terkonfirmasi (pivot 2x)';
-   if(rd)rd.textContent=resistance?fmt(Math.abs(resistance.price-last.close))+' pts above':'Level belum terkonfirmasi (pivot 2x)';
+   if(sd)sd.textContent=support?fmt(Math.abs(last.close-support.price))+' pts below · '+(support.confirmed?'pivot 2x terkonfirmasi':'swing low · 1 pivot / sementara'):'Belum ada swing low valid';
+   if(rd)rd.textContent=resistance?fmt(Math.abs(resistance.price-last.close))+' pts above · '+(resistance.confirmed?'pivot 2x terkonfirmasi':'swing high · 1 pivot / sementara'):'Belum ada swing high valid';
    const state=$('.aurum-market-state');
    const closed=m15.marketStatus==='closed'||d1.marketStatus==='closed';
    if(state&&closed)state.textContent='● MARKET CLOSED';
